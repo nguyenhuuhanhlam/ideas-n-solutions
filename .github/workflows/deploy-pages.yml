@@ -27,6 +27,8 @@ jobs:
       # Pages của repo nằm dưới subpath /ideas-n-solutions/ nên phải build với base tương ứng
       - run: npm run build -- --base=/ideas-n-solutions/
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true # tự bật Pages (build type workflow) nếu repo chưa bật
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
