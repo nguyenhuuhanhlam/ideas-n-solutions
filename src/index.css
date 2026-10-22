@@ -1,0 +1,9 @@
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #11141a;
+  color: #e8ecf3;
+  overflow: hidden;
+}
+button:hover { filter: brightness(1.15); }
