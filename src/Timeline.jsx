@@ -251,8 +251,13 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
                 for (const s of t.subtasks) {
                   const sx1 = xOf(subMap ? subMap(s.start) : s.start + shift), sx2 = xOf(subMap ? subMap(s.end) : s.end + shift);
                   if (sx2 < -2 || sx1 > W + 2) continue;
-                  ctx.fillStyle = personColor; ctx.globalAlpha = isDim ? 0.3 : 0.45;
-                  rrect(ctx, sx1, sy, Math.max(2, sx2 - sx1 - 1.5), sh, 3); ctx.fill(); ctx.globalAlpha = 1;
+                  const subW = Math.max(2, sx2 - sx1 - 1.5);
+                  ctx.fillStyle = personColor; ctx.globalAlpha = isDim ? 0.18 : 0.3;
+                  rrect(ctx, sx1, sy, subW, sh, 3); ctx.fill();
+                  // phần đã xong của task con đậm hơn (tiến độ riêng của task con)
+                  const doneW = subW * (s.progress || 0);
+                  if (doneW > 1) { ctx.globalAlpha = isDim ? 0.3 : 0.85; rrect(ctx, sx1, sy, doneW, sh, 3); ctx.fill(); }
+                  ctx.globalAlpha = 1;
                   state.hits.push({ kind: "subtask", project: p, task: t, sub: s, x: Math.max(0, sx1), y: sy, w: Math.min(W, sx2) - Math.max(0, sx1), h: sh });
                   if (sx2 - sx1 > 56) {
                     ctx.save(); ctx.beginPath(); ctx.rect(sx1 + 4, sy, sx2 - sx1 - 6, sh); ctx.clip();
@@ -491,12 +496,12 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
       if (hit && hit.task) {
         const now = performance.now();
         const lt = state.lastTap;
-        if (lt && lt.id === hit.task.id && now - lt.t < 350 && Math.abs(x - lt.x) < 8 && Math.abs(y - lt.y) < 8) {
+        if (lt && lt.id === (hit.sub ? hit.sub.id : hit.task.id) && now - lt.t < 350 && Math.abs(x - lt.x) < 8 && Math.abs(y - lt.y) < 8) {
           state.lastTap = null;
-          if (onEditTaskRef.current) onEditTaskRef.current(hit.project, hit.task);
+          if (onEditTaskRef.current) onEditTaskRef.current(hit.project, hit.task, hit.sub || null);
           return;
         }
-        state.lastTap = { t: now, x, y, id: hit.task.id };
+        state.lastTap = { t: now, x, y, id: hit.sub ? hit.sub.id : hit.task.id };
       }
       const isTask = hit && (hit.kind === "task" || hit.kind === "subtask");
       const isSummary = hit && hit.kind === "project";
@@ -557,7 +562,9 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
       if (tip) {
         if (hit && hit.task) {
           const t = hit.task, person = personById(t.assigneeId);
-          tip.textContent = `${hit.kind === "subtask" ? `${t.name} › ${hit.sub.name}` : t.name}\n${person.name} · ${fmtDay(t.start)} → ${fmtDay(t.end)} · xong ${Math.round(t.progress * 100)}%`;
+          tip.textContent = hit.kind === "subtask"
+            ? `${t.name} › ${hit.sub.name}\n${person.name} · ${fmtDay(hit.sub.start)} → ${fmtDay(hit.sub.end)} · xong ${Math.round((hit.sub.progress || 0) * 100)}%`
+            : `${t.name}\n${person.name} · ${fmtDay(t.start)} → ${fmtDay(t.end)} · xong ${Math.round(t.progress * 100)}%`;
           tip.style.display = "block";
           tip.style.left = `${Math.min(x + 14, W - 240)}px`;
           tip.style.top = `${y + 16}px`;

@@ -87,6 +87,75 @@ function TaskForm({ project, task, onClose, onSave }) {
   );
 }
 
+// Form sửa task con — mở bằng bấm đúp vào thanh task con (hoặc nút Sửa
+// task con trong panel). Task con có nội dung riêng: tên đầu việc, mô tả
+// chi tiết, khoảng ngày, tiến độ. Ràng buộc: phải nằm gọn trong task chính
+// và không được chồng lên task con khác của cùng task chính.
+function SubtaskForm({ project, task, sub, onClose, onSave }) {
+  const [name, setName] = useState(sub.name);
+  const [note, setNote] = useState(sub.note || "");
+  const [startISO, setStartISO] = useState(isoOf(sub.start));
+  const [endISO, setEndISO] = useState(isoOf(sub.end));
+  const [progress, setProgress] = useState(Math.round((sub.progress || 0) * 100));
+  const [error, setError] = useState(null);
+
+  const submit = () => {
+    const s = dayOfISO(startISO), e = dayOfISO(endISO);
+    if (s == null || e == null) { setError("Ngày chưa hợp lệ."); return; }
+    if (e <= s) { setError("Ngày kết thúc phải sau ngày bắt đầu."); return; }
+    if (!name.trim()) { setError("Tên task con không được để trống."); return; }
+    if (s < task.start || e > task.end) {
+      setError(`Task con phải nằm trong khoảng của task chính "${task.name}" (${fmtDay(task.start)} → ${fmtDay(task.end)}).`);
+      return;
+    }
+    const clash = task.subtasks.find((o) => o.id !== sub.id && s < o.end && o.start < e);
+    if (clash) {
+      setError(`Chồng lên task con "${clash.name}" (${fmtDay(clash.start)} → ${fmtDay(clash.end)}) — các đầu việc của cùng một task không được trùng nhau.`);
+      return;
+    }
+    onSave({ name: name.trim(), note: note.trim(), start: s, end: e, progress: progress / 100 });
+  };
+
+  return (
+    <div onClick={(ev) => { if (ev.target === ev.currentTarget) onClose(); }}
+      style={{ position: "fixed", inset: 0, zIndex: 20, background: "rgba(4,6,10,0.62)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ width: 420, maxWidth: "92vw", background: "#171b24", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 14, padding: 18, boxShadow: "0 18px 48px rgba(0,0,0,0.55)" }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+          <div style={{ fontWeight: 700, fontSize: 15 }}>Sửa task con</div>
+          <button onClick={onClose} style={{ background: "none", border: "none", color: "#8b95a9", fontSize: 17, cursor: "pointer" }}>×</button>
+        </div>
+        <div style={{ fontSize: 12, color: "#8b95a9", marginTop: 2 }}>{project.name} › {task.name} · Người làm: {personById(task.assigneeId).name}</div>
+
+        <label style={labelStyle}>Tên đầu việc</label>
+        <input style={fieldStyle} value={name} onChange={(ev) => setName(ev.target.value)} />
+        <label style={labelStyle}>Nội dung chi tiết</label>
+        <textarea style={{ ...fieldStyle, resize: "vertical", minHeight: 64, fontFamily: "inherit", lineHeight: 1.5 }} rows={3}
+          value={note} onChange={(ev) => setNote(ev.target.value)} placeholder="Mô tả nội dung công việc, yêu cầu, sản phẩm bàn giao…" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          <div>
+            <label style={labelStyle}>Bắt đầu</label>
+            <input style={fieldStyle} type="date" value={startISO} onChange={(ev) => setStartISO(ev.target.value)} />
+          </div>
+          <div>
+            <label style={labelStyle}>Kết thúc</label>
+            <input style={fieldStyle} type="date" value={endISO} onChange={(ev) => setEndISO(ev.target.value)} />
+          </div>
+        </div>
+        <div style={{ fontSize: 12, color: "#8b95a9", marginTop: 6 }}>Phải nằm trong task chính: {fmtDay(task.start)} → {fmtDay(task.end)}</div>
+        <label style={labelStyle}>Tiến độ: {progress}%</label>
+        <input type="range" min="0" max="100" value={progress} onChange={(ev) => setProgress(+ev.target.value)} style={{ width: "100%", accentColor: "#ffd166" }} />
+        {error && (
+          <div style={{ marginTop: 12, background: "rgba(255,93,93,0.12)", border: "1px solid rgba(255,93,93,0.45)", color: "#ffb3b3", borderRadius: 8, padding: "8px 10px", fontSize: 12.5, lineHeight: 1.5 }}>{error}</div>
+        )}
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
+          <button onClick={onClose} style={{ background: "#232936", color: "#e8ecf3", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 8, padding: "8px 16px", fontSize: 13, cursor: "pointer" }}>Hủy</button>
+          <button onClick={submit} style={{ background: "#ffd166", color: "#16181d", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Lưu</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [sel, setSel] = useState(null);
   const [focusId, setFocusId] = useState(null);
@@ -133,6 +202,14 @@ export default function App() {
     project.start = Math.min(project.start, ...project.tasks.map((t) => t.start));
     project.end = Math.max(project.end, ...project.tasks.map((t) => t.end));
     setSel({ project, task });
+    setDataVersion((v) => v + 1);
+    setEditing(null);
+  };
+  // Lưu form sửa task con: ghi thẳng vào subtask đang chọn
+  const handleSaveSub = ({ name, note, start, end, progress }) => {
+    const { project, task, sub } = editing;
+    Object.assign(sub, { name, note, start, end, progress });
+    setSel({ project, task, sub });
     setDataVersion((v) => v + 1);
     setEditing(null);
   };
@@ -195,7 +272,7 @@ export default function App() {
       <main style={{ position: "relative", flex: 1, minWidth: 0 }}>
         <Timeline projects={PROJECTS} selectedId={sel?.task?.id || null} onSelect={setSel} hudRef={hudRef} controlsRef={controlsRef}
           focusedId={focusId} onLabelClick={handleLabelClick} onClearFocus={() => setFocusId(null)}
-          onEditTask={(p, t) => setEditing({ project: p, task: t })} dataVersion={dataVersion}
+          onEditTask={(p, t, s) => setEditing(s ? { kind: "sub", project: p, task: t, sub: s } : { kind: "task", project: p, task: t })} dataVersion={dataVersion}
           filterPersonId={filterPersonId} onPersonFilter={handlePersonFilter}
           soloProjectId={soloId} onProjectSolo={handleProjectSolo}
           onEscape={() => { setFocusId(null); setFilterPersonId(null); setSoloId(null); }} />
@@ -219,14 +296,30 @@ export default function App() {
                 <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,0.12)", margin: "8px 0 12px" }}>
                   <div style={{ height: "100%", borderRadius: 3, width: `${sel.task.progress * 100}%`, background: personById(sel.task.assigneeId).color }} />
                 </div>
-                <button onClick={() => setEditing({ project: sel.project, task: sel.task })}
+                <button onClick={() => setEditing({ kind: "task", project: sel.project, task: sel.task })}
                   style={{ background: "#2b3242", color: "#ffd166", border: "1px solid rgba(255,209,102,0.45)", borderRadius: 8, padding: "5px 12px", fontSize: 12.5, cursor: "pointer", margin: "2px 0 10px" }}>
                   Sửa task… <span style={{ color: "#8b95a9" }}>(hoặc bấm đúp vào thanh)</span>
                 </button>
-                <div style={{ fontSize: 11, color: "#8b95a9", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 6 }}>Task con ({sel.task.subtasks.length})</div>
+                {sel.sub && (
+                  <div style={{ background: "rgba(255,209,102,0.07)", border: "1px solid rgba(255,209,102,0.3)", borderRadius: 10, padding: "10px 12px", margin: "0 0 12px" }}>
+                    <div style={{ fontSize: 11, color: "#ffd166", textTransform: "uppercase", letterSpacing: 0.6 }}>Task con đang chọn</div>
+                    <div style={{ fontWeight: 700, fontSize: 14, margin: "3px 0 4px" }}>{sel.sub.name}</div>
+                    <div style={{ fontSize: 12.5, lineHeight: 1.7 }}>
+                      <div>Thời gian: {fmtDay(sel.sub.start)} → {fmtDay(sel.sub.end)}</div>
+                      <div>Tiến độ: {Math.round((sel.sub.progress || 0) * 100)}%</div>
+                      {sel.sub.note && <div style={{ color: "#c6cdd9" }}>Nội dung: {sel.sub.note}</div>}
+                    </div>
+                    <button onClick={() => setEditing({ kind: "sub", project: sel.project, task: sel.task, sub: sel.sub })}
+                      style={{ background: "#2b3242", color: "#ffd166", border: "1px solid rgba(255,209,102,0.45)", borderRadius: 8, padding: "5px 12px", fontSize: 12.5, cursor: "pointer", marginTop: 8 }}>
+                      Sửa task con… <span style={{ color: "#8b95a9" }}>(hoặc bấm đúp vào thanh task con)</span>
+                    </button>
+                  </div>
+                )}
+                <div style={{ fontSize: 11, color: "#8b95a9", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 6 }}>Task con ({sel.task.subtasks.length}) — bấm để chọn</div>
                 {sel.task.subtasks.map((s) => (
-                  <div key={s.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, padding: "3px 0", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                    <span>{s.name}</span><span style={{ color: "#8b95a9" }}>{fmtDay(s.start)} → {fmtDay(s.end)}</span>
+                  <div key={s.id} onClick={() => setSel({ project: sel.project, task: sel.task, sub: s })} title="Bấm để chọn task con này"
+                    style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, padding: "3px 4px", borderTop: "1px solid rgba(255,255,255,0.06)", cursor: "pointer", borderRadius: 4, background: sel.sub?.id === s.id ? "rgba(255,209,102,0.1)" : "transparent", color: sel.sub?.id === s.id ? "#ffd166" : "inherit" }}>
+                    <span>{s.name} · {Math.round((s.progress || 0) * 100)}%</span><span style={{ color: "#8b95a9" }}>{fmtDay(s.start)} → {fmtDay(s.end)}</span>
                   </div>
                 ))}
               </>
@@ -249,7 +342,7 @@ export default function App() {
           background: "rgba(16,19,26,0.9)", border: "1px solid rgba(255,255,255,0.1)",
           borderRadius: 8, padding: "6px 10px", fontSize: 12, color: "#aeb8c8",
         }}>
-          Lăn chuột: zoom về con trỏ · Kéo nền: pan (có quán tính) · Kéo thanh task: dời task · Kéo mép thanh task: đổi thời lượng (task con co/giãn theo) · Kéo thanh tổng ở mức thu nhỏ: dời cả project, kéo mép của nó: co/giãn cả project · Click tên project: nổi bật (xung quanh chuyển xám) · Bấm đúp vào task: mở form sửa · Icon phễu cạnh tên nhân viên: lọc riêng nhân viên đó · Icon khung ngắm ở cuối tên công trình: tập trung vào dự án, chia đôi màn hình xem chi tiết
+          Lăn chuột: zoom về con trỏ · Kéo nền: pan (có quán tính) · Kéo thanh task: dời task · Kéo mép thanh task: đổi thời lượng (task con co/giãn theo) · Kéo thanh tổng ở mức thu nhỏ: dời cả project, kéo mép của nó: co/giãn cả project · Click tên project: nổi bật (xung quanh chuyển xám) · Bấm đúp vào task/task con: mở form sửa nội dung · Icon phễu cạnh tên nhân viên: lọc riêng nhân viên đó · Icon khung ngắm ở cuối tên công trình: tập trung vào dự án, chia đôi màn hình xem chi tiết
         </footer>
       </main>
 
@@ -262,9 +355,13 @@ export default function App() {
       )}
       </div>
 
-      {editing && (
+      {editing?.kind === "task" && (
         <TaskForm key={editing.task.id} project={editing.project} task={editing.task}
           onClose={() => setEditing(null)} onSave={handleSaveEdit} />
+      )}
+      {editing?.kind === "sub" && (
+        <SubtaskForm key={editing.sub.id} project={editing.project} task={editing.task} sub={editing.sub}
+          onClose={() => setEditing(null)} onSave={handleSaveSub} />
       )}
     </div>
   );

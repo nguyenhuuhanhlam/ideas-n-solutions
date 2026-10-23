@@ -55,6 +55,15 @@ const TASK_NAMES = [
   "Giám sát hiện trường", "Kiểm định chất lượng", "Xử lý sự cố", "Tổng kết dự án",
 ];
 const SUB_NAMES = ["Chuẩn bị", "Thực hiện chính", "Kiểm tra", "Hoàn thiện", "Bàn giao"];
+// Nội dung chi tiết mẫu cho từng loại task con — người dùng sửa lại được
+// bằng form sửa task con (bấm đúp vào thanh task con).
+const SUB_NOTES = {
+  "Chuẩn bị": "Chuẩn bị hồ sơ, vật tư, thiết bị và nhân lực; rà soát điều kiện triển khai tại hiện trường.",
+  "Thực hiện chính": "Thực hiện phần việc chính theo bản vẽ và tiến độ đã duyệt; cập nhật nhật ký hằng ngày.",
+  "Kiểm tra": "Kiểm tra chất lượng, đo đạc đối chiếu thông số kỹ thuật; lập biên bản kiểm tra kèm ảnh chụp.",
+  "Hoàn thiện": "Khắc phục các tồn tại, hoàn thiện phần việc và hồ sơ; chuẩn bị nghiệm thu nội bộ.",
+  "Bàn giao": "Lập biên bản bàn giao, đóng gói hồ sơ hoàn công và chuyển giao cho bộ phận tiếp nhận.",
+};
 
 const PROJ_TYPES = ["Cấp nước", "Xử lý nước thải", "Khu dân cư", "Nhà máy", "Trường học", "Bệnh viện", "Cầu đường", "Khu công nghiệp", "Chung cư", "Trạm bơm"];
 const PROJ_LOCS = ["An Bình", "Sông Hậu", "Long An", "Tiền Giang", "Vĩnh Long", "Cần Thơ", "Đồng Tháp", "Hậu Giang", "Sóc Trăng", "Bến Tre"];
@@ -70,6 +79,8 @@ function makeSubtasks(task) {
   return weights.map((w, i) => {
     const len = i === n - 1 ? task.end - cursor : Math.max(1, Math.round((dur * w) / total));
     const sub = { id: `${task.id}s${i + 1}`, name: SUB_NAMES[i % SUB_NAMES.length], start: cursor, end: Math.min(task.end, cursor + len) };
+    sub.progress = sub.end <= TODAY ? 1 : sub.start >= TODAY ? 0 : Math.round(((TODAY - sub.start) / (sub.end - sub.start)) * 100) / 100;
+    sub.note = SUB_NOTES[sub.name] || "";
     cursor = sub.end;
     return sub;
   });
