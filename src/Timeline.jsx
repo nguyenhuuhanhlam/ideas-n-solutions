@@ -49,7 +49,7 @@ function grayOf(color) {
   return grayCache.get(color);
 }
 
-export default function Timeline({ projects, selectedId, onSelect, hudRef, controlsRef, focusedId, onLabelClick, onClearFocus }) {
+export default function Timeline({ projects, selectedId, onSelect, hudRef, controlsRef, focusedId, onLabelClick, onClearFocus, onEditTask, dataVersion }) {
   const hostRef = useRef(null);
   const tipRef = useRef(null);
   const onSelectRef = useRef(onSelect);
@@ -62,9 +62,11 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
   onLabelClickRef.current = onLabelClick;
   const onClearFocusRef = useRef(onClearFocus);
   onClearFocusRef.current = onClearFocus;
+  const onEditTaskRef = useRef(onEditTask);
+  onEditTaskRef.current = onEditTask;
   const redrawRef = useRef(null);
-  // Khi focus/chọn thay đổi từ bên ngoài (React state), báo vòng lặp vẽ lại ngay
-  useEffect(() => { if (redrawRef.current) redrawRef.current(); }, [focusedId, selectedId]);
+  // Khi focus/chọn/dữ liệu thay đổi từ bên ngoài (React state), báo vòng lặp vẽ lại ngay
+  useEffect(() => { if (redrawRef.current) redrawRef.current(); }, [focusedId, selectedId, dataVersion]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -76,7 +78,7 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
     const cam = { ppd: 2.6, leftDay: TODAY - (W / 2.6) * 0.35, scrollY: 0 };
     const heights = new Float64Array(projects.length).fill(30);
     const state = {
-      dirty: true, vel: { x: 0, y: 0 }, drag: null, hoverId: null,
+      dirty: true, vel: { x: 0, y: 0 }, drag: null, hoverId: null, lastTap: null,
       tween: null, frame: 0, lastLod: -1, hits: [],
     };
     const xOf = (day) => (day - cam.leftDay) * cam.ppd;
@@ -404,6 +406,19 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
       const rect = el.getBoundingClientRect();
       const x = e.clientX - rect.left, y = e.clientY - rect.top;
       const hit = y > AXIS_H ? hitAt(x, y) : null;
+      // Nhận diện bấm đúp vào task bằng tay (không phụ thuộc sự kiện dblclick
+      // của trình duyệt, vốn chập chờn với pointer capture): 2 lần nhấn vào
+      // cùng 1 task trong 350ms và lệch < 8px -> mở form sửa.
+      if (hit && hit.task) {
+        const now = performance.now();
+        const lt = state.lastTap;
+        if (lt && lt.id === hit.task.id && now - lt.t < 350 && Math.abs(x - lt.x) < 8 && Math.abs(y - lt.y) < 8) {
+          state.lastTap = null;
+          if (onEditTaskRef.current) onEditTaskRef.current(hit.project, hit.task);
+          return;
+        }
+        state.lastTap = { t: now, x, y, id: hit.task.id };
+      }
       const isTask = hit && (hit.kind === "task" || hit.kind === "subtask");
       const isSummary = hit && hit.kind === "project";
       state.drag = {
@@ -425,8 +440,8 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
         const dx = x - d.lastX, dy = y - d.lastY;
         d.lastX = x; d.lastY = y;
         if (Math.abs(x - d.startX) + Math.abs(y - d.startY) > 4) d.moved = true;
-        if (d.kind === "maybe-task" && d.moved && Math.abs(x - d.startX) > Math.abs(y - d.startY)) d.kind = d.edge ? "task-resize" : "task";
-        if (d.kind === "maybe-summary" && d.moved && Math.abs(x - d.startX) > Math.abs(y - d.startY)) d.kind = d.edge ? "summary-scale" : "summary-move";
+        if (d.kind === "maybe-task" && d.moved && Math.abs(x - d.startX) > Math.abs(y - d.startY)) { d.kind = d.edge ? "task-resize" : "task"; state.lastTap = null; }
+        if (d.kind === "maybe-summary" && d.moved && Math.abs(x - d.startX) > Math.abs(y - d.startY)) { d.kind = d.edge ? "summary-scale" : "summary-move"; state.lastTap = null; }
         if (d.kind === "pan") {
           cam.leftDay -= dx / cam.ppd; cam.scrollY -= dy;
           state.vel.x = state.vel.x * 0.6 + dx * 0.4;
@@ -562,7 +577,13 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
     }
     function onDbl(e) {
       const rect = el.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
+      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      // Bấm đúp trúng task/task con -> mở form sửa task đó; bấm đúp vùng trống -> phóng to
+      const hit = my > AXIS_H ? hitAt(mx, my) : null;
+      if (hit && hit.task) {
+        if (onEditTaskRef.current) onEditTaskRef.current(hit.project, hit.task);
+        return;
+      }
       startTween(cam.ppd * 1.8, { anchor: { day: dayAt(mx), x: mx }, dur: 380 });
     }
     el.addEventListener("wheel", onWheel, { passive: false });

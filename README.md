@@ -26,6 +26,7 @@ npm run dev
 | Kéo **mép** một thanh task | Đổi thời lượng của task tổng đó — các task con **co/giãn theo đúng tỉ lệ** |
 | Kéo **thanh tổng** của project (ở LOD 0) | Kéo thân: dời **toàn bộ project**; kéo mép: **co/giãn toàn bộ timeline của project** theo tỉ lệ quanh mép còn lại (mọi task/task con đi theo) |
 | Click thanh / project | Mở panel chi tiết bên phải |
+| **Bấm đúp vào một thanh task** (hoặc nút "Sửa task…" trong panel) | Mở **form sửa task**: tên, người làm (trong nhóm của project), ngày bắt đầu/kết thúc, tiến độ. Form chặn lưu khi khoảng mới trùng task khác của cùng người; task con tự co/giãn theo khoảng mới. Bấm đúp vào vùng trống vẫn là phóng to như trước |
 | Click **tên project** (nhãn dính mép trái) | **Nổi bật project đó**: mọi project xung quanh chuyển sang sắc xám (gray shade), chỉ project đang chọn giữ màu; click lại vào tên đó, click vùng trống, bấm `Esc` hoặc nút chip trên header để bỏ |
 | Nút trên header | Phóng to / Thu nhỏ / Về hôm nay / Toàn cảnh (chuyển động có tween) |
 
