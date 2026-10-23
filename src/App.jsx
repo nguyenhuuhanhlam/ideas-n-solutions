@@ -86,7 +86,7 @@ export default function App() {
           background: "rgba(16,19,26,0.9)", border: "1px solid rgba(255,255,255,0.1)",
           borderRadius: 8, padding: "6px 10px", fontSize: 12, color: "#aeb8c8",
         }}>
-          Lăn chuột: zoom về con trỏ · Kéo nền: pan (thả ra có quán tính) · Kéo thanh task: dời task · Double-click: phóng to · Click tên project: nổi bật project đó (xung quanh chuyển xám), click lại hoặc Esc để bỏ
+          Lăn chuột: zoom về con trỏ · Kéo nền: pan (có quán tính) · Kéo thanh task: dời task · Kéo mép thanh task: đổi thời lượng (task con co/giãn theo) · Kéo thanh tổng ở mức thu nhỏ: dời cả project, kéo mép của nó: co/giãn cả project · Click tên project: nổi bật (xung quanh chuyển xám)
         </footer>
       </main>
     </div>

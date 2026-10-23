@@ -142,19 +142,23 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
         ctx.beginPath(); ctx.moveTo(0, y + h - 0.5); ctx.lineTo(W, y + h - 0.5); ctx.stroke();
 
         if (lod === 0) {
-          // thanh tổng của project + tiến độ + mốc kết thúc từng task
-          const x1 = xOf(p.start), x2 = xOf(p.end);
+          // thanh tổng của project + tiến độ + mốc kết thúc từng task.
+          // Đang kéo thanh tổng: kéo thân = dời (shift), kéo mép = co/giãn theo tỉ lệ (map).
+          const dSum = state.drag && (state.drag.kind === "summary-move" || state.drag.kind === "summary-scale") && state.drag.project.id === p.id ? state.drag : null;
+          const mapDay = (d) => dSum && dSum.kind === "summary-scale" ? dSum.anchor + (d - dSum.anchor) * dSum.factor : dSum ? d + dSum.deltaDays : d;
+          const x1 = xOf(mapDay(p.start)), x2 = xOf(mapDay(p.end));
           if (x2 > -4 && x1 < W + 4) {
             const by = y + h / 2 - 7, bh = 14;
             ctx.fillStyle = "rgba(255,255,255,0.14)"; rrect(ctx, x1, by, Math.max(3, x2 - x1), bh, 7); ctx.fill();
             const prog = p.tasks.reduce((a, t) => a + t.progress, 0) / Math.max(1, p.tasks.length);
             ctx.fillStyle = pColor; rrect(ctx, x1, by, Math.max(3, (x2 - x1) * prog), bh, 7); ctx.fill();
+            if (dSum) { ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 1.6; rrect(ctx, x1 - 1, by - 1, (x2 - x1) + 2, bh + 2, 8); ctx.stroke(); }
             ctx.fillStyle = isDim ? "#8f97a5" : "#e8ecf3";
             for (const t of p.tasks) {
-              const mx = xOf(t.end);
+              const mx = xOf(mapDay(t.end));
               ctx.beginPath(); ctx.moveTo(mx, by + bh / 2 - 4); ctx.lineTo(mx + 4, by + bh / 2); ctx.lineTo(mx, by + bh / 2 + 4); ctx.lineTo(mx - 4, by + bh / 2); ctx.closePath(); ctx.fill();
             }
-            state.hits.push({ kind: "project", project: p, x: Math.max(0, x1), y: by, w: Math.min(W, x2) - Math.max(0, x1), h: bh });
+            state.hits.push({ kind: "project", project: p, x: Math.max(0, x1), y: by, w: Math.min(W, x2) - Math.max(0, x1), h: bh, sx1: x1, sx2: x2 });
           }
         } else {
           const rh = rowH(lod);
@@ -164,7 +168,17 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
             for (const t of p.tasks) {
               if (t.assigneeId !== pid) continue;
               const shift = dragTask && dragTask.task.id === t.id ? dragTask.deltaDays : 0;
-              const x1 = xOf(t.start + shift), x2 = xOf(t.end + shift);
+              // Đang kéo mép task tổng: đầu mép di chuyển, task con co/giãn theo tỉ lệ (subMap)
+              const dRes = state.drag && state.drag.kind === "task-resize" && state.drag.task.id === t.id ? state.drag : null;
+              let effS = t.start + shift, effE = t.end + shift, subMap = null;
+              if (dRes) {
+                if (dRes.edge === "end") { effE = Math.max(t.start + 1, dRes.day); effS = t.start; }
+                else { effS = Math.min(t.end - 1, dRes.day); effE = t.end; }
+                const anchor = dRes.edge === "end" ? t.start : t.end;
+                const f = (effE - effS) / (t.end - t.start);
+                subMap = (d) => anchor + (d - anchor) * f;
+              }
+              const x1 = xOf(effS), x2 = xOf(effE);
               if (x2 < -4 || x1 > W + 4) continue;
               rowHasVisible = true;
               const person = personById(pid);
@@ -183,7 +197,7 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
               if (selectedRef.current === t.id) {
                 ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 2; rrect(ctx, x1 - 1.5, ty - 1.5, (x2 - x1) + 3, th + 3, 6); ctx.stroke();
               }
-              state.hits.push({ kind: "task", project: p, task: t, x: Math.max(0, x1), y: ty, w: Math.min(W, x2) - Math.max(0, x1), h: th });
+              state.hits.push({ kind: "task", project: p, task: t, x: Math.max(0, x1), y: ty, w: Math.min(W, x2) - Math.max(0, x1), h: th, sx1: x1, sx2: x2 });
               // nhãn trong thanh khi đủ rộng & đủ sâu; thanh tràn mép trái thì
               // nhãn bắt đầu sau nhãn người làm để không bị cắt mất đầu chữ
               if (lod >= 2 && x2 - x1 > 74) {
@@ -200,7 +214,7 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
               if (lod === 3) {
                 const sy = ty + th + 3, sh = 12;
                 for (const s of t.subtasks) {
-                  const sx1 = xOf(s.start + shift), sx2 = xOf(s.end + shift);
+                  const sx1 = xOf(subMap ? subMap(s.start) : s.start + shift), sx2 = xOf(subMap ? subMap(s.end) : s.end + shift);
                   if (sx2 < -2 || sx1 > W + 2) continue;
                   ctx.fillStyle = personColor; ctx.globalAlpha = isDim ? 0.3 : 0.45;
                   rrect(ctx, sx1, sy, Math.max(2, sx2 - sx1 - 1.5), sh, 3); ctx.fill(); ctx.globalAlpha = 1;
@@ -346,7 +360,9 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
       const hits = state.hits;
       for (let i = hits.length - 1; i >= 0; i--) {
         const r = hits[i];
-        if (x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) return r;
+        // Thanh task/thanh tổng cho bắt chuột nới 6px hai đầu cho dễ nắm mép kéo
+        const pad = r.kind === "task" || r.kind === "project" ? 6 : 0;
+        if (x >= r.x - pad && x <= r.x + r.w + pad && y >= r.y && y <= r.y + r.h) return r;
       }
       return null;
     }
@@ -362,14 +378,27 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
       cam.leftDay = cursorDay - mx / cam.ppd; // điểm dưới con trỏ đứng yên — chỉ trục X đổi
       state.dirty = true;
     }
+    // Con trỏ nằm sát mép trái/phải của thanh (task hoặc thanh tổng) -> kéo mép
+    function edgeOf(hit, x) {
+      if (!hit || (hit.kind !== "task" && hit.kind !== "project") || hit.sx1 == null) return null;
+      if (hit.sx2 - hit.sx1 < 30) return null;
+      if (Math.abs(x - hit.sx1) <= 8) return "start";
+      if (Math.abs(x - hit.sx2) <= 8) return "end";
+      return null;
+    }
     function onDown(e) {
       const rect = el.getBoundingClientRect();
       const x = e.clientX - rect.left, y = e.clientY - rect.top;
       const hit = y > AXIS_H ? hitAt(x, y) : null;
+      const isTask = hit && (hit.kind === "task" || hit.kind === "subtask");
+      const isSummary = hit && hit.kind === "project";
       state.drag = {
-        kind: hit && (hit.kind === "task" || hit.kind === "subtask") ? "maybe-task" : "pan",
+        kind: isTask ? "maybe-task" : isSummary ? "maybe-summary" : "pan",
         hit, startX: x, startY: y, lastX: x, lastY: y,
         deltaDays: 0, moved: false, task: hit ? hit.task : null,
+        project: hit ? hit.project : null,
+        edge: isTask && hit.kind === "task" ? edgeOf(hit, x) : isSummary ? edgeOf(hit, x) : null,
+        day: 0, anchor: 0, factor: 1,
       };
       state.vel = { x: 0, y: 0 }; state.tween = null;
       el.setPointerCapture(e.pointerId);
@@ -382,14 +411,24 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
         const dx = x - d.lastX, dy = y - d.lastY;
         d.lastX = x; d.lastY = y;
         if (Math.abs(x - d.startX) + Math.abs(y - d.startY) > 4) d.moved = true;
-        if (d.kind === "maybe-task" && d.moved && Math.abs(x - d.startX) > Math.abs(y - d.startY)) d.kind = "task";
+        if (d.kind === "maybe-task" && d.moved && Math.abs(x - d.startX) > Math.abs(y - d.startY)) d.kind = d.edge ? "task-resize" : "task";
+        if (d.kind === "maybe-summary" && d.moved && Math.abs(x - d.startX) > Math.abs(y - d.startY)) d.kind = d.edge ? "summary-scale" : "summary-move";
         if (d.kind === "pan") {
           cam.leftDay -= dx / cam.ppd; cam.scrollY -= dy;
           state.vel.x = state.vel.x * 0.6 + dx * 0.4;
           state.vel.y = state.vel.y * 0.6 + dy * 0.4;
           el.style.cursor = "grabbing";
-        } else if (d.kind === "task") {
+        } else if (d.kind === "task" || d.kind === "summary-move") {
           d.deltaDays = Math.round((x - d.startX) / cam.ppd);
+          el.style.cursor = "ew-resize";
+        } else if (d.kind === "task-resize") {
+          d.day = Math.round(dayAt(x));
+          el.style.cursor = "ew-resize";
+        } else if (d.kind === "summary-scale") {
+          const p = d.project, span = p.end - p.start, pd = dayAt(x);
+          d.anchor = d.edge === "end" ? p.start : p.end;
+          const newSpan = d.edge === "end" ? pd - d.anchor : d.anchor - pd;
+          d.factor = clamp(newSpan / span, Math.max(0.3, 20 / span), 2.5);
           el.style.cursor = "ew-resize";
         }
         state.dirty = true;
@@ -399,12 +438,18 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
       const hit = y > AXIS_H ? hitAt(x, y) : null;
       const id = hit && hit.task ? hit.task.id : hit && hit.kind === "project" ? hit.project.id : null;
       if (id !== state.hoverId) { state.hoverId = id; state.dirty = true; }
-      el.style.cursor = hit ? "pointer" : "grab";
+      el.style.cursor = edgeOf(hit, x) ? "ew-resize" : hit ? "pointer" : "grab";
       const tip = tipRef.current;
       if (tip) {
         if (hit && hit.task) {
           const t = hit.task, person = personById(t.assigneeId);
           tip.textContent = `${hit.kind === "subtask" ? `${t.name} › ${hit.sub.name}` : t.name}\n${person.name} · ${fmtDay(t.start)} → ${fmtDay(t.end)} · xong ${Math.round(t.progress * 100)}%`;
+          tip.style.display = "block";
+          tip.style.left = `${Math.min(x + 14, W - 240)}px`;
+          tip.style.top = `${y + 16}px`;
+        } else if (hit && hit.kind === "project") {
+          const p = hit.project;
+          tip.textContent = `${p.name} (thanh tổng)\n${fmtDay(p.start)} → ${fmtDay(p.end)} · Kéo thân: dời cả project · Kéo mép: co/giãn thời gian`;
           tip.style.display = "block";
           tip.style.left = `${Math.min(x + 14, W - 240)}px`;
           tip.style.top = `${y + 16}px`;
@@ -423,6 +468,42 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
         p.start = Math.min(p.start, ...p.tasks.map((t2) => t2.start));
         p.end = Math.max(p.end, ...p.tasks.map((t2) => t2.end));
         if (selectedRef.current === t.id) onSelectRef.current({ project: p, task: t });
+      } else if (d.kind === "task-resize" && d.task) {
+        // Kéo mép task tổng: đổi thời lượng task, task con co/giãn theo tỉ lệ
+        const t = d.task, p = d.hit.project;
+        const anchor = d.edge === "end" ? t.start : t.end;
+        let effS = t.start, effE = t.end;
+        if (d.edge === "end") effE = Math.max(t.start + 1, d.day); else effS = Math.min(t.end - 1, d.day);
+        const f = (effE - effS) / (t.end - t.start);
+        const mapR = (v) => Math.round(anchor + (v - anchor) * f);
+        t.subtasks.forEach((s) => {
+          let ns = Math.max(effS, Math.min(effE - 1, mapR(s.start)));
+          let ne = Math.max(ns + 1, Math.min(effE, mapR(s.end)));
+          if (ne > effE) { ne = effE; ns = ne - 1; }
+          s.start = ns; s.end = ne;
+        });
+        t.start = effS; t.end = effE;
+        p.start = Math.min(p.start, ...p.tasks.map((t2) => t2.start));
+        p.end = Math.max(p.end, ...p.tasks.map((t2) => t2.end));
+        if (selectedRef.current === t.id) onSelectRef.current({ project: p, task: t });
+      } else if (d.kind === "summary-move" && d.deltaDays !== 0 && d.project) {
+        // Kéo thân thanh tổng: dời toàn bộ project (mọi task + task con)
+        const p = d.project, dd = d.deltaDays;
+        p.tasks.forEach((t) => { t.start += dd; t.end += dd; t.subtasks.forEach((s) => { s.start += dd; s.end += dd; }); });
+        p.start += dd; p.end += dd;
+        onSelectRef.current({ project: p, task: null });
+      } else if (d.kind === "summary-scale" && d.project && Math.abs(d.factor - 1) > 0.001) {
+        // Kéo mép thanh tổng: co/giãn toàn bộ timeline project theo tỉ lệ quanh mép cố định
+        const p = d.project, anchor = d.anchor, f = d.factor;
+        const mapR = (v) => Math.round(anchor + (v - anchor) * f);
+        p.tasks.forEach((t) => {
+          t.subtasks.forEach((s) => { s.start = mapR(s.start); s.end = Math.max(s.start + 1, mapR(s.end)); });
+          const ns = mapR(t.start);
+          t.end = Math.max(ns + 1, mapR(t.end)); t.start = ns;
+        });
+        p.start = Math.min(...p.tasks.map((t) => t.start));
+        p.end = Math.max(...p.tasks.map((t) => t.end));
+        onSelectRef.current({ project: p, task: null });
       } else if (!d.moved) {
         // click chọn; click đúng nhãn tên project = bật/tắt nổi bật project đó
         const rect = el.getBoundingClientRect();
