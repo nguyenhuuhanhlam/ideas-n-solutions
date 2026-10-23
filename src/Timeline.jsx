@@ -49,7 +49,7 @@ function grayOf(color) {
   return grayCache.get(color);
 }
 
-export default function Timeline({ projects, selectedId, onSelect, hudRef, controlsRef, focusedId, onLabelClick, onClearFocus, onEditTask, dataVersion, filterPersonId, onPersonFilter, onEscape }) {
+export default function Timeline({ projects, selectedId, onSelect, hudRef, controlsRef, focusedId, onLabelClick, onClearFocus, onEditTask, dataVersion, filterPersonId, onPersonFilter, onEscape, soloProjectId, onProjectSolo }) {
   const hostRef = useRef(null);
   const tipRef = useRef(null);
   const onSelectRef = useRef(onSelect);
@@ -70,9 +70,13 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
   onPersonFilterRef.current = onPersonFilter;
   const onEscapeRef = useRef(onEscape);
   onEscapeRef.current = onEscape;
+  const soloRef = useRef(soloProjectId);
+  soloRef.current = soloProjectId;
+  const onProjectSoloRef = useRef(onProjectSolo);
+  onProjectSoloRef.current = onProjectSolo;
   const redrawRef = useRef(null);
-  // Khi focus/chọn/dữ liệu/lọc thay đổi từ bên ngoài (React state), báo vòng lặp vẽ lại ngay
-  useEffect(() => { if (redrawRef.current) redrawRef.current(); }, [focusedId, selectedId, dataVersion, filterPersonId]);
+  // Khi focus/chọn/dữ liệu/lọc/tập trung thay đổi từ bên ngoài, báo vòng lặp vẽ lại ngay
+  useEffect(() => { if (redrawRef.current) redrawRef.current(); }, [focusedId, selectedId, dataVersion, filterPersonId, soloProjectId]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -91,11 +95,14 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
     const dayAt = (x) => cam.leftDay + x / cam.ppd;
 
     function rowH(lod) { return lod === 0 ? 30 : lod === 1 ? 19 : lod === 2 ? 28 : 47; }
-    // Danh sách project đang hiển thị: khi lọc theo 1 nhân viên thì chỉ còn
-    // các project mà nhân viên đó có task.
+    // Danh sách project đang hiển thị: chế độ tập trung -> chỉ 1 project đó;
+    // lọc theo 1 nhân viên -> chỉ các project mà nhân viên đó có task.
     function visibleList() {
+      const solo = soloRef.current;
+      let list = solo ? projects.filter((p) => p.id === solo) : projects;
       const fp = filterRef.current;
-      return fp ? projects.filter((p) => p.tasks.some((t) => t.assigneeId === fp)) : projects;
+      if (fp) list = list.filter((p) => p.tasks.some((t) => t.assigneeId === fp));
+      return list;
     }
     function targetHeight(p, lod) {
       if (lod === 0) return 30;
@@ -278,15 +285,28 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
             }
           });
         }
-        // nhãn project — dính mép trái, bấm vào để nổi bật project này
+        // nhãn project — dính mép trái, bấm vào để nổi bật project này.
+        // Cuối nhãn có nút "tập trung" (icon khung ngắm): mở chế độ chia đôi
+        // màn hình, timeline chỉ còn project này + panel chi tiết bên phải.
         const label = `${String(i + 1).padStart(3, "0")} · ${p.name}`;
+        const isSolo = soloRef.current === p.id;
         ctx.fillStyle = "rgba(18,21,28,0.94)"; rrect(ctx, 6, y + 3, 196, 17, 8.5); ctx.fill();
-        if (isFocused) { ctx.strokeStyle = p.color; ctx.lineWidth = 1.6; rrect(ctx, 6, y + 3, 196, 17, 8.5); ctx.stroke(); }
+        if (isFocused || isSolo) { ctx.strokeStyle = isSolo ? "#8ab8ff" : p.color; ctx.lineWidth = 1.6; rrect(ctx, 6, y + 3, 196, 17, 8.5); ctx.stroke(); }
         ctx.fillStyle = pColor; ctx.beginPath(); ctx.arc(15, y + 11.5, 4.5, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = isDim ? "#98a1b1" : "#eef1f7"; ctx.font = "600 11px Inter, system-ui, sans-serif";
         ctx.textAlign = "left"; ctx.textBaseline = "middle";
         ctx.fillText(label, 23, y + 12);
         state.hits.push({ kind: "projectLabel", project: p, x: 6, y: y + 3, w: 196, h: 17 });
+        // nút tập trung: 4 góc khung ngắm ở cuối nhãn
+        const bx = 182, byy = y + 6.5, s = 10, c = 3.6;
+        ctx.strokeStyle = isSolo ? "#8ab8ff" : "rgba(203,211,224,0.85)"; ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(bx, byy + c); ctx.lineTo(bx, byy); ctx.lineTo(bx + c, byy);
+        ctx.moveTo(bx + s - c, byy); ctx.lineTo(bx + s, byy); ctx.lineTo(bx + s, byy + c);
+        ctx.moveTo(bx + s, byy + s - c); ctx.lineTo(bx + s, byy + s); ctx.lineTo(bx + s - c, byy + s);
+        ctx.moveTo(bx + c, byy + s); ctx.lineTo(bx, byy + s); ctx.lineTo(bx, byy + s - c);
+        ctx.stroke();
+        state.hits.push({ kind: "projectSolo", project: p, x: 174, y: y + 3, w: 28, h: 17 });
       }
 
       // đường hôm nay
@@ -530,6 +550,13 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
           tip.style.display = "block";
           tip.style.left = `${Math.min(x + 14, W - 240)}px`;
           tip.style.top = `${y + 16}px`;
+        } else if (hit && hit.kind === "projectSolo") {
+          tip.textContent = soloRef.current === hit.project.id
+            ? `Thoát chế độ tập trung dự án`
+            : `Tập trung vào ${hit.project.name}: chia đôi màn hình — timeline bên trái, chi tiết dự án bên phải`;
+          tip.style.display = "block";
+          tip.style.left = `${Math.min(x + 14, W - 240)}px`;
+          tip.style.top = `${y + 16}px`;
         } else tip.style.display = "none";
       }
     }
@@ -603,7 +630,8 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
         // click chọn; click đúng nhãn tên project = bật/tắt nổi bật project đó
         const rect = el.getBoundingClientRect();
         const hit = hitAt(e.clientX - rect.left, e.clientY - rect.top);
-        if (hit && hit.kind === "projectLabel") onLabelClickRef.current && onLabelClickRef.current(hit.project);
+        if (hit && hit.kind === "projectSolo") onProjectSoloRef.current && onProjectSoloRef.current(hit.project);
+        else if (hit && hit.kind === "projectLabel") onLabelClickRef.current && onLabelClickRef.current(hit.project);
         else if (hit && hit.kind === "personFilter") onPersonFilterRef.current && onPersonFilterRef.current(hit.personId);
         else if (hit && hit.task) onSelectRef.current({ project: hit.project, task: hit.task, sub: hit.sub || null });
         else if (hit && hit.kind === "project") onSelectRef.current({ project: hit.project, task: null });
