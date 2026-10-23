@@ -330,28 +330,30 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
           ctx.fillText(`${dt.getUTCFullYear()}`, x, 27);
           continue;
         }
-        // Nhãn tick = ô tròn nhỏ ghi THỨ trong tuần (2..7, Chủ nhật = N — dùng
-        // N thay S vì S khi thu nhỏ trông giống số 5, dễ nhầm) + ngày.
-        // Cuối tuần tô màu riêng (Thứ 7 cam, Chủ nhật đỏ) cho dễ cảm nhận nhịp tuần.
+        // Nhãn tick = ô nhỏ ghi tên tắt của thứ (Mon/Tue/Wed/Thu/Fri/Sat/Sun)
+        // + ngày tháng. Cách ghi số 2..7/N trước đây gây nhầm (N giống 5 khi
+        // thu nhỏ, các số thứ khó liên tưởng) nên đổi hẳn sang tên tắt tiếng Anh.
+        // Cuối tuần tô màu riêng (Sat cam, Sun đỏ) cho dễ cảm nhận nhịp tuần.
+        const DOW_ABBR = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         const dow = dt.getUTCDay();
-        const dowChar = dow === 0 ? "N" : String(dow + 1);
+        const dowAbbr = DOW_ABBR[dow];
         const dateText = interval >= 30
           ? `${dt.getUTCDate()}/${dt.getUTCMonth() + 1}/${dt.getUTCFullYear()}`
           : `${dt.getUTCDate()}/${dt.getUTCMonth() + 1}`;
         ctx.font = "11px Inter, system-ui, sans-serif";
         const textW = ctx.measureText(dateText).width;
-        const badgeR = 7.5, gap = 4;
-        const startX = x - (badgeR * 2 + gap + textW) / 2;
-        const bcx = startX + badgeR, bcy = 27;
+        ctx.font = "700 8.5px Inter, system-ui, sans-serif";
+        const badgeW = ctx.measureText(dowAbbr).width + 10, badgeH = 15, gap = 4;
+        const startX = x - (badgeW + gap + textW) / 2;
+        const bcy = 27;
         ctx.fillStyle = dow === 0 ? "#e5534b" : dow === 6 ? "#d9932c" : "rgba(255,255,255,0.16)";
-        ctx.beginPath(); ctx.arc(bcx, bcy, badgeR, 0, Math.PI * 2); ctx.fill();
-        if (d === TODAY) { ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(bcx, bcy, badgeR + 0.8, 0, Math.PI * 2); ctx.stroke(); }
+        rrect(ctx, startX, bcy - badgeH / 2, badgeW, badgeH, badgeH / 2); ctx.fill();
+        if (d === TODAY) { ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 1.6; rrect(ctx, startX - 0.8, bcy - badgeH / 2 - 0.8, badgeW + 1.6, badgeH + 1.6, badgeH / 2); ctx.stroke(); }
         ctx.fillStyle = dow === 0 || dow === 6 ? "#ffffff" : "#dfe5ef";
-        ctx.font = "700 9px Inter, system-ui, sans-serif";
-        ctx.fillText(dowChar, bcx, bcy + 0.5);
+        ctx.fillText(dowAbbr, startX + badgeW / 2, bcy + 0.5);
         ctx.fillStyle = "#aeb8c8"; ctx.font = "11px Inter, system-ui, sans-serif";
         ctx.textAlign = "left";
-        ctx.fillText(dateText, startX + badgeR * 2 + gap, bcy);
+        ctx.fillText(dateText, startX + badgeW + gap, bcy);
         ctx.textAlign = "center";
       }
       ctx.fillStyle = "#8b95a9"; ctx.font = "600 10px Inter, system-ui, sans-serif"; ctx.textAlign = "left";
