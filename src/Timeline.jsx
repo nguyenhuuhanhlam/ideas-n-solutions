@@ -38,13 +38,33 @@ function rrect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-export default function Timeline({ projects, selectedId, onSelect, hudRef, controlsRef }) {
+// Đổi một màu hsl(...) thành sắc xám tương ứng (giữ nguyên độ sáng) cho chế độ
+// làm mờ các project xung quanh khi một project đang được nổi bật.
+const grayCache = new Map();
+function grayOf(color) {
+  if (!grayCache.has(color)) {
+    const m = /hsl\([\d.]+ ([\d.]+)% ([\d.]+)%\)/.exec(color);
+    grayCache.set(color, m ? `hsl(0 0% ${m[2]}%)` : "#7d8590");
+  }
+  return grayCache.get(color);
+}
+
+export default function Timeline({ projects, selectedId, onSelect, hudRef, controlsRef, focusedId, onLabelClick, onClearFocus }) {
   const hostRef = useRef(null);
   const tipRef = useRef(null);
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
   const selectedRef = useRef(selectedId);
   selectedRef.current = selectedId;
+  const focusedRef = useRef(focusedId);
+  focusedRef.current = focusedId;
+  const onLabelClickRef = useRef(onLabelClick);
+  onLabelClickRef.current = onLabelClick;
+  const onClearFocusRef = useRef(onClearFocus);
+  onClearFocusRef.current = onClearFocus;
+  const redrawRef = useRef(null);
+  // Khi focus/chọn thay đổi từ bên ngoài (React state), báo vòng lặp vẽ lại ngay
+  useEffect(() => { if (redrawRef.current) redrawRef.current(); }, [focusedId, selectedId]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -108,11 +128,16 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
       const lay = layout();
       const dragTask = state.drag && state.drag.kind === "task" ? state.drag : null;
 
+      const focusedIdNow = focusedRef.current;
       for (let i = 0; i < projects.length; i++) {
         const p = projects[i]; const { y, h } = lay[i];
         if (y + h < AXIS_H || y > H) continue;
-        ctx.fillStyle = i % 2 ? "rgba(255,255,255,0.045)" : "rgba(255,255,255,0.018)";
+        const isFocused = !!focusedIdNow && focusedIdNow === p.id;
+        const isDim = !!focusedIdNow && !isFocused;
+        const pColor = isDim ? grayOf(p.color) : p.color;
+        ctx.fillStyle = isFocused ? "rgba(255,255,255,0.075)" : i % 2 ? "rgba(255,255,255,0.045)" : "rgba(255,255,255,0.018)";
         ctx.fillRect(0, y, W, h);
+        if (isFocused) { ctx.fillStyle = p.color; ctx.fillRect(0, y, 3, h); }
         ctx.strokeStyle = "rgba(255,255,255,0.09)";
         ctx.beginPath(); ctx.moveTo(0, y + h - 0.5); ctx.lineTo(W, y + h - 0.5); ctx.stroke();
 
@@ -123,8 +148,8 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
             const by = y + h / 2 - 7, bh = 14;
             ctx.fillStyle = "rgba(255,255,255,0.14)"; rrect(ctx, x1, by, Math.max(3, x2 - x1), bh, 7); ctx.fill();
             const prog = p.tasks.reduce((a, t) => a + t.progress, 0) / Math.max(1, p.tasks.length);
-            ctx.fillStyle = p.color; rrect(ctx, x1, by, Math.max(3, (x2 - x1) * prog), bh, 7); ctx.fill();
-            ctx.fillStyle = "#e8ecf3";
+            ctx.fillStyle = pColor; rrect(ctx, x1, by, Math.max(3, (x2 - x1) * prog), bh, 7); ctx.fill();
+            ctx.fillStyle = isDim ? "#8f97a5" : "#e8ecf3";
             for (const t of p.tasks) {
               const mx = xOf(t.end);
               ctx.beginPath(); ctx.moveTo(mx, by + bh / 2 - 4); ctx.lineTo(mx + 4, by + bh / 2); ctx.lineTo(mx, by + bh / 2 + 4); ctx.lineTo(mx - 4, by + bh / 2); ctx.closePath(); ctx.fill();
@@ -143,11 +168,12 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
               if (x2 < -4 || x1 > W + 4) continue;
               rowHasVisible = true;
               const person = personById(pid);
+              const personColor = isDim ? grayOf(person.color) : person.color;
               const th = lod === 1 ? 13 : lod === 2 ? 20 : 22;
               const ty = ry + (rh - (lod === 3 ? 38 : th)) / 2;
               // thanh task
-              ctx.globalAlpha = state.hoverId === t.id || selectedRef.current === t.id ? 1 : 0.88;
-              ctx.fillStyle = person.color; rrect(ctx, x1, ty, Math.max(3, x2 - x1), th, 5); ctx.fill();
+              ctx.globalAlpha = isDim ? 0.5 : state.hoverId === t.id || selectedRef.current === t.id ? 1 : 0.88;
+              ctx.fillStyle = personColor; rrect(ctx, x1, ty, Math.max(3, x2 - x1), th, 5); ctx.fill();
               ctx.globalAlpha = 1;
               // tiến độ
               if (t.progress > 0) {
@@ -176,7 +202,7 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
                 for (const s of t.subtasks) {
                   const sx1 = xOf(s.start + shift), sx2 = xOf(s.end + shift);
                   if (sx2 < -2 || sx1 > W + 2) continue;
-                  ctx.fillStyle = person.color; ctx.globalAlpha = 0.45;
+                  ctx.fillStyle = personColor; ctx.globalAlpha = isDim ? 0.3 : 0.45;
                   rrect(ctx, sx1, sy, Math.max(2, sx2 - sx1 - 1.5), sh, 3); ctx.fill(); ctx.globalAlpha = 1;
                   state.hits.push({ kind: "subtask", project: p, task: t, sub: s, x: Math.max(0, sx1), y: sy, w: Math.min(W, sx2) - Math.max(0, sx1), h: sh });
                   if (sx2 - sx1 > 56) {
@@ -192,20 +218,22 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
             if (lod >= 2 && rowHasVisible) {
               const person = personById(pid);
               ctx.fillStyle = "rgba(24,28,37,0.92)"; rrect(ctx, 6, ry + 2, 118, 16, 8); ctx.fill();
-              ctx.fillStyle = person.color; ctx.beginPath(); ctx.arc(15, ry + 10, 4.5, 0, Math.PI * 2); ctx.fill();
-              ctx.fillStyle = "#cfd6e4"; ctx.font = "10.5px Inter, system-ui, sans-serif";
+              ctx.fillStyle = isDim ? grayOf(person.color) : person.color; ctx.beginPath(); ctx.arc(15, ry + 10, 4.5, 0, Math.PI * 2); ctx.fill();
+              ctx.fillStyle = isDim ? "#79828f" : "#cfd6e4"; ctx.font = "10.5px Inter, system-ui, sans-serif";
               ctx.textAlign = "left"; ctx.textBaseline = "middle";
               ctx.fillText(person.name, 23, ry + 10.5);
             }
           });
         }
-        // nhãn project — dính mép trái
+        // nhãn project — dính mép trái, bấm vào để nổi bật project này
         const label = `${String(i + 1).padStart(3, "0")} · ${p.name}`;
         ctx.fillStyle = "rgba(18,21,28,0.94)"; rrect(ctx, 6, y + 3, 196, 17, 8.5); ctx.fill();
-        ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(15, y + 11.5, 4.5, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = "#eef1f7"; ctx.font = "600 11px Inter, system-ui, sans-serif";
+        if (isFocused) { ctx.strokeStyle = p.color; ctx.lineWidth = 1.6; rrect(ctx, 6, y + 3, 196, 17, 8.5); ctx.stroke(); }
+        ctx.fillStyle = pColor; ctx.beginPath(); ctx.arc(15, y + 11.5, 4.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = isDim ? "#98a1b1" : "#eef1f7"; ctx.font = "600 11px Inter, system-ui, sans-serif";
         ctx.textAlign = "left"; ctx.textBaseline = "middle";
         ctx.fillText(label, 23, y + 12);
+        state.hits.push({ kind: "projectLabel", project: p, x: 6, y: y + 3, w: 196, h: 17 });
       }
 
       // đường hôm nay
@@ -244,6 +272,7 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
     const shape = new Konva.Shape({ sceneFunc: (ctx) => draw(ctx), hitFunc: () => {} });
     shape.listening(false);
     layer.add(shape);
+    redrawRef.current = () => { state.dirty = true; };
 
     // ---------- VÒNG LẶP ----------
     let raf = 0;
@@ -395,14 +424,22 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
         p.end = Math.max(p.end, ...p.tasks.map((t2) => t2.end));
         if (selectedRef.current === t.id) onSelectRef.current({ project: p, task: t });
       } else if (!d.moved) {
-        // click chọn
+        // click chọn; click đúng nhãn tên project = bật/tắt nổi bật project đó
         const rect = el.getBoundingClientRect();
         const hit = hitAt(e.clientX - rect.left, e.clientY - rect.top);
-        if (hit && hit.task) onSelectRef.current({ project: hit.project, task: hit.task, sub: hit.sub || null });
+        if (hit && hit.kind === "projectLabel") onLabelClickRef.current && onLabelClickRef.current(hit.project);
+        else if (hit && hit.task) onSelectRef.current({ project: hit.project, task: hit.task, sub: hit.sub || null });
         else if (hit && hit.kind === "project") onSelectRef.current({ project: hit.project, task: null });
-        else onSelectRef.current(null);
+        else { onSelectRef.current(null); if (onClearFocusRef.current) onClearFocusRef.current(); }
       }
       state.dirty = true;
+    }
+    function onKey(e) {
+      if (e.key === "Escape") {
+        if (onClearFocusRef.current) onClearFocusRef.current();
+        onSelectRef.current(null);
+        state.dirty = true;
+      }
     }
     function onDbl(e) {
       const rect = el.getBoundingClientRect();
@@ -414,6 +451,7 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
     el.addEventListener("pointermove", onMove);
     el.addEventListener("pointerup", onUp);
     el.addEventListener("dblclick", onDbl);
+    window.addEventListener("keydown", onKey);
 
     const ro = new ResizeObserver(() => {
       W = host.clientWidth; H = host.clientHeight;
@@ -430,6 +468,7 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
       el.removeEventListener("pointermove", onMove);
       el.removeEventListener("pointerup", onUp);
       el.removeEventListener("dblclick", onDbl);
+      window.removeEventListener("keydown", onKey);
       stage.destroy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

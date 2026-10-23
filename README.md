@@ -24,6 +24,7 @@ npm run dev
 | Double-click | Phóng to tại điểm click |
 | Kéo một thanh task | Dời task đó (task con đi theo), ngày bắt đầu/kết thúc cập nhật trong panel |
 | Click thanh / project | Mở panel chi tiết bên phải |
+| Click **tên project** (nhãn dính mép trái) | **Nổi bật project đó**: mọi project xung quanh chuyển sang sắc xám (gray shade), chỉ project đang chọn giữ màu; click lại vào tên đó, click vùng trống, bấm `Esc` hoặc nút chip trên header để bỏ |
 | Nút trên header | Phóng to / Thu nhỏ / Về hôm nay / Toàn cảnh (chuyển động có tween) |
 
 ### Mô hình đã chốt khi thảo luận (và đã áp vào bản mẫu)

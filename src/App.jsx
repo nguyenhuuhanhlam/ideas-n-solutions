@@ -4,8 +4,15 @@ import { PROJECTS, fmtDay, personById } from "./data";
 
 export default function App() {
   const [sel, setSel] = useState(null);
+  const [focusId, setFocusId] = useState(null);
   const hudRef = useRef(null);
   const controlsRef = useRef(null);
+  const focusedProject = PROJECTS.find((p) => p.id === focusId) || null;
+  // Bấm tên project: nổi bật project đó (xung quanh chuyển xám); bấm lại thì bỏ.
+  const handleLabelClick = (p) => {
+    setSel({ project: p, task: null });
+    setFocusId((prev) => (prev === p.id ? null : p.id));
+  };
 
   const btn = {
     background: "#232936", color: "#e8ecf3", border: "1px solid rgba(255,255,255,0.14)",
@@ -19,7 +26,13 @@ export default function App() {
           <div style={{ fontWeight: 700, fontSize: 16 }}>Timeline Projects — bản mẫu test</div>
           <div style={{ fontSize: 12, color: "#8b95a9" }}>100 project xếp lớp trên 1 trục thời gian · dữ liệu giả · task song song theo người làm</div>
         </div>
-        <span ref={hudRef} style={{ fontSize: 12, color: "#aeb8c8", whiteSpace: "nowrap", marginLeft: "auto" }} />
+        {focusedProject && (
+          <button onClick={() => setFocusId(null)} title="Bỏ nổi bật"
+            style={{ marginLeft: "auto", background: "#2b3242", color: "#ffd166", border: "1px solid rgba(255,209,102,0.5)", borderRadius: 999, padding: "5px 12px", fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap" }}>
+            Đang nổi bật: {focusedProject.name} ×
+          </button>
+        )}
+        <span ref={hudRef} style={{ fontSize: 12, color: "#aeb8c8", whiteSpace: "nowrap", marginLeft: focusedProject ? 0 : "auto" }} />
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <button style={btn} onClick={() => controlsRef.current?.zoomStep(1.5)}>Phóng to</button>
           <button style={btn} onClick={() => controlsRef.current?.zoomStep(1 / 1.5)}>Thu nhỏ</button>
@@ -29,7 +42,8 @@ export default function App() {
       </header>
 
       <main style={{ position: "relative", flex: 1, minHeight: 0 }}>
-        <Timeline projects={PROJECTS} selectedId={sel?.task?.id || null} onSelect={setSel} hudRef={hudRef} controlsRef={controlsRef} />
+        <Timeline projects={PROJECTS} selectedId={sel?.task?.id || null} onSelect={setSel} hudRef={hudRef} controlsRef={controlsRef}
+          focusedId={focusId} onLabelClick={handleLabelClick} onClearFocus={() => setFocusId(null)} />
 
         {sel && (
           <aside style={{
@@ -72,7 +86,7 @@ export default function App() {
           background: "rgba(16,19,26,0.9)", border: "1px solid rgba(255,255,255,0.1)",
           borderRadius: 8, padding: "6px 10px", fontSize: 12, color: "#aeb8c8",
         }}>
-          Lăn chuột: zoom về con trỏ · Kéo nền: pan (thả ra có quán tính) · Kéo thanh task: dời task · Double-click: phóng to · Click: xem chi tiết
+          Lăn chuột: zoom về con trỏ · Kéo nền: pan (thả ra có quán tính) · Kéo thanh task: dời task · Double-click: phóng to · Click tên project: nổi bật project đó (xung quanh chuyển xám), click lại hoặc Esc để bỏ
         </footer>
       </main>
     </div>
