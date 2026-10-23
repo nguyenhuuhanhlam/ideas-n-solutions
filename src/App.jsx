@@ -296,8 +296,8 @@ export default function App() {
             <div style={{ fontSize: 11, color: "#8b95a9", textTransform: "uppercase", letterSpacing: 0.6 }}>{sel.project.name}</div>
             {sel.task ? (
               <>
-                <div style={{ fontWeight: 700, fontSize: 15, margin: "4px 0 8px" }}>{sel.task.name}{sel.sub ? ` › ${sel.sub.name}` : ""}</div>
-                <div style={{ fontSize: 11, color: "#8b95a9", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 6 }}>Task con ({sel.task.subtasks.length}) — bấm để chọn</div>
+                <div style={{ fontWeight: 700, fontSize: 15, margin: "4px 0 0" }}>{sel.task.name}{sel.sub ? ` › ${sel.sub.name}` : ""}</div>
+                <div style={{ fontSize: 11, color: "#8b95a9", textTransform: "uppercase", letterSpacing: 0.6, margin: "1.5rem 0 6px" }}>Task con ({sel.task.subtasks.length}) — bấm để chọn</div>
                 {sel.task.subtasks.map((s) => (
                   <div key={s.id} onClick={() => setSel({ project: sel.project, task: sel.task, sub: s })} title="Bấm để chọn task con này"
                     style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, padding: "3px 4px", borderTop: "1px solid rgba(255,255,255,0.06)", cursor: "pointer", borderRadius: 4, background: sel.sub?.id === s.id ? "rgba(255,209,102,0.1)" : "transparent", color: sel.sub?.id === s.id ? "#ffd166" : "inherit" }}>
@@ -305,7 +305,7 @@ export default function App() {
                   </div>
                 ))}
                 {sel.sub && (
-                  <div style={{ background: "rgba(255,209,102,0.07)", border: "1px solid rgba(255,209,102,0.3)", borderRadius: 10, padding: "10px 12px", margin: "0 0 12px" }}>
+                  <div style={{ background: "rgba(255,209,102,0.07)", border: "1px solid rgba(255,209,102,0.3)", borderRadius: 10, padding: "10px 12px", margin: "1.5rem 0 0" }}>
                     <div style={{ fontSize: 11, color: "#ffd166", textTransform: "uppercase", letterSpacing: 0.6 }}>Task con đang chọn</div>
                     <div style={{ fontWeight: 700, fontSize: 14, margin: "3px 0 4px" }}>{sel.sub.name}</div>
                     <div style={{ fontSize: 12.5, lineHeight: 1.7 }}>
@@ -319,7 +319,7 @@ export default function App() {
                     </button>
                   </div>
                 )}
-                <div style={{ fontSize: 11, color: "#8b95a9", textTransform: "uppercase", letterSpacing: 0.6, margin: "12px 0 6px" }}>Nội dung task</div>
+                <div style={{ fontSize: 11, color: "#8b95a9", textTransform: "uppercase", letterSpacing: 0.6, margin: "1.5rem 0 6px" }}>Nội dung task</div>
                 <div style={{ fontSize: 13, lineHeight: 1.9 }}>
                   <div>Người làm: <b>{personById(sel.task.assigneeId).name}</b></div>
                   <div>Thời gian: {fmtDay(sel.task.start)} → {fmtDay(sel.task.end)}</div>
