@@ -172,8 +172,10 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
               const dRes = state.drag && state.drag.kind === "task-resize" && state.drag.task.id === t.id ? state.drag : null;
               let effS = t.start + shift, effE = t.end + shift, subMap = null;
               if (dRes) {
-                if (dRes.edge === "end") { effE = Math.max(t.start + 1, dRes.day); effS = t.start; }
-                else { effS = Math.min(t.end - 1, dRes.day); effE = t.end; }
+                // Kéo mép cũng bị chặn bởi task kề của cùng người
+                const { prevEnd, nextStart } = personBounds(p, t);
+                if (dRes.edge === "end") { effE = Math.max(t.start + 1, nextStart != null ? Math.min(dRes.day, nextStart) : dRes.day); effS = t.start; }
+                else { effS = Math.min(t.end - 1, prevEnd != null ? Math.max(dRes.day, prevEnd) : dRes.day); effE = t.end; }
                 const anchor = dRes.edge === "end" ? t.start : t.end;
                 const f = (effE - effS) / (t.end - t.start);
                 subMap = (d) => anchor + (d - anchor) * f;
@@ -378,6 +380,18 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
       cam.leftDay = cursorDay - mx / cam.ppd; // điểm dưới con trỏ đứng yên — chỉ trục X đổi
       state.dirty = true;
     }
+    // Giới hạn không-trùng của một task: task chính của cùng 1 người trong
+    // cùng 1 project không được đè lên nhau — trả về cuối task trước gần nhất
+    // và đầu task sau gần nhất của chính người đó.
+    function personBounds(p, t) {
+      let prevEnd = null, nextStart = null;
+      for (const o of p.tasks) {
+        if (o.id === t.id || o.assigneeId !== t.assigneeId) continue;
+        if (o.end <= t.start) prevEnd = prevEnd == null ? o.end : Math.max(prevEnd, o.end);
+        if (o.start >= t.end) nextStart = nextStart == null ? o.start : Math.min(nextStart, o.start);
+      }
+      return { prevEnd, nextStart };
+    }
     // Con trỏ nằm sát mép trái/phải của thanh (task hoặc thanh tổng) -> kéo mép
     function edgeOf(hit, x) {
       if (!hit || (hit.kind !== "task" && hit.kind !== "project") || hit.sx1 == null) return null;
@@ -420,6 +434,12 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
           el.style.cursor = "grabbing";
         } else if (d.kind === "task" || d.kind === "summary-move") {
           d.deltaDays = Math.round((x - d.startX) / cam.ppd);
+          // Kéo task không được đè lên task kề trước/sau của cùng người
+          if (d.kind === "task" && d.task && d.hit) {
+            const { prevEnd, nextStart } = personBounds(d.hit.project, d.task);
+            if (prevEnd != null) d.deltaDays = Math.max(d.deltaDays, prevEnd - d.task.start);
+            if (nextStart != null) d.deltaDays = Math.min(d.deltaDays, nextStart - d.task.end);
+          }
           el.style.cursor = "ew-resize";
         } else if (d.kind === "task-resize") {
           d.day = Math.round(dayAt(x));
@@ -472,8 +492,10 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
         // Kéo mép task tổng: đổi thời lượng task, task con co/giãn theo tỉ lệ
         const t = d.task, p = d.hit.project;
         const anchor = d.edge === "end" ? t.start : t.end;
+        const { prevEnd, nextStart } = personBounds(p, t);
         let effS = t.start, effE = t.end;
-        if (d.edge === "end") effE = Math.max(t.start + 1, d.day); else effS = Math.min(t.end - 1, d.day);
+        if (d.edge === "end") effE = Math.max(t.start + 1, nextStart != null ? Math.min(d.day, nextStart) : d.day);
+        else effS = Math.min(t.end - 1, prevEnd != null ? Math.max(d.day, prevEnd) : d.day);
         const f = (effE - effS) / (t.end - t.start);
         const mapR = (v) => Math.round(anchor + (v - anchor) * f);
         t.subtasks.forEach((s) => {
@@ -500,6 +522,22 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
           t.subtasks.forEach((s) => { s.start = mapR(s.start); s.end = Math.max(s.start + 1, mapR(s.end)); });
           const ns = mapR(t.start);
           t.end = Math.max(ns + 1, mapR(t.end)); t.start = ns;
+        });
+        // Làm tròn khi co/giãn có thể tạo trùng nhẹ giữa 2 task liên tiếp của
+        // cùng 1 người — đẩy dồn về sau để giữ quy tắc không-trùng.
+        const byPerson = {};
+        p.tasks.forEach((t) => { (byPerson[t.assigneeId] = byPerson[t.assigneeId] || []).push(t); });
+        Object.values(byPerson).forEach((list) => {
+          list.sort((a, b) => a.start - b.start);
+          let lastEnd = null;
+          for (const t of list) {
+            if (lastEnd != null && t.start < lastEnd) {
+              const sh = lastEnd - t.start;
+              t.start += sh; t.end += sh;
+              t.subtasks.forEach((s) => { s.start += sh; s.end += sh; });
+            }
+            lastEnd = t.end;
+          }
         });
         p.start = Math.min(...p.tasks.map((t) => t.start));
         p.end = Math.max(...p.tasks.map((t) => t.end));

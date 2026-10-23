@@ -1,5 +1,7 @@
 // Dữ liệu giả cho bản mẫu timeline — 100 project, mỗi project <= 20 task,
-// task chạy song song, mỗi task giao cho 1 người trong nhóm của project.
+// task chạy song song giữa các người khác nhau, mỗi task giao cho 1 người
+// trong nhóm của project. Quy tắc cứng: các task chính của cùng 1 người
+// trong cùng 1 project không bao giờ trùng nhau (xếp nối tiếp).
 // Thời gian được giữ dạng "số ngày" (ngày Julian rút gọn = UTC day number) để
 // phép biến đổi zoom/pan chỉ là toán số học đơn giản.
 
@@ -84,26 +86,46 @@ for (const type of PROJ_TYPES) {
     const members = sample(PEOPLE, ri(3, 6));
     const taskCount = ri(10, 20);
     const names = sample(TASK_NAMES, taskCount);
-    const tasks = names.map((name, ti) => {
-      // Phân tầng đều theo thời lượng project để giai đoạn nào cũng có task,
-      // zoom vào khoảng thời gian nào trong project cũng thấy việc.
-      const seg = duration / taskCount;
-      const tStart = start + Math.floor(ti * seg) + ri(0, Math.max(1, Math.floor(seg) - 8));
-      const tEnd = Math.min(end, tStart + ri(10, 42));
-      const task = {
-        id: `pr${seq}t${ti + 1}`,
-        name,
-        start: tStart,
-        end: tEnd,
-        assigneeId: pick(members).id,
-        progress:
-          tEnd <= TODAY ? ri(88, 100) / 100 :
-          tStart >= TODAY ? 0 :
-          Math.round(((TODAY - tStart) / (tEnd - tStart)) * 100) / 100,
-      };
-      task.subtasks = makeSubtasks(task);
-      return task;
-    });
+    // QUY TẮC: các task chính của cùng 1 người KHÔNG được trùng nhau.
+    // Vì vậy task được chia đều cho các thành viên rồi xếp NỐI TIẾP theo từng
+    // người (chuỗi việc của mỗi người chạy liên tục trong khung project),
+    // còn giữa các người khác nhau thì chạy song song.
+    const perMember = new Map(members.map((m) => [m.id, []]));
+    {
+      const order = [];
+      while (order.length < names.length) order.push(...sample(members, members.length));
+      names.forEach((name, i) => perMember.get(order[i % order.length].id).push(name));
+    }
+    const tasks = [];
+    let tidx = 0;
+    for (const m of members) {
+      const list = perMember.get(m.id);
+      let cursor = start + ri(0, 8);
+      list.forEach((name, j) => {
+        const remaining = list.length - j;
+        // Chừa chỗ cho các task còn lại của chính người này (mỗi task >= 6 ngày)
+        const reserve = (remaining - 1) * 7;
+        const maxDur = end - cursor - reserve;
+        if (maxDur < 6) return;
+        const tStart = cursor;
+        const tEnd = tStart + Math.min(maxDur, ri(8, 40));
+        tidx += 1;
+        const task = {
+          id: `pr${seq}t${tidx}`,
+          name,
+          start: tStart,
+          end: tEnd,
+          assigneeId: m.id,
+          progress:
+            tEnd <= TODAY ? ri(88, 100) / 100 :
+            tStart >= TODAY ? 0 :
+            Math.round(((TODAY - tStart) / (tEnd - tStart)) * 100) / 100,
+        };
+        task.subtasks = makeSubtasks(task);
+        tasks.push(task);
+        cursor = tEnd + (j < list.length - 1 ? ri(1, 6) : 0);
+      });
+    }
     tasks.sort((a, b) => a.start - b.start);
     PROJECTS.push({
       id: `pr${seq}`,

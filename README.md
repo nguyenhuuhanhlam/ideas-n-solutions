@@ -34,7 +34,10 @@ npm run dev
 - Tối đa ~**100 project**, mỗi project **≤ 20 task**; task chạy **song song**
   vì nhiều người cùng làm một project.
 - Bên trong lane của project, task xếp **theo hàng của người làm**
-  (màu thanh = màu của người đó) — trùng giờ của cùng một người tức là quá tải.
+  (màu thanh = màu của người đó). **Quy tắc cứng: các task chính của cùng
+  1 người không bao giờ trùng nhau** — dữ liệu sinh ra đã xếp nối tiếp theo
+  từng người, và khi kéo/kéo mép, task bị chặn tại task kề trước/sau của
+  chính người đó; co/giãn cả project cũng có bước sửa chồng lấn do làm tròn.
 - Zoom có **min/max**, không zoom vô cực. Chuyển động liên tục nhưng **chi tiết
   đổi theo ngưỡng** (LOD):
   - `LOD 0` (< 1,5 px/ngày): chỉ thanh tổng của project + tiến độ + mốc task.
