@@ -330,10 +330,11 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
           ctx.fillText(`${dt.getUTCFullYear()}`, x, 27);
           continue;
         }
-        // Nhãn tick = ô tròn nhỏ ghi THỨ trong tuần (2..7, Chủ nhật = S) + ngày.
+        // Nhãn tick = ô tròn nhỏ ghi THỨ trong tuần (2..7, Chủ nhật = N — dùng
+        // N thay S vì S khi thu nhỏ trông giống số 5, dễ nhầm) + ngày.
         // Cuối tuần tô màu riêng (Thứ 7 cam, Chủ nhật đỏ) cho dễ cảm nhận nhịp tuần.
         const dow = dt.getUTCDay();
-        const dowChar = dow === 0 ? "S" : String(dow + 1);
+        const dowChar = dow === 0 ? "N" : String(dow + 1);
         const dateText = interval >= 30
           ? `${dt.getUTCDate()}/${dt.getUTCMonth() + 1}/${dt.getUTCFullYear()}`
           : `${dt.getUTCDate()}/${dt.getUTCMonth() + 1}`;
