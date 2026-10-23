@@ -141,6 +141,17 @@ export default function App() {
     background: "#232936", color: "#e8ecf3", border: "1px solid rgba(255,255,255,0.14)",
     borderRadius: 8, padding: "6px 12px", fontSize: 13, cursor: "pointer",
   };
+  // Nút icon cho thanh menu trên — nhãn đầy đủ nằm trong tooltip
+  const I = ({ children }) => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>{children}</svg>
+  );
+  const iconBtn = {
+    ...btn, width: 34, height: 34, padding: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 9,
+  };
+  const ZoomInIcon = () => (<I><circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.5" y2="16.5" /><line x1="11" y1="8" x2="11" y2="14" /><line x1="8" y1="11" x2="14" y2="11" /></I>);
+  const ZoomOutIcon = () => (<I><circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.5" y2="16.5" /><line x1="8" y1="11" x2="14" y2="11" /></I>);
+  const TodayIcon = () => (<I><rect x="3" y="5" width="18" height="16" rx="2" /><line x1="3" y1="10" x2="21" y2="10" /><line x1="8" y1="3" x2="8" y2="7" /><line x1="16" y1="3" x2="16" y2="7" /><circle cx="12" cy="15.5" r="1.5" fill="currentColor" stroke="none" /></I>);
+  const FitIcon = () => (<I><path d="M9 4H5a1 1 0 0 0-1 1v4" /><path d="M15 4h4a1 1 0 0 1 1 1v4" /><path d="M20 15v4a1 1 0 0 1-1 1h-4" /><path d="M4 15v4a1 1 0 0 0 1 1h4" /></I>);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "#11141a", color: "#e8ecf3" }}>
@@ -173,10 +184,10 @@ export default function App() {
         )}
         <span ref={hudRef} style={{ fontSize: 12, color: "#aeb8c8", whiteSpace: "nowrap", marginLeft: focusedProject || filterPerson || soloProject ? 0 : "auto" }} />
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <button style={btn} onClick={() => controlsRef.current?.zoomStep(1.5)}>Phóng to</button>
-          <button style={btn} onClick={() => controlsRef.current?.zoomStep(1 / 1.5)}>Thu nhỏ</button>
-          <button style={btn} onClick={() => controlsRef.current?.today()}>Về hôm nay</button>
-          <button style={btn} onClick={() => controlsRef.current?.fit()}>Toàn cảnh</button>
+          <button style={iconBtn} title="Phóng to" aria-label="Phóng to" onClick={() => controlsRef.current?.zoomStep(1.5)}><ZoomInIcon /></button>
+          <button style={iconBtn} title="Thu nhỏ" aria-label="Thu nhỏ" onClick={() => controlsRef.current?.zoomStep(1 / 1.5)}><ZoomOutIcon /></button>
+          <button style={iconBtn} title="Về hôm nay" aria-label="Về hôm nay" onClick={() => controlsRef.current?.today()}><TodayIcon /></button>
+          <button style={iconBtn} title="Toàn cảnh" aria-label="Toàn cảnh" onClick={() => controlsRef.current?.fit()}><FitIcon /></button>
         </div>
       </header>
 
