@@ -325,13 +325,33 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
         ctx.strokeStyle = "rgba(255,255,255,0.18)";
         ctx.beginPath(); ctx.moveTo(x, AXIS_H - 9); ctx.lineTo(x, AXIS_H); ctx.stroke();
         const dt = new Date(d * 86400000);
-        let label;
-        if (interval >= 182) label = `${dt.getUTCFullYear()}`;
-        else if (interval >= 30) label = `Th ${dt.getUTCMonth() + 1}/${dt.getUTCFullYear()}`;
-        else if (interval >= 7) label = `${dt.getUTCDate()}/${dt.getUTCMonth() + 1}`;
-        else label = `${dt.getUTCDate()}/${dt.getUTCMonth() + 1}`;
+        if (interval >= 182) {
+          ctx.fillStyle = "#aeb8c8"; ctx.font = "11px Inter, system-ui, sans-serif";
+          ctx.fillText(`${dt.getUTCFullYear()}`, x, 27);
+          continue;
+        }
+        // Nhãn tick = ô tròn nhỏ ghi THỨ trong tuần (2..7, Chủ nhật = S) + ngày.
+        // Cuối tuần tô màu riêng (Thứ 7 cam, Chủ nhật đỏ) cho dễ cảm nhận nhịp tuần.
+        const dow = dt.getUTCDay();
+        const dowChar = dow === 0 ? "S" : String(dow + 1);
+        const dateText = interval >= 30
+          ? `${dt.getUTCDate()}/${dt.getUTCMonth() + 1}/${dt.getUTCFullYear()}`
+          : `${dt.getUTCDate()}/${dt.getUTCMonth() + 1}`;
+        ctx.font = "11px Inter, system-ui, sans-serif";
+        const textW = ctx.measureText(dateText).width;
+        const badgeR = 7.5, gap = 4;
+        const startX = x - (badgeR * 2 + gap + textW) / 2;
+        const bcx = startX + badgeR, bcy = 27;
+        ctx.fillStyle = dow === 0 ? "#e5534b" : dow === 6 ? "#d9932c" : "rgba(255,255,255,0.16)";
+        ctx.beginPath(); ctx.arc(bcx, bcy, badgeR, 0, Math.PI * 2); ctx.fill();
+        if (d === TODAY) { ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(bcx, bcy, badgeR + 0.8, 0, Math.PI * 2); ctx.stroke(); }
+        ctx.fillStyle = dow === 0 || dow === 6 ? "#ffffff" : "#dfe5ef";
+        ctx.font = "700 9px Inter, system-ui, sans-serif";
+        ctx.fillText(dowChar, bcx, bcy + 0.5);
         ctx.fillStyle = "#aeb8c8"; ctx.font = "11px Inter, system-ui, sans-serif";
-        ctx.fillText(label, x, 27);
+        ctx.textAlign = "left";
+        ctx.fillText(dateText, startX + badgeR * 2 + gap, bcy);
+        ctx.textAlign = "center";
       }
       ctx.fillStyle = "#8b95a9"; ctx.font = "600 10px Inter, system-ui, sans-serif"; ctx.textAlign = "left";
       ctx.fillText(interval >= 30 ? "THÁNG" : interval >= 7 ? "TUẦN" : "NGÀY", 8, 11);
