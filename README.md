@@ -27,6 +27,7 @@ npm run dev
 | Kéo **thanh tổng** của project (ở LOD 0) | Kéo thân: dời **toàn bộ project**; kéo mép: **co/giãn toàn bộ timeline của project** theo tỉ lệ quanh mép còn lại (mọi task/task con đi theo) |
 | Click thanh / project | Mở panel chi tiết bên phải |
 | **Bấm đúp vào một thanh task** (hoặc nút "Sửa task…" trong panel) | Mở **form sửa task**: tên, người làm (trong nhóm của project), ngày bắt đầu/kết thúc, tiến độ. Form chặn lưu khi khoảng mới trùng task khác của cùng người; task con tự co/giãn theo khoảng mới. Bấm đúp vào vùng trống vẫn là phóng to như trước |
+| Bấm **icon phễu** ở cuối nhãn tên nhân viên | **Lọc riêng nhân viên đó**: chỉ còn các project mà nhân viên có task, và trong mỗi project chỉ còn hàng/task của nhân viên đó (thanh tổng ở LOD 0 cũng chỉ tính trên task của họ). Bấm lại icon của chính họ, bấm chip "Đang lọc" trên header hoặc `Esc` để bỏ lọc |
 | Click **tên project** (nhãn dính mép trái) | **Nổi bật project đó**: mọi project xung quanh chuyển sang sắc xám (gray shade), chỉ project đang chọn giữ màu; click lại vào tên đó, click vùng trống, bấm `Esc` hoặc nút chip trên header để bỏ |
 | Nút trên header | Phóng to / Thu nhỏ / Về hôm nay / Toàn cảnh (chuyển động có tween) |
 
@@ -57,9 +58,10 @@ npm run dev
   số thanh hiển thị đồng thời chỉ vài trăm). Lý do không dùng thư viện
   timeline/Gantt có sẵn và không dùng PixiJS/WebGL đã được thảo luận: xem
   lịch sử chat "Project management timeline idea".
-- Dữ liệu giả (`src/data.js`): 100 project, sinh có seed cố định; task được
-  phân tầng đều theo thời lượng project để zoom vào giai đoạn nào cũng có việc.
-  Project đang chạy quanh "hôm nay" được xếp lên đầu.
+- Dữ liệu giả (`src/data.js`): **25 project, 15 nhân viên**, sinh có seed cố
+  định; mỗi nhân viên tham gia nhiều project (6–12 project); task của mỗi
+  người xếp nối tiếp trong từng project. Project đang chạy quanh "hôm nay"
+  được xếp lên đầu.
 
 ### Đã kiểm chứng tự động (headless)
 

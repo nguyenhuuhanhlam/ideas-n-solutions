@@ -89,11 +89,19 @@ function TaskForm({ project, task, onClose, onSave }) {
 export default function App() {
   const [sel, setSel] = useState(null);
   const [focusId, setFocusId] = useState(null);
+  const [filterPersonId, setFilterPersonId] = useState(null);
   const [editing, setEditing] = useState(null);
   const [dataVersion, setDataVersion] = useState(0);
   const hudRef = useRef(null);
   const controlsRef = useRef(null);
   const focusedProject = PROJECTS.find((p) => p.id === focusId) || null;
+  const filterPerson = filterPersonId ? personById(filterPersonId) : null;
+  // Bấm icon phễu trên nhãn tên nhân viên: lọc riêng nhân viên đó (chỉ còn các
+  // project họ tham gia và các task của họ); bấm lại vào icon của chính họ thì bỏ lọc.
+  const handlePersonFilter = (pid) => {
+    setFilterPersonId((prev) => (prev === pid ? null : pid));
+    if (sel && sel.task && sel.task.assigneeId !== pid) setSel(null);
+  };
   // Bấm tên project: nổi bật project đó (xung quanh chuyển xám); bấm lại thì bỏ.
   const handleLabelClick = (p) => {
     setSel({ project: p, task: null });
@@ -128,15 +136,25 @@ export default function App() {
       <header style={{ display: "flex", alignItems: "center", gap: 14, padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.09)", flexWrap: "wrap" }}>
         <div>
           <div style={{ fontWeight: 700, fontSize: 16 }}>Timeline Projects — bản mẫu test</div>
-          <div style={{ fontSize: 12, color: "#8b95a9" }}>100 project xếp lớp trên 1 trục thời gian · dữ liệu giả · task song song theo người làm</div>
+          <div style={{ fontSize: 12, color: "#8b95a9" }}>25 project xếp lớp trên 1 trục thời gian · 15 nhân viên · dữ liệu giả · task song song theo người làm</div>
         </div>
-        {focusedProject && (
-          <button onClick={() => setFocusId(null)} title="Bỏ nổi bật"
-            style={{ marginLeft: "auto", background: "#2b3242", color: "#ffd166", border: "1px solid rgba(255,209,102,0.5)", borderRadius: 999, padding: "5px 12px", fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap" }}>
-            Đang nổi bật: {focusedProject.name} ×
-          </button>
+        {(focusedProject || filterPerson) && (
+          <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+            {focusedProject && (
+              <button onClick={() => setFocusId(null)} title="Bỏ nổi bật"
+                style={{ background: "#2b3242", color: "#ffd166", border: "1px solid rgba(255,209,102,0.5)", borderRadius: 999, padding: "5px 12px", fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap" }}>
+                Đang nổi bật: {focusedProject.name} ×
+              </button>
+            )}
+            {filterPerson && (
+              <button onClick={() => setFilterPersonId(null)} title="Bỏ lọc nhân viên"
+                style={{ background: "#2b3242", color: "#7ee2a8", border: "1px solid rgba(126,226,168,0.5)", borderRadius: 999, padding: "5px 12px", fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap" }}>
+                Đang lọc: {filterPerson.name} ×
+              </button>
+            )}
+          </div>
         )}
-        <span ref={hudRef} style={{ fontSize: 12, color: "#aeb8c8", whiteSpace: "nowrap", marginLeft: focusedProject ? 0 : "auto" }} />
+        <span ref={hudRef} style={{ fontSize: 12, color: "#aeb8c8", whiteSpace: "nowrap", marginLeft: focusedProject || filterPerson ? 0 : "auto" }} />
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <button style={btn} onClick={() => controlsRef.current?.zoomStep(1.5)}>Phóng to</button>
           <button style={btn} onClick={() => controlsRef.current?.zoomStep(1 / 1.5)}>Thu nhỏ</button>
@@ -148,7 +166,9 @@ export default function App() {
       <main style={{ position: "relative", flex: 1, minHeight: 0 }}>
         <Timeline projects={PROJECTS} selectedId={sel?.task?.id || null} onSelect={setSel} hudRef={hudRef} controlsRef={controlsRef}
           focusedId={focusId} onLabelClick={handleLabelClick} onClearFocus={() => setFocusId(null)}
-          onEditTask={(p, t) => setEditing({ project: p, task: t })} dataVersion={dataVersion} />
+          onEditTask={(p, t) => setEditing({ project: p, task: t })} dataVersion={dataVersion}
+          filterPersonId={filterPersonId} onPersonFilter={handlePersonFilter}
+          onEscape={() => { setFocusId(null); setFilterPersonId(null); }} />
 
         {sel && (
           <aside style={{
@@ -195,7 +215,7 @@ export default function App() {
           background: "rgba(16,19,26,0.9)", border: "1px solid rgba(255,255,255,0.1)",
           borderRadius: 8, padding: "6px 10px", fontSize: 12, color: "#aeb8c8",
         }}>
-          Lăn chuột: zoom về con trỏ · Kéo nền: pan (có quán tính) · Kéo thanh task: dời task · Kéo mép thanh task: đổi thời lượng (task con co/giãn theo) · Kéo thanh tổng ở mức thu nhỏ: dời cả project, kéo mép của nó: co/giãn cả project · Click tên project: nổi bật (xung quanh chuyển xám) · Bấm đúp vào task: mở form sửa
+          Lăn chuột: zoom về con trỏ · Kéo nền: pan (có quán tính) · Kéo thanh task: dời task · Kéo mép thanh task: đổi thời lượng (task con co/giãn theo) · Kéo thanh tổng ở mức thu nhỏ: dời cả project, kéo mép của nó: co/giãn cả project · Click tên project: nổi bật (xung quanh chuyển xám) · Bấm đúp vào task: mở form sửa · Icon phễu cạnh tên nhân viên: lọc riêng nhân viên đó
         </footer>
       </main>
 

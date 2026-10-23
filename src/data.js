@@ -1,7 +1,8 @@
-// Dữ liệu giả cho bản mẫu timeline — 100 project, mỗi project <= 20 task,
-// task chạy song song giữa các người khác nhau, mỗi task giao cho 1 người
-// trong nhóm của project. Quy tắc cứng: các task chính của cùng 1 người
-// trong cùng 1 project không bao giờ trùng nhau (xếp nối tiếp).
+// Dữ liệu giả cho bản mẫu timeline — 25 project, 15 nhân viên, mỗi project
+// <= 20 task, task chạy song song giữa các người khác nhau, mỗi task giao
+// cho 1 người trong nhóm của project. Một nhân viên tham gia nhiều project.
+// Quy tắc cứng: các task chính của cùng 1 người trong cùng 1 project không
+// bao giờ trùng nhau (xếp nối tiếp).
 // Thời gian được giữ dạng "số ngày" (ngày Julian rút gọn = UTC day number) để
 // phép biến đổi zoom/pan chỉ là toán số học đơn giản.
 
@@ -43,8 +44,7 @@ export const PEOPLE = [
   "Nguyễn Văn An", "Trần Thị Bình", "Lê Hoàng Cường", "Phạm Thu Dung",
   "Hoàng Văn Đức", "Võ Thị Hà", "Đặng Minh Hải", "Bùi Ngọc Hạnh",
   "Đỗ Văn Hùng", "Ngô Thị Hương", "Vũ Đình Khánh", "Lý Thị Lan",
-  "Trịnh Văn Long", "Phan Thị Mai", "Dương Văn Nam", "Chu Thị Nga",
-  "Huỳnh Văn Phát", "Tạ Thị Phương", "Lương Minh Quân", "Đinh Thị Sen",
+  "Trịnh Văn Long", "Phan Thị Mai", "Dương Văn Nam",
 ].map((name, i) => ({ id: `p${i + 1}`, name, color: `hsl(${Math.round((i * 137.5) % 360)} 65% 58%)` }));
 
 const TASK_NAMES = [
@@ -77,8 +77,14 @@ function makeSubtasks(task) {
 
 export const PROJECTS = [];
 let seq = 0;
-for (const type of PROJ_TYPES) {
-  for (const loc of PROJ_LOCS) {
+// Chỉ 25 project cho bản demo: ghép loại x địa điểm theo bước nhảy để cả
+// 10 loại và 10 địa điểm đều xuất hiện, không trùng cặp.
+const COMBOS = Array.from({ length: 25 }, (_, i) => [
+  PROJ_TYPES[i % PROJ_TYPES.length],
+  PROJ_LOCS[(i + Math.floor(i / 10) * 4) % PROJ_LOCS.length],
+]);
+for (const [type, loc] of COMBOS) {
+  {
     seq += 1;
     const start = BASE + ri(0, 290);
     const duration = ri(70, 240);

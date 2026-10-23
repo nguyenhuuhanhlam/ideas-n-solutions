@@ -49,7 +49,7 @@ function grayOf(color) {
   return grayCache.get(color);
 }
 
-export default function Timeline({ projects, selectedId, onSelect, hudRef, controlsRef, focusedId, onLabelClick, onClearFocus, onEditTask, dataVersion }) {
+export default function Timeline({ projects, selectedId, onSelect, hudRef, controlsRef, focusedId, onLabelClick, onClearFocus, onEditTask, dataVersion, filterPersonId, onPersonFilter, onEscape }) {
   const hostRef = useRef(null);
   const tipRef = useRef(null);
   const onSelectRef = useRef(onSelect);
@@ -64,9 +64,15 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
   onClearFocusRef.current = onClearFocus;
   const onEditTaskRef = useRef(onEditTask);
   onEditTaskRef.current = onEditTask;
+  const filterRef = useRef(filterPersonId);
+  filterRef.current = filterPersonId;
+  const onPersonFilterRef = useRef(onPersonFilter);
+  onPersonFilterRef.current = onPersonFilter;
+  const onEscapeRef = useRef(onEscape);
+  onEscapeRef.current = onEscape;
   const redrawRef = useRef(null);
-  // Khi focus/chọn/dữ liệu thay đổi từ bên ngoài (React state), báo vòng lặp vẽ lại ngay
-  useEffect(() => { if (redrawRef.current) redrawRef.current(); }, [focusedId, selectedId, dataVersion]);
+  // Khi focus/chọn/dữ liệu/lọc thay đổi từ bên ngoài (React state), báo vòng lặp vẽ lại ngay
+  useEffect(() => { if (redrawRef.current) redrawRef.current(); }, [focusedId, selectedId, dataVersion, filterPersonId]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -85,17 +91,27 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
     const dayAt = (x) => cam.leftDay + x / cam.ppd;
 
     function rowH(lod) { return lod === 0 ? 30 : lod === 1 ? 19 : lod === 2 ? 28 : 47; }
+    // Danh sách project đang hiển thị: khi lọc theo 1 nhân viên thì chỉ còn
+    // các project mà nhân viên đó có task.
+    function visibleList() {
+      const fp = filterRef.current;
+      return fp ? projects.filter((p) => p.tasks.some((t) => t.assigneeId === fp)) : projects;
+    }
     function targetHeight(p, lod) {
       if (lod === 0) return 30;
-      return 26 + p.members.length * rowH(lod); // 26px chừa dải tiêu đề lane, tránh đè hàng đầu
+      const rows = filterRef.current ? 1 : p.members.length;
+      return 26 + rows * rowH(lod); // 26px chừa dải tiêu đề lane, tránh đè hàng đầu
     }
-    function layout() {
-      const out = new Array(projects.length);
+    function layout(list) {
+      const out = new Array(list.length);
       let y = AXIS_H - cam.scrollY;
-      for (let i = 0; i < projects.length; i++) { out[i] = { y, h: heights[i] }; y += heights[i]; }
+      for (let i = 0; i < list.length; i++) {
+        const h = heights[projects.indexOf(list[i])];
+        out[i] = { y, h }; y += h;
+      }
       return out;
     }
-    function totalHeight() { return heights.reduce((a, b) => a + b, 0); }
+    function totalHeight() { return visibleList().reduce((a, p) => a + heights[projects.indexOf(p)], 0); }
     function clampScroll() {
       cam.scrollY = clamp(cam.scrollY, 0, Math.max(0, totalHeight() - (H - AXIS_H) + 24));
     }
@@ -127,17 +143,20 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
       }
       ctx.stroke();
 
-      const lay = layout();
+      const filterNow = filterRef.current;
+      const list = visibleList();
+      const lay = layout(list);
       const dragTask = state.drag && state.drag.kind === "task" ? state.drag : null;
 
       const focusedIdNow = focusedRef.current;
-      for (let i = 0; i < projects.length; i++) {
-        const p = projects[i]; const { y, h } = lay[i];
+      for (let vi = 0; vi < list.length; vi++) {
+        const p = list[vi]; const { y, h } = lay[vi];
+        const i = projects.indexOf(p); // số thứ tự gốc cho nhãn, không đổi khi lọc
         if (y + h < AXIS_H || y > H) continue;
         const isFocused = !!focusedIdNow && focusedIdNow === p.id;
         const isDim = !!focusedIdNow && !isFocused;
         const pColor = isDim ? grayOf(p.color) : p.color;
-        ctx.fillStyle = isFocused ? "rgba(255,255,255,0.075)" : i % 2 ? "rgba(255,255,255,0.045)" : "rgba(255,255,255,0.018)";
+        ctx.fillStyle = isFocused ? "rgba(255,255,255,0.075)" : vi % 2 ? "rgba(255,255,255,0.045)" : "rgba(255,255,255,0.018)";
         ctx.fillRect(0, y, W, h);
         if (isFocused) { ctx.fillStyle = p.color; ctx.fillRect(0, y, 3, h); }
         ctx.strokeStyle = "rgba(255,255,255,0.09)";
@@ -145,18 +164,22 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
 
         if (lod === 0) {
           // thanh tổng của project + tiến độ + mốc kết thúc từng task.
+          // Đang lọc theo nhân viên: thanh tổng chỉ tính trên task của người đó.
           // Đang kéo thanh tổng: kéo thân = dời (shift), kéo mép = co/giãn theo tỉ lệ (map).
+          const sumTasks = filterNow ? p.tasks.filter((t) => t.assigneeId === filterNow) : p.tasks;
           const dSum = state.drag && (state.drag.kind === "summary-move" || state.drag.kind === "summary-scale") && state.drag.project.id === p.id ? state.drag : null;
           const mapDay = (d) => dSum && dSum.kind === "summary-scale" ? dSum.anchor + (d - dSum.anchor) * dSum.factor : dSum ? d + dSum.deltaDays : d;
-          const x1 = xOf(mapDay(p.start)), x2 = xOf(mapDay(p.end));
+          const sStart = sumTasks.length ? Math.min(...sumTasks.map((t) => t.start)) : p.start;
+          const sEnd = sumTasks.length ? Math.max(...sumTasks.map((t) => t.end)) : p.end;
+          const x1 = xOf(mapDay(sStart)), x2 = xOf(mapDay(sEnd));
           if (x2 > -4 && x1 < W + 4) {
             const by = y + h / 2 - 7, bh = 14;
             ctx.fillStyle = "rgba(255,255,255,0.14)"; rrect(ctx, x1, by, Math.max(3, x2 - x1), bh, 7); ctx.fill();
-            const prog = p.tasks.reduce((a, t) => a + t.progress, 0) / Math.max(1, p.tasks.length);
+            const prog = sumTasks.reduce((a, t) => a + t.progress, 0) / Math.max(1, sumTasks.length);
             ctx.fillStyle = pColor; rrect(ctx, x1, by, Math.max(3, (x2 - x1) * prog), bh, 7); ctx.fill();
             if (dSum) { ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 1.6; rrect(ctx, x1 - 1, by - 1, (x2 - x1) + 2, bh + 2, 8); ctx.stroke(); }
             ctx.fillStyle = isDim ? "#8f97a5" : "#e8ecf3";
-            for (const t of p.tasks) {
+            for (const t of sumTasks) {
               const mx = xOf(mapDay(t.end));
               ctx.beginPath(); ctx.moveTo(mx, by + bh / 2 - 4); ctx.lineTo(mx + 4, by + bh / 2); ctx.lineTo(mx, by + bh / 2 + 4); ctx.lineTo(mx - 4, by + bh / 2); ctx.closePath(); ctx.fill();
             }
@@ -164,7 +187,8 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
           }
         } else {
           const rh = rowH(lod);
-          p.members.forEach((pid, row) => {
+          const memberList = filterNow ? p.members.filter((m) => m === filterNow) : p.members;
+          memberList.forEach((pid, row) => {
             const ry = y + 24 + row * rh;
             let rowHasVisible = false;
             for (const t of p.tasks) {
@@ -232,14 +256,25 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
                 }
               }
             }
-            // nhãn người làm — dính mép trái, chỉ hiện khi hàng có task trong khung nhìn
-            if (lod >= 2 && rowHasVisible) {
+            // nhãn người làm — dính mép trái, chỉ hiện khi hàng có task trong
+            // khung nhìn (đang lọc thì luôn hiện). Cuối nhãn có icon phễu lọc:
+            // bấm vào để chỉ xem nhân viên này và các task của họ.
+            if (lod >= 2 && (rowHasVisible || filterNow)) {
               const person = personById(pid);
+              const isFilterTarget = filterNow === pid;
               ctx.fillStyle = "rgba(24,28,37,0.92)"; rrect(ctx, 6, ry + 2, 118, 16, 8); ctx.fill();
+              if (isFilterTarget) { ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 1.3; rrect(ctx, 6, ry + 2, 118, 16, 8); ctx.stroke(); }
               ctx.fillStyle = isDim ? grayOf(person.color) : person.color; ctx.beginPath(); ctx.arc(15, ry + 10, 4.5, 0, Math.PI * 2); ctx.fill();
               ctx.fillStyle = isDim ? "#79828f" : "#cfd6e4"; ctx.font = "10.5px Inter, system-ui, sans-serif";
               ctx.textAlign = "left"; ctx.textBaseline = "middle";
               ctx.fillText(person.name, 23, ry + 10.5);
+              // icon phễu lọc
+              ctx.fillStyle = isFilterTarget ? "#ffd166" : "rgba(203,211,224,0.8)";
+              ctx.beginPath();
+              ctx.moveTo(108, ry + 5.5); ctx.lineTo(119, ry + 5.5); ctx.lineTo(115.2, ry + 9.8);
+              ctx.lineTo(115.2, ry + 14); ctx.lineTo(111.8, ry + 14); ctx.lineTo(111.8, ry + 9.8);
+              ctx.closePath(); ctx.fill();
+              state.hits.push({ kind: "personFilter", personId: pid, project: p, x: 103, y: ry + 2, w: 21, h: 16 });
             }
           });
         }
@@ -314,11 +349,12 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
         state.vel.x *= 0.93; state.vel.y *= 0.93;
         state.dirty = true;
       }
-      // chiều cao lane đuổi theo target của LOD hiện tại
+      // chiều cao lane đuổi theo target của LOD hiện tại (chỉ các project đang hiển thị)
       const lod = lodOf(cam.ppd);
       let moving = false;
-      for (let i = 0; i < projects.length; i++) {
-        const target = targetHeight(projects[i], lod);
+      for (const p of visibleList()) {
+        const i = projects.indexOf(p);
+        const target = targetHeight(p, lod);
         const diff = target - heights[i];
         if (Math.abs(diff) > 0.4) { heights[i] += diff * 0.18; moving = true; }
         else if (diff !== 0) heights[i] = target;
@@ -488,6 +524,12 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
           tip.style.display = "block";
           tip.style.left = `${Math.min(x + 14, W - 240)}px`;
           tip.style.top = `${y + 16}px`;
+        } else if (hit && hit.kind === "personFilter") {
+          const person = personById(hit.personId);
+          tip.textContent = filterRef.current === hit.personId ? `Bỏ lọc — hiện tất cả nhân viên` : `Lọc riêng ${person.name}: chỉ hiện các project và task của nhân viên này`;
+          tip.style.display = "block";
+          tip.style.left = `${Math.min(x + 14, W - 240)}px`;
+          tip.style.top = `${y + 16}px`;
         } else tip.style.display = "none";
       }
     }
@@ -562,6 +604,7 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
         const rect = el.getBoundingClientRect();
         const hit = hitAt(e.clientX - rect.left, e.clientY - rect.top);
         if (hit && hit.kind === "projectLabel") onLabelClickRef.current && onLabelClickRef.current(hit.project);
+        else if (hit && hit.kind === "personFilter") onPersonFilterRef.current && onPersonFilterRef.current(hit.personId);
         else if (hit && hit.task) onSelectRef.current({ project: hit.project, task: hit.task, sub: hit.sub || null });
         else if (hit && hit.kind === "project") onSelectRef.current({ project: hit.project, task: null });
         else { onSelectRef.current(null); if (onClearFocusRef.current) onClearFocusRef.current(); }
@@ -570,7 +613,8 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
     }
     function onKey(e) {
       if (e.key === "Escape") {
-        if (onClearFocusRef.current) onClearFocusRef.current();
+        if (onEscapeRef.current) onEscapeRef.current();
+        else if (onClearFocusRef.current) onClearFocusRef.current();
         onSelectRef.current(null);
         state.dirty = true;
       }
