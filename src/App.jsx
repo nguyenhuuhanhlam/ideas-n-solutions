@@ -116,10 +116,14 @@ function SubtaskForm({ project, task, sub, onClose, onSave }) {
     onSave({ name: name.trim(), note: note.trim(), start: s, end: e, progress: progress / 100 });
   };
 
+  // Số ngày hoàn thành — tính sống theo 2 ô ngày đang nhập
+  const sDay = dayOfISO(startISO), eDay = dayOfISO(endISO);
+  const durDays = sDay != null && eDay != null ? eDay - sDay : null;
+
   return (
     <div onClick={(ev) => { if (ev.target === ev.currentTarget) onClose(); }}
       style={{ position: "fixed", inset: 0, zIndex: 20, background: "rgba(4,6,10,0.62)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ width: 420, maxWidth: "92vw", background: "#171b24", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 14, padding: 18, boxShadow: "0 18px 48px rgba(0,0,0,0.55)" }}>
+      <div style={{ width: 483, maxWidth: "92vw", background: "#171b24", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 14, padding: 18, boxShadow: "0 18px 48px rgba(0,0,0,0.55)" }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
           <div style={{ fontWeight: 700, fontSize: 15 }}>Sửa task con</div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "#8b95a9", fontSize: 17, cursor: "pointer" }}>×</button>
@@ -140,6 +144,11 @@ function SubtaskForm({ project, task, sub, onClose, onSave }) {
             <label style={labelStyle}>Kết thúc</label>
             <input style={fieldStyle} type="date" value={endISO} onChange={(ev) => setEndISO(ev.target.value)} />
           </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, background: "rgba(126,226,168,0.08)", border: "1px solid rgba(126,226,168,0.35)", borderRadius: 8, padding: "7px 10px", fontSize: 13 }}>
+          <span style={{ color: "#8b95a9" }}>Số ngày hoàn thành:</span>
+          <b style={{ color: "#7ee2a8", fontSize: 15 }}>{durDays != null && durDays > 0 ? `${durDays} ngày` : "—"}</b>
+          {durDays != null && durDays > 0 && <span style={{ color: "#8b95a9" }}>({fmtDay(sDay)} → {fmtDay(eDay)})</span>}
         </div>
         <div style={{ fontSize: 12, color: "#8b95a9", marginTop: 6 }}>Phải nằm trong task chính: {fmtDay(task.start)} → {fmtDay(task.end)}</div>
         <label style={labelStyle}>Tiến độ: {progress}%</label>
@@ -305,7 +314,7 @@ export default function App() {
                     <div style={{ fontSize: 11, color: "#ffd166", textTransform: "uppercase", letterSpacing: 0.6 }}>Task con đang chọn</div>
                     <div style={{ fontWeight: 700, fontSize: 14, margin: "3px 0 4px" }}>{sel.sub.name}</div>
                     <div style={{ fontSize: 12.5, lineHeight: 1.7 }}>
-                      <div>Thời gian: {fmtDay(sel.sub.start)} → {fmtDay(sel.sub.end)}</div>
+                      <div>Thời gian: {fmtDay(sel.sub.start)} → {fmtDay(sel.sub.end)} · {sel.sub.end - sel.sub.start} ngày</div>
                       <div>Tiến độ: {Math.round((sel.sub.progress || 0) * 100)}%</div>
                       {sel.sub.note && <div style={{ color: "#c6cdd9" }}>Nội dung: {sel.sub.note}</div>}
                     </div>
