@@ -23,15 +23,23 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: timeline-projects/package-lock.json
+      # Mỗi app nằm trong thư mục riêng; build với base là subpath Pages của app đó
       - run: npm ci
-      # Pages của repo nằm dưới subpath /ideas-n-solutions/ nên phải build với base tương ứng
-      - run: npm run build -- --base=/ideas-n-solutions/
+        working-directory: timeline-projects
+      - run: npm run build -- --base=/ideas-n-solutions/timeline-projects/
+        working-directory: timeline-projects
+      # Ghép các app + trang chủ ở root thành một site duy nhất
+      - run: |
+          mkdir -p _site/timeline-projects
+          cp -r timeline-projects/dist/* _site/timeline-projects/
+          cp index.html _site/index.html
       - uses: actions/configure-pages@v5
         with:
           enablement: true # tự bật Pages (build type workflow) nếu repo chưa bật
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: _site
 
   deploy:
     needs: build

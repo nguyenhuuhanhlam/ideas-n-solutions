@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Deploy staging (tạo bởi workflow khi build Pages)
+_site/
