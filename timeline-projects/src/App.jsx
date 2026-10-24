@@ -189,6 +189,18 @@ const iconAddBtn = {
   width: 28, height: 28, display: "inline-flex", alignItems: "center", justifyContent: "center",
   cursor: "pointer", flexShrink: 0, padding: 0,
 };
+// Nút sửa (task / task con) cũng dạng icon — bút chì, nền tối viền vàng để
+// phân biệt với nút thêm vàng đặc; gợi ý bấm đúp giữ trong title.
+const PencilIcon = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <path d="M11.2 2.3a1.6 1.6 0 0 1 2.3 2.3L5.9 12.2 2.5 13.5l1.3-3.4L11.2 2.3Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+  </svg>
+);
+const iconEditBtn = {
+  background: "#2b3242", color: "#ffd166", border: "1px solid rgba(255,209,102,0.45)", borderRadius: 8,
+  width: 28, height: 28, display: "inline-flex", alignItems: "center", justifyContent: "center",
+  cursor: "pointer", flexShrink: 0, padding: 0,
+};
 const fieldStyle = {
   width: "100%", boxSizing: "border-box", background: "#0f1218", color: "#e8ecf3",
   border: "1px solid rgba(255,255,255,0.16)", borderRadius: 8, padding: "8px 10px", fontSize: 13.5,
@@ -575,8 +587,9 @@ export default function App() {
                       {sel.sub.note && <div style={{ color: "#c6cdd9" }}>Nội dung: {sel.sub.note}</div>}
                     </div>
                     <button onClick={() => setEditing({ kind: "sub", project: sel.project, task: sel.task, sub: sel.sub })}
-                      style={{ background: "#2b3242", color: "#ffd166", border: "1px solid rgba(255,209,102,0.45)", borderRadius: 8, padding: "5px 12px", fontSize: 12.5, cursor: "pointer", marginTop: 8 }}>
-                      Sửa task con… <span style={{ color: "#8b95a9" }}>(hoặc bấm đúp vào thanh task con)</span>
+                      title="Sửa task con (hoặc bấm đúp vào thanh task con)" aria-label="Sửa task con"
+                      style={{ ...iconEditBtn, marginTop: 8 }}>
+                      <PencilIcon />
                     </button>
                   </div>
                 )}
@@ -590,8 +603,9 @@ export default function App() {
                   <div style={{ height: "100%", borderRadius: 3, width: `${sel.task.progress * 100}%`, background: personById(sel.task.assigneeId).color }} />
                 </div>
                 <button onClick={() => setEditing({ kind: "task", project: sel.project, task: sel.task })}
-                  style={{ background: "#2b3242", color: "#ffd166", border: "1px solid rgba(255,209,102,0.45)", borderRadius: 8, padding: "5px 12px", fontSize: 12.5, cursor: "pointer", margin: "2px 8px 4px 0" }}>
-                  Sửa task… <span style={{ color: "#8b95a9" }}>(hoặc bấm đúp vào thanh)</span>
+                  title="Sửa task (hoặc bấm đúp vào thanh task)" aria-label="Sửa task"
+                  style={{ ...iconEditBtn, margin: "2px 8px 4px 0" }}>
+                  <PencilIcon />
                 </button>
                 <button onClick={() => setCreating({ project: sel.project })}
                   title="Thêm task mới" aria-label="Thêm task mới" style={{ ...iconAddBtn, margin: "2px 0 4px" }}>
