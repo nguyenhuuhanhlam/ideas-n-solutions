@@ -32,6 +32,17 @@ khi thả chuột.
 - Quy tắc cứng vẫn áp dụng: task mới không được trùng thời gian với task
   khác của cùng người trong cùng dự án — form báo rõ task bị trùng.
 
+### Thêm task con cho task
+
+- Trong panel của một task, bấm **Thêm task con…** ngay cạnh tiêu đề
+  "Task con (N)".
+- Form thêm task con: tên đầu việc, nội dung chi tiết, ngày bắt đầu/kết
+  thúc, tiến độ. Ngày mặc định là khe trống đầu tiên đủ 3 ngày trong task
+  chính (tự tìm, không cần tự dò lịch trống).
+- Ràng buộc như khi sửa: task con phải nằm gọn trong task chính và không
+  được chồng lên task con khác của cùng task — form báo rõ đầu việc bị
+  chồng. Lưu xong task con mới được chọn ngay trong panel.
+
 Phác thảo test cho ý tưởng: **mọi project xếp chồng thành từng lớp trên một
 trục thời gian ngang duy nhất**, thao tác chính là **zoom phóng nhanh và kéo
 chuột** (không phải form nhập liệu hay board).
@@ -79,6 +90,9 @@ npm run dev
   Chiều cao lane giãn/co có animation khi qua ngưỡng, không nhảy cục.
 - Cuối tuần được tô mờ khi zoom đủ sâu; đường đỏ là **hôm nay** (22-10-2026
   trong dữ liệu giả). Ngày hiển thị dạng `dd-mm-yyyy`.
+- Tên tắt của thứ (Mon/Tue/…/Sun, Sat cam, Sun đỏ) **chỉ hiện ở cấp độ ngày**
+  (zoom sâu, nhãn "NGÀY" trên trục); ở cấp tuần/tháng trục chỉ hiện ngày
+  tháng cho gọn.
 
 ### Kỹ thuật
 

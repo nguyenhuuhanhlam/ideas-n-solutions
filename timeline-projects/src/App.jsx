@@ -4,6 +4,7 @@ import ProjectWorkspace from "./ProjectWorkspace";
 import {
   PEOPLE, PROJECTS, TODAY, fmtDay, personById, saveData, clearData,
   buildDemoData, nextPersonId, nextProjectId, nextPersonColor, nextTaskId,
+  nextSubtaskId,
 } from "./data";
 
 // Panel quản lý dữ liệu: thêm/xóa nhân viên và dự án, nạp lại dữ liệu demo,
@@ -260,7 +261,7 @@ function TaskForm({ project, task, isNew, onClose, onSave }) {
 // task con trong panel). Task con có nội dung riêng: tên đầu việc, mô tả
 // chi tiết, khoảng ngày, tiến độ. Ràng buộc: phải nằm gọn trong task chính
 // và không được chồng lên task con khác của cùng task chính.
-function SubtaskForm({ project, task, sub, onClose, onSave }) {
+function SubtaskForm({ project, task, sub, isNew, onClose, onSave }) {
   const [name, setName] = useState(sub.name);
   const [note, setNote] = useState(sub.note || "");
   const [startISO, setStartISO] = useState(isoOf(sub.start));
@@ -294,13 +295,13 @@ function SubtaskForm({ project, task, sub, onClose, onSave }) {
       style={{ position: "fixed", inset: 0, zIndex: 20, background: "rgba(4,6,10,0.62)", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ width: 483, maxWidth: "92vw", background: "#171b24", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 14, padding: 18, boxShadow: "0 18px 48px rgba(0,0,0,0.55)" }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
-          <div style={{ fontWeight: 700, fontSize: 15 }}>Sửa task con</div>
+          <div style={{ fontWeight: 700, fontSize: 15 }}>{isNew ? "Thêm task con" : "Sửa task con"}</div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "#8b95a9", fontSize: 17, cursor: "pointer" }}>×</button>
         </div>
         <div style={{ fontSize: 12, color: "#8b95a9", marginTop: 2 }}>{project.name} › {task.name} · Người làm: {personById(task.assigneeId).name}</div>
 
         <label style={labelStyle}>Tên đầu việc</label>
-        <input style={fieldStyle} value={name} onChange={(ev) => setName(ev.target.value)} />
+        <input style={fieldStyle} value={name} onChange={(ev) => setName(ev.target.value)} placeholder="Tên đầu việc…" />
         <label style={labelStyle}>Nội dung chi tiết</label>
         <textarea style={{ ...fieldStyle, resize: "vertical", minHeight: 64, fontFamily: "inherit", lineHeight: 1.5 }} rows={3}
           value={note} onChange={(ev) => setNote(ev.target.value)} placeholder="Mô tả nội dung công việc, yêu cầu, sản phẩm bàn giao…" />
@@ -341,6 +342,7 @@ export default function App() {
   const [soloId, setSoloId] = useState(null);
   const [editing, setEditing] = useState(null);
   const [creating, setCreating] = useState(null);
+  const [creatingSub, setCreatingSub] = useState(null);
   const [managing, setManaging] = useState(false);
   const [dataVersion, setDataVersion] = useState(0);
   // Dữ liệu thay đổi từ panel Quản lý (hoặc form sửa): lưu bền + dọn các
@@ -410,6 +412,28 @@ export default function App() {
     setSel({ project, task });
     setDataVersion((v) => v + 1);
     setCreating(null);
+  };
+  // Khe trống đầu tiên đủ len ngày cho task con mới (khoảng nửa-mở [start, end)
+  // như quy tắc chồng lấn hiện tại): quét các task con đã xếp theo thời gian.
+  const firstFreeSubtaskSlot = (task, len = 3) => {
+    const sorted = [...task.subtasks].sort((a, b) => a.start - b.start);
+    let cursor = task.start;
+    for (const s of sorted) {
+      if (s.start - cursor >= len) return [cursor, cursor + len];
+      cursor = Math.max(cursor, s.end);
+    }
+    if (task.end - cursor >= len) return [cursor, cursor + len];
+    return [task.start, Math.min(task.end, task.start + 2)];
+  };
+  // Lưu form thêm task con: task con mới vào task chính, lưu bền ngay.
+  const handleCreateSub = ({ name, note, start, end, progress }) => {
+    const { project, task } = creatingSub;
+    const sub = { id: nextSubtaskId(task), name, note, start, end, progress };
+    task.subtasks.push(sub);
+    saveData();
+    setSel({ project, task, sub });
+    setDataVersion((v) => v + 1);
+    setCreatingSub(null);
   };
   // Lưu form sửa task con: ghi thẳng vào subtask đang chọn
   const handleSaveSub = ({ name, note, start, end, progress }) => {
@@ -516,7 +540,13 @@ export default function App() {
             {sel.task ? (
               <>
                 <div style={{ fontWeight: 700, fontSize: 15, margin: "4px 0 0" }}>{sel.task.name}{sel.sub ? ` › ${sel.sub.name}` : ""}</div>
-                <div style={{ fontSize: 11, color: "#8b95a9", textTransform: "uppercase", letterSpacing: 0.6, margin: "1.5rem 0 6px" }}>Task con ({sel.task.subtasks.length}) — bấm để chọn</div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "1.5rem 0 6px" }}>
+                  <div style={{ fontSize: 11, color: "#8b95a9", textTransform: "uppercase", letterSpacing: 0.6 }}>Task con ({sel.task.subtasks.length}) — bấm để chọn</div>
+                  <button onClick={() => setCreatingSub({ project: sel.project, task: sel.task })}
+                    style={{ background: "#ffd166", color: "#16181d", border: "none", borderRadius: 7, padding: "3px 10px", fontSize: 11.5, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
+                    Thêm task con…
+                  </button>
+                </div>
                 {sel.task.subtasks.map((s) => (
                   <div key={s.id} onClick={() => setSel({ project: sel.project, task: sel.task, sub: s })} title="Bấm để chọn task con này"
                     style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, padding: "3px 4px", borderTop: "1px solid rgba(255,255,255,0.06)", cursor: "pointer", borderRadius: 4, background: sel.sub?.id === s.id ? "rgba(255,209,102,0.1)" : "transparent", color: sel.sub?.id === s.id ? "#ffd166" : "inherit" }}>
@@ -611,6 +641,14 @@ export default function App() {
         <SubtaskForm key={editing.sub.id} project={editing.project} task={editing.task} sub={editing.sub}
           onClose={() => setEditing(null)} onSave={handleSaveSub} />
       )}
+      {creatingSub && (() => {
+        const [s, e] = firstFreeSubtaskSlot(creatingSub.task);
+        return (
+          <SubtaskForm key="new-sub" project={creatingSub.project} task={creatingSub.task} isNew
+            sub={{ id: "__new__", name: "", note: "", start: s, end: e, progress: 0 }}
+            onClose={() => setCreatingSub(null)} onSave={handleCreateSub} />
+        );
+      })()}
       {managing && (
         <ManageModal onClose={() => setManaging(false)} onChanged={handleDataChanged}
           onAddTask={(pr) => { setManaging(false); setCreating({ project: pr }); }} />
