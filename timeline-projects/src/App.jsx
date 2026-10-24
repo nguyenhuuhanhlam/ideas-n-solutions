@@ -1,7 +1,165 @@
 import { useRef, useState } from "react";
 import Timeline from "./Timeline";
 import ProjectWorkspace from "./ProjectWorkspace";
-import { PROJECTS, fmtDay, personById } from "./data";
+import {
+  PEOPLE, PROJECTS, TODAY, fmtDay, personById, saveData, clearData,
+  buildDemoData, nextPersonId, nextProjectId, nextPersonColor,
+} from "./data";
+
+// Panel quản lý dữ liệu: thêm/xóa nhân viên và dự án, nạp lại dữ liệu demo,
+// xóa toàn bộ. Mọi thay đổi ghi thẳng vào localStorage qua saveData().
+function ManageModal({ onClose, onChanged }) {
+  const [tab, setTab] = useState("people");
+  const [personName, setPersonName] = useState("");
+  const [projectName, setProjectName] = useState("");
+  const [pStart, setPStart] = useState(isoOf(TODAY));
+  const [pEnd, setPEnd] = useState(isoOf(TODAY + 30));
+  const [error, setError] = useState(null);
+  const [arming, setArming] = useState(null);
+  // Nút xóa 2 bước: bấm lần 1 chuyển sang "Chắc chắn?", bấm lần 2 mới xóa.
+  const arm = (key, fn) => {
+    if (arming === key) { setArming(null); fn(); }
+    else { setArming(key); setTimeout(() => setArming((a) => (a === key ? null : a)), 3000); }
+  };
+
+  const addPerson = () => {
+    const name = personName.trim();
+    if (!name) { setError("Tên nhân viên không được để trống."); return; }
+    PEOPLE.push({ id: nextPersonId(), name, color: nextPersonColor() });
+    saveData(); setPersonName(""); setError(null); onChanged();
+  };
+  const deletePerson = (p) => {
+    const taskCount = PROJECTS.reduce((n, pr) => n + pr.tasks.filter((t) => t.assigneeId === p.id).length, 0);
+    if (taskCount > 0) {
+      setError(`Không xóa được ${p.name}: còn ${taskCount} task đang giao cho người này. Xóa hoặc đổi người làm của các task đó trước.`);
+      return;
+    }
+    PROJECTS.forEach((pr) => { pr.members = pr.members.filter((m) => m !== p.id); });
+    PEOPLE.splice(PEOPLE.findIndex((o) => o.id === p.id), 1);
+    saveData(); setError(null); onChanged();
+  };
+  const addProject = () => {
+    const name = projectName.trim();
+    const s = dayOfISO(pStart), e = dayOfISO(pEnd);
+    if (!name) { setError("Tên dự án không được để trống."); return; }
+    if (s == null || e == null) { setError("Ngày chưa hợp lệ."); return; }
+    if (e <= s) { setError("Ngày kết thúc phải sau ngày bắt đầu."); return; }
+    PROJECTS.push({
+      id: nextProjectId(), name,
+      color: `hsl(${Math.round((PROJECTS.length * 47) % 360)} 55% 52%)`,
+      start: s, end: e, members: [], tasks: [],
+    });
+    saveData(); setProjectName(""); setError(null); onChanged();
+  };
+  const deleteProject = (pr) => {
+    PROJECTS.splice(PROJECTS.findIndex((o) => o.id === pr.id), 1);
+    saveData(); setError(null); onChanged();
+  };
+
+  const tabBtn = (active) => ({
+    background: active ? "#2b3242" : "transparent", color: active ? "#ffd166" : "#aeb8c8",
+    border: "1px solid rgba(255,255,255,0.14)", borderRadius: 8, padding: "6px 14px",
+    fontSize: 13, cursor: "pointer", fontWeight: active ? 700 : 400,
+  });
+  const delBtn = (key) => ({
+    background: arming === key ? "#ff5d5d" : "#232936", color: arming === key ? "#fff" : "#ff8a8a",
+    border: "1px solid rgba(255,93,93,0.45)", borderRadius: 7, padding: "4px 10px",
+    fontSize: 12, cursor: "pointer", whiteSpace: "nowrap",
+  });
+
+  return (
+    <div onClick={(ev) => { if (ev.target === ev.currentTarget) onClose(); }}
+      style={{ position: "fixed", inset: 0, zIndex: 20, background: "rgba(4,6,10,0.62)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ width: 520, maxWidth: "92vw", maxHeight: "88vh", overflowY: "auto", background: "#171b24", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 14, padding: 18, boxShadow: "0 18px 48px rgba(0,0,0,0.55)" }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+          <div style={{ fontWeight: 700, fontSize: 15 }}>Quản lý dữ liệu</div>
+          <button onClick={onClose} style={{ background: "none", border: "none", color: "#8b95a9", fontSize: 17, cursor: "pointer" }}>×</button>
+        </div>
+        <div style={{ fontSize: 12, color: "#8b95a9", marginTop: 2 }}>
+          {PEOPLE.length} nhân viên · {PROJECTS.length} dự án · Lưu trong trình duyệt (localStorage)
+        </div>
+
+        <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
+          <button style={tabBtn(tab === "people")} onClick={() => setTab("people")}>Nhân viên</button>
+          <button style={tabBtn(tab === "projects")} onClick={() => setTab("projects")}>Dự án</button>
+        </div>
+
+        {tab === "people" && (
+          <>
+            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+              <input style={fieldStyle} value={personName} placeholder="Tên nhân viên mới…"
+                onChange={(ev) => setPersonName(ev.target.value)}
+                onKeyDown={(ev) => { if (ev.key === "Enter") addPerson(); }} />
+              <button onClick={addPerson} style={{ background: "#ffd166", color: "#16181d", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>Thêm</button>
+            </div>
+            {PEOPLE.length === 0 && <div style={{ fontSize: 13, color: "#8b95a9", marginTop: 12 }}>Chưa có nhân viên nào.</div>}
+            {PEOPLE.map((p) => {
+              const inProjects = PROJECTS.filter((pr) => pr.members.includes(p.id)).length;
+              const taskCount = PROJECTS.reduce((n, pr) => n + pr.tasks.filter((t) => t.assigneeId === p.id).length, 0);
+              return (
+                <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 0", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                  <span style={{ width: 10, height: 10, borderRadius: "50%", background: p.color, flexShrink: 0 }} />
+                  <span style={{ flex: 1, fontSize: 13.5 }}>{p.name}</span>
+                  <span style={{ fontSize: 12, color: "#8b95a9" }}>{inProjects} dự án · {taskCount} task</span>
+                  <button style={delBtn(`person:${p.id}`)} onClick={() => arm(`person:${p.id}`, () => deletePerson(p))}>
+                    {arming === `person:${p.id}` ? "Chắc chắn xóa?" : "Xóa"}
+                  </button>
+                </div>
+              );
+            })}
+          </>
+        )}
+
+        {tab === "projects" && (
+          <>
+            <label style={labelStyle}>Tên dự án</label>
+            <input style={fieldStyle} value={projectName} placeholder="Tên dự án mới…"
+              onChange={(ev) => setProjectName(ev.target.value)} />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <div>
+                <label style={labelStyle}>Bắt đầu</label>
+                <input style={fieldStyle} type="date" value={pStart} onChange={(ev) => setPStart(ev.target.value)} />
+              </div>
+              <div>
+                <label style={labelStyle}>Kết thúc</label>
+                <input style={fieldStyle} type="date" value={pEnd} onChange={(ev) => setPEnd(ev.target.value)} />
+              </div>
+            </div>
+            <button onClick={addProject} style={{ background: "#ffd166", color: "#16181d", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", marginTop: 12 }}>Thêm dự án</button>
+            <div style={{ fontSize: 12, color: "#8b95a9", marginTop: 6 }}>Dự án mới chưa có task; thêm task cho dự án ở bước tiếp theo.</div>
+            {PROJECTS.length === 0 && <div style={{ fontSize: 13, color: "#8b95a9", marginTop: 12 }}>Chưa có dự án nào.</div>}
+            {PROJECTS.map((pr) => (
+              <div key={pr.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 0", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                <span style={{ width: 4, height: 26, borderRadius: 2, background: pr.color, flexShrink: 0 }} />
+                <span style={{ flex: 1, fontSize: 13.5 }}>
+                  {pr.name}
+                  <span style={{ display: "block", fontSize: 12, color: "#8b95a9" }}>{fmtDay(pr.start)} → {fmtDay(pr.end)} · {pr.tasks.length} task · {pr.members.length} người</span>
+                </span>
+                <button style={delBtn(`project:${pr.id}`)} onClick={() => arm(`project:${pr.id}`, () => deleteProject(pr))}>
+                  {arming === `project:${pr.id}` ? "Chắc chắn xóa?" : "Xóa"}
+                </button>
+              </div>
+            ))}
+          </>
+        )}
+
+        {error && (
+          <div style={{ marginTop: 12, background: "rgba(255,93,93,0.12)", border: "1px solid rgba(255,93,93,0.45)", color: "#ffb3b3", borderRadius: 8, padding: "8px 10px", fontSize: 12.5, lineHeight: 1.5 }}>{error}</div>
+        )}
+
+        <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", marginTop: 16, paddingTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button style={delBtn("demo")} onClick={() => arm("demo", () => { buildDemoData(); setError(null); onChanged(); })}>
+            {arming === "demo" ? "Ghi đè dữ liệu hiện tại bằng demo?" : "Nạp dữ liệu demo"}
+          </button>
+          <button style={delBtn("clear")} onClick={() => arm("clear", () => { clearData(); setError(null); onChanged(); })}>
+            {arming === "clear" ? "Xóa hết, chắc chắn?" : "Xóa toàn bộ dữ liệu"}
+          </button>
+          <span style={{ fontSize: 12, color: "#8b95a9", alignSelf: "center" }}>Demo cũ (25 dự án, 15 người) vẫn nạp lại được bất cứ lúc nào.</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const DAY_MS = 86400000;
 const isoOf = (day) => {
@@ -171,7 +329,17 @@ export default function App() {
   const [filterPersonId, setFilterPersonId] = useState(null);
   const [soloId, setSoloId] = useState(null);
   const [editing, setEditing] = useState(null);
+  const [managing, setManaging] = useState(false);
   const [dataVersion, setDataVersion] = useState(0);
+  // Dữ liệu thay đổi từ panel Quản lý (hoặc form sửa): lưu bền + dọn các
+  // lựa chọn đang trỏ tới dữ liệu không còn tồn tại.
+  const handleDataChanged = () => {
+    setDataVersion((v) => v + 1);
+    setSel((cur) => (cur && PROJECTS.some((p) => p.id === cur.project.id) ? cur : null));
+    setFocusId((cur) => (PROJECTS.some((p) => p.id === cur) ? cur : null));
+    setSoloId((cur) => (PROJECTS.some((p) => p.id === cur) ? cur : null));
+    setFilterPersonId((cur) => (PEOPLE.some((p) => p.id === cur) ? cur : null));
+  };
   const hudRef = useRef(null);
   const controlsRef = useRef(null);
   const focusedProject = PROJECTS.find((p) => p.id === focusId) || null;
@@ -210,6 +378,7 @@ export default function App() {
     Object.assign(task, { name, assigneeId, start, end, progress });
     project.start = Math.min(project.start, ...project.tasks.map((t) => t.start));
     project.end = Math.max(project.end, ...project.tasks.map((t) => t.end));
+    saveData();
     setSel({ project, task });
     setDataVersion((v) => v + 1);
     setEditing(null);
@@ -218,6 +387,7 @@ export default function App() {
   const handleSaveSub = ({ name, note, start, end, progress }) => {
     const { project, task, sub } = editing;
     Object.assign(sub, { name, note, start, end, progress });
+    saveData();
     setSel({ project, task, sub });
     setDataVersion((v) => v + 1);
     setEditing(null);
@@ -243,9 +413,13 @@ export default function App() {
     <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "#11141a", color: "#e8ecf3" }}>
       <header style={{ display: "flex", alignItems: "center", gap: 14, padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.09)", flexWrap: "wrap" }}>
         <div>
-          <div style={{ fontWeight: 700, fontSize: 16 }}>Timeline Projects — bản mẫu test</div>
-          <div style={{ fontSize: 12, color: "#8b95a9" }}>25 project xếp lớp trên 1 trục thời gian · 15 nhân viên · dữ liệu giả · task song song theo người làm</div>
+          <div style={{ fontWeight: 700, fontSize: 16 }}>Timeline Projects</div>
+          <div style={{ fontSize: 12, color: "#8b95a9" }}>{PROJECTS.length} dự án · {PEOPLE.length} nhân viên · dữ liệu lưu ở trình duyệt</div>
         </div>
+        <button onClick={() => setManaging(true)} title="Thêm/xóa nhân viên và dự án"
+          style={{ background: "#2b3242", color: "#ffd166", border: "1px solid rgba(255,209,102,0.5)", borderRadius: 9, padding: "0 14px", height: 34, fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
+          Quản lý
+        </button>
         {(focusedProject || filterPerson || soloProject) && (
           <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
             {soloProject && (
@@ -285,6 +459,23 @@ export default function App() {
           filterPersonId={filterPersonId} onPersonFilter={handlePersonFilter}
           soloProjectId={soloId} onProjectSolo={handleProjectSolo}
           onEscape={() => { setFocusId(null); setFilterPersonId(null); setSoloId(null); }} />
+
+        {PROJECTS.length === 0 && (
+          <div style={{
+            position: "absolute", top: "38%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 5,
+            background: "rgba(20,24,33,0.97)", border: "1px solid rgba(255,255,255,0.14)",
+            borderRadius: 14, padding: "22px 26px", textAlign: "center", boxShadow: "0 12px 32px rgba(0,0,0,0.45)",
+          }}>
+            <div style={{ fontWeight: 700, fontSize: 17 }}>Chưa có dự án nào</div>
+            <div style={{ fontSize: 13, color: "#aeb8c8", margin: "8px 0 14px", lineHeight: 1.6 }}>
+              Dữ liệu demo đã được reset. Thêm nhân viên và dự án để bắt đầu quản lý thật.
+            </div>
+            <button onClick={() => setManaging(true)}
+              style={{ background: "#ffd166", color: "#16181d", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+              Mở Quản lý
+            </button>
+          </div>
+        )}
 
         {sel && (
           <aside style={{
@@ -372,6 +563,9 @@ export default function App() {
       {editing?.kind === "sub" && (
         <SubtaskForm key={editing.sub.id} project={editing.project} task={editing.task} sub={editing.sub}
           onClose={() => setEditing(null)} onSave={handleSaveSub} />
+      )}
+      {managing && (
+        <ManageModal onClose={() => setManaging(false)} onChanged={handleDataChanged} />
       )}
     </div>
   );

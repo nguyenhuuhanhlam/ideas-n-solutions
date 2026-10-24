@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import Konva from "konva";
-import { TODAY, DATA_MIN, DATA_MAX, fmtDay, personById } from "./data";
+import { TODAY, fmtDay, personById, saveData } from "./data";
 
 // Timeline 1 trục thời gian — bản mẫu test cảm giác zoom / kéo.
 // - Zoom: liên tục, chỉ giãn trục X, luôn về điểm dưới con trỏ, kẹp [MIN_PPD, MAX_PPD]
@@ -86,7 +86,10 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
     stage.add(layer);
 
     const cam = { ppd: 2.6, leftDay: TODAY - (W / 2.6) * 0.35, scrollY: 0 };
-    const heights = new Float64Array(projects.length).fill(30);
+    // Mảng thường (không dùng Float64Array) để thêm project sau vẫn tự nối dài;
+    // lane chưa có chiều cao thì mặc định 30.
+    const heights = new Array(projects.length).fill(30);
+    const hAt = (i) => (heights[i] == null ? 30 : heights[i]);
     const state = {
       dirty: true, vel: { x: 0, y: 0 }, drag: null, hoverId: null, lastTap: null,
       tween: null, frame: 0, lastLod: -1, hits: [],
@@ -113,12 +116,12 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
       const out = new Array(list.length);
       let y = AXIS_H - cam.scrollY;
       for (let i = 0; i < list.length; i++) {
-        const h = heights[projects.indexOf(list[i])];
+        const h = hAt(projects.indexOf(list[i]));
         out[i] = { y, h }; y += h;
       }
       return out;
     }
-    function totalHeight() { return visibleList().reduce((a, p) => a + heights[projects.indexOf(p)], 0); }
+    function totalHeight() { return visibleList().reduce((a, p) => a + hAt(projects.indexOf(p)), 0); }
     function clampScroll() {
       cam.scrollY = clamp(cam.scrollY, 0, Math.max(0, totalHeight() - (H - AXIS_H) + 24));
     }
@@ -403,7 +406,7 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
       for (const p of visibleList()) {
         const i = projects.indexOf(p);
         const target = targetHeight(p, lod);
-        const diff = target - heights[i];
+        const diff = target - hAt(i);
         if (Math.abs(diff) > 0.4) { heights[i] += diff * 0.18; moving = true; }
         else if (diff !== 0) heights[i] = target;
       }
@@ -432,8 +435,15 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
       controlsRef.current = {
         zoomStep: (f) => startTween(cam.ppd * f, { anchor: { day: dayAt(W / 2), x: W / 2 } }),
         fit: () => {
-          const span = DATA_MAX - DATA_MIN;
-          startTween(W / (span * 1.02), { toLeft: DATA_MIN - span * 0.01, toScrollY: 0, dur: 650 });
+          if (!projects.length) {
+            // Chưa có project nào: khung nhìn mặc định quanh hôm nay
+            startTween(2.6, { toLeft: TODAY - (W / 2.6) * 0.35, toScrollY: 0, dur: 650 });
+            return;
+          }
+          const mn = Math.min(...projects.map((p) => p.start));
+          const mx = Math.max(...projects.map((p) => p.end));
+          const span = Math.max(30, mx - mn);
+          startTween(W / (span * 1.02), { toLeft: mn - span * 0.01, toScrollY: 0, dur: 650 });
         },
         today: () => startTween(Math.max(cam.ppd, 3), { anchor: { day: TODAY, x: W * 0.4 }, dur: 650 }),
       };
@@ -667,6 +677,8 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
         else if (hit && hit.kind === "project") onSelectRef.current({ project: hit.project, task: null });
         else { onSelectRef.current(null); if (onClearFocusRef.current) onClearFocusRef.current(); }
       }
+      // Kéo thả đã đổi dữ liệu thật (task/project): lưu bền ngay khi thả chuột
+      if (d.kind === "task" || d.kind === "task-resize" || d.kind === "summary-move" || d.kind === "summary-scale") saveData();
       state.dirty = true;
     }
     function onKey(e) {

@@ -4,6 +4,23 @@ App này thuộc repo [ideas-n-solutions](https://github.com/nguyenhuuhanhlam/id
 (và nằm trong thư mục `timeline-projects/` của repo). Demo live:
 https://nguyenhuuhanhlam.github.io/ideas-n-solutions/timeline-projects/
 
+### Quản lý dữ liệu (từ 2026-10-24)
+
+App khởi đầu **rỗng** — dữ liệu demo cũ đã được reset. Nút **Quản lý** trên thanh
+menu mở panel thêm/xóa:
+
+- **Nhân viên**: thêm theo tên (màu tự gán); xóa bằng nút 2 bước. Không xóa
+  được người còn task đang giao.
+- **Dự án**: thêm theo tên + khoảng ngày (mặc định 30 ngày từ hôm nay); xóa
+  bằng nút 2 bước, xóa luôn task của dự án đó.
+- **Nạp dữ liệu demo**: sinh lại bộ demo cũ (25 dự án, 15 nhân viên) để test,
+  ghi đè dữ liệu hiện tại. **Xóa toàn bộ dữ liệu**: về trạng thái rỗng.
+
+Dữ liệu được lưu bền vào **localStorage** của trình duyệt đang dùng
+(`timeline-projects-data-v1`) — chưa có backend nên đổi máy/trình duyệt khác
+sẽ không thấy dữ liệu này. Kéo thả task/project trên timeline cũng lưu ngay
+khi thả chuột.
+
 Phác thảo test cho ý tưởng: **mọi project xếp chồng thành từng lớp trên một
 trục thời gian ngang duy nhất**, thao tác chính là **zoom phóng nhanh và kéo
 chuột** (không phải form nhập liệu hay board).
