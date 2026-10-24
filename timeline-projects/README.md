@@ -21,6 +21,17 @@ Dữ liệu được lưu bền vào **localStorage** của trình duyệt đang
 sẽ không thấy dữ liệu này. Kéo thả task/project trên timeline cũng lưu ngay
 khi thả chuột.
 
+### Thêm task cho dự án
+
+- Bấm tên dự án trên timeline để mở panel dự án rồi bấm **Thêm task…**,
+  hoặc trong panel Quản lý bấm **+ Task** ở hàng dự án, hoặc bấm
+  **Thêm task mới…** trong panel của một task cùng dự án.
+- Form thêm task: tên, người làm (chọn trong toàn bộ nhân viên — người chưa
+  trong nhóm sẽ tự được thêm vào dự án), ngày bắt đầu/kết thúc, tiến độ.
+  Task mới bắt đầu với 0 task con.
+- Quy tắc cứng vẫn áp dụng: task mới không được trùng thời gian với task
+  khác của cùng người trong cùng dự án — form báo rõ task bị trùng.
+
 Phác thảo test cho ý tưởng: **mọi project xếp chồng thành từng lớp trên một
 trục thời gian ngang duy nhất**, thao tác chính là **zoom phóng nhanh và kéo
 chuột** (không phải form nhập liệu hay board).

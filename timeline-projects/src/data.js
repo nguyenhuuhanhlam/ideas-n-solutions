@@ -212,6 +212,14 @@ const maxNum = (arr, prefix) => arr.reduce((m, o) => {
 }, 0);
 export const nextPersonId = () => `p${maxNum(PEOPLE, "p") + 1}`;
 export const nextProjectId = () => `pr${maxNum(PROJECTS, "pr") + 1}`;
+export const nextTaskId = (project) => {
+  const n = project.tasks.reduce((m, t) => {
+    const suffix = String(t.id).split("t").pop();
+    const v = parseInt(suffix, 10);
+    return Number.isFinite(v) ? Math.max(m, v) : m;
+  }, 0);
+  return `${project.id}t${n + 1}`;
+};
 export const nextPersonColor = () => personColor(PEOPLE.length);
 
 // Trả về bản ghi dự phòng thay vì undefined để canvas/panel không crash

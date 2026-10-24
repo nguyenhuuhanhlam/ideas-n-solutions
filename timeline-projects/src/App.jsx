@@ -3,12 +3,12 @@ import Timeline from "./Timeline";
 import ProjectWorkspace from "./ProjectWorkspace";
 import {
   PEOPLE, PROJECTS, TODAY, fmtDay, personById, saveData, clearData,
-  buildDemoData, nextPersonId, nextProjectId, nextPersonColor,
+  buildDemoData, nextPersonId, nextProjectId, nextPersonColor, nextTaskId,
 } from "./data";
 
 // Panel quản lý dữ liệu: thêm/xóa nhân viên và dự án, nạp lại dữ liệu demo,
 // xóa toàn bộ. Mọi thay đổi ghi thẳng vào localStorage qua saveData().
-function ManageModal({ onClose, onChanged }) {
+function ManageModal({ onClose, onChanged, onAddTask }) {
   const [tab, setTab] = useState("people");
   const [personName, setPersonName] = useState("");
   const [projectName, setProjectName] = useState("");
@@ -135,6 +135,10 @@ function ManageModal({ onClose, onChanged }) {
                   {pr.name}
                   <span style={{ display: "block", fontSize: 12, color: "#8b95a9" }}>{fmtDay(pr.start)} → {fmtDay(pr.end)} · {pr.tasks.length} task · {pr.members.length} người</span>
                 </span>
+                <button onClick={() => onAddTask(pr)}
+                  style={{ background: "#2b3242", color: "#ffd166", border: "1px solid rgba(255,209,102,0.45)", borderRadius: 7, padding: "4px 10px", fontSize: 12, cursor: "pointer", whiteSpace: "nowrap" }}>
+                  + Task
+                </button>
                 <button style={delBtn(`project:${pr.id}`)} onClick={() => arm(`project:${pr.id}`, () => deleteProject(pr))}>
                   {arming === `project:${pr.id}` ? "Chắc chắn xóa?" : "Xóa"}
                 </button>
@@ -179,8 +183,11 @@ const fieldStyle = {
 };
 const labelStyle = { display: "block", fontSize: 11.5, color: "#8b95a9", margin: "12px 0 5px", textTransform: "uppercase", letterSpacing: 0.5 };
 
-// Form sửa task — mở bằng bấm đúp vào thanh task (hoặc nút Sửa trong panel)
-function TaskForm({ project, task, onClose, onSave }) {
+// Form sửa task — mở bằng bấm đúp vào thanh task (hoặc nút Sửa trong panel).
+// Chế độ tạo mới (isNew): cùng form nhưng tiêu đề "Thêm task", chọn người làm
+// trong toàn bộ nhân viên (người chưa trong nhóm sẽ tự được thêm vào project
+// khi lưu), task mới bắt đầu với 0 task con.
+function TaskForm({ project, task, isNew, onClose, onSave }) {
   const [name, setName] = useState(task.name);
   const [assigneeId, setAssigneeId] = useState(task.assigneeId);
   const [startISO, setStartISO] = useState(isoOf(task.start));
@@ -193,6 +200,8 @@ function TaskForm({ project, task, onClose, onSave }) {
     if (s == null || e == null) { setError("Ngày chưa hợp lệ."); return; }
     if (e <= s) { setError("Ngày kết thúc phải sau ngày bắt đầu."); return; }
     if (!name.trim()) { setError("Tên task không được để trống."); return; }
+    if (isNew && !PEOPLE.length) { setError("Chưa có nhân viên nào — thêm nhân viên ở Quản lý trước."); return; }
+    if (!assigneeId) { setError("Chưa chọn người làm."); return; }
     // Quy tắc: task chính của cùng 1 người không được trùng nhau
     const clash = project.tasks.find((o) => o.id !== task.id && o.assigneeId === assigneeId && s < o.end && o.start < e);
     if (clash) {
@@ -207,17 +216,18 @@ function TaskForm({ project, task, onClose, onSave }) {
       style={{ position: "fixed", inset: 0, zIndex: 20, background: "rgba(4,6,10,0.62)", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ width: 400, maxWidth: "92vw", background: "#171b24", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 14, padding: 18, boxShadow: "0 18px 48px rgba(0,0,0,0.55)" }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
-          <div style={{ fontWeight: 700, fontSize: 15 }}>Sửa task</div>
+          <div style={{ fontWeight: 700, fontSize: 15 }}>{isNew ? "Thêm task" : "Sửa task"}</div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "#8b95a9", fontSize: 17, cursor: "pointer" }}>×</button>
         </div>
         <div style={{ fontSize: 12, color: "#8b95a9", marginTop: 2 }}>Project: {project.name}</div>
 
         <label style={labelStyle}>Tên task</label>
-        <input style={fieldStyle} value={name} onChange={(ev) => setName(ev.target.value)} />
+        <input style={fieldStyle} value={name} onChange={(ev) => setName(ev.target.value)} placeholder="Tên công việc…" />
         <label style={labelStyle}>Người làm</label>
         <select style={fieldStyle} value={assigneeId} onChange={(ev) => setAssigneeId(ev.target.value)}>
-          {project.members.map((pid) => (
-            <option key={pid} value={pid}>{personById(pid).name}</option>
+          {isNew && !PEOPLE.length && <option value="">Chưa có nhân viên — thêm ở Quản lý</option>}
+          {(isNew ? PEOPLE : project.members.map((pid) => personById(pid))).map((p) => (
+            <option key={p.id} value={p.id}>{p.name}</option>
           ))}
         </select>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
@@ -232,7 +242,8 @@ function TaskForm({ project, task, onClose, onSave }) {
         </div>
         <label style={labelStyle}>Tiến độ: {progress}%</label>
         <input type="range" min="0" max="100" value={progress} onChange={(ev) => setProgress(+ev.target.value)} style={{ width: "100%", accentColor: "#ffd166" }} />
-        <div style={{ fontSize: 12, color: "#8b95a9", marginTop: 8 }}>Task con sẽ tự co/giãn theo khoảng thời gian mới của task.</div>
+        {!isNew && <div style={{ fontSize: 12, color: "#8b95a9", marginTop: 8 }}>Task con sẽ tự co/giãn theo khoảng thời gian mới của task.</div>}
+        {isNew && <div style={{ fontSize: 12, color: "#8b95a9", marginTop: 8 }}>Task mới bắt đầu với 0 task con; thêm task con ở bước tiếp theo. Người làm chưa trong nhóm sẽ tự được thêm vào dự án.</div>}
         {error && (
           <div style={{ marginTop: 12, background: "rgba(255,93,93,0.12)", border: "1px solid rgba(255,93,93,0.45)", color: "#ffb3b3", borderRadius: 8, padding: "8px 10px", fontSize: 12.5, lineHeight: 1.5 }}>{error}</div>
         )}
@@ -329,6 +340,7 @@ export default function App() {
   const [filterPersonId, setFilterPersonId] = useState(null);
   const [soloId, setSoloId] = useState(null);
   const [editing, setEditing] = useState(null);
+  const [creating, setCreating] = useState(null);
   const [managing, setManaging] = useState(false);
   const [dataVersion, setDataVersion] = useState(0);
   // Dữ liệu thay đổi từ panel Quản lý (hoặc form sửa): lưu bền + dọn các
@@ -382,6 +394,22 @@ export default function App() {
     setSel({ project, task });
     setDataVersion((v) => v + 1);
     setEditing(null);
+  };
+  // Lưu form thêm task: task mới vào project, người làm chưa trong nhóm thì
+  // tự thêm vào nhóm; project tự nới span nếu task vượt ra ngoài.
+  const handleCreateTask = ({ name, assigneeId, start, end, progress }) => {
+    const { project } = creating;
+    const task = {
+      id: nextTaskId(project), name, assigneeId, start, end, progress, subtasks: [],
+    };
+    project.tasks.push(task);
+    if (!project.members.includes(assigneeId)) project.members.push(assigneeId);
+    project.start = Math.min(project.start, start);
+    project.end = Math.max(project.end, end);
+    saveData();
+    setSel({ project, task });
+    setDataVersion((v) => v + 1);
+    setCreating(null);
   };
   // Lưu form sửa task con: ghi thẳng vào subtask đang chọn
   const handleSaveSub = ({ name, note, start, end, progress }) => {
@@ -520,8 +548,12 @@ export default function App() {
                   <div style={{ height: "100%", borderRadius: 3, width: `${sel.task.progress * 100}%`, background: personById(sel.task.assigneeId).color }} />
                 </div>
                 <button onClick={() => setEditing({ kind: "task", project: sel.project, task: sel.task })}
-                  style={{ background: "#2b3242", color: "#ffd166", border: "1px solid rgba(255,209,102,0.45)", borderRadius: 8, padding: "5px 12px", fontSize: 12.5, cursor: "pointer", margin: "2px 0 4px" }}>
+                  style={{ background: "#2b3242", color: "#ffd166", border: "1px solid rgba(255,209,102,0.45)", borderRadius: 8, padding: "5px 12px", fontSize: 12.5, cursor: "pointer", margin: "2px 8px 4px 0" }}>
                   Sửa task… <span style={{ color: "#8b95a9" }}>(hoặc bấm đúp vào thanh)</span>
+                </button>
+                <button onClick={() => setCreating({ project: sel.project })}
+                  style={{ background: "#ffd166", color: "#16181d", border: "none", borderRadius: 8, padding: "5px 14px", fontSize: 12.5, fontWeight: 700, cursor: "pointer", margin: "2px 0 4px" }}>
+                  Thêm task mới…
                 </button>
               </>
             ) : (
@@ -529,10 +561,16 @@ export default function App() {
                 <div>Thời gian: {fmtDay(sel.project.start)} → {fmtDay(sel.project.end)}</div>
                 <div>Số task: {sel.project.tasks.length} · Số người: {sel.project.members.length}</div>
                 <div style={{ color: "#8b95a9" }}>Phóng to thêm để xem từng task của project này.</div>
-                <button onClick={() => enterSolo(sel.project)}
-                  style={{ background: "#2b3242", color: "#8ab8ff", border: "1px solid rgba(138,184,255,0.45)", borderRadius: 8, padding: "6px 12px", fontSize: 12.5, cursor: "pointer", marginTop: 8 }}>
-                  Tập trung vào dự án này — mở chi tiết
-                </button>
+                <div style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
+                  <button onClick={() => setCreating({ project: sel.project })}
+                    style={{ background: "#ffd166", color: "#16181d", border: "none", borderRadius: 8, padding: "6px 14px", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+                    Thêm task…
+                  </button>
+                  <button onClick={() => enterSolo(sel.project)}
+                    style={{ background: "#2b3242", color: "#8ab8ff", border: "1px solid rgba(138,184,255,0.45)", borderRadius: 8, padding: "6px 12px", fontSize: 12.5, cursor: "pointer" }}>
+                    Tập trung vào dự án này — mở chi tiết
+                  </button>
+                </div>
               </div>
             )}
           </aside>
@@ -543,7 +581,7 @@ export default function App() {
           background: "rgba(16,19,26,0.9)", border: "1px solid rgba(255,255,255,0.1)",
           borderRadius: 8, padding: "6px 10px", fontSize: 12, color: "#aeb8c8",
         }}>
-          Lăn chuột: zoom về con trỏ · Kéo nền: pan (có quán tính) · Kéo thanh task: dời task · Kéo mép thanh task: đổi thời lượng (task con co/giãn theo) · Kéo thanh tổng ở mức thu nhỏ: dời cả project, kéo mép của nó: co/giãn cả project · Click tên project: nổi bật (xung quanh chuyển xám) · Bấm đúp vào task/task con: mở form sửa nội dung · Icon phễu cạnh tên nhân viên: lọc riêng nhân viên đó · Icon khung ngắm ở cuối tên công trình: tập trung vào dự án, chia đôi màn hình xem chi tiết
+          Lăn chuột: zoom về con trỏ · Kéo nền: pan (có quán tính) · Kéo thanh task: dời task · Kéo mép thanh task: đổi thời lượng (task con co/giãn theo) · Kéo thanh tổng ở mức thu nhỏ: dời cả project, kéo mép của nó: co/giãn cả project · Click tên project: nổi bật (xung quanh chuyển xám) · Bấm đúp vào task/task con: mở form sửa nội dung · Nút Thêm task trong panel dự án: thêm task mới, gán người làm · Icon phễu cạnh tên nhân viên: lọc riêng nhân viên đó · Icon khung ngắm ở cuối tên công trình: tập trung vào dự án, chia đôi màn hình xem chi tiết
         </footer>
       </main>
 
@@ -560,12 +598,22 @@ export default function App() {
         <TaskForm key={editing.task.id} project={editing.project} task={editing.task}
           onClose={() => setEditing(null)} onSave={handleSaveEdit} />
       )}
+      {creating && (
+        <TaskForm key="new-task" project={creating.project} isNew
+          task={{
+            id: "__new__", name: "", assigneeId: PEOPLE[0]?.id || "",
+            start: creating.project.start, end: Math.min(creating.project.end, creating.project.start + 13),
+            progress: 0, subtasks: [],
+          }}
+          onClose={() => setCreating(null)} onSave={handleCreateTask} />
+      )}
       {editing?.kind === "sub" && (
         <SubtaskForm key={editing.sub.id} project={editing.project} task={editing.task} sub={editing.sub}
           onClose={() => setEditing(null)} onSave={handleSaveSub} />
       )}
       {managing && (
-        <ManageModal onClose={() => setManaging(false)} onChanged={handleDataChanged} />
+        <ManageModal onClose={() => setManaging(false)} onChanged={handleDataChanged}
+          onAddTask={(pr) => { setManaging(false); setCreating({ project: pr }); }} />
       )}
     </div>
   );
