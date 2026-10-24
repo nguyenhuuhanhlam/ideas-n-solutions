@@ -136,9 +136,9 @@ function ManageModal({ onClose, onChanged, onAddTask }) {
                   {pr.name}
                   <span style={{ display: "block", fontSize: 12, color: "#8b95a9" }}>{fmtDay(pr.start)} → {fmtDay(pr.end)} · {pr.tasks.length} task · {pr.members.length} người</span>
                 </span>
-                <button onClick={() => onAddTask(pr)}
-                  style={{ background: "#2b3242", color: "#ffd166", border: "1px solid rgba(255,209,102,0.45)", borderRadius: 7, padding: "4px 10px", fontSize: 12, cursor: "pointer", whiteSpace: "nowrap" }}>
-                  + Task
+                <button onClick={() => onAddTask(pr)} title="Thêm task cho dự án này" aria-label="Thêm task cho dự án này"
+                  style={{ ...iconAddBtn, width: 26, height: 26 }}>
+                  <PlusIcon size={13} />
                 </button>
                 <button style={delBtn(`project:${pr.id}`)} onClick={() => arm(`project:${pr.id}`, () => deleteProject(pr))}>
                   {arming === `project:${pr.id}` ? "Chắc chắn xóa?" : "Xóa"}
@@ -177,6 +177,18 @@ const dayOfISO = (s) => {
   return m ? Math.floor(Date.UTC(+m[1], +m[2] - 1, +m[3]) / DAY_MS) : null;
 };
 
+// Nút thêm (task / task con) dạng icon dấu cộng — tiết kiệm chỗ so với nút
+// chữ, nhãn đầy đủ nằm trong title + aria-label (tooltip khi rê chuột).
+const PlusIcon = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <path d="M8 2.5v11M2.5 8h11" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+  </svg>
+);
+const iconAddBtn = {
+  background: "#ffd166", color: "#16181d", border: "none", borderRadius: 8,
+  width: 28, height: 28, display: "inline-flex", alignItems: "center", justifyContent: "center",
+  cursor: "pointer", flexShrink: 0, padding: 0,
+};
 const fieldStyle = {
   width: "100%", boxSizing: "border-box", background: "#0f1218", color: "#e8ecf3",
   border: "1px solid rgba(255,255,255,0.16)", borderRadius: 8, padding: "8px 10px", fontSize: 13.5,
@@ -543,8 +555,8 @@ export default function App() {
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "1.5rem 0 6px" }}>
                   <div style={{ fontSize: 11, color: "#8b95a9", textTransform: "uppercase", letterSpacing: 0.6 }}>Task con ({sel.task.subtasks.length}) — bấm để chọn</div>
                   <button onClick={() => setCreatingSub({ project: sel.project, task: sel.task })}
-                    style={{ background: "#ffd166", color: "#16181d", border: "none", borderRadius: 7, padding: "3px 10px", fontSize: 11.5, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
-                    Thêm task con…
+                    title="Thêm task con" aria-label="Thêm task con" style={iconAddBtn}>
+                    <PlusIcon />
                   </button>
                 </div>
                 {sel.task.subtasks.map((s) => (
@@ -582,8 +594,8 @@ export default function App() {
                   Sửa task… <span style={{ color: "#8b95a9" }}>(hoặc bấm đúp vào thanh)</span>
                 </button>
                 <button onClick={() => setCreating({ project: sel.project })}
-                  style={{ background: "#ffd166", color: "#16181d", border: "none", borderRadius: 8, padding: "5px 14px", fontSize: 12.5, fontWeight: 700, cursor: "pointer", margin: "2px 0 4px" }}>
-                  Thêm task mới…
+                  title="Thêm task mới" aria-label="Thêm task mới" style={{ ...iconAddBtn, margin: "2px 0 4px" }}>
+                  <PlusIcon />
                 </button>
               </>
             ) : (
@@ -593,8 +605,8 @@ export default function App() {
                 <div style={{ color: "#8b95a9" }}>Phóng to thêm để xem từng task của project này.</div>
                 <div style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
                   <button onClick={() => setCreating({ project: sel.project })}
-                    style={{ background: "#ffd166", color: "#16181d", border: "none", borderRadius: 8, padding: "6px 14px", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
-                    Thêm task…
+                    title="Thêm task" aria-label="Thêm task" style={iconAddBtn}>
+                    <PlusIcon />
                   </button>
                   <button onClick={() => enterSolo(sel.project)}
                     style={{ background: "#2b3242", color: "#8ab8ff", border: "1px solid rgba(138,184,255,0.45)", borderRadius: 8, padding: "6px 12px", fontSize: 12.5, cursor: "pointer" }}>
@@ -611,7 +623,7 @@ export default function App() {
           background: "rgba(16,19,26,0.9)", border: "1px solid rgba(255,255,255,0.1)",
           borderRadius: 8, padding: "6px 10px", fontSize: 12, color: "#aeb8c8",
         }}>
-          Lăn chuột: zoom về con trỏ · Kéo nền: pan (có quán tính) · Kéo thanh task: dời task · Kéo mép thanh task: đổi thời lượng (task con co/giãn theo) · Kéo thanh tổng ở mức thu nhỏ: dời cả project, kéo mép của nó: co/giãn cả project · Click tên project: nổi bật (xung quanh chuyển xám) · Bấm đúp vào task/task con: mở form sửa nội dung · Nút Thêm task trong panel dự án: thêm task mới, gán người làm · Icon phễu cạnh tên nhân viên: lọc riêng nhân viên đó · Icon khung ngắm ở cuối tên công trình: tập trung vào dự án, chia đôi màn hình xem chi tiết
+          Lăn chuột: zoom về con trỏ · Kéo nền: pan (có quán tính) · Kéo thanh task: dời task · Kéo mép thanh task: đổi thời lượng (task con co/giãn theo) · Kéo thanh tổng ở mức thu nhỏ: dời cả project, kéo mép của nó: co/giãn cả project · Click tên project: nổi bật (xung quanh chuyển xám) · Bấm đúp vào task/task con: mở form sửa nội dung · Nút ＋ trong panel dự án: thêm task mới, gán người làm · Icon phễu cạnh tên nhân viên: lọc riêng nhân viên đó · Icon khung ngắm ở cuối tên công trình: tập trung vào dự án, chia đôi màn hình xem chi tiết
         </footer>
       </main>
 

@@ -23,9 +23,10 @@ khi thả chuột.
 
 ### Thêm task cho dự án
 
-- Bấm tên dự án trên timeline để mở panel dự án rồi bấm **Thêm task…**,
-  hoặc trong panel Quản lý bấm **+ Task** ở hàng dự án, hoặc bấm
-  **Thêm task mới…** trong panel của một task cùng dự án.
+- Bấm tên dự án trên timeline để mở panel dự án rồi bấm nút **＋**,
+  hoặc trong panel Quản lý bấm nút **＋** ở hàng dự án, hoặc bấm nút **＋**
+  trong panel của một task cùng dự án (nút thêm dạng icon để tiết kiệm
+  chỗ, nhãn đầy đủ trong tooltip).
 - Form thêm task: tên, người làm (chọn trong toàn bộ nhân viên — người chưa
   trong nhóm sẽ tự được thêm vào dự án), ngày bắt đầu/kết thúc, tiến độ.
   Task mới bắt đầu với 0 task con.
@@ -34,8 +35,7 @@ khi thả chuột.
 
 ### Thêm task con cho task
 
-- Trong panel của một task, bấm **Thêm task con…** ngay cạnh tiêu đề
-  "Task con (N)".
+- Trong panel của một task, bấm nút **＋** ngay cạnh tiêu đề "Task con (N)".
 - Form thêm task con: tên đầu việc, nội dung chi tiết, ngày bắt đầu/kết
   thúc, tiến độ. Ngày mặc định là khe trống đầu tiên đủ 3 ngày trong task
   chính (tự tìm, không cần tự dò lịch trống).
