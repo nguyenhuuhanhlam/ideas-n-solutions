@@ -529,7 +529,7 @@ export default function App() {
 
       <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
       <main style={{ position: "relative", flex: 1, minWidth: 0 }}>
-        <Timeline projects={PROJECTS} selectedId={sel?.task?.id || null} onSelect={setSel} hudRef={hudRef} controlsRef={controlsRef}
+        <Timeline projects={PROJECTS} selectedId={sel?.task?.id || null} selectedSubId={sel?.sub?.id || null} onSelect={setSel} hudRef={hudRef} controlsRef={controlsRef}
           focusedId={focusId} onLabelClick={handleLabelClick} onClearFocus={() => setFocusId(null)}
           onEditTask={(p, t, s) => setEditing(s ? { kind: "sub", project: p, task: t, sub: s } : { kind: "task", project: p, task: t })} dataVersion={dataVersion}
           filterPersonId={filterPersonId} onPersonFilter={handlePersonFilter}

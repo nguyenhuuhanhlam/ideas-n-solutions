@@ -49,13 +49,15 @@ function grayOf(color) {
   return grayCache.get(color);
 }
 
-export default function Timeline({ projects, selectedId, onSelect, hudRef, controlsRef, focusedId, onLabelClick, onClearFocus, onEditTask, dataVersion, filterPersonId, onPersonFilter, onEscape, soloProjectId, onProjectSolo }) {
+export default function Timeline({ projects, selectedId, selectedSubId, onSelect, hudRef, controlsRef, focusedId, onLabelClick, onClearFocus, onEditTask, dataVersion, filterPersonId, onPersonFilter, onEscape, soloProjectId, onProjectSolo }) {
   const hostRef = useRef(null);
   const tipRef = useRef(null);
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
   const selectedRef = useRef(selectedId);
   selectedRef.current = selectedId;
+  const selectedSubRef = useRef(selectedSubId);
+  selectedSubRef.current = selectedSubId;
   const focusedRef = useRef(focusedId);
   focusedRef.current = focusedId;
   const onLabelClickRef = useRef(onLabelClick);
@@ -76,7 +78,7 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
   onProjectSoloRef.current = onProjectSolo;
   const redrawRef = useRef(null);
   // Khi focus/chọn/dữ liệu/lọc/tập trung thay đổi từ bên ngoài, báo vòng lặp vẽ lại ngay
-  useEffect(() => { if (redrawRef.current) redrawRef.current(); }, [focusedId, selectedId, dataVersion, filterPersonId, soloProjectId]);
+  useEffect(() => { if (redrawRef.current) redrawRef.current(); }, [focusedId, selectedId, selectedSubId, dataVersion, filterPersonId, soloProjectId]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -275,6 +277,13 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
                   const doneW = subW * (s.progress || 0);
                   if (doneW > 1) { ctx.globalAlpha = isDim ? 0.3 : 0.85; rrect(ctx, sx1, sy, doneW, sh, 3); ctx.fill(); }
                   ctx.globalAlpha = 1;
+                  // task con đang chọn: viền vàng bao quanh như task lớn
+                  // (trước đây chỉ task lớn có viền nên khó thấy task con nào
+                  // đang được chọn trong panel)
+                  if (selectedSubRef.current === s.id) {
+                    ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 1.6;
+                    rrect(ctx, sx1 - 1.5, sy - 1.5, subW + 3, sh + 3, 4); ctx.stroke();
+                  }
                   state.hits.push({ kind: "subtask", project: p, task: t, sub: s, x: Math.max(0, sx1), y: sy, w: Math.min(W, sx2) - Math.max(0, sx1), h: sh });
                   if (sx2 - sx1 > 56) {
                     ctx.save(); ctx.beginPath(); ctx.rect(sx1 + 4, sy, sx2 - sx1 - 6, sh); ctx.clip();
