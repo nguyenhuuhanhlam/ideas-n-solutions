@@ -85,18 +85,21 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
     const layer = new Konva.Layer({ listening: false });
     stage.add(layer);
 
-    // Lần đầu mở ứng dụng: zoom vừa khung min–max của toàn bộ dự án
-    // (ngày bắt đầu sớm nhất → ngày kết thúc muộn nhất), cùng công thức
-    // với nút Toàn cảnh — thay vì khung mặc định quanh hôm nay.
-    // Chưa có dự án nào thì giữ khung mặc định quanh hôm nay.
-    const cam = { ppd: 2.6, leftDay: TODAY - (W / 2.6) * 0.35, scrollY: 0 };
-    if (projects.length) {
+    // Khung vừa min–max toàn bộ dự án, chừa 3 ngày mỗi bên: mép trái bắt đầu
+    // từ 3 ngày trước điểm bắt đầu sớm nhất (điểm min), mép phải 3 ngày sau
+    // điểm kết thúc muộn nhất — để thanh đầu/cuối và nhãn tick đầu không dính
+    // sát mép màn hình. Dùng chung cho lần đầu mở app và nút Toàn cảnh.
+    // Chưa có dự án nào thì trả null để giữ khung mặc định quanh hôm nay.
+    const fitSpan = () => {
+      if (!projects.length) return null;
       const mn = Math.min(...projects.map((p) => p.start));
       const mx = Math.max(...projects.map((p) => p.end));
-      const span = Math.max(30, mx - mn);
-      cam.ppd = clamp(W / (span * 1.02), MIN_PPD, MAX_PPD);
-      cam.leftDay = mn - span * 0.01;
-    }
+      const span = Math.max(30, mx - mn + 6);
+      return { ppd: clamp(W / span, MIN_PPD, MAX_PPD), leftDay: mn - 3 };
+    };
+    const cam = { ppd: 2.6, leftDay: TODAY - (W / 2.6) * 0.35, scrollY: 0 };
+    const f0 = fitSpan();
+    if (f0) { cam.ppd = f0.ppd; cam.leftDay = f0.leftDay; }
     // Mảng thường (không dùng Float64Array) để thêm project sau vẫn tự nối dài;
     // lane chưa có chiều cao thì mặc định 30.
     const heights = new Array(projects.length).fill(30);
@@ -453,15 +456,13 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
       controlsRef.current = {
         zoomStep: (f) => startTween(cam.ppd * f, { anchor: { day: dayAt(W / 2), x: W / 2 } }),
         fit: () => {
-          if (!projects.length) {
+          const f = fitSpan();
+          if (!f) {
             // Chưa có project nào: khung nhìn mặc định quanh hôm nay
             startTween(2.6, { toLeft: TODAY - (W / 2.6) * 0.35, toScrollY: 0, dur: 650 });
             return;
           }
-          const mn = Math.min(...projects.map((p) => p.start));
-          const mx = Math.max(...projects.map((p) => p.end));
-          const span = Math.max(30, mx - mn);
-          startTween(W / (span * 1.02), { toLeft: mn - span * 0.01, toScrollY: 0, dur: 650 });
+          startTween(f.ppd, { toLeft: f.leftDay, toScrollY: 0, dur: 650 });
         },
         today: () => startTween(Math.max(cam.ppd, 3), { anchor: { day: TODAY, x: W * 0.4 }, dur: 650 }),
       };

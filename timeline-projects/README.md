@@ -83,8 +83,9 @@ npm run dev
   chính người đó; co/giãn cả project cũng có bước sửa chồng lấn do làm tròn.
 - Zoom có **min/max**, không zoom vô cực. **Lần đầu mở ứng dụng**, khung nhìn
   tự zoom vừa đúng khoảng min–max của toàn bộ dự án (ngày bắt đầu sớm nhất
-  → ngày kết thúc muộn nhất) — cùng mức với nút Toàn cảnh; chưa có dự án
-  nào thì mở khung mặc định quanh hôm nay. Chuyển động liên tục nhưng **chi tiết
+  → ngày kết thúc muộn nhất), chừa **3 ngày mỗi bên** (mép trái bắt đầu từ
+  3 ngày trước điểm bắt đầu sớm nhất) — cùng mức với nút Toàn cảnh; chưa có
+  dự án nào thì mở khung mặc định quanh hôm nay. Chuyển động liên tục nhưng **chi tiết
   đổi theo ngưỡng** (LOD):
   - `LOD 0` (< 1,5 px/ngày): chỉ thanh tổng của project + tiến độ + mốc task.
   - `LOD 1` (1,5–7): các task theo hàng người làm.
