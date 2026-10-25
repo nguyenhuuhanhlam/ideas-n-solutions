@@ -9,7 +9,12 @@
 
 export const DAY_MS = 86400000;
 export const dayNum = (y, m, d) => Math.floor(Date.UTC(y, m - 1, d) / DAY_MS);
-export const TODAY = dayNum(2026, 10, 22);
+// Hôm nay THẬT theo ngày lịch trên máy người dùng (trước đây cố định
+// 22-10-2026 làm "hôm nay giả" cho dữ liệu demo nên sau vài ngày mốc
+// HÔM NAY bị lệch so với thực tế — user phát hiện 25-10 mà TODAY vẫn 22-10).
+// Tính theo ngày địa phương để khớp cách app render dd-mm-yyyy.
+const _now = new Date();
+export const TODAY = dayNum(_now.getFullYear(), _now.getMonth() + 1, _now.getDate());
 
 export function fmtDay(day) {
   const dt = new Date(day * DAY_MS);

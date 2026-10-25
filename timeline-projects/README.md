@@ -91,8 +91,8 @@ npm run dev
   - `LOD 2` (7–25): thêm nhãn task, nhãn người làm dính mép trái, tiến độ.
   - `LOD 3` (≥ 25): thêm **task con** ngay dưới thanh task cha.
   Chiều cao lane giãn/co có animation khi qua ngưỡng, không nhảy cục.
-- Cuối tuần được tô mờ khi zoom đủ sâu; đường đỏ là **hôm nay** (22-10-2026
-  trong dữ liệu giả). Ngày hiển thị dạng `dd-mm-yyyy`.
+- Cuối tuần được tô mờ khi zoom đủ sâu; đường đỏ là **hôm nay** (ngày thật
+  theo giờ máy người dùng). Ngày hiển thị dạng `dd-mm-yyyy`.
 - Tên tắt của thứ (Mon/Tue/…/Sun, Sat cam, Sun đỏ) **chỉ hiện ở cấp độ ngày**
   (zoom sâu, nhãn "NGÀY" trên trục); ở cấp tuần/tháng trục chỉ hiện ngày
   tháng cho gọn.
