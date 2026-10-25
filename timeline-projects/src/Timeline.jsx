@@ -248,7 +248,10 @@ export default function Timeline({ projects, selectedId, selectedSubId, onSelect
                 ctx.fillStyle = "rgba(0,0,0,0.32)";
                 rrect(ctx, x1, ty + th - 4, Math.max(3, (x2 - x1) * t.progress), 4, 2); ctx.fill();
               }
-              if (selectedRef.current === t.id) {
+              // Viền chỉ nằm trên thanh đang chọn sâu nhất: chọn task thì viền
+              // task; đã chọn task con thì CHỈ viền task con, task lớn bỏ viền
+              // (để cả 2 viền cùng lúc nhìn như bị lỗi).
+              if (selectedRef.current === t.id && !selectedSubRef.current) {
                 ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 2; rrect(ctx, x1 - 1.5, ty - 1.5, (x2 - x1) + 3, th + 3, 6); ctx.stroke();
               }
               state.hits.push({ kind: "task", project: p, task: t, x: Math.max(0, x1), y: ty, w: Math.min(W, x2) - Math.max(0, x1), h: th, sx1: x1, sx2: x2 });
@@ -277,9 +280,8 @@ export default function Timeline({ projects, selectedId, selectedSubId, onSelect
                   const doneW = subW * (s.progress || 0);
                   if (doneW > 1) { ctx.globalAlpha = isDim ? 0.3 : 0.85; rrect(ctx, sx1, sy, doneW, sh, 3); ctx.fill(); }
                   ctx.globalAlpha = 1;
-                  // task con đang chọn: viền vàng bao quanh như task lớn
-                  // (trước đây chỉ task lớn có viền nên khó thấy task con nào
-                  // đang được chọn trong panel)
+                  // task con đang chọn: viền vàng bao quanh; lúc này task lớn
+                  // không còn viền nữa (chỉ tập trung vào thanh đang chọn)
                   if (selectedSubRef.current === s.id) {
                     ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 1.6;
                     rrect(ctx, sx1 - 1.5, sy - 1.5, subW + 3, sh + 3, 4); ctx.stroke();
