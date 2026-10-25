@@ -81,7 +81,10 @@ npm run dev
   1 người không bao giờ trùng nhau** — dữ liệu sinh ra đã xếp nối tiếp theo
   từng người, và khi kéo/kéo mép, task bị chặn tại task kề trước/sau của
   chính người đó; co/giãn cả project cũng có bước sửa chồng lấn do làm tròn.
-- Zoom có **min/max**, không zoom vô cực. Chuyển động liên tục nhưng **chi tiết
+- Zoom có **min/max**, không zoom vô cực. **Lần đầu mở ứng dụng**, khung nhìn
+  tự zoom vừa đúng khoảng min–max của toàn bộ dự án (ngày bắt đầu sớm nhất
+  → ngày kết thúc muộn nhất) — cùng mức với nút Toàn cảnh; chưa có dự án
+  nào thì mở khung mặc định quanh hôm nay. Chuyển động liên tục nhưng **chi tiết
   đổi theo ngưỡng** (LOD):
   - `LOD 0` (< 1,5 px/ngày): chỉ thanh tổng của project + tiến độ + mốc task.
   - `LOD 1` (1,5–7): các task theo hàng người làm.

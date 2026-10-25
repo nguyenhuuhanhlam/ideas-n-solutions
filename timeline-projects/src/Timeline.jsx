@@ -85,7 +85,18 @@ export default function Timeline({ projects, selectedId, onSelect, hudRef, contr
     const layer = new Konva.Layer({ listening: false });
     stage.add(layer);
 
+    // Lần đầu mở ứng dụng: zoom vừa khung min–max của toàn bộ dự án
+    // (ngày bắt đầu sớm nhất → ngày kết thúc muộn nhất), cùng công thức
+    // với nút Toàn cảnh — thay vì khung mặc định quanh hôm nay.
+    // Chưa có dự án nào thì giữ khung mặc định quanh hôm nay.
     const cam = { ppd: 2.6, leftDay: TODAY - (W / 2.6) * 0.35, scrollY: 0 };
+    if (projects.length) {
+      const mn = Math.min(...projects.map((p) => p.start));
+      const mx = Math.max(...projects.map((p) => p.end));
+      const span = Math.max(30, mx - mn);
+      cam.ppd = clamp(W / (span * 1.02), MIN_PPD, MAX_PPD);
+      cam.leftDay = mn - span * 0.01;
+    }
     // Mảng thường (không dùng Float64Array) để thêm project sau vẫn tự nối dài;
     // lane chưa có chiều cao thì mặc định 30.
     const heights = new Array(projects.length).fill(30);
