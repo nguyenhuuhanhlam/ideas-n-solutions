@@ -396,9 +396,11 @@ export default function App() {
                   </ul>
                   {t.subtasks.some((s) => s.state === 'xong') && (
                     <div className="draft">
-                      <strong>Bản nháp:</strong>
+                      <strong>{t.status === 'da-duyet' ? 'Kết quả đã duyệt:' : 'Bản nháp:'}</strong>
                       <ul>{t.subtasks.filter((s) => s.state === 'xong').map((s, i) => <li key={i}>{s.output}</li>)}</ul>
-                      <p className="hint">⚠️ Đây vẫn là bản nháp — chưa ghi vào workspace chung cho tới khi được duyệt.</p>
+                      {t.status === 'da-duyet'
+                        ? <p className="hint">✓ Đã duyệt bởi {t.approvedBy} — đã ghi vào workspace chung.</p>
+                        : <p className="hint">⚠️ Đây vẫn là bản nháp — chưa ghi vào workspace chung cho tới khi được duyệt.</p>}
                     </div>
                   )}
                   {t.note && <p className="hint">💡 {t.note}</p>}
