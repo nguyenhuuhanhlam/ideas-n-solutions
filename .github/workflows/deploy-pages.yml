@@ -23,16 +23,23 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: timeline-projects/package-lock.json
+          cache-dependency-path: |
+            timeline-projects/package-lock.json
+            team-assistant-sim/package-lock.json
       # Mỗi app nằm trong thư mục riêng; build với base là subpath Pages của app đó
       - run: npm ci
         working-directory: timeline-projects
       - run: npm run build -- --base=/ideas-n-solutions/timeline-projects/
         working-directory: timeline-projects
+      - run: npm ci
+        working-directory: team-assistant-sim
+      - run: npm run build -- --base=/ideas-n-solutions/team-assistant-sim/
+        working-directory: team-assistant-sim
       # Ghép các app + trang chủ ở root thành một site duy nhất
       - run: |
-          mkdir -p _site/timeline-projects
+          mkdir -p _site/timeline-projects _site/team-assistant-sim
           cp -r timeline-projects/dist/* _site/timeline-projects/
+          cp -r team-assistant-sim/dist/* _site/team-assistant-sim/
           cp index.html _site/index.html
       - uses: actions/configure-pages@v5
         with:

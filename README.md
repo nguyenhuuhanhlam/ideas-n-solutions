@@ -9,6 +9,7 @@ thư mục mới và một thẻ vào trang chủ ở `index.html`.
 | App | Thư mục | Demo |
 | --- | --- | --- |
 | Timeline Projects — quản lý dự án trên 1 trục thời gian | `timeline-projects/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/timeline-projects/ |
+| Team Assistant — mô phỏng trợ lý trung tâm cho team kiến trúc | `team-assistant-sim/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/team-assistant-sim/ |
 
 ## Deploy
 
