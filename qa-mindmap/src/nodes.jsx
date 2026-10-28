@@ -1,6 +1,6 @@
 import { Handle, Position } from '@xyflow/react'
 
-function NodeShell({ data, className, icon, children }) {
+function NodeShell({ data, className, icon }) {
   return (
     <div className={`qm-node ${className} ${data.selected ? 'sel' : ''}`}>
       <Handle type="target" position={Position.Left} />
@@ -13,7 +13,7 @@ function NodeShell({ data, className, icon, children }) {
         <button
           type="button"
           className="qm-toggle"
-          title={data.collapsed ? `Mở ${data.childCount} node con` : 'Thu gọn nhánh này'}
+          title={data.collapsed ? `Mở ${data.childCount} nhánh con` : 'Thu gọn nhánh này'}
           onClick={(e) => {
             e.stopPropagation()
             data.onToggle?.(data.id)
@@ -23,33 +23,28 @@ function NodeShell({ data, className, icon, children }) {
         </button>
       )}
       <Handle type="source" position={Position.Right} />
-      {children}
     </div>
   )
 }
 
 export function RootNode({ data }) {
   return (
-    <NodeShell data={data} className="root" icon="🌐">
+    <NodeShell data={data} className="root" icon="🧠">
       <span className="qm-badge">gốc</span>
     </NodeShell>
   )
 }
 
-export function QuestionNode({ data }) {
-  return (
-    <NodeShell data={data} className="question" icon="❓" />
-  )
+export function TopicNode({ data }) {
+  return <NodeShell data={data} className="topic" icon="📁" />
 }
 
-export function ChildNode({ data }) {
-  return (
-    <NodeShell data={data} className="child" icon="↳" />
-  )
+export function SubtopicNode({ data }) {
+  return <NodeShell data={data} className="subtopic" icon="📄" />
 }
 
 export const nodeTypes = {
   root: RootNode,
-  question: QuestionNode,
-  child: ChildNode,
+  topic: TopicNode,
+  subtopic: SubtopicNode,
 }

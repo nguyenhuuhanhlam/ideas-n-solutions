@@ -44,7 +44,8 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .react-flow__handle { width: 8px; height: 8px; background: #8b95a9; border: 2px solid #11141a; }
 .qm-node { display: flex; align-items: center; gap: 9px; background: #1b2130; border: 1.5px solid rgba(255,255,255,.18); border-radius: 11px; padding: 9px 12px; font-size: 12.5px; color: #e8ecf3; box-shadow: 0 4px 14px rgba(0,0,0,.35); position: relative; width: 240px; min-height: 56px; }
 .qm-node.root { width: 260px; min-height: 72px; border-color: rgba(255,209,102,.7); background: #2b2410; }
-.qm-node.child { width: 250px; border-color: rgba(255,178,125,.55); background: #2b2419; }
+.qm-node.topic { width: 250px; min-height: 64px; border-color: rgba(138,184,255,.65); background: #1d2a42; }
+.qm-node.subtopic { width: 250px; border-color: rgba(255,178,125,.55); background: #2b2419; }
 .qm-node.sel { outline: 2px solid #ffd166; outline-offset: 1px; }
 .qm-ico { font-size: 17px; flex-shrink: 0; }
 .qm-text { flex: 1; display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }

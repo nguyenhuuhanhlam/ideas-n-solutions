@@ -6,9 +6,9 @@ import { DRAFT_PROPOSAL, MAPS, NODES } from './data.js'
 import { nodeTypes } from './nodes.jsx'
 
 const SUBTITLE = {
-  root: 'Mindmap · 28-10-2026',
-  question: 'Câu hỏi đã ghi nhận',
-  child: 'Node con · chủ đề trùng lắp',
+  root: 'Nút gốc · 28-10-2026',
+  topic: 'Topic · tối đa 4 subtopic',
+  subtopic: 'Subtopic · tóm tắt tối ưu',
 }
 
 function descendantsOf(id, list) {
@@ -87,7 +87,7 @@ export default function App() {
       id: `e-${n.parentId}-${n.id}`,
       source: n.parentId,
       target: n.id,
-      style: { stroke: n.kind === 'child' ? '#ffd166' : '#5b6b84', strokeWidth: n.kind === 'child' ? 2 : 1.5 },
+      style: { stroke: n.kind === 'subtopic' ? '#ffd166' : '#5b6b84', strokeWidth: n.kind === 'subtopic' ? 2 : 1.5 },
     })), [visibleItems, hidden])
 
   const selected = byId[selectedId] || byId.root
@@ -102,25 +102,12 @@ export default function App() {
 
   const approveDraft = () => {
     if (draftState !== 'pending' || !draft) return
-    const newNode = {
-      id: 'q2b',
-      parentId: draft.parentId,
-      kind: 'child',
-      title: draft.title,
-      detail: draft.detail,
-      source: 'tailscale.com/pricing, kiểm chứng 28-10-2026',
-      date: '28-10-2026',
-      position: { x: 760, y: 270 },
-    }
-    setItems((prev) => [...prev, newNode])
-    setCollapsed((prev) => {
-      const next = new Set(prev)
-      next.delete(draft.parentId)
-      return next
-    })
+    // Gộp vào chi tiết của subtopic đã có, không tạo node mới — giữ tối đa 4 nhánh.
+    setItems((prev) => prev.map((n) => (n.id === draft.targetId
+      ? { ...n, detail: `${n.detail}${draft.appendText}` }
+      : n)))
     setDraftState('approved')
-    setSelectedId(newNode.id)
-    setTimeout(() => rfRef.current?.fitView({ padding: 0.15 }), 50)
+    setSelectedId(draft.targetId)
   }
 
   const dismissDraft = () => setDraftState('dismissed')
@@ -138,7 +125,7 @@ export default function App() {
       <header className="qm-topbar">
         <div>
           <h1>🧠 QA Mindmap — Lưu hỏi đáp thành mindmap</h1>
-          <p className="sub">Chỉ ghi khi bạn yêu cầu · Đưa bản tóm tắt duyệt trước · Chủ đề trùng lắp thì bổ sung node con</p>
+          <p className="sub">Chỉ ghi khi bạn yêu cầu · Đưa bản tóm tắt duyệt trước · Trùng lắp thì gộp vào subtopic đã có, tối đa 4 nhánh</p>
         </div>
         <div className="qm-map-picker">
           <label>Mindmap:</label>
@@ -149,7 +136,7 @@ export default function App() {
       </header>
 
       <div className="qm-toolbar">
-        <span className="qm-count">{items.length} node · {items.filter((n) => n.kind === 'question').length} câu hỏi · {items.filter((n) => n.kind === 'child').length} node con</span>
+        <span className="qm-count">{items.length} node · 1 nút gốc · {items.filter((n) => n.kind === 'topic').length} topic · {items.filter((n) => n.kind === 'subtopic').length} subtopic (tối đa 4)</span>
         <div className="qm-search">
           <input
             value={query}
@@ -193,7 +180,7 @@ export default function App() {
           >
             <Background gap={22} size={1.5} />
             <Controls />
-            <MiniMap pannable zoomable nodeColor={(n) => (n.type === 'root' ? '#ffd166' : n.type === 'child' ? '#ffb27d' : '#8ab8ff')} />
+            <MiniMap pannable zoomable nodeColor={(n) => (n.type === 'root' ? '#ffd166' : n.type === 'subtopic' ? '#ffb27d' : '#8ab8ff')} />
           </ReactFlow>
           <div className="qm-hint">Bấm 1 node để xem chi tiết ở panel phải · Nút +N / − trên node để thu / mở nhánh con · Kéo thả để di chuyển, lăn chuột để zoom</div>
         </div>
@@ -206,19 +193,19 @@ export default function App() {
                 <p className="hint">Muse đề xuất trước khi ghi. Bạn duyệt thì mới ghi vào cây.</p>
                 <div className="draft-box">
                   <p><strong>Mindmap:</strong> {draft.map}</p>
-                  <p><strong>Gắn vào:</strong> {draft.parentTitle} <span className="tag">node con</span></p>
+                  <p><strong>Gộp vào:</strong> {draft.targetTitle} <span className="tag">gộp vào chi tiết</span></p>
                   <p><strong>Tiêu đề:</strong> {draft.title}</p>
-                  <p><strong>Chi tiết:</strong> {draft.detail}</p>
+                  <p><strong>Chi tiết thêm:</strong> {draft.detail}</p>
                   <p className="hint">Lý do: {draft.reason}</p>
                 </div>
                 <div className="actions">
-                  <button type="button" className="primary" onClick={approveDraft}>✓ Duyệt và ghi node con</button>
+                  <button type="button" className="primary" onClick={approveDraft}>✓ Duyệt và gộp vào subtopic</button>
                   <button type="button" onClick={dismissDraft}>Không ghi</button>
                 </div>
               </>
             )}
             {draftState === 'approved' && (
-              <p>✓ Đã ghi node con <strong>“Starter $6/user/tháng”</strong> dưới node “Tailscale có free không?”. Bấm “Đặt lại bản mẫu” ở thanh trên để chạy lại demo.</p>
+              <p>✓ Đã gộp <strong>“Starter $6/user/tháng”</strong> vào chi tiết subtopic <strong>“Giá”</strong>. Số node không đổi, vẫn 4 subtopic. Bấm “Đặt lại bản mẫu” ở thanh trên để chạy lại demo.</p>
             )}
             {draftState === 'dismissed' && (
               <p>Đã bỏ bản tóm tắt này, cây không đổi. Bấm “Đặt lại bản mẫu” để chạy lại demo.</p>
@@ -233,7 +220,7 @@ export default function App() {
               <p className="qm-meta">Ghi ngày {selected.date} · Nguồn: {selected.source}</p>
               {selChildren.length > 0 && (
                 <>
-                  <h3>Node con ({selChildren.length})</h3>
+                  <h3>Nhánh dưới ({selChildren.length})</h3>
                   <ul className="qm-children">
                     {selChildren.map((c) => (
                       <li key={c.id}>
@@ -256,14 +243,14 @@ export default function App() {
               <li>Chỉ ghi khi bạn yêu cầu ghi nhận, không tự ghi mọi câu hỏi đáp.</li>
               <li>Node đơn giản: tiêu đề là chủ đề tóm tắt, chi tiết là câu trả lời tóm tắt.</li>
               <li>Đưa bản tóm tắt cho bạn duyệt trước khi ghi.</li>
-              <li>Chủ đề trùng lắp thì bổ sung node con, không tạo node trùng riêng.</li>
+              <li>Chủ đề trùng lắp thì gộp vào chi tiết của subtopic đã có, không tạo node mới, giữ tối đa 4 nhánh.</li>
             </ul>
           </section>
         </aside>
       </main>
 
       <footer className="qm-foot">
-        Bản mẫu — dữ liệu chỉ là cây Tailscale ngày 28-10-2026, chưa có thêm / sửa / xóa thật, chưa lưu bền. Bản quản lý thật sẽ thêm form thêm node, sửa, xóa và lưu localStorage + xuất / nhập JSON.
+        Bản mẫu — gốc Muse Q&amp;A → topic Tailscale → 4 subtopic, dữ liệu ngày 28-10-2026, chưa có thêm / sửa / xóa thật, chưa lưu bền. Bản quản lý thật sẽ thêm form thêm node, sửa, xóa và lưu localStorage + xuất / nhập JSON.
       </footer>
     </div>
   )

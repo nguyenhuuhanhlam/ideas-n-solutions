@@ -2,23 +2,27 @@
 
 Bản mẫu trong kho ideas-n-solutions. Lưu thông tin trong các buổi hỏi đáp thành mindmap.
 
-## Quy tắc đã chốt — 28-10-2026
+## Cấu trúc đã chốt — 28-10-2026
 
+Bản ghi nhớ nội dung chính của phiên làm việc, hạn chế sinh quá nhiều node:
+
+- Nút gốc (ví dụ “Muse Q&A”, có thể 1 hoặc nhiều nút gốc cho các dạng chủ đề khác nhau)
+  → topic → subtopic, tối đa 1–4 nhánh subtopic, tóm tắt tối ưu nội dung.
 - Chỉ ghi khi user yêu cầu ghi nhận, không tự ghi mọi câu hỏi đáp.
 - Node đơn giản: tiêu đề là chủ đề tóm tắt, chi tiết là câu trả lời tóm tắt.
 - Đưa bản tóm tắt cho user duyệt trước khi ghi.
-- Chủ đề trùng lắp thì bổ sung node con, không tạo node trùng riêng.
+- Chủ đề trùng lắp thì gộp vào chi tiết của subtopic đã có, không tạo node mới.
 
 ## Bản mẫu hiện tại
 
-Cây Tailscale, buổi hỏi đáp 28-10-2026: gốc Tailscale + 5 node hỏi đáp
-(là gì, có free không, có bản macOS không, Muse có truy xuất được folder
-qua Tailscale không, có nổi tiếng và đáng tin không) + 1 node con
-“Personal Plus $5/tháng” dưới node “có free không” làm ví dụ trùng chủ đề.
+Gốc Muse Q&A → topic Tailscale (buổi hỏi đáp 28-10-2026) → 4 subtopic:
+tổng quan và độ tin cậy, giá, cài đặt macOS, truy xuất folder.
+5 câu hỏi gốc đã gom vào 4 subtopic này.
 
-Panel phải có demo luồng duyệt: bản tóm tắt đề xuất node con
-“Starter $6/user/tháng” dưới node “có free không” — bấm “Duyệt và ghi
-node con” thì node mới xuất hiện trên cây.
+Panel phải có demo luồng duyệt: bản tóm tắt đề xuất gộp
+“Starter $6/user/tháng” vào chi tiết subtopic “Giá” — bấm
+“Duyệt và gộp vào subtopic” thì chi tiết của node “Giá” dài thêm,
+số node không đổi, vẫn 4 subtopic.
 
 ## Chạy / build
 
