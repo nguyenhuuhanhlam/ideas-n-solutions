@@ -15,6 +15,9 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .qm-search-result { font-size: 12px; color: #8b95a9; }
 .qm-toolbar button { background: #1e2431; border: 1px solid rgba(255,255,255,.16); color: #e8ecf3; border-radius: 9px; padding: 8px 12px; font-size: 12.5px; }
 .qm-toolbar button:hover { border-color: rgba(255,209,102,.6); }
+.qm-mode { display: inline-flex; gap: 0; border: 1px solid rgba(255,255,255,.16); border-radius: 9px; overflow: hidden; }
+.qm-mode button { border: none; border-radius: 0; margin: 0; }
+.qm-mode button.active { background: #ffd166; color: #11141a; font-weight: 700; }
 .qm-toolbar button.ghost { background: none; }
 .qm-layout { display: grid; grid-template-columns: minmax(0, 1fr) 390px; gap: 14px; align-items: start; }
 .qm-canvas-wrap { position: relative; height: calc(100vh - 200px); min-height: 560px; background: #141821; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; overflow: hidden; }
@@ -46,7 +49,9 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .qm-node.root { width: 260px; min-height: 72px; border-color: rgba(255,209,102,.7); background: #2b2410; }
 .qm-node.topic { width: 250px; min-height: 64px; border-color: rgba(138,184,255,.65); background: #1d2a42; }
 .qm-node.subtopic { width: 250px; border-color: rgba(255,178,125,.55); background: #2b2419; }
-.qm-node.sel { outline: 2px solid #ffd166; outline-offset: 1px; }
+.qm-node { user-select: none; -webkit-user-select: none; }
+.qm-canvas-wrap { user-select: none; -webkit-user-select: none; }
+.qm-node.sel { outline: 3px solid #8ab8ff; outline-offset: 1px; }
 .qm-node.multi { outline: 2px dashed #ffd166; outline-offset: 2px; }
 .qm-check { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; background: #ffd166; color: #11141a; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
 .qm-merge-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: rgba(255,209,102,.12); border: 1px solid rgba(255,209,102,.5); border-radius: 10px; padding: 10px 12px; margin: 0 0 12px; font-size: 13px; line-height: 1.5; }

@@ -44,6 +44,7 @@ export default function App() {
   const [collapsed, setCollapsed] = useState(new Set())
   const [selectedId, setSelectedId] = useState('root')
   const [multiSelected, setMultiSelected] = useState(new Set())
+  const [mode, setMode] = useState('select') // 'select': kéo nền để khoanh chọn · 'pan': kéo nền để di chuyển cả hình
   const [draft, setDraft] = useState(DRAFT_PROPOSAL)
   const [draftState, setDraftState] = useState('pending') // pending | approved | dismissed
   const [query, setQuery] = useState('')
@@ -69,13 +70,19 @@ export default function App() {
 
   const visibleItems = useMemo(() => items.filter((n) => !hidden.has(n.id)), [items, hidden])
 
-  // Kéo thả node: lưu vị trí mới vào items (bản trước onNodesChange nối vào state rỗng nên kéo xong node bật về chỗ cũ).
+  // Kéo thả node: KHÔNG setState mỗi tick drag — đó là nguyên nhân nháy/chậm
+  // (mỗi lần di chuột lại tạo lại toàn bộ node/edge + re-render cả panel phải).
+  // Trong lúc kéo để React Flow tự di chuyển node, chỉ lưu vị trí khi thả chuột.
   const onNodesChange = useCallback((changes) => {
     changes.forEach((ch) => {
-      if (ch.type === 'position' && ch.position) {
+      if (ch.type === 'position' && ch.position && ch.dragging === false) {
         setItems((prev) => prev.map((n) => (n.id === ch.id ? { ...n, position: ch.position } : n)))
       }
     })
+  }, [])
+  const handleNodeDragStop = useCallback((_e, node) => {
+    if (!node?.position) return
+    setItems((prev) => prev.map((n) => (n.id === node.id ? { ...n, position: node.position } : n)))
   }, [])
   const onEdgesChange = useCallback(() => {}, [])
 
@@ -116,11 +123,21 @@ export default function App() {
     return items.filter((n) => nodeText(n).toLowerCase().includes(q))
   }, [query, items])
 
-  // Chọn nhiều subtopic: Ctrl+Click (hoặc Cmd+Click) để thêm / bỏ 1 node khỏi nhóm chọn.
+  // Chọn nhiều subtopic: Ctrl / Cmd / Shift + Click để thêm / bỏ 1 node khỏi nhóm chọn.
+  // Kéo khung chọn trên nền (chế độ Chọn) cũng đồng bộ vào nhóm chọn qua onSelectionChange.
+  const handleSelectionChange = useCallback(({ nodes: selNodes }) => {
+    if (!selNodes || selNodes.length < 2) return
+    const subIds = selNodes.filter((n) => byId[n.id]?.kind === 'subtopic').map((n) => n.id)
+    if (subIds.length >= 2) {
+      setMultiSelected(new Set(subIds))
+      setSelectedId(subIds[subIds.length - 1])
+    }
+  }, [byId])
+
   const handleNodeClick = useCallback((_e, node) => {
     const item = byId[node.id]
     if (!item) return
-    if ((_e.ctrlKey || _e.metaKey) && item.kind === 'subtopic') {
+    if ((_e.ctrlKey || _e.metaKey || _e.shiftKey) && item.kind === 'subtopic') {
       setMultiSelected((prev) => {
         const next = new Set(prev)
         if (next.has(node.id)) next.delete(node.id)
@@ -229,6 +246,10 @@ export default function App() {
             </span>
           )}
         </div>
+        <span className="qm-mode">
+          <button type="button" className={mode === 'select' ? 'active' : ''} onClick={() => setMode('select')} title="Kéo nền để khoanh chọn nhiều node, bấm node để xem chi tiết">🖱️ Chọn</button>
+          <button type="button" className={mode === 'pan' ? 'active' : ''} onClick={() => setMode('pan')} title="Kéo nền để di chuyển cả hình">✋ Kéo hình</button>
+        </span>
         <button type="button" onClick={expandAll}>Mở hết</button>
         <button type="button" onClick={collapseAll}>Thu hết</button>
         <button type="button" onClick={() => rfRef.current?.fitView({ padding: 0.15 })}>⤢ Vừa khung hình</button>
@@ -255,6 +276,11 @@ export default function App() {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onNodeClick={handleNodeClick}
+            onNodeDragStop={handleNodeDragStop}
+            onSelectionChange={handleSelectionChange}
+            panOnDrag={mode === 'pan'}
+            selectionOnDrag={mode === 'select'}
+            nodesDraggable
             onInit={(inst) => { rfRef.current = inst }}
             fitView
             fitViewOptions={{ padding: 0.15 }}
@@ -267,7 +293,9 @@ export default function App() {
             <Controls />
             <MiniMap pannable zoomable nodeColor={(n) => (n.type === 'root' ? '#ffd166' : n.type === 'subtopic' ? '#ffb27d' : '#8ab8ff')} />
           </ReactFlow>
-          <div className="qm-hint">Bấm 1 node để xem chi tiết · Ctrl+Click để chọn nhiều subtopic rồi gộp · Kéo thân node để di chuyển vị trí · Nút +N / − để thu / mở nhánh · Lăn chuột để zoom</div>
+          <div className="qm-hint">{mode === 'select'
+            ? 'Chế độ Chọn: kéo nền để khoanh chọn nhiều node · bấm node để xem chi tiết · Ctrl / Shift+Click để chọn thêm · kéo thân node để di chuyển'
+            : 'Chế độ Kéo hình: kéo nền để di chuyển cả hình · bấm node để xem chi tiết · chuyển sang chế độ Chọn để khoanh chọn nhiều node'}</div>
         </div>
 
         <aside className="qm-panel-col">
@@ -341,7 +369,8 @@ export default function App() {
               <li>Node đơn giản: tiêu đề là chủ đề tóm tắt, chi tiết là câu trả lời tóm tắt.</li>
               <li>Đưa bản tóm tắt cho bạn duyệt trước khi ghi.</li>
               <li>Chủ đề trùng lắp thì gộp vào chi tiết của subtopic đã có, không tạo node mới, giữ tối đa 4 nhánh.</li>
-              <li>Chọn nhiều subtopic bằng Ctrl+Click (Cmd+Click trên Mac) rồi bấm “Gộp thành 1 node”: tiêu đề lấy node đầu tiên, chi tiết chia thành từng section theo node gốc.</li>
+              <li>Chọn nhiều subtopic bằng Ctrl / Shift+Click (Cmd+Click trên Mac), hoặc kéo khung chọn trên nền ở chế độ Chọn, rồi bấm “Gộp thành 1 node”: tiêu đề lấy node đầu tiên, chi tiết chia thành từng section theo node gốc.</li>
+              <li>Chế độ Chọn (mặc định): kéo nền để khoanh chọn, bấm node để xem chi tiết. Chế độ Kéo hình: kéo nền để di chuyển cả hình.</li>
               <li>Kéo thân node để di chuyển vị trí, vị trí mới được giữ trong phiên này.</li>
             </ul>
           </section>
