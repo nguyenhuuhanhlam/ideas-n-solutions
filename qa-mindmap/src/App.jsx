@@ -1,6 +1,6 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  Background, Controls, MiniMap, ReactFlow,
+  Background, Controls, MiniMap, ReactFlow, useEdgesState, useNodesState,
 } from '@xyflow/react'
 import { DRAFT_PROPOSAL, MAPS, NODES } from './data.js'
 import { nodeTypes } from './nodes.jsx'
@@ -39,6 +39,23 @@ function nodeText(n) {
   return `${n.title} ${n.detail} ${sectionsText}`
 }
 
+// Vị trí node tách riêng khỏi dữ liệu, đúng mẫu team-assistant-sim:
+// useNodesState chỉ giữ id/type/position (nhẹ), onNodesChange là setter của hook
+// (applyNodeChanges — chỉ cập nhật node đang kéo, giữ nguyên object các node còn lại).
+// items chỉ giữ dữ liệu (tiêu đề/chi tiết/sections), nên kéo không làm mới lại
+// byId, tìm kiếm, panel phải hay edge — đó là lý do team-assistant kéo mượt.
+function initialFlowNodes() {
+  return NODES.map((n) => ({ id: n.id, type: n.kind, position: n.position, data: {} }))
+}
+function edgeStyleFor(kind) {
+  return { stroke: kind === 'subtopic' ? '#ffd166' : '#5b6b84', strokeWidth: kind === 'subtopic' ? 2 : 1.5 }
+}
+function initialFlowEdges() {
+  return NODES.filter((n) => n.parentId).map((n) => ({
+    id: `e-${n.parentId}-${n.id}`, source: n.parentId, target: n.id, style: edgeStyleFor(n.kind),
+  }))
+}
+
 export default function App() {
   const [items, setItems] = useState(NODES)
   const [collapsed, setCollapsed] = useState(new Set())
@@ -49,6 +66,8 @@ export default function App() {
   const [draftState, setDraftState] = useState('pending') // pending | approved | dismissed
   const [query, setQuery] = useState('')
   const rfRef = useRef(null)
+  const [flowNodes, setFlowNodes, onNodesChange] = useNodesState(initialFlowNodes())
+  const [flowEdges, setFlowEdges, onEdgesChange] = useEdgesState(initialFlowEdges())
 
   const byId = useMemo(() => Object.fromEntries(items.map((n) => [n.id, n])), [items])
   const childrenOf = useCallback((id) => items.filter((n) => n.parentId === id), [items])
@@ -70,48 +89,61 @@ export default function App() {
 
   const visibleItems = useMemo(() => items.filter((n) => !hidden.has(n.id)), [items, hidden])
 
-  // Kéo thả node: KHÔNG setState mỗi tick drag — đó là nguyên nhân nháy/chậm
-  // (mỗi lần di chuột lại tạo lại toàn bộ node/edge + re-render cả panel phải).
-  // Trong lúc kéo để React Flow tự di chuyển node, chỉ lưu vị trí khi thả chuột.
-  const onNodesChange = useCallback((changes) => {
-    changes.forEach((ch) => {
-      if (ch.type === 'position' && ch.position && ch.dragging === false) {
-        setItems((prev) => prev.map((n) => (n.id === ch.id ? { ...n, position: ch.position } : n)))
-      }
+  // Đồng bộ items -> flowNodes/flowEdges khi dữ liệu đổi (gộp node, duyệt draft,
+  // đặt lại bản mẫu): bỏ node/edge đã xóa, thêm node mới, giữ nguyên vị trí
+  // đang kéo của các node còn lại. Không chạy khi kéo (items không đổi lúc kéo).
+  useEffect(() => {
+    setFlowNodes((prev) => {
+      const prevById = Object.fromEntries(prev.map((n) => [n.id, n]))
+      return items.map((item) => {
+        const old = prevById[item.id]
+        return old
+          ? { ...old, type: item.kind }
+          : { id: item.id, type: item.kind, position: item.position, data: {} }
+      })
     })
-  }, [])
+    setFlowEdges(items
+      .filter((n) => n.parentId)
+      .map((n) => ({
+        id: `e-${n.parentId}-${n.id}`, source: n.parentId, target: n.id, style: edgeStyleFor(n.kind),
+      })))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items])
+
+  // Kéo thả node: chỉ lưu vị trí cuối về items khi thả chuột (để gộp xếp theo
+  // vị trí và để vị trí không mất khi dữ liệu đổi). Trong lúc kéo, vị trí sống
+  // trong flowNodes, items không đổi nên không re-render toàn app.
   const handleNodeDragStop = useCallback((_e, node) => {
     if (!node?.position) return
     setItems((prev) => prev.map((n) => (n.id === node.id ? { ...n, position: node.position } : n)))
   }, [])
-  const onEdgesChange = useCallback(() => {}, [])
 
-  const nodes = useMemo(() => visibleItems.map((n) => ({
-    id: n.id,
-    type: n.kind,
-    position: n.position,
-    data: {
-      id: n.id,
-      title: n.title,
-      subtitle: SUBTITLE[n.kind],
-      selected: selectedId === n.id,
-      multiSelected: multiSelected.has(n.id),
-      merged: !!n.sections,
-      sectionCount: n.sections ? n.sections.length : 0,
-      childCount: childrenOf(n.id).length,
-      collapsed: collapsed.has(n.id),
-      onToggle: toggle,
-    },
-  })), [visibleItems, selectedId, multiSelected, childrenOf, collapsed, toggle])
+  // Nodes hiển thị: vị trí từ flowNodes, dữ liệu tươi từ items (như team-assistant-sim).
+  const nodes = useMemo(() => flowNodes
+    .filter((fn) => !hidden.has(fn.id))
+    .map((fn) => {
+      const n = byId[fn.id]
+      if (!n) return fn
+      return {
+        ...fn,
+        type: n.kind,
+        data: {
+          id: n.id,
+          title: n.title,
+          subtitle: SUBTITLE[n.kind],
+          selected: selectedId === n.id,
+          multiSelected: multiSelected.has(n.id),
+          merged: !!n.sections,
+          sectionCount: n.sections ? n.sections.length : 0,
+          childCount: childrenOf(n.id).length,
+          collapsed: collapsed.has(n.id),
+          onToggle: toggle,
+        },
+      }
+    }), [flowNodes, byId, hidden, selectedId, multiSelected, childrenOf, collapsed, toggle])
 
-  const edges = useMemo(() => visibleItems
-    .filter((n) => n.parentId && !hidden.has(n.parentId))
-    .map((n) => ({
-      id: `e-${n.parentId}-${n.id}`,
-      source: n.parentId,
-      target: n.id,
-      style: { stroke: n.kind === 'subtopic' ? '#ffd166' : '#5b6b84', strokeWidth: n.kind === 'subtopic' ? 2 : 1.5 },
-    })), [visibleItems, hidden])
+  const edges = useMemo(() => flowEdges
+    .filter((e) => !hidden.has(e.target) && !hidden.has(e.source)), [flowEdges, hidden])
 
   const selected = byId[selectedId] || byId.root
   const selPath = selected ? pathOf(selected.id, byId) : []
@@ -203,6 +235,8 @@ export default function App() {
   const dismissDraft = () => setDraftState('dismissed')
   const resetDraft = () => {
     setItems(NODES)
+    setFlowNodes(initialFlowNodes())
+    setFlowEdges(initialFlowEdges())
     setDraftState('pending')
     setSelectedId('root')
     setMultiSelected(new Set())
