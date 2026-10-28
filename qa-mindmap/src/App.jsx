@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import {
-  Background, Controls, MiniMap, ReactFlow, useEdgesState, useNodesState,
+  Background, Controls, MiniMap, ReactFlow,
 } from '@xyflow/react'
 import { DRAFT_PROPOSAL, MAPS, NODES } from './data.js'
 import { nodeTypes } from './nodes.jsx'
@@ -34,10 +34,16 @@ function pathOf(id, byId) {
   return out
 }
 
+function nodeText(n) {
+  const sectionsText = n.sections ? n.sections.map((s) => `${s.title} ${s.text}`).join(' ') : ''
+  return `${n.title} ${n.detail} ${sectionsText}`
+}
+
 export default function App() {
   const [items, setItems] = useState(NODES)
   const [collapsed, setCollapsed] = useState(new Set())
   const [selectedId, setSelectedId] = useState('root')
+  const [multiSelected, setMultiSelected] = useState(new Set())
   const [draft, setDraft] = useState(DRAFT_PROPOSAL)
   const [draftState, setDraftState] = useState('pending') // pending | approved | dismissed
   const [query, setQuery] = useState('')
@@ -63,8 +69,15 @@ export default function App() {
 
   const visibleItems = useMemo(() => items.filter((n) => !hidden.has(n.id)), [items, hidden])
 
-  const [baseNodes, , onNodesChange] = useNodesState([])
-  const [baseEdges, , onEdgesChange] = useEdgesState([])
+  // Kéo thả node: lưu vị trí mới vào items (bản trước onNodesChange nối vào state rỗng nên kéo xong node bật về chỗ cũ).
+  const onNodesChange = useCallback((changes) => {
+    changes.forEach((ch) => {
+      if (ch.type === 'position' && ch.position) {
+        setItems((prev) => prev.map((n) => (n.id === ch.id ? { ...n, position: ch.position } : n)))
+      }
+    })
+  }, [])
+  const onEdgesChange = useCallback(() => {}, [])
 
   const nodes = useMemo(() => visibleItems.map((n) => ({
     id: n.id,
@@ -75,11 +88,14 @@ export default function App() {
       title: n.title,
       subtitle: SUBTITLE[n.kind],
       selected: selectedId === n.id,
+      multiSelected: multiSelected.has(n.id),
+      merged: !!n.sections,
+      sectionCount: n.sections ? n.sections.length : 0,
       childCount: childrenOf(n.id).length,
       collapsed: collapsed.has(n.id),
       onToggle: toggle,
     },
-  })), [visibleItems, selectedId, childrenOf, collapsed, toggle])
+  })), [visibleItems, selectedId, multiSelected, childrenOf, collapsed, toggle])
 
   const edges = useMemo(() => visibleItems
     .filter((n) => n.parentId && !hidden.has(n.parentId))
@@ -97,17 +113,74 @@ export default function App() {
   const searchResults = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return []
-    return items.filter((n) => `${n.title} ${n.detail}`.toLowerCase().includes(q))
+    return items.filter((n) => nodeText(n).toLowerCase().includes(q))
   }, [query, items])
+
+  // Chọn nhiều subtopic: Ctrl+Click (hoặc Cmd+Click) để thêm / bỏ 1 node khỏi nhóm chọn.
+  const handleNodeClick = useCallback((_e, node) => {
+    const item = byId[node.id]
+    if (!item) return
+    if ((_e.ctrlKey || _e.metaKey) && item.kind === 'subtopic') {
+      setMultiSelected((prev) => {
+        const next = new Set(prev)
+        if (next.has(node.id)) next.delete(node.id)
+        else next.add(node.id)
+        return next
+      })
+      setSelectedId(node.id)
+      return
+    }
+    setSelectedId(node.id)
+    setMultiSelected(new Set())
+  }, [byId])
+
+  // Gộp: xếp theo vị trí trên canvas (trên xuống dưới), node đầu tiên giữ tiêu đề + vị trí.
+  const selectedSubtopics = useMemo(() => {
+    const list = items.filter((n) => multiSelected.has(n.id))
+    return [...list].sort((a, b) => a.position.y - b.position.y || a.position.x - b.position.x)
+  }, [items, multiSelected])
+  const canMerge = selectedSubtopics.length >= 2
+    && selectedSubtopics.every((n) => n.parentId === selectedSubtopics[0].parentId)
+
+  const mergeSelected = () => {
+    if (!canMerge) return
+    const [first, ...rest] = selectedSubtopics
+    const sections = selectedSubtopics.map((n) => ({
+      title: n.title,
+      text: n.sections ? n.sections.map((s) => s.text).join(' ') : n.detail,
+    }))
+    const merged = {
+      ...first,
+      title: first.title,
+      detail: sections.map((s) => `${s.title}: ${s.text}`).join(' '),
+      sections,
+      source: `${first.source} · gộp từ ${selectedSubtopics.length} subtopic`,
+    }
+    const restIds = new Set(rest.map((n) => n.id))
+    setItems((prev) => prev.map((n) => (n.id === first.id ? merged : n)).filter((n) => !restIds.has(n.id)))
+    setMultiSelected(new Set())
+    setSelectedId(first.id)
+  }
 
   const approveDraft = () => {
     if (draftState !== 'pending' || !draft) return
-    // Gộp vào chi tiết của subtopic đã có, không tạo node mới — giữ tối đa 4 nhánh.
-    setItems((prev) => prev.map((n) => (n.id === draft.targetId
-      ? { ...n, detail: `${n.detail}${draft.appendText}` }
-      : n)))
+    setItems((prev) => {
+      const target = prev.find((n) => n.id === draft.targetId)
+        || prev.find((n) => n.sections?.some((s) => s.title === draft.targetTitle))
+      if (!target) return prev
+      if (target.sections) {
+        return prev.map((n) => (n.id === target.id ? {
+          ...n,
+          sections: n.sections.map((s) => (s.title === draft.targetTitle ? { ...s, text: `${s.text}${draft.appendText}` } : s)),
+          detail: `${n.detail}${draft.appendText}`,
+        } : n))
+      }
+      return prev.map((n) => (n.id === target.id ? { ...n, detail: `${n.detail}${draft.appendText}` } : n))
+    })
     setDraftState('approved')
-    setSelectedId(draft.targetId)
+    const targetNode = items.find((n) => n.id === draft.targetId)
+      || items.find((n) => n.sections?.some((s) => s.title === draft.targetTitle))
+    if (targetNode) setSelectedId(targetNode.id)
   }
 
   const dismissDraft = () => setDraftState('dismissed')
@@ -115,6 +188,7 @@ export default function App() {
     setItems(NODES)
     setDraftState('pending')
     setSelectedId('root')
+    setMultiSelected(new Set())
     setCollapsed(new Set())
   }
   const expandAll = () => setCollapsed(new Set())
@@ -161,6 +235,17 @@ export default function App() {
         <button type="button" className="ghost" onClick={resetDraft}>↺ Đặt lại bản mẫu</button>
       </div>
 
+      {multiSelected.size > 0 && (
+        <div className="qm-merge-bar">
+          <span>Đã chọn {multiSelected.size} subtopic: <strong>{selectedSubtopics.map((n) => n.title).join(' + ')}</strong></span>
+          <button type="button" className="primary" disabled={!canMerge} onClick={mergeSelected}>⧉ Gộp thành 1 node</button>
+          <button type="button" onClick={() => setMultiSelected(new Set())}>Bỏ chọn</button>
+          {selectedSubtopics.length === 1 && <span className="hint">Chọn thêm 1 subtopic nữa bằng Ctrl+Click để gộp.</span>}
+          {selectedSubtopics.length >= 2 && !canMerge && <span className="hint">Chỉ gộp được các subtopic cùng 1 topic.</span>}
+          {canMerge && <span className="hint">Tiêu đề node gộp lấy node đầu tiên ({selectedSubtopics[0].title}), chi tiết chia thành {selectedSubtopics.length} section theo từng node gốc.</span>}
+        </div>
+      )}
+
       <main className="qm-layout">
         <div className="qm-canvas-wrap">
           <ReactFlow
@@ -169,7 +254,7 @@ export default function App() {
             nodeTypes={nodeTypes}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
-            onNodeClick={(_e, node) => setSelectedId(node.id)}
+            onNodeClick={handleNodeClick}
             onInit={(inst) => { rfRef.current = inst }}
             fitView
             fitViewOptions={{ padding: 0.15 }}
@@ -182,7 +267,7 @@ export default function App() {
             <Controls />
             <MiniMap pannable zoomable nodeColor={(n) => (n.type === 'root' ? '#ffd166' : n.type === 'subtopic' ? '#ffb27d' : '#8ab8ff')} />
           </ReactFlow>
-          <div className="qm-hint">Bấm 1 node để xem chi tiết ở panel phải · Nút +N / − trên node để thu / mở nhánh con · Kéo thả để di chuyển, lăn chuột để zoom</div>
+          <div className="qm-hint">Bấm 1 node để xem chi tiết · Ctrl+Click để chọn nhiều subtopic rồi gộp · Kéo thân node để di chuyển vị trí · Nút +N / − để thu / mở nhánh · Lăn chuột để zoom</div>
         </div>
 
         <aside className="qm-panel-col">
@@ -216,7 +301,19 @@ export default function App() {
             <section className="panel">
               <h2>📌 {selected.title}</h2>
               <p className="qm-path">{selPath.map((n) => n.title).join(' › ')}</p>
-              <p className="qm-detail">{selected.detail}</p>
+              {selected.sections ? (
+                <>
+                  <p className="hint">Node gộp từ {selected.sections.length} subtopic · Tiêu đề lấy node đầu tiên.</p>
+                  {selected.sections.map((s, i) => (
+                    <div key={i} className="qm-section">
+                      <h3>Section {i + 1}: {s.title}</h3>
+                      <p className="qm-detail">{s.text}</p>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <p className="qm-detail">{selected.detail}</p>
+              )}
               <p className="qm-meta">Ghi ngày {selected.date} · Nguồn: {selected.source}</p>
               {selChildren.length > 0 && (
                 <>
@@ -225,7 +322,7 @@ export default function App() {
                     {selChildren.map((c) => (
                       <li key={c.id}>
                         <button type="button" className="linklike" onClick={() => setSelectedId(c.id)}>{c.title}</button>
-                        <small>{c.detail.slice(0, 80)}…</small>
+                        <small>{(c.sections ? c.sections.map((s) => s.text).join(' ') : c.detail).slice(0, 80)}…</small>
                       </li>
                     ))}
                   </ul>
@@ -244,6 +341,8 @@ export default function App() {
               <li>Node đơn giản: tiêu đề là chủ đề tóm tắt, chi tiết là câu trả lời tóm tắt.</li>
               <li>Đưa bản tóm tắt cho bạn duyệt trước khi ghi.</li>
               <li>Chủ đề trùng lắp thì gộp vào chi tiết của subtopic đã có, không tạo node mới, giữ tối đa 4 nhánh.</li>
+              <li>Chọn nhiều subtopic bằng Ctrl+Click (Cmd+Click trên Mac) rồi bấm “Gộp thành 1 node”: tiêu đề lấy node đầu tiên, chi tiết chia thành từng section theo node gốc.</li>
+              <li>Kéo thân node để di chuyển vị trí, vị trí mới được giữ trong phiên này.</li>
             </ul>
           </section>
         </aside>

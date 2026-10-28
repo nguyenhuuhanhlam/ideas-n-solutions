@@ -24,6 +24,14 @@ Panel phải có demo luồng duyệt: bản tóm tắt đề xuất gộp
 “Duyệt và gộp vào subtopic” thì chi tiết của node “Giá” dài thêm,
 số node không đổi, vẫn 4 subtopic.
 
+## Gộp subtopic + kéo thả node (thêm 28-10-2026)
+
+- Chọn nhiều subtopic bằng Ctrl+Click (Cmd+Click trên Mac), rồi bấm
+  “Gộp thành 1 node” ở thanh gộp hiện ra: tiêu đề node gộp lấy tên
+  của node đầu tiên (theo thứ tự trên xuống dưới), chi tiết chia
+  thành từng section theo node gốc — gộp 3 node thì 3 section.
+- Kéo thân node để di chuyển vị trí, vị trí mới được giữ trong phiên này.
+
 ## Chạy / build
 
 ```sh
