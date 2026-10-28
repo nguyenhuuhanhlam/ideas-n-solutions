@@ -26,6 +26,7 @@ jobs:
           cache-dependency-path: |
             timeline-projects/package-lock.json
             team-assistant-sim/package-lock.json
+            qa-mindmap/package-lock.json
       # Mỗi app nằm trong thư mục riêng; build với base là subpath Pages của app đó
       - run: npm ci
         working-directory: timeline-projects
@@ -35,11 +36,16 @@ jobs:
         working-directory: team-assistant-sim
       - run: npm run build -- --base=/ideas-n-solutions/team-assistant-sim/
         working-directory: team-assistant-sim
+      - run: npm ci
+        working-directory: qa-mindmap
+      - run: npm run build -- --base=/ideas-n-solutions/qa-mindmap/
+        working-directory: qa-mindmap
       # Ghép các app + trang chủ ở root thành một site duy nhất
       - run: |
-          mkdir -p _site/timeline-projects _site/team-assistant-sim
+          mkdir -p _site/timeline-projects _site/team-assistant-sim _site/qa-mindmap
           cp -r timeline-projects/dist/* _site/timeline-projects/
           cp -r team-assistant-sim/dist/* _site/team-assistant-sim/
+          cp -r qa-mindmap/dist/* _site/qa-mindmap/
           cp index.html _site/index.html
       - uses: actions/configure-pages@v5
         with:
