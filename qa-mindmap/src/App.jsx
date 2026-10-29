@@ -123,6 +123,7 @@ export default function App() {
   const [multiSelected, setMultiSelected] = useState(new Set())
   const [draft, setDraft] = useState(DRAFT_PROPOSAL)
   const [draftState, setDraftState] = useState('pending') // pending | approved | dismissed
+  const [showSettings, setShowSettings] = useState(false)
   const [query, setQuery] = useState('')
   const rfRef = useRef(null)
   const [flowNodes, setFlowNodes, onNodesChange] = useNodesState(initialFlowNodes())
@@ -130,6 +131,14 @@ export default function App() {
 
   const byId = useMemo(() => Object.fromEntries(items.map((n) => [n.id, n])), [items])
   const childrenOf = useCallback((id) => items.filter((n) => n.parentId === id), [items])
+
+  // Đóng hộp thoại Cài đặt bằng phím Esc.
+  useEffect(() => {
+    if (!showSettings) return undefined
+    const onKey = (e) => { if (e.key === 'Escape') setShowSettings(false) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [showSettings])
 
   // Áp vị trí layout vào cả items lẫn flowNodes (effect items->flowNodes
   // giữ nguyên vị trí flow cũ nên phải cập nhật cả 2, như kéo thả).
@@ -382,6 +391,7 @@ export default function App() {
         <button type="button" className="icon-btn" title="Sắp xếp lại vị trí cho đều và đẹp" aria-label="Sắp xếp lại vị trí cho đều và đẹp" onClick={applyLayout}>▦</button>
         <button type="button" className="icon-btn" title="Vừa khung hình" aria-label="Vừa khung hình" onClick={() => rfRef.current?.fitView({ padding: 0.15 })}>⤢</button>
         <button type="button" className="icon-btn ghost" title="Đặt lại bản mẫu" aria-label="Đặt lại bản mẫu" onClick={resetDraft}>↺</button>
+        <button type="button" className="icon-btn" title="Cài đặt hệ thống — Quy tắc đã chốt" aria-label="Cài đặt hệ thống — Quy tắc đã chốt" onClick={() => setShowSettings((v) => !v)}>⚙️</button>
       </div>
 
       <main className="qm-layout">
@@ -491,8 +501,18 @@ export default function App() {
             </section>
           )}
 
-          <section className="panel">
-            <h2>📋 Quy tắc đã chốt — 28-10-2026</h2>
+        </aside>
+      </main>
+
+      {showSettings && (
+        <div className="qm-modal-backdrop" onClick={() => setShowSettings(false)}>
+          <div className="qm-modal" role="dialog" aria-modal="true" aria-label="Cài đặt hệ thống" onClick={(e) => e.stopPropagation()}>
+            <div className="qm-modal-head">
+              <h2>⚙️ Cài đặt hệ thống</h2>
+              <button type="button" className="icon-btn" title="Đóng Cài đặt" aria-label="Đóng Cài đặt" onClick={() => setShowSettings(false)}>✕</button>
+            </div>
+            <p className="hint">Các quy tắc này là quy ước của app, không phải dữ liệu node — đưa vào đây để panel phải chỉ còn chi tiết node đang chọn, gọn hơn. Bấm ra ngoài hoặc phím Esc để đóng.</p>
+            <h3>📋 Quy tắc đã chốt — 28-10-2026</h3>
             <ul className="qm-rules">
               <li>Chỉ ghi khi bạn yêu cầu ghi nhận, không tự ghi mọi câu hỏi đáp.</li>
               <li>Node đơn giản: tiêu đề là chủ đề tóm tắt, chi tiết là câu trả lời tóm tắt.</li>
@@ -505,9 +525,9 @@ export default function App() {
               <li>Sắp xếp vị trí (không phải đổi thứ tự câu hỏi): layout chỉ tính cây đang thấy — topic đóng thì không giữ chỗ cho con ẩn, nên lúc mở app gốc + 2 topic xích lại gần nhau, gốc nằm giữa; mở 1 topic thì cây tự giãn ra vừa đủ chỗ cho subtopic của nó, thu lại thì tự co lại. Kéo lệch rồi thì bấm ▦ trên thanh công cụ để tính lại cây đang thấy cho đều và đẹp, xong tự vừa khung hình. Mở/thu nhánh sẽ sắp lại cây, vị trí kéo tay lúc đó được sắp lại cho đều.</li>
               <li>Các nút thao tác đều dạng icon, nhãn đầy đủ nằm trong title + aria-label (rê chuột vào nút để xem).</li>
             </ul>
-          </section>
-        </aside>
-      </main>
+          </div>
+        </div>
+      )}
 
       <footer className="qm-foot">
         Bản mẫu — gốc Muse Q&amp;A → 2 topic (Tailscale, Render ngoại thất SketchUp), mỗi topic tối đa 4 subtopic, dữ liệu 28 và 29-10-2026, chưa có thêm / sửa / xóa thật, chưa lưu bền. Bản quản lý thật sẽ thêm form thêm node, sửa, xóa và lưu localStorage + xuất / nhập JSON.

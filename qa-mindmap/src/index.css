@@ -72,6 +72,13 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .qm-toggle { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgba(255,255,255,.3); background: #11141a; color: #ffd166; font-size: 12px; font-weight: 700; line-height: 1; }
 .qm-badge { position: absolute; top: -9px; right: -7px; background: #ffd166; color: #11141a; border-radius: 999px; font-size: 11px; font-weight: 700; padding: 2px 7px; }
 .qm-foot { margin-top: 16px; color: #8b95a9; font-size: 12.5px; line-height: 1.6; text-align: center; }
+/* Hộp thoại Cài đặt hệ thống: phủ toàn màn hình, không chiếm chỗ trong
+   luồng trang nên không làm dịch canvas hay panel khi mở/đóng. */
+.qm-modal-backdrop { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.65); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.qm-modal { background: #171b24; border: 1px solid rgba(255,255,255,.2); border-radius: 14px; padding: 18px 20px; width: 100%; max-width: 640px; max-height: 82vh; overflow-y: auto; box-shadow: 0 12px 40px rgba(0,0,0,.5); }
+.qm-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.qm-modal-head h2 { font-size: 15px; margin: 0; color: #ffd166; }
+.qm-modal h3 { font-size: 13.5px; margin: 14px 0 6px; color: #e8ecf3; }
 .react-flow__controls button { background: #1e2431; color: #e8ecf3; border-color: rgba(255,255,255,.15); }
 .react-flow__minimap { background: #141821 !important; }
 @media (max-width: 1100px) {

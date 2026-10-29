@@ -60,6 +60,16 @@ số node không đổi, vẫn 4 subtopic.
   Đánh đổi: mở/thu nhánh sẽ sắp lại cây, vị trí kéo tay lúc
   đó được sắp lại cho đều.
 
+## Cài đặt hệ thống (thêm 29-10-2026)
+
+- Mục “Quy tắc đã chốt” không còn nằm ở panel phải nữa — panel
+  phải giờ chỉ còn panel gộp (khi chọn nhiều), panel duyệt và
+  panel chi tiết node đang chọn, gọn hơn.
+- Bấm ⚙️ trên thanh công cụ để mở hộp thoại “Cài đặt hệ thống”,
+  trong đó có toàn bộ quy tắc đã chốt. Hộp thoại phủ toàn màn
+  hình nên không làm dịch canvas hay panel; bấm ra ngoài, bấm ✕
+  hoặc phím Esc để đóng.
+
 ## Sửa 29-10-2026: pan như team-assistant-sim + nút icon
 
 - Canvas đúng mẫu team-assistant-sim: kéo nền để di chuyển cả
