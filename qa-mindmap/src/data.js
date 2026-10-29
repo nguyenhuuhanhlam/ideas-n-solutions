@@ -1,4 +1,8 @@
 // Dữ liệu mẫu — cây Tailscale, buổi hỏi đáp 28-10-2026.
+// Lưu ý vị trí: position ở đây chỉ là vị trí dự phòng / thứ tự cây.
+// App tính lại vị trí hiển thị theo cây đang thấy (layoutPositions trong
+// App.jsx: topic đóng thì không tính con ẩn), nên lúc mở app gốc + 2 topic
+// xích lại gần nhau, không dùng nguyên vị trí cây đầy đủ ở dưới này.
 // Cấu trúc đã chốt với user (22:52, 28-10-2026 — thay cấu trúc cũ “mỗi câu hỏi 1 node”):
 // - Bản ghi nhớ nội dung chính của phiên làm việc, hạn chế sinh quá nhiều node.
 // - Nút gốc (ví dụ “Muse Q&A”, có thể 1 hoặc nhiều nút gốc cho các dạng chủ đề khác nhau)
@@ -45,7 +49,7 @@ export const NODES = [
     detail: 'Tailscale tạo mạng riêng ảo (tailnet) nối các máy ở xa như cùng một mạng LAN. Mỗi máy được cấp IP riêng dạng 100.x, chỉ máy cùng tài khoản mới thấy nhau. Không cần public IP, không cần mở cổng router, không cần DDNS. Lưu lượng mã hóa WireGuard, truy cập được dịch vụ nội bộ từ xa như MCP server, MySQL, NAS, camera. Công ty ở Toronto, thành lập 2019 bởi cựu kỹ sư Google. Đầu 2026 hơn 5 triệu user, hơn 20.000 doanh nghiệp, khách gồm Hugging Face, Mozilla, Mercari, Instacart. Đạt SOC 2 Type 2, lưu lượng đi trực tiếp giữa các máy, mã hóa đầu cuối.',
     source: 'Trả lời trong buổi hỏi đáp + nguồn công khai, kiểm chứng 28-10-2026',
     date: '28-10-2026',
-    position: { x: 760, y: 0 },
+    position: { x: 750, y: 0 },
   },
   {
     id: 'sub-price',
@@ -55,7 +59,7 @@ export const NODES = [
     detail: 'Có bản free. Bản Personal $0 cho cá nhân: 3 user, 100 thiết bị, gần đủ tính năng chính. Personal Plus $5/tháng: 6 user, 100 thiết bị, chia sẻ với gia đình.',
     source: 'tailscale.com/pricing, kiểm chứng 28-10-2026',
     date: '28-10-2026',
-    position: { x: 760, y: 150 },
+    position: { x: 750, y: 150 },
   },
   {
     id: 'sub-macos',
@@ -65,7 +69,7 @@ export const NODES = [
     detail: 'Có bản macOS, 2 cách cài: từ Mac App Store, hoặc bản Standalone tải từ tailscale.com/download (ít bị giới hạn sandbox hơn, hợp cho tính năng nâng cao). Giao diện mới cần macOS 13 Ventura trở lên, máy còn macOS 12 Monterey thì vẫn dùng giao diện cũ. Đăng nhập cùng tài khoản là vào chung mạng với máy Windows hiện tại.',
     source: 'Trả lời trong buổi hỏi đáp',
     date: '28-10-2026',
-    position: { x: 760, y: 300 },
+    position: { x: 750, y: 300 },
   },
   {
     id: 'sub-folder',
@@ -75,7 +79,7 @@ export const NODES = [
     detail: 'Muse truy xuất được folder qua Tailscale, nhưng Tailscale chỉ lo phần đường mạng, không tự mở folder. Cần thêm 1 dịch vụ trên máy Windows chia sẻ đúng folder đó qua mạng, ví dụ thêm tool đọc file vào MCP server đang chạy ở cổng 8001, chạy 1 web server nhỏ trỏ vào folder, hoặc Windows File Sharing / SFTP. Máy ảo của Muse chỉ kết nối TCP ra ngoài qua Tailscale, không mount ổ đĩa trực tiếp được.',
     source: 'Trả lời trong buổi hỏi đáp',
     date: '28-10-2026',
-    position: { x: 760, y: 450 },
+    position: { x: 750, y: 450 },
   },
   {
     id: 'topic-sketchup-render',
@@ -95,7 +99,7 @@ export const NODES = [
     detail: 'Giữ nguyên hình khối, tỉ lệ và góc máy là câu khóa quan trọng nhất, vì AI dễ tự thêm tầng, đổi cửa sổ, đổi mặt đứng. Xuất ảnh dạng Shaded hoặc Shaded with Textures, tắt Profiles, ẩn guides và section plane, dùng Two-Point Perspective, FOV khoảng 35–60° cho đỡ méo hình.',
     source: 'Buổi hỏi đáp 29-10-2026 · Cad2Real, SketchUp guide',
     date: '29-10-2026',
-    position: { x: 760, y: 640 },
+    position: { x: 750, y: 640 },
   },
   {
     id: 'sub-sketchup-day-golden',
@@ -105,7 +109,7 @@ export const NODES = [
     detail: 'Mẫu khung chung: giữ đúng geometry, proportions và camera, mặt đứng trắng + lam gỗ ấm, kính full chiều cao, mái phẳng, sân vườn, nắng nhẹ, ảnh kiến trúc chi tiết cao. Ban ngày nắng đẹp thêm đá tự nhiên, cửa kính mở ra terrace, cây cọ, lối đá. Golden hour thêm ánh sáng ấm, bóng dài, kính sáng đèn từ trong, phản chiếu hồ bơi, tông điện ảnh.',
     source: 'Buổi hỏi đáp 29-10-2026',
     date: '29-10-2026',
-    position: { x: 760, y: 790 },
+    position: { x: 750, y: 790 },
   },
   {
     id: 'sub-sketchup-night-style',
@@ -115,7 +119,7 @@ export const NODES = [
     detail: 'Blue hour: khung thép đen + kính, đèn trong nhà ấm tương phản trời xanh đậm, đèn lối đi, phản chiếu mặt nước. Tối giản: bê tông thô + thép đen, cửa trượt kính lớn, sân rải sỏi, cây tạo hình, sáng dịu trời âm u. Nhà phố trời mưa nhẹ: gạch tối, khung cửa thép rộng, vỉa hè ướt tạo phản chiếu trên gạch và kính.',
     source: 'Buổi hỏi đáp 29-10-2026',
     date: '29-10-2026',
-    position: { x: 760, y: 940 },
+    position: { x: 750, y: 940 },
   },
   {
     id: 'sub-sketchup-ai-note',
@@ -125,7 +129,7 @@ export const NODES = [
     detail: 'Prompt SketchUp AI Render nên dưới 500 ký tự, viết như nói chuyện bình thường, nêu rõ vật liệu, ánh sáng, cảnh quan, phong cách, tránh các ký tự $, ..., +, =. Negative prompt nếu tool có hỗ trợ: distorted geometry, extra floors, changed windows, warped perspective, cartoon, low detail, blurry, extra buildings.',
     source: 'Buổi hỏi đáp 29-10-2026 · SketchUp Help, Best Practices for Custom Prompts',
     date: '29-10-2026',
-    position: { x: 760, y: 1090 },
+    position: { x: 750, y: 1090 },
   },
 ]
 

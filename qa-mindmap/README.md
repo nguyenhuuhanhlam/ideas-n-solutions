@@ -45,12 +45,20 @@ số node không đổi, vẫn 4 subtopic.
   + các topic, bấm +N trên topic để mở nhánh. Nút ＋ / － vẫn
   mở / thu toàn bộ; tìm kiếm (Enter) hoặc bấm tên nhánh
   trong panel phải chỉ mở đúng nhánh cần tới, các nhánh khác vẫn đóng.
-- Sắp xếp VỊ TRÍ, không phải đổi thứ tự câu hỏi: vị trí mặc định
-  đã cân đối sẵn — gốc nằm giữa 2 topic, subtopic cách đều nhau
-  150px, giữa 2 nhóm topic cách thêm 40px. Kéo lệch rồi thì bấm
-  ▦ trên thanh công cụ để tính lại toàn bộ cây cho đều và đẹp,
-  xong tự vừa khung hình. Nút ↑ ↓ đổi thứ tự đã bỏ (đính chính
-  29-10-2026: “sắp xếp lại node” ở đây là vị trí, không phải thứ tự).
+- Sắp xếp VỊ TRÍ, không phải đổi thứ tự câu hỏi: layout chỉ tính
+  cây đang thấy — topic đóng thì không giữ chỗ cho con ẩn.
+  Trước đây layout tính cả subtopic đang ẩn nên lúc khởi đầu
+  2 topic bị đẩy cách nhau 640px dù chưa mở nhánh nào; giờ lúc
+  mở app chỉ thấy gốc (y=71) + 2 topic xích lại gần nhau
+  (y=0 và y=150, gốc nằm giữa), mở 1 topic thì cây tự giãn ra
+  vừa đủ chỗ cho subtopic của nó, thu lại thì tự co lại.
+  Subtopic đang thấy cách đều nhau 150px, giữa 2 nhóm topic
+  cách thêm 40px. Kéo lệch rồi thì bấm ▦ trên thanh công cụ
+  để tính lại cây đang thấy cho đều và đẹp, xong tự vừa khung
+  hình. Nút ↑ ↓ đổi thứ tự đã bỏ (đính chính 29-10-2026:
+  “sắp xếp lại node” ở đây là vị trí, không phải thứ tự).
+  Đánh đổi: mở/thu nhánh sẽ sắp lại cây, vị trí kéo tay lúc
+  đó được sắp lại cho đều.
 
 ## Sửa 29-10-2026: pan như team-assistant-sim + nút icon
 

@@ -44,9 +44,6 @@ function nodeText(n) {
 // (applyNodeChanges — chỉ cập nhật node đang kéo, giữ nguyên object các node còn lại).
 // items chỉ giữ dữ liệu (tiêu đề/chi tiết/sections), nên kéo không làm mới lại
 // byId, tìm kiếm, panel phải hay edge — đó là lý do team-assistant kéo mượt.
-function initialFlowNodes() {
-  return NODES.map((n) => ({ id: n.id, type: n.kind, position: n.position, data: {} }))
-}
 function edgeStyleFor(kind) {
   return { stroke: kind === 'subtopic' ? '#ffd166' : '#5b6b84', strokeWidth: kind === 'subtopic' ? 2 : 1.5 }
 }
@@ -66,8 +63,61 @@ function defaultCollapsed() {
     .map((n) => n.id))
 }
 
+// Sắp xếp VỊ TRÍ cho đều và đẹp — và chỉ tính CÂY ĐANG THẤY.
+// Đây là chỗ sửa lỗi "lúc khởi đầu các nút cận root bị xếp cách xa quá":
+// bản cũ tính layout từ toàn bộ cây, kể cả subtopic đang ẩn, nên 2 topic
+// phải đứng cách nhau 640px để chừa chỗ cho 8 subtopic ẩn phía sau.
+// Bản này: node đang đóng được tính như 1 lá (không giữ chỗ cho con ẩn),
+// nên lúc khởi đầu chỉ thấy gốc + 2 topic xích lại gần nhau (cách nhau
+// 150px, gốc nằm giữa); mở 1 topic thì cây tự giãn ra vừa đủ chỗ cho
+// subtopic của nó, thu lại thì cây tự co lại. Node cha luôn nằm chính
+// giữa các con đang thấy của nó (tính theo tâm node, cao gốc 72 /
+// topic 64 / subtopic 56), cột x giữ nguyên: gốc 10, topic 380, subtopic 750.
+// Chỉ trả về vị trí của node đang thấy; node ẩn giữ nguyên vị trí cũ
+// (không nhìn thấy, lần mở sau layout sẽ tính lại cho nó).
+function layoutPositions(list, collapsedSet) {
+  const HEIGHT = { root: 72, topic: 64, subtopic: 56 }
+  const LEAF_PITCH = 150
+  const GROUP_GAP = 40
+  const kidsOf = (id) => list.filter((n) => n.parentId === id)
+  const pos = {}
+  let cursor = 0
+  const walk = (node, depth) => {
+    const kids = collapsedSet.has(node.id) ? [] : kidsOf(node.id)
+    const x = 10 + depth * 370
+    if (!kids.length) {
+      pos[node.id] = { x, y: cursor }
+      cursor += LEAF_PITCH
+      const center = pos[node.id].y + (HEIGHT[node.kind] || 56) / 2
+      return { first: center, last: center, leafCount: 1 }
+    }
+    let first = null
+    let last = null
+    let leafCount = 0
+    kids.forEach((kid, i) => {
+      const range = walk(kid, depth + 1)
+      if (first === null) first = range.first
+      last = range.last
+      leafCount += range.leafCount
+      if (node.kind === 'root' && range.leafCount > 1 && i < kids.length - 1) cursor += GROUP_GAP
+    })
+    const center = (first + last) / 2
+    pos[node.id] = { x, y: center - (HEIGHT[node.kind] || 56) / 2 }
+    return { first, last, leafCount }
+  }
+  list.filter((n) => !n.parentId).forEach((root) => walk(root, 0))
+  return pos
+}
+
+// Vị trí lúc khởi đầu: chỉ tính cây đang thấy với topic đóng mặc định
+// => gốc (10, 71), topic Tailscale (380, 0), topic Render (380, 150).
+const START_POS = layoutPositions(NODES, defaultCollapsed())
+function initialFlowNodes() {
+  return NODES.map((n) => ({ id: n.id, type: n.kind, position: START_POS[n.id] || n.position, data: {} }))
+}
+
 export default function App() {
-  const [items, setItems] = useState(NODES)
+  const [items, setItems] = useState(() => NODES.map((n) => (START_POS[n.id] ? { ...n, position: START_POS[n.id] } : n)))
   const [collapsed, setCollapsed] = useState(defaultCollapsed)
   const [selectedId, setSelectedId] = useState('root')
   const [multiSelected, setMultiSelected] = useState(new Set())
@@ -81,14 +131,26 @@ export default function App() {
   const byId = useMemo(() => Object.fromEntries(items.map((n) => [n.id, n])), [items])
   const childrenOf = useCallback((id) => items.filter((n) => n.parentId === id), [items])
 
-  const toggle = useCallback((id) => {
-    setCollapsed((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
+  // Áp vị trí layout vào cả items lẫn flowNodes (effect items->flowNodes
+  // giữ nguyên vị trí flow cũ nên phải cập nhật cả 2, như kéo thả).
+  // fit=true thì vừa khung hình sau 50ms, như mẫu team-assistant-sim.
+  const applyPositions = useCallback((pos, fit = false) => {
+    setItems((prev) => prev.map((n) => (pos[n.id] ? { ...n, position: pos[n.id] } : n)))
+    setFlowNodes((prev) => prev.map((n) => (pos[n.id] ? { ...n, position: pos[n.id] } : n)))
+    if (fit) setTimeout(() => rfRef.current?.fitView({ padding: 0.15 }), 50)
   }, [])
+
+  // Mở/thu 1 nhánh: đổi tập đóng rồi sắp lại cây đang thấy ngay trong
+  // cùng lần bấm, để nhánh vừa mở có đủ chỗ và nhánh vừa thu không để
+  // lại khoảng trống. Vị trí kéo tay (nếu có) sẽ được sắp lại cho đều
+  // trong lần mở/thu này — đó là đánh đổi của layout tự động.
+  const toggle = useCallback((id) => {
+    const next = new Set(collapsed)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+    setCollapsed(next)
+    applyPositions(layoutPositions(items, next))
+  }, [collapsed, items, applyPositions])
 
   const hidden = useMemo(() => {
     const s = new Set()
@@ -162,59 +224,26 @@ export default function App() {
     : []
 
   // Chọn node từ panel phải / tìm kiếm: mở luôn các nhánh cha trên đường tới node,
-  // các nhánh khác vẫn giữ trạng thái đóng mặc định.
+  // các nhánh khác vẫn giữ trạng thái đóng mặc định. Chỉ sắp lại khi tập đóng
+  // thật sự đổi (tức có nhánh vừa mở ra) — bấm tên 1 node đang thấy thì cây
+  // giữ nguyên vị trí, không sắp lại vô cớ.
   const selectAndReveal = useCallback((id) => {
     setSelectedId(id)
     const p = pathOf(id, byId)
     if (!p.length) return
-    setCollapsed((prev) => {
-      const next = new Set(prev)
-      p.forEach((n) => next.delete(n.id))
-      return next
-    })
-  }, [byId])
+    const next = new Set(collapsed)
+    p.forEach((n) => next.delete(n.id))
+    if (next.size === collapsed.size && [...next].every((x) => collapsed.has(x))) return
+    setCollapsed(next)
+    applyPositions(layoutPositions(items, next))
+  }, [byId, collapsed, items, applyPositions])
 
-  // Sắp xếp VỊ TRÍ cho đều và đẹp (không phải đổi thứ tự câu hỏi):
-  // cây gọn theo chiều dọc — lá (node không có con) cách đều nhau 150px,
-  // giữa 2 nhóm topic cách thêm 40px, node cha nằm chính giữa các con
-  // của nó (tính theo tâm node, cao gốc 72 / topic 64 / subtopic 56),
-  // cột x giữ nguyên: gốc 10, topic 380, subtopic 760.
-  // Tính lại từ cây đang có nên vẫn đúng sau khi kéo lệch, sau khi gộp
-  // (lá ít đi thì các lá còn lại tự dồn đều lại), hay sau khi thêm node.
+  // Nút ▦: sắp lại cây ĐANG THẤY (topic đóng thì không tính con ẩn),
+  // xong tự vừa khung hình. Tính lại từ cây đang có nên vẫn đúng sau
+  // khi kéo lệch, sau khi gộp (lá ít đi thì các lá còn lại tự dồn đều lại).
   const applyLayout = useCallback(() => {
-    const HEIGHT = { root: 72, topic: 64, subtopic: 56 }
-    const LEAF_PITCH = 150
-    const GROUP_GAP = 40
-    const kidsOf = (id) => items.filter((n) => n.parentId === id)
-    const pos = {}
-    let cursor = 0
-    const walk = (node, depth) => {
-      const kids = kidsOf(node.id)
-      const x = 10 + depth * 370
-      if (!kids.length) {
-        pos[node.id] = { x, y: cursor }
-        cursor += LEAF_PITCH
-        const center = cursor - LEAF_PITCH + (HEIGHT[node.kind] || 56) / 2
-        return { first: center, last: center }
-      }
-      let first = null
-      let last = null
-      kids.forEach((kid, i) => {
-        const range = walk(kid, depth + 1)
-        if (first === null) first = range.first
-        last = range.last
-        if (node.kind === 'root' && i < kids.length - 1) cursor += GROUP_GAP
-      })
-      const center = (first + last) / 2
-      pos[node.id] = { x, y: center - (HEIGHT[node.kind] || 56) / 2 }
-      return { first, last }
-    }
-    items.filter((n) => !n.parentId).forEach((root) => walk(root, 0))
-    setItems((prev) => prev.map((n) => (pos[n.id] ? { ...n, position: pos[n.id] } : n)))
-    setFlowNodes((prev) => prev.map((n) => (pos[n.id] ? { ...n, position: pos[n.id] } : n)))
-    // Đợi vị trí mới vào flow rồi mới vừa khung hình (mẫu team-assistant-sim).
-    setTimeout(() => rfRef.current?.fitView({ padding: 0.15 }), 50)
-  }, [items])
+    applyPositions(layoutPositions(items, collapsed), true)
+  }, [items, collapsed, applyPositions])
 
   const searchResults = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -264,7 +293,10 @@ export default function App() {
       source: `${first.source} · gộp từ ${selectedSubtopics.length} subtopic`,
     }
     const restIds = new Set(rest.map((n) => n.id))
-    setItems((prev) => prev.map((n) => (n.id === first.id ? merged : n)).filter((n) => !restIds.has(n.id)))
+    const newItems = items.map((n) => (n.id === first.id ? merged : n)).filter((n) => !restIds.has(n.id))
+    const pos = layoutPositions(newItems, collapsed)
+    setItems(newItems.map((n) => (pos[n.id] ? { ...n, position: pos[n.id] } : n)))
+    setFlowNodes((prev) => prev.filter((n) => !restIds.has(n.id)).map((n) => (pos[n.id] ? { ...n, position: pos[n.id] } : n)))
     setMultiSelected(new Set())
     setSelectedId(first.id)
   }
@@ -292,7 +324,7 @@ export default function App() {
 
   const dismissDraft = () => setDraftState('dismissed')
   const resetDraft = () => {
-    setItems(NODES)
+    setItems(NODES.map((n) => (START_POS[n.id] ? { ...n, position: START_POS[n.id] } : n)))
     setFlowNodes(initialFlowNodes())
     setFlowEdges(initialFlowEdges())
     setDraftState('pending')
@@ -300,8 +332,16 @@ export default function App() {
     setMultiSelected(new Set())
     setCollapsed(defaultCollapsed())
   }
-  const expandAll = () => setCollapsed(new Set())
-  const collapseAll = () => setCollapsed(new Set(items.filter((n) => childrenOf(n.id).length > 0).map((n) => n.id)))
+  const expandAll = () => {
+    const next = new Set()
+    setCollapsed(next)
+    applyPositions(layoutPositions(items, next), true)
+  }
+  const collapseAll = () => {
+    const next = new Set(items.filter((n) => childrenOf(n.id).length > 0).map((n) => n.id))
+    setCollapsed(next)
+    applyPositions(layoutPositions(items, next), true)
+  }
 
   return (
     <div className="qm-app">
@@ -462,7 +502,7 @@ export default function App() {
               <li>Kéo nền để di chuyển cả hình, bấm node để xem chi tiết — đúng kiểu team-assistant-sim, không còn chế độ khoanh chọn trên nền.</li>
               <li>Kéo thân node để di chuyển vị trí, vị trí mới được giữ trong phiên này.</li>
               <li>Mặc định các topic đóng, subtopic ẩn: mở app chỉ thấy nút gốc + các topic, bấm +N trên topic để mở nhánh. Nút ＋ / － trên thanh công cụ vẫn mở / thu toàn bộ, tìm kiếm hoặc bấm tên nhánh trong panel phải chỉ mở đúng nhánh cần tới.</li>
-              <li>Sắp xếp vị trí (không phải đổi thứ tự câu hỏi): vị trí mặc định đã cân đối sẵn — gốc nằm giữa 2 topic, subtopic cách đều nhau; kéo lệch rồi thì bấm ▦ trên thanh công cụ để tính lại toàn bộ cây cho đều và đẹp, xong tự vừa khung hình.</li>
+              <li>Sắp xếp vị trí (không phải đổi thứ tự câu hỏi): layout chỉ tính cây đang thấy — topic đóng thì không giữ chỗ cho con ẩn, nên lúc mở app gốc + 2 topic xích lại gần nhau, gốc nằm giữa; mở 1 topic thì cây tự giãn ra vừa đủ chỗ cho subtopic của nó, thu lại thì tự co lại. Kéo lệch rồi thì bấm ▦ trên thanh công cụ để tính lại cây đang thấy cho đều và đẹp, xong tự vừa khung hình. Mở/thu nhánh sẽ sắp lại cây, vị trí kéo tay lúc đó được sắp lại cho đều.</li>
               <li>Các nút thao tác đều dạng icon, nhãn đầy đủ nằm trong title + aria-label (rê chuột vào nút để xem).</li>
             </ul>
           </section>
