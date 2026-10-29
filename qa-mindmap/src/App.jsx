@@ -344,17 +344,6 @@ export default function App() {
         <button type="button" className="icon-btn ghost" title="Đặt lại bản mẫu" aria-label="Đặt lại bản mẫu" onClick={resetDraft}>↺</button>
       </div>
 
-      {multiSelected.size > 0 && (
-        <div className="qm-merge-bar">
-          <span>Đã chọn {multiSelected.size} subtopic: <strong>{selectedSubtopics.map((n) => n.title).join(' + ')}</strong></span>
-          <button type="button" className="icon-btn primary" title="Gộp thành 1 node" aria-label="Gộp thành 1 node" disabled={!canMerge} onClick={mergeSelected}>⧉</button>
-          <button type="button" className="icon-btn" title="Bỏ chọn" aria-label="Bỏ chọn" onClick={() => setMultiSelected(new Set())}>✕</button>
-          {selectedSubtopics.length === 1 && <span className="hint">Chọn thêm 1 subtopic nữa bằng Ctrl+Click để gộp.</span>}
-          {selectedSubtopics.length >= 2 && !canMerge && <span className="hint">Chỉ gộp được các subtopic cùng 1 topic.</span>}
-          {canMerge && <span className="hint">Tiêu đề node gộp lấy node đầu tiên ({selectedSubtopics[0].title}), chi tiết chia thành {selectedSubtopics.length} section theo từng node gốc.</span>}
-        </div>
-      )}
-
       <main className="qm-layout">
         <div className="qm-canvas-wrap">
           <ReactFlow
@@ -386,6 +375,19 @@ export default function App() {
         </div>
 
         <aside className="qm-panel-col">
+          {multiSelected.size > 0 && (
+            <section className="panel merge-panel">
+              <h2>⧉ Gộp subtopic — đã chọn {multiSelected.size}</h2>
+              <p className="qm-detail">{selectedSubtopics.map((n) => n.title).join(' + ')}</p>
+              <div className="actions">
+                <button type="button" className="icon-btn primary" title="Gộp thành 1 node" aria-label="Gộp thành 1 node" disabled={!canMerge} onClick={mergeSelected}>⧉</button>
+                <button type="button" className="icon-btn" title="Bỏ chọn" aria-label="Bỏ chọn" onClick={() => setMultiSelected(new Set())}>✕</button>
+              </div>
+              {selectedSubtopics.length === 1 && <p className="hint">Chọn thêm 1 subtopic nữa bằng Ctrl+Click để gộp.</p>}
+              {selectedSubtopics.length >= 2 && !canMerge && <p className="hint">Chỉ gộp được các subtopic cùng 1 topic.</p>}
+              {canMerge && <p className="hint">Tiêu đề node gộp lấy node đầu tiên ({selectedSubtopics[0].title}), chi tiết chia thành {selectedSubtopics.length} section theo từng node gốc.</p>}
+            </section>
+          )}
           <section className="panel draft-panel">
             <h2>✍️ Bản tóm tắt chờ duyệt — demo luồng ghi nhận</h2>
             {draftState === 'pending' && draft && (
@@ -456,7 +458,7 @@ export default function App() {
               <li>Node đơn giản: tiêu đề là chủ đề tóm tắt, chi tiết là câu trả lời tóm tắt.</li>
               <li>Đưa bản tóm tắt cho bạn duyệt trước khi ghi.</li>
               <li>Chủ đề trùng lắp thì gộp vào chi tiết của subtopic đã có, không tạo node mới, giữ tối đa 4 nhánh.</li>
-              <li>Chọn nhiều subtopic bằng Ctrl / Shift+Click (Cmd+Click trên Mac), rồi bấm ⧉ để gộp thành 1 node: tiêu đề lấy node đầu tiên, chi tiết chia thành từng section theo node gốc.</li>
+              <li>Chọn nhiều subtopic bằng Ctrl / Shift+Click (Cmd+Click trên Mac), rồi bấm ⧉ trong panel “Gộp subtopic” ở đầu cột phải để gộp thành 1 node: tiêu đề lấy node đầu tiên, chi tiết chia thành từng section theo node gốc. Panel gộp nằm ở cột phải nên khi nó hiện ra, khung hình bên trái không bị đẩy xuống.</li>
               <li>Kéo nền để di chuyển cả hình, bấm node để xem chi tiết — đúng kiểu team-assistant-sim, không còn chế độ khoanh chọn trên nền.</li>
               <li>Kéo thân node để di chuyển vị trí, vị trí mới được giữ trong phiên này.</li>
               <li>Mặc định các topic đóng, subtopic ẩn: mở app chỉ thấy nút gốc + các topic, bấm +N trên topic để mở nhánh. Nút ＋ / － trên thanh công cụ vẫn mở / thu toàn bộ, tìm kiếm hoặc bấm tên nhánh trong panel phải chỉ mở đúng nhánh cần tới.</li>

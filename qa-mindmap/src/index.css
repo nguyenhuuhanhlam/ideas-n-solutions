@@ -19,8 +19,8 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; font-size: 16px; font-weight: 700; line-height: 1; }
 .qm-toolbar button.icon-btn { width: 34px; height: 34px; padding: 0; }
 .qm-toolbar button.ghost { background: none; }
-.qm-merge-bar button.icon-btn, .actions button.icon-btn { width: 34px; height: 34px; padding: 0; }
-.qm-merge-bar button.icon-btn.primary, .actions button.icon-btn.primary { background: #ffd166; color: #11141a; border: none; }
+.actions button.icon-btn { width: 34px; height: 34px; padding: 0; }
+.actions button.icon-btn.primary { background: #ffd166; color: #11141a; border: none; }
 .qm-layout { display: grid; grid-template-columns: minmax(0, 1fr) 390px; gap: 14px; align-items: start; }
 .qm-canvas-wrap { position: relative; height: calc(100vh - 200px); min-height: 560px; background: #141821; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; overflow: hidden; }
 .qm-hint { position: absolute; left: 12px; bottom: 10px; z-index: 5; font-size: 12px; color: #8b95a9; background: rgba(17,20,26,.85); border: 1px solid rgba(255,255,255,.12); border-radius: 8px; padding: 6px 10px; pointer-events: none; }
@@ -57,10 +57,11 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .qm-node.sel { outline: 3px solid #8ab8ff; outline-offset: 1px; }
 .qm-node.multi { outline: 2px dashed #ffd166; outline-offset: 2px; }
 .qm-check { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; background: #ffd166; color: #11141a; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
-.qm-merge-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: rgba(255,209,102,.12); border: 1px solid rgba(255,209,102,.5); border-radius: 10px; padding: 10px 12px; margin: 0 0 12px; font-size: 13px; line-height: 1.5; }
-.qm-merge-bar button { background: #1e2431; color: #e8ecf3; border: 1px solid rgba(255,255,255,.2); border-radius: 8px; padding: 8px 14px; font-weight: 600; font-size: 13px; }
-.qm-merge-bar button.primary { background: #ffd166; color: #11141a; border: none; font-weight: 700; }
-.qm-merge-bar button:disabled { opacity: .45; cursor: not-allowed; }
+/* Panel gộp nằm trong cột phải, không nằm trên canvas: khi nó hiện ra,
+   cột phải chỉ dài thêm trong vùng cuộn của nó, khung hình bên trái không
+   bị đẩy xuống — trước đây thanh gộp ở giữa toolbar và canvas làm cả
+   khung hình dịch xuống mỗi lần chọn thêm node. */
+.merge-panel { border-color: rgba(255,209,102,.5); background: rgba(255,209,102,.08); }
 .qm-section { background: #1e2431; border-radius: 10px; padding: 10px 12px; margin-top: 10px; }
 .qm-section h3 { font-size: 13px; margin: 0 0 6px; color: #ffd166; }
 .qm-section .qm-detail { margin: 0; }

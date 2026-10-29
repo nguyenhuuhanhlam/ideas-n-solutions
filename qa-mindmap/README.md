@@ -27,9 +27,13 @@ số node không đổi, vẫn 4 subtopic.
 ## Gộp subtopic + kéo thả node (thêm 28-10-2026)
 
 - Chọn nhiều subtopic bằng Ctrl / Shift+Click (Cmd+Click trên Mac),
-  rồi bấm ⧉ ở thanh gộp hiện ra: tiêu đề node gộp lấy tên
-  của node đầu tiên (theo thứ tự trên xuống dưới), chi tiết chia
-  thành từng section theo node gốc — gộp 3 node thì 3 section.
+  rồi bấm ⧉ trong panel “Gộp subtopic” ở đầu cột phải: tiêu đề
+  node gộp lấy tên của node đầu tiên (theo thứ tự trên xuống
+  dưới), chi tiết chia thành từng section theo node gốc — gộp
+  3 node thì 3 section. Panel gộp nằm ở cột phải, không nằm trên
+  canvas, nên khi nó hiện ra khung hình không bị đẩy xuống
+  (trước đây thanh gộp ở giữa toolbar và canvas làm cả khung
+  hình dịch xuống mỗi lần chọn thêm node).
 - Kéo nền để di chuyển cả hình, bấm node để xem chi tiết.
   Kéo thân node để di chuyển vị trí, vị trí mới được giữ trong
   phiên này.
