@@ -27,27 +27,26 @@ số node không đổi, vẫn 4 subtopic.
 ## Gộp subtopic + kéo thả node (thêm 28-10-2026)
 
 - Chọn nhiều subtopic bằng Ctrl / Shift+Click (Cmd+Click trên Mac),
-  hoặc kéo khung chọn trên nền ở chế độ Chọn, rồi bấm
-  “Gộp thành 1 node” ở thanh gộp hiện ra: tiêu đề node gộp lấy tên
+  rồi bấm ⧉ ở thanh gộp hiện ra: tiêu đề node gộp lấy tên
   của node đầu tiên (theo thứ tự trên xuống dưới), chi tiết chia
   thành từng section theo node gốc — gộp 3 node thì 3 section.
-- Chế độ Chọn (mặc định): kéo nền để khoanh chọn nhiều node.
-  Chế độ Kéo hình: kéo nền để di chuyển cả hình. Kéo thân node
-  để di chuyển vị trí, vị trí mới được giữ trong phiên này.
+- Kéo nền để di chuyển cả hình, bấm node để xem chi tiết.
+  Kéo thân node để di chuyển vị trí, vị trí mới được giữ trong
+  phiên này.
 - Viền node đang chọn là xanh dương, để không lẫn với viền vàng của nút gốc.
 
-## Sắp xếp lại node + mặc định đóng subtopic (thêm 29-10-2026)
+## Sắp xếp vị trí + mặc định đóng subtopic (thêm 29-10-2026)
 
 - Mặc định các topic đóng, subtopic ẩn: mở app chỉ thấy nút gốc
-  + các topic, bấm +N trên topic để mở nhánh. Nút “Mở hết” /
-  “Thu hết” vẫn đổi toàn bộ; tìm kiếm (Enter) hoặc bấm tên nhánh
+  + các topic, bấm +N trên topic để mở nhánh. Nút ＋ / － vẫn
+  mở / thu toàn bộ; tìm kiếm (Enter) hoặc bấm tên nhánh
   trong panel phải chỉ mở đúng nhánh cần tới, các nhánh khác vẫn đóng.
-- Sắp xếp lại node: chọn 1 node rồi bấm ↑ / ↓ trong hộp
-  “↕ Sắp xếp” ở panel phải, hoặc bấm ↑ / ↓ ở từng nhánh trong
-  mục “Nhánh dưới” của node cha. Chỉ đổi thứ tự trong nhóm cùng
-  cha (subtopic trong cùng topic, topic dưới cùng nút gốc); dời
-  1 topic thì cả subtopic của nó dời theo. Thứ tự mới giữ trong
-  phiên này, như kéo thả.
+- Sắp xếp VỊ TRÍ, không phải đổi thứ tự câu hỏi: vị trí mặc định
+  đã cân đối sẵn — gốc nằm giữa 2 topic, subtopic cách đều nhau
+  150px, giữa 2 nhóm topic cách thêm 40px. Kéo lệch rồi thì bấm
+  ▦ trên thanh công cụ để tính lại toàn bộ cây cho đều và đẹp,
+  xong tự vừa khung hình. Nút ↑ ↓ đổi thứ tự đã bỏ (đính chính
+  29-10-2026: “sắp xếp lại node” ở đây là vị trí, không phải thứ tự).
 
 ## Sửa 29-10-2026: pan như team-assistant-sim + nút icon
 
@@ -56,11 +55,8 @@ số node không đổi, vẫn 4 subtopic.
   trí. Không còn 2 chế độ Chọn / Kéo hình, không còn kéo khung
   chọn trên nền; chọn nhiều subtopic để gộp vẫn bằng
   Ctrl / Shift+Click (Cmd+Click trên Mac).
-- Nút sắp xếp làm nổi bật: hộp “↕ Sắp xếp” viền vàng trong panel
-  phải của node đang chọn, và nút ↑ ↓ ở từng nhánh trong
-  “Nhánh dưới” to hơn, viền vàng — trước đây nút nhỏ, nền tối nên
-  khó thấy (và nút gốc đang chọn lúc mới mở app vốn không có hàng
-  sắp xếp, chỉ có ở các nhánh dưới).
+- Đính chính “sắp xếp lại node”: nút ↑ ↓ đổi thứ tự đã bỏ, thay
+  bằng nút ▦ sắp xếp lại vị trí cho đều và đẹp (xem mục trên).
 - Các nút thao tác chuyển về dạng icon, nhãn đầy đủ trong title
   + aria-label: thanh công cụ ＋ mở hết / － thu hết / ⤢ vừa
   khung hình / ↺ đặt lại, thanh gộp ⧉ / ✕, duyệt ✓ / ✕.

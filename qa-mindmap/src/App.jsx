@@ -174,44 +174,47 @@ export default function App() {
     })
   }, [byId])
 
-  // Sắp xếp lại: dời node lên / xuống 1 bậc trong nhóm cùng cha, theo thứ tự
-  // trên xuống dưới trên canvas. Dời cả cây con (ví dụ dời 1 topic thì các
-  // subtopic của nó dời theo cùng khoảng), chỉ đổi tọa độ y để giữ nguyên cột.
-  // Vị trí được cập nhật cả items lẫn flowNodes (như kéo thả), giữ trong phiên này.
-  const moveSibling = useCallback((id, dir) => {
-    const node = byId[id]
-    if (!node || !node.parentId) return
-    const siblings = items
-      .filter((n) => n.parentId === node.parentId)
-      .sort((a, b) => a.position.y - b.position.y || a.position.x - b.position.x)
-    const idx = siblings.findIndex((n) => n.id === id)
-    const targetIdx = idx + dir
-    if (idx < 0 || targetIdx < 0 || targetIdx >= siblings.length) return
-    const target = siblings[targetIdx]
-    const delta = target.position.y - node.position.y
-    if (delta === 0) return
-    const subtreeA = new Set([id, ...descendantsOf(id, items)])
-    const subtreeB = new Set([target.id, ...descendantsOf(target.id, items)])
-    const shift = (n) => (subtreeA.has(n.id) ? delta : subtreeB.has(n.id) ? -delta : 0)
-    setItems((prev) => prev.map((n) => {
-      const s = shift(n)
-      return s ? { ...n, position: { ...n.position, y: n.position.y + s } } : n
-    }))
-    setFlowNodes((prev) => prev.map((n) => {
-      const s = shift(n)
-      return s ? { ...n, position: { ...n.position, y: n.position.y + s } } : n
-    }))
-  }, [byId, items])
-
-  // Vị trí của node đang chọn trong nhóm cùng cha (để hiển thị + khóa nút ở 2 đầu).
-  const siblingInfo = useMemo(() => {
-    if (!selected || !selected.parentId) return null
-    const siblings = items
-      .filter((n) => n.parentId === selected.parentId)
-      .sort((a, b) => a.position.y - b.position.y || a.position.x - b.position.x)
-    const idx = siblings.findIndex((n) => n.id === selected.id)
-    return idx < 0 ? null : { pos: idx + 1, total: siblings.length }
-  }, [selected, items])
+  // Sắp xếp VỊ TRÍ cho đều và đẹp (không phải đổi thứ tự câu hỏi):
+  // cây gọn theo chiều dọc — lá (node không có con) cách đều nhau 150px,
+  // giữa 2 nhóm topic cách thêm 40px, node cha nằm chính giữa các con
+  // của nó (tính theo tâm node, cao gốc 72 / topic 64 / subtopic 56),
+  // cột x giữ nguyên: gốc 10, topic 380, subtopic 760.
+  // Tính lại từ cây đang có nên vẫn đúng sau khi kéo lệch, sau khi gộp
+  // (lá ít đi thì các lá còn lại tự dồn đều lại), hay sau khi thêm node.
+  const applyLayout = useCallback(() => {
+    const HEIGHT = { root: 72, topic: 64, subtopic: 56 }
+    const LEAF_PITCH = 150
+    const GROUP_GAP = 40
+    const kidsOf = (id) => items.filter((n) => n.parentId === id)
+    const pos = {}
+    let cursor = 0
+    const walk = (node, depth) => {
+      const kids = kidsOf(node.id)
+      const x = 10 + depth * 370
+      if (!kids.length) {
+        pos[node.id] = { x, y: cursor }
+        cursor += LEAF_PITCH
+        const center = cursor - LEAF_PITCH + (HEIGHT[node.kind] || 56) / 2
+        return { first: center, last: center }
+      }
+      let first = null
+      let last = null
+      kids.forEach((kid, i) => {
+        const range = walk(kid, depth + 1)
+        if (first === null) first = range.first
+        last = range.last
+        if (node.kind === 'root' && i < kids.length - 1) cursor += GROUP_GAP
+      })
+      const center = (first + last) / 2
+      pos[node.id] = { x, y: center - (HEIGHT[node.kind] || 56) / 2 }
+      return { first, last }
+    }
+    items.filter((n) => !n.parentId).forEach((root) => walk(root, 0))
+    setItems((prev) => prev.map((n) => (pos[n.id] ? { ...n, position: pos[n.id] } : n)))
+    setFlowNodes((prev) => prev.map((n) => (pos[n.id] ? { ...n, position: pos[n.id] } : n)))
+    // Đợi vị trí mới vào flow rồi mới vừa khung hình (mẫu team-assistant-sim).
+    setTimeout(() => rfRef.current?.fitView({ padding: 0.15 }), 50)
+  }, [items])
 
   const searchResults = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -336,6 +339,7 @@ export default function App() {
         </div>
         <button type="button" className="icon-btn" title="Mở hết" aria-label="Mở hết" onClick={expandAll}>＋</button>
         <button type="button" className="icon-btn" title="Thu hết" aria-label="Thu hết" onClick={collapseAll}>－</button>
+        <button type="button" className="icon-btn" title="Sắp xếp lại vị trí cho đều và đẹp" aria-label="Sắp xếp lại vị trí cho đều và đẹp" onClick={applyLayout}>▦</button>
         <button type="button" className="icon-btn" title="Vừa khung hình" aria-label="Vừa khung hình" onClick={() => rfRef.current?.fitView({ padding: 0.15 })}>⤢</button>
         <button type="button" className="icon-btn ghost" title="Đặt lại bản mẫu" aria-label="Đặt lại bản mẫu" onClick={resetDraft}>↺</button>
       </div>
@@ -378,7 +382,7 @@ export default function App() {
             <Controls />
             <MiniMap pannable zoomable nodeColor={(n) => (n.type === 'root' ? '#ffd166' : n.type === 'subtopic' ? '#ffb27d' : '#8ab8ff')} />
           </ReactFlow>
-          <div className="qm-hint">Kéo nền để di chuyển cả hình · lăn chuột để zoom · bấm node để xem chi tiết · kéo thân node để di chuyển vị trí · Ctrl / Shift+Click để chọn nhiều subtopic rồi gộp</div>
+          <div className="qm-hint">Kéo nền để di chuyển cả hình · lăn chuột để zoom · bấm node để xem chi tiết · kéo thân node để di chuyển vị trí · bấm ▦ trên thanh công cụ để sắp xếp lại vị trí cho đều và đẹp · Ctrl / Shift+Click để chọn nhiều subtopic rồi gộp</div>
         </div>
 
         <aside className="qm-panel-col">
@@ -426,29 +430,13 @@ export default function App() {
                 <p className="qm-detail">{selected.detail}</p>
               )}
               <p className="qm-meta">Ghi ngày {selected.date} · Nguồn: {selected.source}</p>
-              {siblingInfo && (
-                <div className="qm-order-box">
-                  <span className="qm-order-label">↕ Sắp xếp · trong {byId[selected.parentId]?.title}: {siblingInfo.pos}/{siblingInfo.total}</span>
-                  <span className="qm-order-btns">
-                    <button type="button" disabled={siblingInfo.pos <= 1} onClick={() => moveSibling(selected.id, -1)} title="Dời lên 1 bậc trong cùng topic" aria-label="Dời lên 1 bậc">↑</button>
-                    <button type="button" disabled={siblingInfo.pos >= siblingInfo.total} onClick={() => moveSibling(selected.id, 1)} title="Dời xuống 1 bậc trong cùng topic" aria-label="Dời xuống 1 bậc">↓</button>
-                  </span>
-                </div>
-              )}
               {selChildren.length > 0 && (
                 <>
                   <h3>Nhánh dưới ({selChildren.length})</h3>
-                  <p className="hint">Bấm ↑ ↓ ở từng nhánh để sắp xếp lại thứ tự trong nhóm này.</p>
                   <ul className="qm-children">
-                    {selChildren.map((c, i) => (
+                    {selChildren.map((c) => (
                       <li key={c.id}>
-                        <div className="qm-child-row">
-                          <button type="button" className="linklike" onClick={() => selectAndReveal(c.id)}>{c.title}</button>
-                          <span className="qm-child-order">
-                            <button type="button" disabled={i === 0} onClick={() => moveSibling(c.id, -1)} title="Dời nhánh này lên 1 bậc" aria-label="Dời nhánh này lên 1 bậc">↑</button>
-                            <button type="button" disabled={i === selChildren.length - 1} onClick={() => moveSibling(c.id, 1)} title="Dời nhánh này xuống 1 bậc" aria-label="Dời nhánh này xuống 1 bậc">↓</button>
-                          </span>
-                        </div>
+                        <button type="button" className="linklike" onClick={() => selectAndReveal(c.id)}>{c.title}</button>
                         <small>{(c.sections ? c.sections.map((s) => s.text).join(' ') : c.detail).slice(0, 80)}…</small>
                       </li>
                     ))}
@@ -472,7 +460,7 @@ export default function App() {
               <li>Kéo nền để di chuyển cả hình, bấm node để xem chi tiết — đúng kiểu team-assistant-sim, không còn chế độ khoanh chọn trên nền.</li>
               <li>Kéo thân node để di chuyển vị trí, vị trí mới được giữ trong phiên này.</li>
               <li>Mặc định các topic đóng, subtopic ẩn: mở app chỉ thấy nút gốc + các topic, bấm +N trên topic để mở nhánh. Nút ＋ / － trên thanh công cụ vẫn mở / thu toàn bộ, tìm kiếm hoặc bấm tên nhánh trong panel phải chỉ mở đúng nhánh cần tới.</li>
-              <li>Sắp xếp lại node: chọn 1 node rồi bấm ↑ / ↓ trong hộp “↕ Sắp xếp” ở panel phải, hoặc bấm ↑ / ↓ ở từng nhánh trong mục “Nhánh dưới” của node cha — chỉ đổi thứ tự trong nhóm cùng cha, dời topic thì cả subtopic của nó dời theo, thứ tự mới giữ trong phiên này.</li>
+              <li>Sắp xếp vị trí (không phải đổi thứ tự câu hỏi): vị trí mặc định đã cân đối sẵn — gốc nằm giữa 2 topic, subtopic cách đều nhau; kéo lệch rồi thì bấm ▦ trên thanh công cụ để tính lại toàn bộ cây cho đều và đẹp, xong tự vừa khung hình.</li>
               <li>Các nút thao tác đều dạng icon, nhãn đầy đủ nằm trong title + aria-label (rê chuột vào nút để xem).</li>
             </ul>
           </section>
