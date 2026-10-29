@@ -32,6 +32,11 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .qm-meta { color: #8b95a9; font-size: 12px; line-height: 1.5; }
 .qm-children { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; }
 .qm-children li { background: #1e2431; border-radius: 8px; padding: 8px 10px; }
+.qm-child-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.qm-child-order { display: inline-flex; gap: 4px; flex-shrink: 0; }
+.qm-child-order button { background: #11141a; border: 1px solid rgba(255,255,255,.2); color: #e8ecf3; border-radius: 6px; width: 26px; height: 24px; padding: 0; font-size: 12px; line-height: 1; }
+.qm-order { color: #c6cdd9; font-size: 12.5px; margin: 8px 0; }
+.qm-order button { background: #1e2431; border: 1px solid rgba(255,255,255,.2); color: #e8ecf3; border-radius: 8px; padding: 5px 10px; font-size: 12px; margin-left: 4px; }
 .qm-children small { display: block; color: #8b95a9; margin-top: 2px; line-height: 1.5; }
 .qm-rules { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.6; color: #c6cdd9; }
 .qm-rules li { margin-bottom: 6px; }

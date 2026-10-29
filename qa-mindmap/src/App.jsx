@@ -56,9 +56,19 @@ function initialFlowEdges() {
   }))
 }
 
+// Mặc định: nút gốc mở, các topic đóng — tức các subtopic (nhánh dưới topic)
+// luôn ẩn khi mới mở app, chỉ hiện khi bấm +N trên topic (hoặc qua tìm kiếm /
+// bấm tên nhánh trong panel phải, lúc đó chỉ mở đúng nhánh cần tới).
+// Nút gốc không nằm trong tập này, nên mở app vẫn thấy gốc + 2 topic.
+function defaultCollapsed() {
+  return new Set(NODES
+    .filter((n) => n.parentId && NODES.some((c) => c.parentId === n.id))
+    .map((n) => n.id))
+}
+
 export default function App() {
   const [items, setItems] = useState(NODES)
-  const [collapsed, setCollapsed] = useState(new Set())
+  const [collapsed, setCollapsed] = useState(defaultCollapsed)
   const [selectedId, setSelectedId] = useState('root')
   const [multiSelected, setMultiSelected] = useState(new Set())
   const [mode, setMode] = useState('select') // 'select': kéo nền để khoanh chọn · 'pan': kéo nền để di chuyển cả hình
@@ -147,7 +157,62 @@ export default function App() {
 
   const selected = byId[selectedId] || byId.root
   const selPath = selected ? pathOf(selected.id, byId) : []
-  const selChildren = selected ? childrenOf(selected.id) : []
+  // Nhánh dưới xếp theo vị trí trên canvas (trên xuống dưới), khớp thứ tự nhìn thấy.
+  const selChildren = selected
+    ? [...childrenOf(selected.id)].sort((a, b) => a.position.y - b.position.y || a.position.x - b.position.x)
+    : []
+
+  // Chọn node từ panel phải / tìm kiếm: mở luôn các nhánh cha trên đường tới node,
+  // các nhánh khác vẫn giữ trạng thái đóng mặc định.
+  const selectAndReveal = useCallback((id) => {
+    setSelectedId(id)
+    const p = pathOf(id, byId)
+    if (!p.length) return
+    setCollapsed((prev) => {
+      const next = new Set(prev)
+      p.forEach((n) => next.delete(n.id))
+      return next
+    })
+  }, [byId])
+
+  // Sắp xếp lại: dời node lên / xuống 1 bậc trong nhóm cùng cha, theo thứ tự
+  // trên xuống dưới trên canvas. Dời cả cây con (ví dụ dời 1 topic thì các
+  // subtopic của nó dời theo cùng khoảng), chỉ đổi tọa độ y để giữ nguyên cột.
+  // Vị trí được cập nhật cả items lẫn flowNodes (như kéo thả), giữ trong phiên này.
+  const moveSibling = useCallback((id, dir) => {
+    const node = byId[id]
+    if (!node || !node.parentId) return
+    const siblings = items
+      .filter((n) => n.parentId === node.parentId)
+      .sort((a, b) => a.position.y - b.position.y || a.position.x - b.position.x)
+    const idx = siblings.findIndex((n) => n.id === id)
+    const targetIdx = idx + dir
+    if (idx < 0 || targetIdx < 0 || targetIdx >= siblings.length) return
+    const target = siblings[targetIdx]
+    const delta = target.position.y - node.position.y
+    if (delta === 0) return
+    const subtreeA = new Set([id, ...descendantsOf(id, items)])
+    const subtreeB = new Set([target.id, ...descendantsOf(target.id, items)])
+    const shift = (n) => (subtreeA.has(n.id) ? delta : subtreeB.has(n.id) ? -delta : 0)
+    setItems((prev) => prev.map((n) => {
+      const s = shift(n)
+      return s ? { ...n, position: { ...n.position, y: n.position.y + s } } : n
+    }))
+    setFlowNodes((prev) => prev.map((n) => {
+      const s = shift(n)
+      return s ? { ...n, position: { ...n.position, y: n.position.y + s } } : n
+    }))
+  }, [byId, items])
+
+  // Vị trí của node đang chọn trong nhóm cùng cha (để hiển thị + khóa nút ở 2 đầu).
+  const siblingInfo = useMemo(() => {
+    if (!selected || !selected.parentId) return null
+    const siblings = items
+      .filter((n) => n.parentId === selected.parentId)
+      .sort((a, b) => a.position.y - b.position.y || a.position.x - b.position.x)
+    const idx = siblings.findIndex((n) => n.id === selected.id)
+    return idx < 0 ? null : { pos: idx + 1, total: siblings.length }
+  }, [selected, items])
 
   const searchResults = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -240,7 +305,7 @@ export default function App() {
     setDraftState('pending')
     setSelectedId('root')
     setMultiSelected(new Set())
-    setCollapsed(new Set())
+    setCollapsed(defaultCollapsed())
   }
   const expandAll = () => setCollapsed(new Set())
   const collapseAll = () => setCollapsed(new Set(items.filter((n) => childrenOf(n.id).length > 0).map((n) => n.id)))
@@ -269,8 +334,7 @@ export default function App() {
             placeholder="Tìm trong cây, ví dụ: free, macOS…"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && searchResults[0]) {
-                setSelectedId(searchResults[0].id)
-                setCollapsed(new Set())
+                selectAndReveal(searchResults[0].id)
               }
             }}
           />
@@ -377,13 +441,27 @@ export default function App() {
                 <p className="qm-detail">{selected.detail}</p>
               )}
               <p className="qm-meta">Ghi ngày {selected.date} · Nguồn: {selected.source}</p>
+              {siblingInfo && (
+                <p className="qm-order">
+                  Thứ tự trong {byId[selected.parentId]?.title}: {siblingInfo.pos}/{siblingInfo.total}
+                  {' '}
+                  <button type="button" disabled={siblingInfo.pos <= 1} onClick={() => moveSibling(selected.id, -1)} title="Dời lên 1 bậc trong cùng topic">↑ Lên</button>
+                  <button type="button" disabled={siblingInfo.pos >= siblingInfo.total} onClick={() => moveSibling(selected.id, 1)} title="Dời xuống 1 bậc trong cùng topic">↓ Xuống</button>
+                </p>
+              )}
               {selChildren.length > 0 && (
                 <>
                   <h3>Nhánh dưới ({selChildren.length})</h3>
                   <ul className="qm-children">
-                    {selChildren.map((c) => (
+                    {selChildren.map((c, i) => (
                       <li key={c.id}>
-                        <button type="button" className="linklike" onClick={() => setSelectedId(c.id)}>{c.title}</button>
+                        <div className="qm-child-row">
+                          <button type="button" className="linklike" onClick={() => selectAndReveal(c.id)}>{c.title}</button>
+                          <span className="qm-child-order">
+                            <button type="button" disabled={i === 0} onClick={() => moveSibling(c.id, -1)} title="Dời nhánh này lên 1 bậc">↑</button>
+                            <button type="button" disabled={i === selChildren.length - 1} onClick={() => moveSibling(c.id, 1)} title="Dời nhánh này xuống 1 bậc">↓</button>
+                          </span>
+                        </div>
                         <small>{(c.sections ? c.sections.map((s) => s.text).join(' ') : c.detail).slice(0, 80)}…</small>
                       </li>
                     ))}
@@ -406,6 +484,8 @@ export default function App() {
               <li>Chọn nhiều subtopic bằng Ctrl / Shift+Click (Cmd+Click trên Mac), hoặc kéo khung chọn trên nền ở chế độ Chọn, rồi bấm “Gộp thành 1 node”: tiêu đề lấy node đầu tiên, chi tiết chia thành từng section theo node gốc.</li>
               <li>Chế độ Chọn (mặc định): kéo nền để khoanh chọn, bấm node để xem chi tiết. Chế độ Kéo hình: kéo nền để di chuyển cả hình.</li>
               <li>Kéo thân node để di chuyển vị trí, vị trí mới được giữ trong phiên này.</li>
+              <li>Mặc định các topic đóng, subtopic ẩn: mở app chỉ thấy nút gốc + các topic, bấm +N trên topic để mở nhánh. “Mở hết” / “Thu hết” trên thanh công cụ vẫn đổi toàn bộ, tìm kiếm hoặc bấm tên nhánh trong panel phải chỉ mở đúng nhánh cần tới.</li>
+              <li>Sắp xếp lại node: chọn 1 node rồi bấm ↑ Lên / ↓ Xuống trong panel phải, hoặc bấm ↑ / ↓ ở từng nhánh trong mục “Nhánh dưới” của node cha — chỉ đổi thứ tự trong nhóm cùng cha, dời topic thì cả subtopic của nó dời theo, thứ tự mới giữ trong phiên này.</li>
             </ul>
           </section>
         </aside>

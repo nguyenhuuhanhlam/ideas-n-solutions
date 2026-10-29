@@ -36,6 +36,18 @@ số node không đổi, vẫn 4 subtopic.
   để di chuyển vị trí, vị trí mới được giữ trong phiên này.
 - Viền node đang chọn là xanh dương, để không lẫn với viền vàng của nút gốc.
 
+## Sắp xếp lại node + mặc định đóng subtopic (thêm 29-10-2026)
+
+- Mặc định các topic đóng, subtopic ẩn: mở app chỉ thấy nút gốc
+  + các topic, bấm +N trên topic để mở nhánh. Nút “Mở hết” /
+  “Thu hết” vẫn đổi toàn bộ; tìm kiếm (Enter) hoặc bấm tên nhánh
+  trong panel phải chỉ mở đúng nhánh cần tới, các nhánh khác vẫn đóng.
+- Sắp xếp lại node: chọn 1 node rồi bấm ↑ Lên / ↓ Xuống trong
+  panel phải, hoặc bấm ↑ / ↓ ở từng nhánh trong mục “Nhánh dưới”
+  của node cha. Chỉ đổi thứ tự trong nhóm cùng cha (subtopic trong
+  cùng topic, topic dưới cùng nút gốc); dời 1 topic thì cả subtopic
+  của nó dời theo. Thứ tự mới giữ trong phiên này, như kéo thả.
+
 ## Chạy / build
 
 ```sh
