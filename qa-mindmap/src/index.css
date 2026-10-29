@@ -15,10 +15,12 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .qm-search-result { font-size: 12px; color: #8b95a9; }
 .qm-toolbar button { background: #1e2431; border: 1px solid rgba(255,255,255,.16); color: #e8ecf3; border-radius: 9px; padding: 8px 12px; font-size: 12.5px; }
 .qm-toolbar button:hover { border-color: rgba(255,209,102,.6); }
-.qm-mode { display: inline-flex; gap: 0; border: 1px solid rgba(255,255,255,.16); border-radius: 9px; overflow: hidden; }
-.qm-mode button { border: none; border-radius: 0; margin: 0; }
-.qm-mode button.active { background: #ffd166; color: #11141a; font-weight: 700; }
+/* Nút icon: vuông, nhãn đầy đủ trong title + aria-label, rê chuột vào để xem. */
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; font-size: 16px; font-weight: 700; line-height: 1; }
+.qm-toolbar button.icon-btn { width: 34px; height: 34px; padding: 0; }
 .qm-toolbar button.ghost { background: none; }
+.qm-merge-bar button.icon-btn, .actions button.icon-btn { width: 34px; height: 34px; padding: 0; }
+.qm-merge-bar button.icon-btn.primary, .actions button.icon-btn.primary { background: #ffd166; color: #11141a; border: none; }
 .qm-layout { display: grid; grid-template-columns: minmax(0, 1fr) 390px; gap: 14px; align-items: start; }
 .qm-canvas-wrap { position: relative; height: calc(100vh - 200px); min-height: 560px; background: #141821; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; overflow: hidden; }
 .qm-hint { position: absolute; left: 12px; bottom: 10px; z-index: 5; font-size: 12px; color: #8b95a9; background: rgba(17,20,26,.85); border: 1px solid rgba(255,255,255,.12); border-radius: 8px; padding: 6px 10px; pointer-events: none; }
@@ -33,10 +35,15 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .qm-children { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; }
 .qm-children li { background: #1e2431; border-radius: 8px; padding: 8px 10px; }
 .qm-child-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.qm-child-order { display: inline-flex; gap: 4px; flex-shrink: 0; }
-.qm-child-order button { background: #11141a; border: 1px solid rgba(255,255,255,.2); color: #e8ecf3; border-radius: 6px; width: 26px; height: 24px; padding: 0; font-size: 12px; line-height: 1; }
-.qm-order { color: #c6cdd9; font-size: 12.5px; margin: 8px 0; }
-.qm-order button { background: #1e2431; border: 1px solid rgba(255,255,255,.2); color: #e8ecf3; border-radius: 8px; padding: 5px 10px; font-size: 12px; margin-left: 4px; }
+.qm-child-order { display: inline-flex; gap: 6px; flex-shrink: 0; }
+.qm-child-order button { background: #11141a; border: 1.5px solid rgba(255,209,102,.6); color: #ffd166; border-radius: 8px; width: 30px; height: 28px; padding: 0; font-size: 14px; font-weight: 800; line-height: 1; }
+.qm-child-order button:hover:not(:disabled) { background: rgba(255,209,102,.2); }
+/* Hộp sắp xếp của node đang chọn: viền vàng, nổi hẳn khỏi nền panel. */
+.qm-order-box { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #1e2431; border: 1.5px solid rgba(255,209,102,.6); border-radius: 10px; padding: 9px 11px; margin: 10px 0; }
+.qm-order-label { color: #e8ecf3; font-size: 13px; font-weight: 600; }
+.qm-order-btns { display: inline-flex; gap: 6px; flex-shrink: 0; }
+.qm-order-btns button { background: #11141a; border: 1.5px solid rgba(255,209,102,.7); color: #ffd166; border-radius: 8px; width: 32px; height: 30px; padding: 0; font-size: 15px; font-weight: 800; line-height: 1; }
+.qm-order-btns button:hover:not(:disabled) { background: rgba(255,209,102,.2); }
 .qm-children small { display: block; color: #8b95a9; margin-top: 2px; line-height: 1.5; }
 .qm-rules { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.6; color: #c6cdd9; }
 .qm-rules li { margin-bottom: 6px; }

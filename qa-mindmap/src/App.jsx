@@ -71,7 +71,6 @@ export default function App() {
   const [collapsed, setCollapsed] = useState(defaultCollapsed)
   const [selectedId, setSelectedId] = useState('root')
   const [multiSelected, setMultiSelected] = useState(new Set())
-  const [mode, setMode] = useState('select') // 'select': kéo nền để khoanh chọn · 'pan': kéo nền để di chuyển cả hình
   const [draft, setDraft] = useState(DRAFT_PROPOSAL)
   const [draftState, setDraftState] = useState('pending') // pending | approved | dismissed
   const [query, setQuery] = useState('')
@@ -221,16 +220,7 @@ export default function App() {
   }, [query, items])
 
   // Chọn nhiều subtopic: Ctrl / Cmd / Shift + Click để thêm / bỏ 1 node khỏi nhóm chọn.
-  // Kéo khung chọn trên nền (chế độ Chọn) cũng đồng bộ vào nhóm chọn qua onSelectionChange.
-  const handleSelectionChange = useCallback(({ nodes: selNodes }) => {
-    if (!selNodes || selNodes.length < 2) return
-    const subIds = selNodes.filter((n) => byId[n.id]?.kind === 'subtopic').map((n) => n.id)
-    if (subIds.length >= 2) {
-      setMultiSelected(new Set(subIds))
-      setSelectedId(subIds[subIds.length - 1])
-    }
-  }, [byId])
-
+  // Không còn kéo khung chọn trên nền — nền dùng để pan, đúng mẫu team-assistant-sim.
   const handleNodeClick = useCallback((_e, node) => {
     const item = byId[node.id]
     if (!item) return
@@ -344,21 +334,17 @@ export default function App() {
             </span>
           )}
         </div>
-        <span className="qm-mode">
-          <button type="button" className={mode === 'select' ? 'active' : ''} onClick={() => setMode('select')} title="Kéo nền để khoanh chọn nhiều node, bấm node để xem chi tiết">🖱️ Chọn</button>
-          <button type="button" className={mode === 'pan' ? 'active' : ''} onClick={() => setMode('pan')} title="Kéo nền để di chuyển cả hình">✋ Kéo hình</button>
-        </span>
-        <button type="button" onClick={expandAll}>Mở hết</button>
-        <button type="button" onClick={collapseAll}>Thu hết</button>
-        <button type="button" onClick={() => rfRef.current?.fitView({ padding: 0.15 })}>⤢ Vừa khung hình</button>
-        <button type="button" className="ghost" onClick={resetDraft}>↺ Đặt lại bản mẫu</button>
+        <button type="button" className="icon-btn" title="Mở hết" aria-label="Mở hết" onClick={expandAll}>＋</button>
+        <button type="button" className="icon-btn" title="Thu hết" aria-label="Thu hết" onClick={collapseAll}>－</button>
+        <button type="button" className="icon-btn" title="Vừa khung hình" aria-label="Vừa khung hình" onClick={() => rfRef.current?.fitView({ padding: 0.15 })}>⤢</button>
+        <button type="button" className="icon-btn ghost" title="Đặt lại bản mẫu" aria-label="Đặt lại bản mẫu" onClick={resetDraft}>↺</button>
       </div>
 
       {multiSelected.size > 0 && (
         <div className="qm-merge-bar">
           <span>Đã chọn {multiSelected.size} subtopic: <strong>{selectedSubtopics.map((n) => n.title).join(' + ')}</strong></span>
-          <button type="button" className="primary" disabled={!canMerge} onClick={mergeSelected}>⧉ Gộp thành 1 node</button>
-          <button type="button" onClick={() => setMultiSelected(new Set())}>Bỏ chọn</button>
+          <button type="button" className="icon-btn primary" title="Gộp thành 1 node" aria-label="Gộp thành 1 node" disabled={!canMerge} onClick={mergeSelected}>⧉</button>
+          <button type="button" className="icon-btn" title="Bỏ chọn" aria-label="Bỏ chọn" onClick={() => setMultiSelected(new Set())}>✕</button>
           {selectedSubtopics.length === 1 && <span className="hint">Chọn thêm 1 subtopic nữa bằng Ctrl+Click để gộp.</span>}
           {selectedSubtopics.length >= 2 && !canMerge && <span className="hint">Chỉ gộp được các subtopic cùng 1 topic.</span>}
           {canMerge && <span className="hint">Tiêu đề node gộp lấy node đầu tiên ({selectedSubtopics[0].title}), chi tiết chia thành {selectedSubtopics.length} section theo từng node gốc.</span>}
@@ -375,9 +361,10 @@ export default function App() {
             onEdgesChange={onEdgesChange}
             onNodeClick={handleNodeClick}
             onNodeDragStop={handleNodeDragStop}
-            onSelectionChange={handleSelectionChange}
-            panOnDrag={mode === 'pan'}
-            selectionOnDrag={mode === 'select'}
+            // Đúng mẫu team-assistant-sim (mặc định của React Flow):
+            // kéo nền là pan, bấm node là chọn, không khoanh chọn.
+            panOnDrag
+            selectionOnDrag={false}
             nodesDraggable
             onInit={(inst) => { rfRef.current = inst }}
             fitView
@@ -391,9 +378,7 @@ export default function App() {
             <Controls />
             <MiniMap pannable zoomable nodeColor={(n) => (n.type === 'root' ? '#ffd166' : n.type === 'subtopic' ? '#ffb27d' : '#8ab8ff')} />
           </ReactFlow>
-          <div className="qm-hint">{mode === 'select'
-            ? 'Chế độ Chọn: kéo nền để khoanh chọn nhiều node · bấm node để xem chi tiết · Ctrl / Shift+Click để chọn thêm · kéo thân node để di chuyển'
-            : 'Chế độ Kéo hình: kéo nền để di chuyển cả hình · bấm node để xem chi tiết · chuyển sang chế độ Chọn để khoanh chọn nhiều node'}</div>
+          <div className="qm-hint">Kéo nền để di chuyển cả hình · lăn chuột để zoom · bấm node để xem chi tiết · kéo thân node để di chuyển vị trí · Ctrl / Shift+Click để chọn nhiều subtopic rồi gộp</div>
         </div>
 
         <aside className="qm-panel-col">
@@ -410,8 +395,8 @@ export default function App() {
                   <p className="hint">Lý do: {draft.reason}</p>
                 </div>
                 <div className="actions">
-                  <button type="button" className="primary" onClick={approveDraft}>✓ Duyệt và gộp vào subtopic</button>
-                  <button type="button" onClick={dismissDraft}>Không ghi</button>
+                  <button type="button" className="icon-btn primary" title="Duyệt và gộp vào subtopic" aria-label="Duyệt và gộp vào subtopic" onClick={approveDraft}>✓</button>
+                  <button type="button" className="icon-btn" title="Không ghi" aria-label="Không ghi" onClick={dismissDraft}>✕</button>
                 </div>
               </>
             )}
@@ -442,24 +427,26 @@ export default function App() {
               )}
               <p className="qm-meta">Ghi ngày {selected.date} · Nguồn: {selected.source}</p>
               {siblingInfo && (
-                <p className="qm-order">
-                  Thứ tự trong {byId[selected.parentId]?.title}: {siblingInfo.pos}/{siblingInfo.total}
-                  {' '}
-                  <button type="button" disabled={siblingInfo.pos <= 1} onClick={() => moveSibling(selected.id, -1)} title="Dời lên 1 bậc trong cùng topic">↑ Lên</button>
-                  <button type="button" disabled={siblingInfo.pos >= siblingInfo.total} onClick={() => moveSibling(selected.id, 1)} title="Dời xuống 1 bậc trong cùng topic">↓ Xuống</button>
-                </p>
+                <div className="qm-order-box">
+                  <span className="qm-order-label">↕ Sắp xếp · trong {byId[selected.parentId]?.title}: {siblingInfo.pos}/{siblingInfo.total}</span>
+                  <span className="qm-order-btns">
+                    <button type="button" disabled={siblingInfo.pos <= 1} onClick={() => moveSibling(selected.id, -1)} title="Dời lên 1 bậc trong cùng topic" aria-label="Dời lên 1 bậc">↑</button>
+                    <button type="button" disabled={siblingInfo.pos >= siblingInfo.total} onClick={() => moveSibling(selected.id, 1)} title="Dời xuống 1 bậc trong cùng topic" aria-label="Dời xuống 1 bậc">↓</button>
+                  </span>
+                </div>
               )}
               {selChildren.length > 0 && (
                 <>
                   <h3>Nhánh dưới ({selChildren.length})</h3>
+                  <p className="hint">Bấm ↑ ↓ ở từng nhánh để sắp xếp lại thứ tự trong nhóm này.</p>
                   <ul className="qm-children">
                     {selChildren.map((c, i) => (
                       <li key={c.id}>
                         <div className="qm-child-row">
                           <button type="button" className="linklike" onClick={() => selectAndReveal(c.id)}>{c.title}</button>
                           <span className="qm-child-order">
-                            <button type="button" disabled={i === 0} onClick={() => moveSibling(c.id, -1)} title="Dời nhánh này lên 1 bậc">↑</button>
-                            <button type="button" disabled={i === selChildren.length - 1} onClick={() => moveSibling(c.id, 1)} title="Dời nhánh này xuống 1 bậc">↓</button>
+                            <button type="button" disabled={i === 0} onClick={() => moveSibling(c.id, -1)} title="Dời nhánh này lên 1 bậc" aria-label="Dời nhánh này lên 1 bậc">↑</button>
+                            <button type="button" disabled={i === selChildren.length - 1} onClick={() => moveSibling(c.id, 1)} title="Dời nhánh này xuống 1 bậc" aria-label="Dời nhánh này xuống 1 bậc">↓</button>
                           </span>
                         </div>
                         <small>{(c.sections ? c.sections.map((s) => s.text).join(' ') : c.detail).slice(0, 80)}…</small>
@@ -481,11 +468,12 @@ export default function App() {
               <li>Node đơn giản: tiêu đề là chủ đề tóm tắt, chi tiết là câu trả lời tóm tắt.</li>
               <li>Đưa bản tóm tắt cho bạn duyệt trước khi ghi.</li>
               <li>Chủ đề trùng lắp thì gộp vào chi tiết của subtopic đã có, không tạo node mới, giữ tối đa 4 nhánh.</li>
-              <li>Chọn nhiều subtopic bằng Ctrl / Shift+Click (Cmd+Click trên Mac), hoặc kéo khung chọn trên nền ở chế độ Chọn, rồi bấm “Gộp thành 1 node”: tiêu đề lấy node đầu tiên, chi tiết chia thành từng section theo node gốc.</li>
-              <li>Chế độ Chọn (mặc định): kéo nền để khoanh chọn, bấm node để xem chi tiết. Chế độ Kéo hình: kéo nền để di chuyển cả hình.</li>
+              <li>Chọn nhiều subtopic bằng Ctrl / Shift+Click (Cmd+Click trên Mac), rồi bấm ⧉ để gộp thành 1 node: tiêu đề lấy node đầu tiên, chi tiết chia thành từng section theo node gốc.</li>
+              <li>Kéo nền để di chuyển cả hình, bấm node để xem chi tiết — đúng kiểu team-assistant-sim, không còn chế độ khoanh chọn trên nền.</li>
               <li>Kéo thân node để di chuyển vị trí, vị trí mới được giữ trong phiên này.</li>
-              <li>Mặc định các topic đóng, subtopic ẩn: mở app chỉ thấy nút gốc + các topic, bấm +N trên topic để mở nhánh. “Mở hết” / “Thu hết” trên thanh công cụ vẫn đổi toàn bộ, tìm kiếm hoặc bấm tên nhánh trong panel phải chỉ mở đúng nhánh cần tới.</li>
-              <li>Sắp xếp lại node: chọn 1 node rồi bấm ↑ Lên / ↓ Xuống trong panel phải, hoặc bấm ↑ / ↓ ở từng nhánh trong mục “Nhánh dưới” của node cha — chỉ đổi thứ tự trong nhóm cùng cha, dời topic thì cả subtopic của nó dời theo, thứ tự mới giữ trong phiên này.</li>
+              <li>Mặc định các topic đóng, subtopic ẩn: mở app chỉ thấy nút gốc + các topic, bấm +N trên topic để mở nhánh. Nút ＋ / － trên thanh công cụ vẫn mở / thu toàn bộ, tìm kiếm hoặc bấm tên nhánh trong panel phải chỉ mở đúng nhánh cần tới.</li>
+              <li>Sắp xếp lại node: chọn 1 node rồi bấm ↑ / ↓ trong hộp “↕ Sắp xếp” ở panel phải, hoặc bấm ↑ / ↓ ở từng nhánh trong mục “Nhánh dưới” của node cha — chỉ đổi thứ tự trong nhóm cùng cha, dời topic thì cả subtopic của nó dời theo, thứ tự mới giữ trong phiên này.</li>
+              <li>Các nút thao tác đều dạng icon, nhãn đầy đủ nằm trong title + aria-label (rê chuột vào nút để xem).</li>
             </ul>
           </section>
         </aside>

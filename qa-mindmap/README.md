@@ -42,11 +42,28 @@ số node không đổi, vẫn 4 subtopic.
   + các topic, bấm +N trên topic để mở nhánh. Nút “Mở hết” /
   “Thu hết” vẫn đổi toàn bộ; tìm kiếm (Enter) hoặc bấm tên nhánh
   trong panel phải chỉ mở đúng nhánh cần tới, các nhánh khác vẫn đóng.
-- Sắp xếp lại node: chọn 1 node rồi bấm ↑ Lên / ↓ Xuống trong
-  panel phải, hoặc bấm ↑ / ↓ ở từng nhánh trong mục “Nhánh dưới”
-  của node cha. Chỉ đổi thứ tự trong nhóm cùng cha (subtopic trong
-  cùng topic, topic dưới cùng nút gốc); dời 1 topic thì cả subtopic
-  của nó dời theo. Thứ tự mới giữ trong phiên này, như kéo thả.
+- Sắp xếp lại node: chọn 1 node rồi bấm ↑ / ↓ trong hộp
+  “↕ Sắp xếp” ở panel phải, hoặc bấm ↑ / ↓ ở từng nhánh trong
+  mục “Nhánh dưới” của node cha. Chỉ đổi thứ tự trong nhóm cùng
+  cha (subtopic trong cùng topic, topic dưới cùng nút gốc); dời
+  1 topic thì cả subtopic của nó dời theo. Thứ tự mới giữ trong
+  phiên này, như kéo thả.
+
+## Sửa 29-10-2026: pan như team-assistant-sim + nút icon
+
+- Canvas đúng mẫu team-assistant-sim: kéo nền để di chuyển cả
+  hình, bấm node để xem chi tiết, kéo thân node để di chuyển vị
+  trí. Không còn 2 chế độ Chọn / Kéo hình, không còn kéo khung
+  chọn trên nền; chọn nhiều subtopic để gộp vẫn bằng
+  Ctrl / Shift+Click (Cmd+Click trên Mac).
+- Nút sắp xếp làm nổi bật: hộp “↕ Sắp xếp” viền vàng trong panel
+  phải của node đang chọn, và nút ↑ ↓ ở từng nhánh trong
+  “Nhánh dưới” to hơn, viền vàng — trước đây nút nhỏ, nền tối nên
+  khó thấy (và nút gốc đang chọn lúc mới mở app vốn không có hàng
+  sắp xếp, chỉ có ở các nhánh dưới).
+- Các nút thao tác chuyển về dạng icon, nhãn đầy đủ trong title
+  + aria-label: thanh công cụ ＋ mở hết / － thu hết / ⤢ vừa
+  khung hình / ↺ đặt lại, thanh gộp ⧉ / ✕, duyệt ✓ / ✕.
 
 ## Chạy / build
 
