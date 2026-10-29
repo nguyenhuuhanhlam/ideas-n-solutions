@@ -2,12 +2,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Background, Controls, MiniMap, ReactFlow, useEdgesState, useNodesState,
 } from '@xyflow/react'
-import { DRAFT_PROPOSAL, MAPS, NODES } from './data.js'
+import { DRAFT_PROPOSAL, MAPS, MAX_SUBTOPICS_PER_TOPIC, NODES } from './data.js'
 import { nodeTypes } from './nodes.jsx'
 
 const SUBTITLE = {
   root: 'Nút gốc · 28-10-2026',
-  topic: 'Topic · tối đa 4 subtopic',
+  topic: `Topic · tối đa ${MAX_SUBTOPICS_PER_TOPIC} subtopic`,
   subtopic: 'Subtopic · tóm tắt tối ưu',
 }
 
@@ -357,7 +357,7 @@ export default function App() {
       <header className="qm-topbar">
         <div>
           <h1>🧠 QA Mindmap — Lưu hỏi đáp thành mindmap</h1>
-          <p className="sub">Chỉ ghi khi bạn yêu cầu · Đưa bản tóm tắt duyệt trước · Trùng lắp thì gộp vào subtopic đã có, tối đa 4 nhánh</p>
+          <p className="sub">Chỉ ghi khi bạn yêu cầu · Đưa bản tóm tắt duyệt trước · Trùng lắp thì gộp vào subtopic đã có, tối đa {MAX_SUBTOPICS_PER_TOPIC} nhánh</p>
         </div>
         <div className="qm-map-picker">
           <label>Mindmap:</label>
@@ -368,7 +368,7 @@ export default function App() {
       </header>
 
       <div className="qm-toolbar">
-        <span className="qm-count">{items.length} node · 1 nút gốc · {items.filter((n) => n.kind === 'topic').length} topic · {items.filter((n) => n.kind === 'subtopic').length} subtopic (tối đa 4)</span>
+        <span className="qm-count">{items.length} node · 1 nút gốc · {items.filter((n) => n.kind === 'topic').length} topic · {items.filter((n) => n.kind === 'subtopic').length} subtopic (tối đa {MAX_SUBTOPICS_PER_TOPIC}/topic)</span>
         <div className="qm-search">
           <input
             value={query}
@@ -517,7 +517,7 @@ export default function App() {
               <li>Chỉ ghi khi bạn yêu cầu ghi nhận, không tự ghi mọi câu hỏi đáp.</li>
               <li>Node đơn giản: tiêu đề là chủ đề tóm tắt, chi tiết là câu trả lời tóm tắt.</li>
               <li>Đưa bản tóm tắt cho bạn duyệt trước khi ghi.</li>
-              <li>Chủ đề trùng lắp thì gộp vào chi tiết của subtopic đã có, không tạo node mới, giữ tối đa 4 nhánh.</li>
+              <li>Chủ đề trùng lắp thì gộp vào chi tiết của subtopic đã có, không tạo node mới, giữ tối đa {MAX_SUBTOPICS_PER_TOPIC} nhánh.</li>
               <li>Chọn nhiều subtopic bằng Ctrl / Shift+Click (Cmd+Click trên Mac), rồi bấm ⧉ trong panel “Gộp subtopic” ở đầu cột phải để gộp thành 1 node: tiêu đề lấy node đầu tiên, chi tiết chia thành từng section theo node gốc. Panel gộp nằm ở cột phải nên khi nó hiện ra, khung hình bên trái không bị đẩy xuống.</li>
               <li>Kéo nền để di chuyển cả hình, bấm node để xem chi tiết — đúng kiểu team-assistant-sim, không còn chế độ khoanh chọn trên nền.</li>
               <li>Kéo thân node để di chuyển vị trí, vị trí mới được giữ trong phiên này.</li>
@@ -530,7 +530,7 @@ export default function App() {
       )}
 
       <footer className="qm-foot">
-        Bản mẫu — gốc Muse Q&amp;A → 2 topic (Tailscale, Render ngoại thất SketchUp), mỗi topic tối đa 4 subtopic, dữ liệu 28 và 29-10-2026, chưa có thêm / sửa / xóa thật, chưa lưu bền. Bản quản lý thật sẽ thêm form thêm node, sửa, xóa và lưu localStorage + xuất / nhập JSON.
+        Bản mẫu — gốc Muse Q&amp;A → 2 topic (Tailscale, Render ngoại thất SketchUp), mỗi topic tối đa {MAX_SUBTOPICS_PER_TOPIC} subtopic, dữ liệu 28 và 29-10-2026, chưa có thêm / sửa / xóa thật, chưa lưu bền. Bản quản lý thật sẽ thêm form thêm node, sửa, xóa và lưu localStorage + xuất / nhập JSON.
       </footer>
     </div>
   )

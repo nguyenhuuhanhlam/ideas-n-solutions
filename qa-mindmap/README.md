@@ -7,7 +7,9 @@ Bản mẫu trong kho ideas-n-solutions. Lưu thông tin trong các buổi hỏi
 Bản ghi nhớ nội dung chính của phiên làm việc, hạn chế sinh quá nhiều node:
 
 - Nút gốc (ví dụ “Muse Q&A”, có thể 1 hoặc nhiều nút gốc cho các dạng chủ đề khác nhau)
-  → topic → subtopic, tối đa 1–4 nhánh subtopic, tóm tắt tối ưu nội dung.
+  → topic → subtopic, tối đa 1–10 nhánh subtopic, tóm tắt tối ưu nội dung.
+  (Giới hạn mở rộng từ 4 lên 10 ngày 29-10-2026; số lượng hiện có vẫn
+  4 subtopic/topic, chỉ trần cho phép tăng lên.)
 - Chỉ ghi khi user yêu cầu ghi nhận, không tự ghi mọi câu hỏi đáp.
 - Node đơn giản: tiêu đề là chủ đề tóm tắt, chi tiết là câu trả lời tóm tắt.
 - Đưa bản tóm tắt cho user duyệt trước khi ghi.

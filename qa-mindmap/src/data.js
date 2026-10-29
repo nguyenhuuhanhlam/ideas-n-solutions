@@ -6,7 +6,10 @@
 // Cấu trúc đã chốt với user (22:52, 28-10-2026 — thay cấu trúc cũ “mỗi câu hỏi 1 node”):
 // - Bản ghi nhớ nội dung chính của phiên làm việc, hạn chế sinh quá nhiều node.
 // - Nút gốc (ví dụ “Muse Q&A”, có thể 1 hoặc nhiều nút gốc cho các dạng chủ đề khác nhau)
-//   → topic → subtopic, tối đa 1–4 nhánh subtopic, tóm tắt tối ưu nội dung.
+//   → topic → subtopic, tối đa 1–10 nhánh subtopic, tóm tắt tối ưu nội dung.
+// Giới hạn mở rộng từ 4 lên 10 ngày 29-10-2026 theo yêu cầu của user;
+// số lượng hiện có vẫn 4 subtopic/topic, chỉ trần cho phép tăng lên.
+export const MAX_SUBTOPICS_PER_TOPIC = 10
 // - Chỉ ghi khi user yêu cầu ghi nhận, không tự ghi mọi câu hỏi đáp.
 // - Node đơn giản: tiêu đề = chủ đề tóm tắt, chi tiết = câu trả lời tóm tắt.
 // - Đưa bản tóm tắt cho user duyệt trước khi ghi.
@@ -16,7 +19,7 @@ export const MAPS = [
     id: 'muse-qa',
     title: 'Muse Q&A',
     date: '29-10-2026',
-    note: 'Bản ghi nhớ nội dung chính các buổi hỏi đáp · Topic Tailscale, Render ngoại thất SketchUp · mỗi topic tối đa 4 subtopic',
+    note: `Bản ghi nhớ nội dung chính các buổi hỏi đáp · Topic Tailscale, Render ngoại thất SketchUp · mỗi topic tối đa ${MAX_SUBTOPICS_PER_TOPIC} subtopic`,
   },
 ]
 
@@ -26,7 +29,7 @@ export const NODES = [
     parentId: null,
     kind: 'root',
     title: 'Muse Q&A',
-    detail: 'Bản ghi nhớ nội dung chính các buổi hỏi đáp với Muse. Mỗi topic là một phiên làm việc, mỗi topic tối đa 4 subtopic tóm tắt tối ưu nội dung.',
+    detail: `Bản ghi nhớ nội dung chính các buổi hỏi đáp với Muse. Mỗi topic là một phiên làm việc, mỗi topic tối đa ${MAX_SUBTOPICS_PER_TOPIC} subtopic tóm tắt tối ưu nội dung.`,
     source: 'Quy tắc đã chốt 28-10-2026',
     date: '28-10-2026',
     position: { x: 10, y: 537 },
@@ -141,6 +144,6 @@ export const DRAFT_PROPOSAL = {
   targetTitle: 'Giá',
   title: 'Bổ sung vào subtopic “Giá”',
   detail: 'Thêm vào chi tiết hiện tại: “Starter $6/user/tháng cho team nhỏ: 100 + 10 thiết bị/user, có split tunneling, MagicDNS và ACL cơ bản.”',
-  reason: 'Trùng chủ đề với subtopic “Giá” nên đề xuất gộp vào chi tiết của subtopic đó, không tạo node mới, để giữ tối đa 4 nhánh.',
+  reason: `Trùng chủ đề với subtopic “Giá” nên đề xuất gộp vào chi tiết của subtopic đó, không tạo node mới, để giữ tối đa ${MAX_SUBTOPICS_PER_TOPIC} nhánh.`,
   appendText: ' Starter $6/user/tháng cho team nhỏ: 100 + 10 thiết bị/user, có split tunneling, MagicDNS và ACL cơ bản.',
 }
