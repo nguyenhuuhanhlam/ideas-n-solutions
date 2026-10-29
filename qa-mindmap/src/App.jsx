@@ -412,7 +412,7 @@ export default function App() {
       </main>
 
       <footer className="qm-foot">
-        Bản mẫu — gốc Muse Q&amp;A → topic Tailscale → 4 subtopic, dữ liệu ngày 28-10-2026, chưa có thêm / sửa / xóa thật, chưa lưu bền. Bản quản lý thật sẽ thêm form thêm node, sửa, xóa và lưu localStorage + xuất / nhập JSON.
+        Bản mẫu — gốc Muse Q&amp;A → 2 topic (Tailscale, Render ngoại thất SketchUp), mỗi topic tối đa 4 subtopic, dữ liệu 28 và 29-10-2026, chưa có thêm / sửa / xóa thật, chưa lưu bền. Bản quản lý thật sẽ thêm form thêm node, sửa, xóa và lưu localStorage + xuất / nhập JSON.
       </footer>
     </div>
   )
