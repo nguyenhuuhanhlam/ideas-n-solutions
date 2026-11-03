@@ -32,7 +32,8 @@ use windows::Win32::System::DataExchange::{
 };
 use windows::Win32::System::Memory::{GlobalAlloc, GlobalLock, GlobalUnlock, GMEM_MOVEABLE};
 use windows::Win32::UI::Shell::{
-    Shell_NotifyIconW, NIIF_INFO, NIM_ADD, NIM_DELETE, NIM_MODIFY, NIF_ICON, NIF_INFO,
+    Shell_NotifyIconW, NIIF_INFO, NIIF_NONE, NIM_ADD, NIM_DELETE, NIM_MODIFY, NIF_ICON,
+    NIF_INFO,
     NIF_MESSAGE, NIF_TIP, NOTIFYICONDATAW,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
@@ -107,8 +108,21 @@ fn balloon_queue() -> &'static Mutex<VecDeque<BalloonOutput>> {
 /// Win32 limits (63 / 255 chars). Clicking the balloon does nothing:
 /// the tray handler ignores balloon clicks, and the clipboard is
 /// left exactly as the user copied it.
+///
+/// A balloon that is still on screen is replaced immediately: Windows
+/// often ignores a plain NIM_MODIFY with new info while the previous
+/// balloon is still showing, so the old balloon is dismissed first
+/// (an empty NIF_INFO modify) and the new one is shown right after.
 fn show_balloon(hwnd: HWND, title: &str, body: &str) {
     unsafe {
+        let mut clear = NOTIFYICONDATAW::default();
+        clear.cbSize = std::mem::size_of::<NOTIFYICONDATAW>() as u32;
+        clear.hWnd = hwnd;
+        clear.uID = 1;
+        clear.uFlags = NIF_INFO;
+        clear.dwInfoFlags = NIIF_NONE;
+        let _ = Shell_NotifyIconW(NIM_MODIFY, &mut clear);
+
         let mut data = NOTIFYICONDATAW::default();
         data.cbSize = std::mem::size_of::<NOTIFYICONDATAW>() as u32;
         data.hWnd = hwnd;

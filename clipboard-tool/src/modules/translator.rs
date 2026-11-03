@@ -15,53 +15,29 @@
 //! Lookup: exact match on the lowercased, whitespace-normalised form
 //! only. No stemming in the skeleton: `books` does not match `book`.
 //! That is a deliberate choice against guessing a wrong meaning.
-//! The sample dictionary below is sorted by key so lookup is a binary
-//! search; the full kaikki.org dictionary (measured later) will use
-//! the same shape, generated as a PHF map if it grows large enough
-//! to justify it. The sample data is a placeholder, not the real
-//! dictionary, and must be replaced by the measured dataset.
+//!
+//! The dictionary lives in its own file, `assets/dictionary.tsv`
+//! (one entry per line: `english<TAB>vietnamese gloss`, multiple
+//! meanings separated by "; "), and is embedded into the binary at
+//! compile time with `include_str!`. Editing the dictionary therefore
+//! means editing that file and rebuilding, and distribution stays a
+//! single exe: no separate dictionary file needs to ship with it.
+//! The sample data is a placeholder, not the real dictionary, and
+//! must be replaced by the measured kaikki.org dataset, in the same
+//! file and format.
 
-/// Sample dictionary: (english, vietnamese gloss), sorted by key.
-/// Keep glosses short: a tray balloon only fits ~256 chars, and the
-/// caller truncates anyway. Multiple meanings are separated by "; ".
-static SAMPLE_DICT: &[(&str, &str)] = &[
-    ("account", "tài khoản"),
-    ("apple", "quả táo"),
-    ("book", "cuốn sách; sách"),
-    ("bridge", "cây cầu"),
-    ("computer", "máy tính"),
-    ("dog", "con chó"),
-    ("door", "cánh cửa"),
-    ("dream", "giấc mơ; mơ"),
-    ("friend", "người bạn"),
-    ("garden", "khu vườn"),
-    ("hello", "xin chào"),
-    ("house", "ngôi nhà"),
-    ("journey", "chuyến đi; hành trình"),
-    ("language", "ngôn ngữ"),
-    ("library", "thư viện"),
-    ("machine learning", "học máy"),
-    ("market", "chợ; thị trường"),
-    ("morning", "buổi sáng"),
-    ("mountain", "ngọn núi"),
-    ("newspaper", "báo; tờ báo"),
-    ("river", "dòng sông"),
-    ("school", "trường học"),
-    ("search", "tìm kiếm"),
-    ("software", "phần mềm"),
-    ("sun", "mặt trời"),
-    ("table", "cái bàn"),
-    ("take off", "cất cánh; cởi ra"),
-    ("teacher", "giáo viên"),
-    ("thank you", "cảm ơn"),
-    ("time", "thời gian"),
-    ("travel", "du lịch; đi lại"),
-    ("water", "nước"),
-    ("window", "cửa sổ"),
-    ("work", "công việc; làm việc"),
-    ("world", "thế giới"),
-    ("write", "viết"),
-];
+use std::collections::HashMap;
+use std::sync::LazyLock;
+
+/// The dictionary, parsed once from `assets/dictionary.tsv`.
+/// Keys are already lowercased and whitespace-normalised in the file.
+static DICTIONARY: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(|| {
+    include_str!("../../assets/dictionary.tsv")
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .filter_map(|line| line.split_once('\t'))
+        .collect()
+});
 
 /// Normalise for lookup: trim, lowercase, collapse whitespace.
 pub fn normalize(text: &str) -> String {
@@ -89,10 +65,7 @@ pub fn is_candidate(text: &str, max_words: usize, max_len: usize) -> bool {
 
 /// Look up an already-normalised key. Returns the gloss, if found.
 pub fn lookup(normalized: &str) -> Option<&'static str> {
-    SAMPLE_DICT
-        .binary_search_by(|(key, _)| key.cmp(&normalized))
-        .ok()
-        .map(|idx| SAMPLE_DICT[idx].1)
+    DICTIONARY.get(normalized).copied()
 }
 
 /// Translate copied text. Returns (display word, gloss) on a hit,
@@ -125,10 +98,18 @@ mod tests {
     use super::*;
 
     #[test]
-    fn sample_dict_is_sorted_for_binary_search() {
-        for pair in SAMPLE_DICT.windows(2) {
-            assert!(pair[0].0 < pair[1].0, "unsorted keys: {:?} >= {:?}", pair[0].0, pair[1].0);
+    fn dictionary_file_parses_with_unique_keys() {
+        let lines: Vec<&str> = include_str!("../../assets/dictionary.tsv")
+            .lines()
+            .filter(|line| !line.trim().is_empty())
+            .collect();
+        assert_eq!(lines.len(), 36, "sample dictionary must stay at 36 entries");
+        for line in &lines {
+            assert!(line.contains('\t'), "entry without a tab separator: {line:?}");
         }
+        // No duplicate keys: the map must hold exactly one entry per line.
+        assert_eq!(DICTIONARY.len(), lines.len(), "duplicate dictionary key");
+        assert_eq!(DICTIONARY.get("hello"), Some(&"xin chào"));
     }
 
     #[test]

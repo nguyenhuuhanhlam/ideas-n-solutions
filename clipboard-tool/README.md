@@ -49,9 +49,12 @@ and outside the overwrite pipeline.
   the title, the Vietnamese gloss as the body. Clicking the balloon
   does nothing and the clipboard is left untouched, so the English
   word is never lost. On a miss it shows nothing.
-- Lookup is exact-match only (no stemming in the skeleton), on a
-  sorted static table, so it is a binary search with no runtime
-  parsing and no network.
+- Lookup is exact-match only (no stemming in the skeleton), in a
+  hash map built once from `assets/dictionary.tsv` (one entry per
+  line: `english<TAB>vietnamese gloss`), embedded into the binary at
+  compile time, so there is no runtime file to ship and no network.
+  A balloon that is still on screen is replaced immediately: the old
+  balloon is dismissed first, then the new one is shown.
 
 The skeleton ships with a small sample dictionary (~36 entries:
 `hello`, `machine learning`, `take off`, ...). It is a placeholder
@@ -119,7 +122,8 @@ echo 'www.example.com/?fbclid=XYZ' | cargo run
 - `src/modules/mod.rs` — the `TextModule` trait and registry
 - `src/modules/link_detector.rs` — module 1
 - `src/modules/fbclid_stripper.rs` — module 2
-- `src/modules/translator.rs` — translator notifier + sample dictionary
+- `src/modules/translator.rs` — translator notifier (dictionary data
+  lives separately in `assets/dictionary.tsv`)
 - `src/win.rs` — Windows-only hidden window, tray, clipboard listener
 - `src/settings_ui.rs` — Windows-only native Win32 settings window
 - `src/main.rs` — entry point, config loading
