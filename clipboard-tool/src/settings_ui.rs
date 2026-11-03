@@ -252,7 +252,7 @@ fn create_controls(parent: HWND) {
         create_control(
             parent,
             w!("STATIC"),
-            "Chung",
+            "General",
             style_static(),
             16,
             40,
@@ -266,7 +266,7 @@ fn create_controls(parent: HWND) {
         create_control(
             parent,
             w!("BUTTON"),
-            "Chay tu dong moi lan copy",
+            "Run automatically on every copy",
             style_button_checkbox(),
             16,
             64,
@@ -280,7 +280,7 @@ fn create_controls(parent: HWND) {
         create_control(
             parent,
             w!("BUTTON"),
-            "Ghi de clipboard bang ket qua cuoi pipeline",
+            "Overwrite clipboard with the final pipeline result",
             style_button_checkbox(),
             16,
             88,
@@ -294,7 +294,7 @@ fn create_controls(parent: HWND) {
         create_control(
             parent,
             w!("STATIC"),
-            "Gioi han ky tu (text dai hon se bo qua):",
+            "Max chars (longer text is skipped):",
             style_static(),
             16,
             116,
@@ -324,7 +324,7 @@ fn create_controls(parent: HWND) {
         create_control(
             parent,
             w!("STATIC"),
-            "Thu tu module (chay tu tren xuong):",
+            "Module order (runs top to bottom):",
             style_static(),
             16,
             146,
@@ -365,7 +365,7 @@ fn create_controls(parent: HWND) {
         create_control(
             parent,
             w!("BUTTON"),
-            "Len",
+            "Up",
             style_button(),
             350,
             168,
@@ -379,7 +379,7 @@ fn create_controls(parent: HWND) {
         create_control(
             parent,
             w!("BUTTON"),
-            "Xuong",
+            "Down",
             style_button(),
             350,
             196,
@@ -419,7 +419,7 @@ fn create_controls(parent: HWND) {
     let c = create_control(
         parent,
         w!("BUTTON"),
-        "Bat module nay",
+        "Enable this module",
         style_button_checkbox(),
         16,
         258,
@@ -432,9 +432,9 @@ fn create_controls(parent: HWND) {
         set_check(h, link_enabled);
     }
     let checks: [(usize, &str, bool, i32); 3] = [
-        (IDC_LINK_MISSING, "Cho phep thieu scheme (example.com -> https://...)", missing, 282),
-        (IDC_LINK_LOCALHOST, "Cho phep localhost", localhost, 306),
-        (IDC_LINK_IP, "Cho phep dia chi IP", ip, 330),
+        (IDC_LINK_MISSING, "Allow missing scheme (example.com -> https://...)", missing, 282),
+        (IDC_LINK_LOCALHOST, "Allow localhost", localhost, 306),
+        (IDC_LINK_IP, "Allow IP addresses", ip, 330),
     ];
     for (id, label, value, y) in checks {
         let h = create_control(
@@ -458,7 +458,7 @@ fn create_controls(parent: HWND) {
         create_control(
             parent,
             w!("STATIC"),
-            "Scheme mac dinh:",
+            "Default scheme:",
             style_static(),
             16,
             358,
@@ -486,7 +486,7 @@ fn create_controls(parent: HWND) {
         create_control(
             parent,
             w!("STATIC"),
-            "Do dai toi da de xet link:",
+            "Max length for link detection:",
             style_static(),
             300,
             358,
@@ -549,7 +549,7 @@ fn create_controls(parent: HWND) {
     let c = create_control(
         parent,
         w!("BUTTON"),
-        "Bat module nay",
+        "Enable this module",
         style_button_checkbox(),
         16,
         412,
@@ -566,7 +566,7 @@ fn create_controls(parent: HWND) {
         create_control(
             parent,
             w!("STATIC"),
-            "Param can loai (cach nhau bang dau phay):",
+            "Parameters to strip (comma-separated):",
             style_static(),
             16,
             440,
@@ -592,7 +592,7 @@ fn create_controls(parent: HWND) {
     let c = create_control(
         parent,
         w!("BUTTON"),
-        "So khop ten param khong phan biet hoa thuong",
+        "Match parameter names case-insensitively",
         style_button_checkbox(),
         16,
         490,
@@ -622,7 +622,7 @@ fn create_controls(parent: HWND) {
         create_control(
             parent,
             w!("BUTTON"),
-            "Luu",
+            "Save",
             style_button(),
             16,
             524,
@@ -636,7 +636,7 @@ fn create_controls(parent: HWND) {
         create_control(
             parent,
             w!("BUTTON"),
-            "Dong (khong luu)",
+            "Close (discard)",
             style_button(),
             118,
             524,
@@ -650,7 +650,7 @@ fn create_controls(parent: HWND) {
         create_control(
             parent,
             w!("STATIC"),
-            "Luu xong van mo cua so de kiem chung. Dong cua so thi thay doi chua luu se mat.",
+            "After saving, the window stays open so you can verify. Closing without saving discards changes.",
             style_static(),
             16,
             564,
@@ -747,31 +747,31 @@ fn do_save(hwnd: HWND) {
         Some(t) => match t.trim().parse() {
             Ok(v) => v,
             Err(_) => {
-                set_status("Loi: Gioi han ky tu phai la so nguyen.");
+                set_status("Error: Max chars must be an integer.");
                 return;
             }
         },
         None => {
-            set_status("Loi: khong doc duoc o gioi han ky tu.");
+            set_status("Error: Could not read the max chars field.");
             return;
         }
     };
     let scheme = ctrl(IDC_LINK_SCHEME).map(get_text).unwrap_or_default();
     let scheme = scheme.trim().to_string();
     if scheme != "http" && scheme != "https" {
-        set_status("Loi: Scheme mac dinh phai la http hoac https.");
+        set_status("Error: Default scheme must be http or https.");
         return;
     }
     let maxlen: u64 = match ctrl(IDC_LINK_MAXLEN).map(get_text) {
         Some(t) => match t.trim().parse() {
             Ok(v) => v,
             Err(_) => {
-                set_status("Loi: max_len cua link_detector phai la so nguyen.");
+                set_status("Error: link_detector max_len must be an integer.");
                 return;
             }
         },
         None => {
-            set_status("Loi: khong doc duoc o max_len.");
+            set_status("Error: Could not read the max_len field.");
             return;
         }
     };
@@ -783,7 +783,7 @@ fn do_save(hwnd: HWND) {
         .filter(|s| !s.is_empty())
         .collect();
     if strip.is_empty() {
-        set_status("Loi: Danh sach strip dang rong. Tat module thay vi de rong.");
+        set_status("Error: Strip list is empty. Disable the module instead of leaving it empty.");
         return;
     }
 
@@ -849,12 +849,12 @@ fn do_save(hwnd: HWND) {
     let text = match serde_json::to_string_pretty(&new_config) {
         Ok(t) => t,
         Err(e) => {
-            set_status(&format!("Loi: khong serialize duoc config: {}", e));
+            set_status(&format!("Error: Could not serialize config: {}", e));
             return;
         }
     };
     if let Err(e) = std::fs::write(&path, text) {
-        set_status(&format!("Loi: khong ghi duoc {}: {}", path.display(), e));
+        set_status(&format!("Error: Could not write {}: {}", path.display(), e));
         return;
     }
     if let Ok(mut s) = state().lock() {
@@ -871,7 +871,7 @@ fn do_save(hwnd: HWND) {
     }
     let _ = hwnd;
     set_status(&format!(
-        "Da luu {}. Core se nap lai ngay, khong can restart.",
+        "Saved {}. Core will reload immediately, no restart needed.",
         path.display()
     ));
 }
