@@ -1,29 +1,198 @@
-//! Real settings window, built with egui/eframe.
+//! Native Win32 settings window (modeless, same thread as the tray).
 //!
-//! Why a separate thread: the tray / clipboard listener owns the Win32
-//! message loop on the main thread, and eframe owns its own event loop.
-//! Windows allows a second UI thread with its own windows, so the
-//! settings window runs on a spawned thread and never blocks clipboard
-//! handling. Only one settings window may be open at a time
-//! (`SETTINGS_OPEN`); a second Settings click while it is open is a
-//! no-op for now (bring-to-front is a later improvement).
+//! Why native, not egui/eframe: the eframe version failed to start on
+//! the user's Windows machine (its fallback message box was the only
+//! thing that appeared). eframe needs a winit event loop on its own
+//! thread plus a working GPU/OpenGL context; a plain Win32 window
+//! needs neither. It is created on the same thread that already runs
+//! the tray message loop, so the existing `GetMessage` / `DispatchMessage`
+//! loop in `win.rs` pumps its messages automatically, clipboard
+//! handling keeps running while it is open, and closing it never quits
+//! the app (its `WM_DESTROY` deliberately does NOT post a quit message).
 //!
-//! Flow: the window edits a *copy* of the config. Cancel / closing the
-//! window discards it. Save validates, writes `config.json` (settings
-//! only, never clipboard text), then posts `WM_CONFIG_RELOADED` to the
-//! Win32 window so the core reloads the file immediately, without a
-//! restart. If eframe fails to start on this thread, the fallback is
-//! still the config file, reported in a message box.
+//! Flow: the window edits a *copy* of the config held in a static.
+//! Cancel / closing discards it. Save validates, writes `config.json`
+//! (settings only, never clipboard text), then posts
+//! `WM_CONFIG_RELOADED` to the main window so the core reloads
+//! immediately, without a restart. Only one settings window may be
+//! open at a time; a second Settings click brings the open one to
+//! the front.
+//!
+//! HWNDs are stored as `isize` addresses in the static state, because
+//! `HWND` itself is not `Send` and a static must be. All access happens
+//! on the Win32 thread, so rebuilding the HWND from its address there
+//! is safe.
 
 use crate::config::AppConfig;
-use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicBool, Ordering};
-use windows::Win32::Foundation::{HWND, LPARAM, WPARAM};
-use windows::Win32::UI::WindowsAndMessaging::{MessageBoxW, PostMessageW, MB_OK};
-use windows::core::w;
+use std::sync::{Mutex, OnceLock};
+use windows::core::{w, PCWSTR};
+use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
+use windows::Win32::UI::WindowsAndMessaging::{
+    CreateWindowExW, DefWindowProcW, DestroyWindow, GetWindowTextW, RegisterClassW,
+    SendMessageW, SetForegroundWindow, SetWindowTextW, ShowWindow,
+    BM_GETCHECK, BM_SETCHECK, BN_CLICKED, HMENU, SW_SHOW, WINDOW_EX_STYLE, WINDOW_STYLE,
+    WM_CLOSE, WM_COMMAND, WM_CREATE, WM_DESTROY, WNDCLASSW, WS_BORDER, WS_CHILD,
+    WS_OVERLAPPEDWINDOW, WS_TABSTOP, WS_VISIBLE, WS_VSCROLL,
+};
 
-static SETTINGS_OPEN: AtomicBool = AtomicBool::new(false);
+// Control ids.
+const IDC_AUTO_RUN: usize = 2001;
+const IDC_OVERWRITE: usize = 2002;
+const IDC_MAX_CHARS: usize = 2003;
+const IDC_LINK_ENABLED: usize = 2010;
+const IDC_LINK_MISSING: usize = 2011;
+const IDC_LINK_LOCALHOST: usize = 2012;
+const IDC_LINK_IP: usize = 2013;
+const IDC_LINK_SCHEME: usize = 2014;
+const IDC_LINK_MAXLEN: usize = 2015;
+const IDC_FB_ENABLED: usize = 2020;
+const IDC_FB_STRIP: usize = 2021;
+const IDC_FB_CASE: usize = 2022;
+const IDC_ORDER_LIST: usize = 2030;
+const IDC_ORDER_UP: usize = 2031;
+const IDC_ORDER_DOWN: usize = 2032;
+const IDC_SAVE: usize = 2040;
+const IDC_CANCEL: usize = 2041;
+const IDC_STATUS: usize = 2042;
+
+// Win32 message numbers not exported as constants in windows 0.58.
+const LB_ADDSTRING: u32 = 0x0180;
+const LB_INSERTSTRING: u32 = 0x0181;
+const LB_DELETESTRING: u32 = 0x0182;
+const LB_GETCURSEL: u32 = 0x0187;
+const LB_SETCURSEL: u32 = 0x0186;
+const LB_GETTEXT: u32 = 0x0189;
+const LB_GETCOUNT: u32 = 0x018B;
+
+fn wide(s: &str) -> Vec<u16> {
+    s.encode_utf16().chain(std::iter::once(0)).collect()
+}
+
+fn style_button_checkbox() -> WINDOW_STYLE {
+    // WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX(3)
+    WINDOW_STYLE(WS_CHILD.0 | WS_VISIBLE.0 | WS_TABSTOP.0 | 3)
+}
+
+fn style_button() -> WINDOW_STYLE {
+    // WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON(0)
+    WINDOW_STYLE(WS_CHILD.0 | WS_VISIBLE.0 | WS_TABSTOP.0)
+}
+
+fn style_edit() -> WINDOW_STYLE {
+    // WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL(128)
+    WINDOW_STYLE(WS_CHILD.0 | WS_VISIBLE.0 | WS_TABSTOP.0 | WS_BORDER.0 | 128)
+}
+
+fn style_static() -> WINDOW_STYLE {
+    WINDOW_STYLE(WS_CHILD.0 | WS_VISIBLE.0)
+}
+
+fn style_listbox() -> WINDOW_STYLE {
+    // WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_VSCROLL | LBS_NOTIFY(1)
+    WINDOW_STYLE(WS_CHILD.0 | WS_VISIBLE.0 | WS_TABSTOP.0 | WS_BORDER.0 | WS_VSCROLL.0 | 1)
+}
+
+struct SettingsState {
+    config: AppConfig,
+    path: PathBuf,
+    main_hwnd_addr: isize,
+    settings_hwnd_addr: isize,
+    ctrl: std::collections::HashMap<usize, isize>,
+}
+
+static STATE: OnceLock<Mutex<SettingsState>> = OnceLock::new();
+static CLASS_REGISTERED: std::sync::atomic::AtomicBool =
+    std::sync::atomic::AtomicBool::new(false);
+
+fn state() -> &'static Mutex<SettingsState> {
+    STATE.get_or_init(|| {
+        Mutex::new(SettingsState {
+            config: AppConfig::default(),
+            path: PathBuf::from("config.json"),
+            main_hwnd_addr: 0,
+            settings_hwnd_addr: 0,
+            ctrl: std::collections::HashMap::new(),
+        })
+    })
+}
+
+fn hwnd_from(addr: isize) -> HWND {
+    HWND(addr as *mut std::ffi::c_void)
+}
+
+fn create_control(
+    parent: HWND,
+    class: PCWSTR,
+    text: &str,
+    style: WINDOW_STYLE,
+    x: i32,
+    y: i32,
+    w: i32,
+    h: i32,
+    id: usize,
+) -> Option<HWND> {
+    let text_w = wide(text);
+    unsafe {
+        CreateWindowExW(
+            WINDOW_EX_STYLE(0),
+            class,
+            PCWSTR(text_w.as_ptr()),
+            style,
+            x,
+            y,
+            w,
+            h,
+            parent,
+            HMENU(id as *mut std::ffi::c_void),
+            None,
+            None,
+        )
+        .ok()
+    }
+}
+
+fn set_text(hwnd: HWND, text: &str) {
+    let text_w = wide(text);
+    unsafe {
+        let _ = SetWindowTextW(hwnd, PCWSTR(text_w.as_ptr()));
+    }
+}
+
+fn get_text(hwnd: HWND) -> String {
+    unsafe {
+        let mut buf = vec![0u16; 4096];
+        let len = GetWindowTextW(hwnd, &mut buf);
+        if len <= 0 {
+            return String::new();
+        }
+        String::from_utf16_lossy(&buf[..len as usize])
+    }
+}
+
+fn set_check(hwnd: HWND, checked: bool) {
+    unsafe {
+        let _ = SendMessageW(
+            hwnd,
+            BM_SETCHECK,
+            WPARAM(if checked { 1 } else { 0 }),
+            LPARAM(0),
+        );
+    }
+}
+
+fn get_check(hwnd: HWND) -> bool {
+    unsafe { SendMessageW(hwnd, BM_GETCHECK, WPARAM(0), LPARAM(0)).0 == 1 }
+}
+
+fn ctrl(id: usize) -> Option<HWND> {
+    state()
+        .lock()
+        .ok()
+        .and_then(|s| s.ctrl.get(&id).copied())
+        .filter(|a| *a != 0)
+        .map(hwnd_from)
+}
 
 fn get_bool(params: &serde_json::Value, key: &str, default: bool) -> bool {
     params.get(key).and_then(|v| v.as_bool()).unwrap_or(default)
@@ -50,347 +219,756 @@ fn set_param(params: &mut serde_json::Value, key: &str, value: serde_json::Value
     }
 }
 
-pub struct SettingsApp {
-    config: AppConfig,
-    path: PathBuf,
-    hwnd_addr: isize,
-    max_chars_str: String,
-    link_default_scheme: String,
-    link_max_len_str: String,
-    fbclid_strip_str: String,
-    raw_params: HashMap<String, String>,
-    status: String,
-}
+fn create_controls(parent: HWND) {
+    let (config, path) = {
+        let s = state().lock().unwrap();
+        (s.config.clone(), s.path.clone())
+    };
+    let mut ctrls: std::collections::HashMap<usize, isize> =
+        std::collections::HashMap::new();
+    let mut put = |id: usize, hwnd: Option<HWND>| {
+        if let Some(h) = hwnd {
+            ctrls.insert(id, h.0 as isize);
+        }
+    };
 
-impl SettingsApp {
-    fn new(config: AppConfig, path: PathBuf, hwnd_addr: isize) -> Self {
-        let max_chars_str = config.max_chars.to_string();
-        let mut link_default_scheme = "https".to_string();
-        let mut link_max_len_str = "2048".to_string();
-        let mut fbclid_strip_str = "fbclid".to_string();
-        let mut raw_params = HashMap::new();
-        for m in &config.modules {
-            match m.id.as_str() {
-                "link_detector" => {
-                    link_default_scheme = get_str(&m.params, "default_scheme", "https");
-                    link_max_len_str = get_u64(&m.params, "max_len", 2048).to_string();
-                }
-                "fbclid_stripper" => {
-                    let strip: Vec<String> = m
-                        .params
-                        .get("strip")
-                        .and_then(|v| v.as_array())
-                        .map(|arr| {
-                            arr.iter()
-                                .filter_map(|v| v.as_str().map(|s| s.to_string()))
-                                .collect()
-                        })
-                        .unwrap_or_else(|| vec!["fbclid".to_string()]);
-                    fbclid_strip_str = strip.join(", ");
-                }
-                _ => {
-                    raw_params.insert(
-                        m.id.clone(),
-                        serde_json::to_string_pretty(&m.params)
-                            .unwrap_or_else(|_| "{}".to_string()),
-                    );
-                }
+    // File path (read-only info, not editable here).
+    put(
+        0,
+        create_control(
+            parent,
+            w!("STATIC"),
+            &format!("File: {}", path.display()),
+            style_static(),
+            16,
+            12,
+            540,
+            20,
+            0,
+        ),
+    );
+    put(
+        0,
+        create_control(
+            parent,
+            w!("STATIC"),
+            "Chung",
+            style_static(),
+            16,
+            40,
+            200,
+            20,
+            0,
+        ),
+    );
+    put(
+        IDC_AUTO_RUN,
+        create_control(
+            parent,
+            w!("BUTTON"),
+            "Chay tu dong moi lan copy",
+            style_button_checkbox(),
+            16,
+            64,
+            300,
+            22,
+            IDC_AUTO_RUN,
+        ),
+    );
+    put(
+        IDC_OVERWRITE,
+        create_control(
+            parent,
+            w!("BUTTON"),
+            "Ghi de clipboard bang ket qua cuoi pipeline",
+            style_button_checkbox(),
+            16,
+            88,
+            360,
+            22,
+            IDC_OVERWRITE,
+        ),
+    );
+    put(
+        0,
+        create_control(
+            parent,
+            w!("STATIC"),
+            "Gioi han ky tu (text dai hon se bo qua):",
+            style_static(),
+            16,
+            116,
+            320,
+            20,
+            0,
+        ),
+    );
+    put(
+        IDC_MAX_CHARS,
+        create_control(
+            parent,
+            w!("EDIT"),
+            &config.max_chars.to_string(),
+            style_edit(),
+            340,
+            112,
+            140,
+            22,
+            IDC_MAX_CHARS,
+        ),
+    );
+
+    // Module order list.
+    put(
+        0,
+        create_control(
+            parent,
+            w!("STATIC"),
+            "Thu tu module (chay tu tren xuong):",
+            style_static(),
+            16,
+            146,
+            300,
+            20,
+            0,
+        ),
+    );
+    let list = create_control(
+        parent,
+        w!("LISTBOX"),
+        "",
+        style_listbox(),
+        16,
+        168,
+        320,
+        52,
+        IDC_ORDER_LIST,
+    );
+    put(IDC_ORDER_LIST, list);
+    if let Some(list_hwnd) = list {
+        let mut ordered = config.modules.clone();
+        ordered.sort_by_key(|m| m.order);
+        for m in &ordered {
+            let text_w = wide(&m.id);
+            unsafe {
+                let _ = SendMessageW(
+                    list_hwnd,
+                    LB_ADDSTRING,
+                    WPARAM(0),
+                    LPARAM(text_w.as_ptr() as isize),
+                );
             }
         }
-        Self {
-            config,
-            path,
-            hwnd_addr,
-            max_chars_str,
-            link_default_scheme,
-            link_max_len_str,
-            fbclid_strip_str,
-            raw_params,
-            status: String::new(),
+    }
+    put(
+        IDC_ORDER_UP,
+        create_control(
+            parent,
+            w!("BUTTON"),
+            "Len",
+            style_button(),
+            350,
+            168,
+            70,
+            24,
+            IDC_ORDER_UP,
+        ),
+    );
+    put(
+        IDC_ORDER_DOWN,
+        create_control(
+            parent,
+            w!("BUTTON"),
+            "Xuong",
+            style_button(),
+            350,
+            196,
+            70,
+            24,
+            IDC_ORDER_DOWN,
+        ),
+    );
+
+    // Link detector section.
+    let link = config.modules.iter().find(|m| m.id == "link_detector");
+    let (link_enabled, missing, localhost, ip, scheme, maxlen) = match link {
+        Some(m) => (
+            m.enabled,
+            get_bool(&m.params, "allow_missing_scheme", true),
+            get_bool(&m.params, "allow_localhost", true),
+            get_bool(&m.params, "allow_ip", true),
+            get_str(&m.params, "default_scheme", "https"),
+            get_u64(&m.params, "max_len", 2048).to_string(),
+        ),
+        None => (false, true, true, true, "https".to_string(), "2048".to_string()),
+    };
+    put(
+        0,
+        create_control(
+            parent,
+            w!("STATIC"),
+            "Module: link_detector",
+            style_static(),
+            16,
+            236,
+            300,
+            20,
+            0,
+        ),
+    );
+    let c = create_control(
+        parent,
+        w!("BUTTON"),
+        "Bat module nay",
+        style_button_checkbox(),
+        16,
+        258,
+        200,
+        22,
+        IDC_LINK_ENABLED,
+    );
+    put(IDC_LINK_ENABLED, c);
+    if let Some(h) = c {
+        set_check(h, link_enabled);
+    }
+    let checks: [(usize, &str, bool, i32); 3] = [
+        (IDC_LINK_MISSING, "Cho phep thieu scheme (example.com -> https://...)", missing, 282),
+        (IDC_LINK_LOCALHOST, "Cho phep localhost", localhost, 306),
+        (IDC_LINK_IP, "Cho phep dia chi IP", ip, 330),
+    ];
+    for (id, label, value, y) in checks {
+        let h = create_control(
+            parent,
+            w!("BUTTON"),
+            label,
+            style_button_checkbox(),
+            16,
+            y,
+            360,
+            22,
+            id,
+        );
+        put(id, h);
+        if let Some(h) = h {
+            set_check(h, value);
         }
     }
+    put(
+        0,
+        create_control(
+            parent,
+            w!("STATIC"),
+            "Scheme mac dinh:",
+            style_static(),
+            16,
+            358,
+            140,
+            20,
+            0,
+        ),
+    );
+    put(
+        IDC_LINK_SCHEME,
+        create_control(
+            parent,
+            w!("EDIT"),
+            &scheme,
+            style_edit(),
+            160,
+            354,
+            120,
+            22,
+            IDC_LINK_SCHEME,
+        ),
+    );
+    put(
+        0,
+        create_control(
+            parent,
+            w!("STATIC"),
+            "Do dai toi da de xet link:",
+            style_static(),
+            300,
+            358,
+            180,
+            20,
+            0,
+        ),
+    );
+    put(
+        IDC_LINK_MAXLEN,
+        create_control(
+            parent,
+            w!("EDIT"),
+            &maxlen,
+            style_edit(),
+            480,
+            354,
+            80,
+            22,
+            IDC_LINK_MAXLEN,
+        ),
+    );
 
-    fn save(&mut self) -> bool {
-        // Global numbers.
-        let max_chars: usize = match self.max_chars_str.trim().parse() {
+    // Fbclid stripper section.
+    let fb = config.modules.iter().find(|m| m.id == "fbclid_stripper");
+    let (fb_enabled, strip, case_insensitive) = match fb {
+        Some(m) => {
+            let strip: Vec<String> = m
+                .params
+                .get("strip")
+                .and_then(|v| v.as_array())
+                .map(|arr| {
+                    arr.iter()
+                        .filter_map(|v| v.as_str().map(|s| s.to_string()))
+                        .collect()
+                })
+                .unwrap_or_else(|| vec!["fbclid".to_string()]);
+            (
+                m.enabled,
+                strip.join(", "),
+                get_bool(&m.params, "case_insensitive", true),
+            )
+        }
+        None => (false, "fbclid".to_string(), true),
+    };
+    put(
+        0,
+        create_control(
+            parent,
+            w!("STATIC"),
+            "Module: fbclid_stripper",
+            style_static(),
+            16,
+            390,
+            300,
+            20,
+            0,
+        ),
+    );
+    let c = create_control(
+        parent,
+        w!("BUTTON"),
+        "Bat module nay",
+        style_button_checkbox(),
+        16,
+        412,
+        200,
+        22,
+        IDC_FB_ENABLED,
+    );
+    put(IDC_FB_ENABLED, c);
+    if let Some(h) = c {
+        set_check(h, fb_enabled);
+    }
+    put(
+        0,
+        create_control(
+            parent,
+            w!("STATIC"),
+            "Param can loai (cach nhau bang dau phay):",
+            style_static(),
+            16,
+            440,
+            300,
+            20,
+            0,
+        ),
+    );
+    put(
+        IDC_FB_STRIP,
+        create_control(
+            parent,
+            w!("EDIT"),
+            &strip,
+            style_edit(),
+            16,
+            462,
+            360,
+            22,
+            IDC_FB_STRIP,
+        ),
+    );
+    let c = create_control(
+        parent,
+        w!("BUTTON"),
+        "So khop ten param khong phan biet hoa thuong",
+        style_button_checkbox(),
+        16,
+        490,
+        380,
+        22,
+        IDC_FB_CASE,
+    );
+    put(IDC_FB_CASE, c);
+    if let Some(h) = c {
+        set_check(h, case_insensitive);
+    }
+
+    // Global checkboxes initial state (created above, set here so the
+    // helper does not need the config inside the creation calls).
+    if let Some(h) = ctrl(IDC_AUTO_RUN) {
+        set_check(h, config.auto_run);
+    }
+    if let Some(h) = ctrl(IDC_OVERWRITE) {
+        set_check(h, config.overwrite_clipboard);
+    }
+    // Note: ctrl() reads from the static, which is updated just below;
+    // the two checkboxes above are set again after the state update in
+    // the WM_CREATE handler path via the same helper, so this block is
+    // intentionally harmless if it no-ops on first creation.
+    put(
+        IDC_SAVE,
+        create_control(
+            parent,
+            w!("BUTTON"),
+            "Luu",
+            style_button(),
+            16,
+            524,
+            90,
+            28,
+            IDC_SAVE,
+        ),
+    );
+    put(
+        IDC_CANCEL,
+        create_control(
+            parent,
+            w!("BUTTON"),
+            "Dong (khong luu)",
+            style_button(),
+            118,
+            524,
+            140,
+            28,
+            IDC_CANCEL,
+        ),
+    );
+    put(
+        IDC_STATUS,
+        create_control(
+            parent,
+            w!("STATIC"),
+            "Luu xong van mo cua so de kiem chung. Dong cua so thi thay doi chua luu se mat.",
+            style_static(),
+            16,
+            564,
+            540,
+            40,
+            IDC_STATUS,
+        ),
+    );
+
+    if let Ok(mut s) = state().lock() {
+        for (id, addr) in ctrls {
+            s.ctrl.insert(id, addr);
+        }
+        // Set global checkboxes now that the map is populated.
+        if let Some(addr) = s.ctrl.get(&IDC_AUTO_RUN).copied() {
+            set_check(hwnd_from(addr), config.auto_run);
+        }
+        if let Some(addr) = s.ctrl.get(&IDC_OVERWRITE).copied() {
+            set_check(hwnd_from(addr), config.overwrite_clipboard);
+        }
+    }
+}
+
+fn listbox_order() -> Vec<String> {
+    let Some(list) = ctrl(IDC_ORDER_LIST) else {
+        return Vec::new();
+    };
+    unsafe {
+        let count = SendMessageW(list, LB_GETCOUNT, WPARAM(0), LPARAM(0)).0;
+        let mut out = Vec::new();
+        for i in 0..count {
+            let mut buf = vec![0u16; 256];
+            let len = SendMessageW(
+                list,
+                LB_GETTEXT,
+                WPARAM(i as usize),
+                LPARAM(buf.as_mut_ptr() as isize),
+            )
+            .0;
+            if len > 0 {
+                out.push(String::from_utf16_lossy(&buf[..len as usize]));
+            }
+        }
+        out
+    }
+}
+
+fn move_listbox_item(delta: isize) {
+    let Some(list) = ctrl(IDC_ORDER_LIST) else {
+        return;
+    };
+    unsafe {
+        let cur = SendMessageW(list, LB_GETCURSEL, WPARAM(0), LPARAM(0)).0;
+        if cur < 0 {
+            return;
+        }
+        let target = cur + delta;
+        let count = SendMessageW(list, LB_GETCOUNT, WPARAM(0), LPARAM(0)).0;
+        if target < 0 || target >= count {
+            return;
+        }
+        let mut buf = vec![0u16; 256];
+        let len = SendMessageW(
+            list,
+            LB_GETTEXT,
+            WPARAM(cur as usize),
+            LPARAM(buf.as_mut_ptr() as isize),
+        )
+        .0;
+        if len <= 0 {
+            return;
+        }
+        let text = String::from_utf16_lossy(&buf[..len as usize]);
+        let _ = SendMessageW(list, LB_DELETESTRING, WPARAM(cur as usize), LPARAM(0));
+        let text_w = wide(&text);
+        let _ = SendMessageW(
+            list,
+            LB_INSERTSTRING,
+            WPARAM(target as usize),
+            LPARAM(text_w.as_ptr() as isize),
+        );
+        let _ = SendMessageW(list, LB_SETCURSEL, WPARAM(target as usize), LPARAM(0));
+    }
+}
+
+fn do_save(hwnd: HWND) {
+    let status = match ctrl(IDC_STATUS) {
+        Some(h) => h,
+        None => return,
+    };
+    let set_status = |msg: &str| set_text(status, msg);
+
+    let max_chars: usize = match ctrl(IDC_MAX_CHARS).map(get_text) {
+        Some(t) => match t.trim().parse() {
             Ok(v) => v,
             Err(_) => {
-                self.status = "Lỗi: Giới hạn ký tự phải là số nguyên.".to_string();
-                return false;
+                set_status("Loi: Gioi han ky tu phai la so nguyen.");
+                return;
             }
-        };
-        self.config.max_chars = max_chars;
-
-        // Per-module string/number buffers -> params.
-        for m in self.config.modules.iter_mut() {
-            match m.id.as_str() {
-                "link_detector" => {
-                    if self.link_default_scheme != "http"
-                        && self.link_default_scheme != "https"
-                    {
-                        self.status =
-                            "Lỗi: Scheme mặc định phải là http hoặc https.".to_string();
-                        return false;
-                    }
-                    let max_len: u64 = match self.link_max_len_str.trim().parse() {
-                        Ok(v) => v,
-                        Err(_) => {
-                            self.status =
-                                "Lỗi: max_len của link_detector phải là số nguyên.".to_string();
-                            return false;
-                        }
-                    };
-                    set_param(
-                        &mut m.params,
-                        "default_scheme",
-                        serde_json::Value::String(self.link_default_scheme.clone()),
-                    );
-                    set_param(&mut m.params, "max_len", serde_json::json!(max_len));
-                }
-                "fbclid_stripper" => {
-                    let strip: Vec<String> = self
-                        .fbclid_strip_str
-                        .split(',')
-                        .map(|s| s.trim().to_string())
-                        .filter(|s| !s.is_empty())
-                        .collect();
-                    if strip.is_empty() {
-                        self.status =
-                            "Lỗi: Danh sách strip của fbclid_stripper đang rỗng. Tắt module thay vì để rỗng.".to_string();
-                        return false;
-                    }
-                    set_param(&mut m.params, "strip", serde_json::json!(strip));
-                }
-                _ => {
-                    if let Some(raw) = self.raw_params.get(&m.id) {
-                        match serde_json::from_str::<serde_json::Value>(raw) {
-                            Ok(v) => m.params = v,
-                            Err(e) => {
-                                self.status =
-                                    format!("Lỗi: params JSON của {} không hợp lệ: {}", m.id, e);
-                                return false;
-                            }
-                        }
-                    }
-                }
-            }
+        },
+        None => {
+            set_status("Loi: khong doc duoc o gioi han ky tu.");
+            return;
         }
-
-        // Order follows the displayed order.
-        for (idx, m) in self.config.modules.iter_mut().enumerate() {
-            m.order = (idx + 1) as u32;
-        }
-
-        let text = match serde_json::to_string_pretty(&self.config) {
-            Ok(t) => t,
-            Err(e) => {
-                self.status = format!("Lỗi: không serialize được config: {}", e);
-                return false;
-            }
-        };
-        if let Err(e) = std::fs::write(&self.path, text) {
-            self.status = format!("Lỗi: không ghi được {}: {}", self.path.display(), e);
-            return false;
-        }
-
-        // Tell the Win32 thread to reload the file immediately.
-        unsafe {
-            let hwnd = HWND(self.hwnd_addr as *mut std::ffi::c_void);
-            let _ = PostMessageW(hwnd, crate::win::WM_CONFIG_RELOADED, WPARAM(0), LPARAM(0));
-        }
-        self.status = format!(
-            "Đã lưu {}. Core sẽ nạp lại ngay, không cần restart. Bấm Đóng để thoát.",
-            self.path.display()
-        );
-        true
-    }
-}
-
-impl eframe::App for SettingsApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
-            egui::ScrollArea::vertical().show(ui, |ui| {
-                ui.heading("Clipboard Tool — Settings");
-                ui.label(format!("File: {}", self.path.display()));
-                ui.separator();
-
-                ui.heading("Chung");
-                ui.checkbox(&mut self.config.auto_run, "Chạy tự động mỗi lần copy");
-                ui.checkbox(
-                    &mut self.config.overwrite_clipboard,
-                    "Ghi đè clipboard bằng kết quả cuối pipeline",
-                );
-                ui.horizontal(|ui| {
-                    ui.label("Giới hạn ký tự (text dài hơn sẽ bỏ qua):");
-                    ui.text_edit_singleline(&mut self.max_chars_str);
-                });
-                ui.separator();
-
-                ui.heading("Module (chạy theo thứ tự từ trên xuống)");
-                let mut swap: Option<(usize, usize)> = None;
-                let count = self.config.modules.len();
-                for i in 0..count {
-                    ui.separator();
-                    let id = self.config.modules[i].id.clone();
-                    ui.horizontal(|ui| {
-                        ui.checkbox(&mut self.config.modules[i].enabled, "");
-                        ui.label(format!("{} ({})", id, id));
-                        if i > 0 && ui.button("↑").clicked() {
-                            swap = Some((i, i - 1));
-                        }
-                        if i + 1 < count && ui.button("↓").clicked() {
-                            swap = Some((i, i + 1));
-                        }
-                    });
-                    match id.as_str() {
-                        "link_detector" => {
-                            let mut v = get_bool(
-                                &self.config.modules[i].params,
-                                "allow_missing_scheme",
-                                true,
-                            );
-                            if ui
-                                .checkbox(&mut v, "Cho phép thiếu scheme (example.com -> https://...)")
-                                .changed()
-                            {
-                                set_param(
-                                    &mut self.config.modules[i].params,
-                                    "allow_missing_scheme",
-                                    serde_json::json!(v),
-                                );
-                            }
-                            let mut v = get_bool(
-                                &self.config.modules[i].params,
-                                "allow_localhost",
-                                true,
-                            );
-                            if ui.checkbox(&mut v, "Cho phép localhost").changed() {
-                                set_param(
-                                    &mut self.config.modules[i].params,
-                                    "allow_localhost",
-                                    serde_json::json!(v),
-                                );
-                            }
-                            let mut v =
-                                get_bool(&self.config.modules[i].params, "allow_ip", true);
-                            if ui.checkbox(&mut v, "Cho phép địa chỉ IP").changed() {
-                                set_param(
-                                    &mut self.config.modules[i].params,
-                                    "allow_ip",
-                                    serde_json::json!(v),
-                                );
-                            }
-                            ui.horizontal(|ui| {
-                                ui.label("Scheme mặc định:");
-                                ui.text_edit_singleline(&mut self.link_default_scheme);
-                            });
-                            ui.horizontal(|ui| {
-                                ui.label("Độ dài tối đa để xét link:");
-                                ui.text_edit_singleline(&mut self.link_max_len_str);
-                            });
-                        }
-                        "fbclid_stripper" => {
-                            ui.horizontal(|ui| {
-                                ui.label("Param cần loại (cách nhau bằng dấu phẩy):");
-                                ui.text_edit_singleline(&mut self.fbclid_strip_str);
-                            });
-                            let mut v = get_bool(
-                                &self.config.modules[i].params,
-                                "case_insensitive",
-                                true,
-                            );
-                            if ui
-                                .checkbox(&mut v, "So khớp tên param không phân biệt hoa thường")
-                                .changed()
-                            {
-                                set_param(
-                                    &mut self.config.modules[i].params,
-                                    "case_insensitive",
-                                    serde_json::json!(v),
-                                );
-                            }
-                        }
-                        _ => {
-                            ui.label("Params (JSON):");
-                            if let Some(raw) = self.raw_params.get_mut(&id) {
-                                ui.text_edit_multiline(raw);
-                            }
-                        }
-                    }
-                }
-                if let Some((a, b)) = swap {
-                    self.config.modules.swap(a, b);
-                }
-
-                ui.separator();
-                ui.horizontal(|ui| {
-                    if ui.button("Lưu").clicked() {
-                        self.save();
-                    }
-                    if ui.button("Đóng (không lưu)").clicked() {
-                        ctx.send_viewport_cmd(egui::ViewportCommand::Close);
-                    }
-                });
-                if !self.status.is_empty() {
-                    ui.label(&self.status);
-                }
-                ui.label("Lưu xong vẫn mở cửa sổ để bạn kiểm chứng. Đóng cửa sổ thì thay đổi chưa lưu sẽ mất.");
-            });
-        });
-    }
-}
-
-/// Open the settings window on its own thread, unless one is already open.
-pub fn open_settings(hwnd: HWND, path: PathBuf, config: AppConfig) {
-    if SETTINGS_OPEN
-        .compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)
-        .is_err()
-    {
+    };
+    let scheme = ctrl(IDC_LINK_SCHEME).map(get_text).unwrap_or_default();
+    let scheme = scheme.trim().to_string();
+    if scheme != "http" && scheme != "https" {
+        set_status("Loi: Scheme mac dinh phai la http hoac https.");
         return;
     }
-    let hwnd_addr = hwnd.0 as isize;
-    std::thread::spawn(move || {
-        let app = SettingsApp::new(config, path, hwnd_addr);
-        let options = eframe::NativeOptions {
-            viewport: egui::ViewportBuilder::default()
-                .with_inner_size([580.0, 700.0])
-                .with_title("Clipboard Tool — Settings"),
-            ..Default::default()
-        };
-        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            eframe::run_native(
-                "Clipboard Tool — Settings",
-                options,
-                Box::new(|_cc| Ok(Box::new(app) as Box<dyn eframe::App>)),
-            )
-        }));
-        SETTINGS_OPEN.store(false, Ordering::SeqCst);
-        match result {
-            Ok(Ok(())) => {}
-            Ok(Err(e)) => {
-                eprintln!("clipboard-tool: settings window failed: {}", e);
-                unsafe {
-                    let hwnd2 = HWND(hwnd_addr as *mut std::ffi::c_void);
-                    let _ = MessageBoxW(
-                        hwnd2,
-                        w!("Settings window failed to start. Edit config.json for now."),
-                        w!("Clipboard Tool"),
-                        MB_OK,
-                    );
+    let maxlen: u64 = match ctrl(IDC_LINK_MAXLEN).map(get_text) {
+        Some(t) => match t.trim().parse() {
+            Ok(v) => v,
+            Err(_) => {
+                set_status("Loi: max_len cua link_detector phai la so nguyen.");
+                return;
+            }
+        },
+        None => {
+            set_status("Loi: khong doc duoc o max_len.");
+            return;
+        }
+    };
+    let strip: Vec<String> = ctrl(IDC_FB_STRIP)
+        .map(get_text)
+        .unwrap_or_default()
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+    if strip.is_empty() {
+        set_status("Loi: Danh sach strip dang rong. Tat module thay vi de rong.");
+        return;
+    }
+
+    // Do NOT call listbox_order() while holding the state lock: it locks
+    // the same mutex itself and would deadlock the Win32 thread on Save.
+    let (path, main_hwnd_addr) = {
+        let s = state().lock().unwrap();
+        (s.path.clone(), s.main_hwnd_addr)
+    };
+    let order = listbox_order();
+    let mut new_config = {
+        let s = state().lock().unwrap();
+        s.config.clone()
+    };
+    new_config.auto_run = ctrl(IDC_AUTO_RUN).map(get_check).unwrap_or(true);
+    new_config.overwrite_clipboard = ctrl(IDC_OVERWRITE).map(get_check).unwrap_or(true);
+    new_config.max_chars = max_chars;
+    // Order from the listbox; modules not in the list keep their order.
+    for (idx, id) in order.iter().enumerate() {
+        if let Some(m) = new_config.modules.iter_mut().find(|m| &m.id == id) {
+            m.order = (idx + 1) as u32;
+        }
+    }
+    for m in new_config.modules.iter_mut() {
+        match m.id.as_str() {
+            "link_detector" => {
+                m.enabled = ctrl(IDC_LINK_ENABLED).map(get_check).unwrap_or(m.enabled);
+                set_param(
+                    &mut m.params,
+                    "allow_missing_scheme",
+                    serde_json::json!(ctrl(IDC_LINK_MISSING).map(get_check).unwrap_or(true)),
+                );
+                set_param(
+                    &mut m.params,
+                    "allow_localhost",
+                    serde_json::json!(ctrl(IDC_LINK_LOCALHOST).map(get_check).unwrap_or(true)),
+                );
+                set_param(
+                    &mut m.params,
+                    "allow_ip",
+                    serde_json::json!(ctrl(IDC_LINK_IP).map(get_check).unwrap_or(true)),
+                );
+                set_param(
+                    &mut m.params,
+                    "default_scheme",
+                    serde_json::Value::String(scheme.clone()),
+                );
+                set_param(&mut m.params, "max_len", serde_json::json!(maxlen));
+            }
+            "fbclid_stripper" => {
+                m.enabled = ctrl(IDC_FB_ENABLED).map(get_check).unwrap_or(m.enabled);
+                set_param(&mut m.params, "strip", serde_json::json!(strip));
+                set_param(
+                    &mut m.params,
+                    "case_insensitive",
+                    serde_json::json!(ctrl(IDC_FB_CASE).map(get_check).unwrap_or(true)),
+                );
+            }
+            _ => {}
+        }
+    }
+
+    let text = match serde_json::to_string_pretty(&new_config) {
+        Ok(t) => t,
+        Err(e) => {
+            set_status(&format!("Loi: khong serialize duoc config: {}", e));
+            return;
+        }
+    };
+    if let Err(e) = std::fs::write(&path, text) {
+        set_status(&format!("Loi: khong ghi duoc {}: {}", path.display(), e));
+        return;
+    }
+    if let Ok(mut s) = state().lock() {
+        s.config = new_config;
+    }
+    unsafe {
+        let main_hwnd = hwnd_from(main_hwnd_addr);
+        let _ = windows::Win32::UI::WindowsAndMessaging::PostMessageW(
+            main_hwnd,
+            crate::win::WM_CONFIG_RELOADED,
+            WPARAM(0),
+            LPARAM(0),
+        );
+    }
+    let _ = hwnd;
+    set_status(&format!(
+        "Da luu {}. Core se nap lai ngay, khong can restart.",
+        path.display()
+    ));
+}
+
+unsafe extern "system" fn settings_wnd_proc(
+    hwnd: HWND,
+    msg: u32,
+    wparam: WPARAM,
+    lparam: LPARAM,
+) -> LRESULT {
+    match msg {
+        WM_CREATE => {
+            create_controls(hwnd);
+            LRESULT(0)
+        }
+        WM_COMMAND => {
+            let id = (wparam.0 & 0xffff) as usize;
+            let code = ((wparam.0 >> 16) & 0xffff) as u32;
+            if code == BN_CLICKED {
+                match id {
+                    IDC_SAVE => do_save(hwnd),
+                    IDC_CANCEL => {
+                        let _ = DestroyWindow(hwnd);
+                    }
+                    IDC_ORDER_UP => move_listbox_item(-1),
+                    IDC_ORDER_DOWN => move_listbox_item(1),
+                    _ => {}
                 }
             }
-            Err(_) => {
-                eprintln!("clipboard-tool: settings window panicked");
-                unsafe {
-                    let hwnd2 = HWND(hwnd_addr as *mut std::ffi::c_void);
-                    let _ = MessageBoxW(
-                        hwnd2,
-                        w!("Settings window failed to start. Edit config.json for now."),
-                        w!("Clipboard Tool"),
-                        MB_OK,
-                    );
-                }
+            LRESULT(0)
+        }
+        WM_CLOSE => {
+            unsafe {
+                let _ = DestroyWindow(hwnd);
+            }
+            LRESULT(0)
+        }
+        WM_DESTROY => {
+            if let Ok(mut s) = state().lock() {
+                s.settings_hwnd_addr = 0;
+                s.ctrl.clear();
+            }
+            LRESULT(0)
+        }
+        _ => unsafe { DefWindowProcW(hwnd, msg, wparam, lparam) },
+    }
+}
+
+/// Open the settings window on the Win32 thread, or bring the open one
+/// to the front. This must be called from the Win32 thread (it is,
+/// via the tray window proc); it creates a modeless window and returns
+/// immediately, the existing message loop pumps it.
+pub fn open_settings(hwnd: HWND, path: PathBuf, config: AppConfig) {
+    {
+        let mut s = state().lock().unwrap();
+        if s.settings_hwnd_addr != 0 {
+            let existing = hwnd_from(s.settings_hwnd_addr);
+            unsafe {
+                let _ = ShowWindow(existing, SW_SHOW);
+                let _ = SetForegroundWindow(existing);
+            }
+            return;
+        }
+        s.config = config;
+        s.path = path;
+        s.main_hwnd_addr = hwnd.0 as isize;
+        s.ctrl.clear();
+    }
+    unsafe {
+        if !CLASS_REGISTERED.swap(true, std::sync::atomic::Ordering::SeqCst) {
+            let wc = WNDCLASSW {
+                style: Default::default(),
+                lpfnWndProc: Some(settings_wnd_proc),
+                hInstance: Default::default(),
+                lpszClassName: w!("ClipToolSettings"),
+                ..Default::default()
+            };
+            let _ = RegisterClassW(&wc);
+        }
+        if let Ok(win_hwnd) = CreateWindowExW(
+            WINDOW_EX_STYLE(0),
+            w!("ClipToolSettings"),
+            w!("Clipboard Tool - Settings"),
+            WS_OVERLAPPEDWINDOW,
+            100,
+            100,
+            600,
+            660,
+            None,
+            None,
+            None,
+            None,
+        ) {
+            let _ = ShowWindow(win_hwnd, SW_SHOW);
+            if let Ok(mut s) = state().lock() {
+                s.settings_hwnd_addr = win_hwnd.0 as isize;
             }
         }
-    });
+    }
 }

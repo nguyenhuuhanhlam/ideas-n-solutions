@@ -50,9 +50,10 @@ cargo build --release
 ## Settings window
 
 Right-click the tray icon and choose Settings (or double-click the
-tray icon). The settings window runs on its own thread, so clipboard
+tray icon). The settings window is a native Win32 window on the same
+thread as the tray, so it needs no GPU / extra UI runtime, clipboard
 handling keeps running while it is open, and only one settings window
-can be open at a time.
+can be open at a time (a second click brings the open one forward).
 
 It edits: auto-run, overwrite-clipboard, max chars, each module's
 enabled flag and order (↑ / ↓), and each module's own parameters
@@ -90,5 +91,5 @@ echo 'www.example.com/?fbclid=XYZ' | cargo run
 - `src/modules/link_detector.rs` — module 1
 - `src/modules/fbclid_stripper.rs` — module 2
 - `src/win.rs` — Windows-only hidden window, tray, clipboard listener
-- `src/settings_ui.rs` — Windows-only egui settings window (own thread)
+- `src/settings_ui.rs` — Windows-only native Win32 settings window
 - `src/main.rs` — entry point, config loading

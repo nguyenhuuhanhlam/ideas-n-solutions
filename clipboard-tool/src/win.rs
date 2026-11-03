@@ -12,11 +12,11 @@
 //! newest sequence may write back; an older pipeline result that lands
 //! late is discarded instead of overwriting a newer copy.
 //!
-//! Settings window: an egui window on its own thread (see
-//! `settings_ui`). It edits a copy of the config, writes `config.json`
-//! on Save, and posts `WM_CONFIG_RELOADED` here so the core reloads
-//! immediately without a restart. Closing it without saving discards
-//! the copy.
+//! Settings window: a native Win32 modeless window (see
+//! `settings_ui`), on this same thread. It edits a copy of the config,
+//! writes `config.json` on Save, and posts `WM_CONFIG_RELOADED` here
+//! so the core reloads immediately without a restart. Closing it
+//! without saving discards the copy.
 
 use crate::config::AppConfig;
 use crate::pipeline::run_pipeline;
