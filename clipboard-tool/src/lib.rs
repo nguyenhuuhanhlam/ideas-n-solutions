@@ -19,4 +19,6 @@ pub mod modules;
 pub mod pipeline;
 
 #[cfg(windows)]
+pub mod settings_ui;
+#[cfg(windows)]
 pub mod win;

@@ -47,14 +47,27 @@ cargo build --release
 # optional: .\target\release\clipboard-tool.exe .\config.json
 ```
 
-Copy `config.example.json` to `config.json` next to the exe (or pass
-its path as the first argument) to change module order, toggles and
-parameters without rebuilding. Adding a new Rust module still needs
-a rebuild; changing settings does not.
+## Settings window
 
-Autostart and single-instance (named mutex) are not in this skeleton
-yet; they belong in the tray step, together with the settings window.
-The tray Settings item currently shows a placeholder message.
+Right-click the tray icon and choose Settings (or double-click the
+tray icon). The settings window runs on its own thread, so clipboard
+handling keeps running while it is open, and only one settings window
+can be open at a time.
+
+It edits: auto-run, overwrite-clipboard, max chars, each module's
+enabled flag and order (↑ / ↓), and each module's own parameters
+(link detector: missing scheme / localhost / IP / default scheme /
+max length; fbclid stripper: strip list / case-insensitive).
+Unknown modules show their params as raw JSON.
+
+Save writes `config.json` (settings only, never clipboard text) and
+the core reloads it immediately, without a restart. Closing the
+window without saving discards the changes. Editing `config.json`
+by hand still works: copy `config.example.json` to `config.json`
+next to the exe (or pass its path as the first argument). Adding a
+new Rust module still needs a rebuild; changing settings does not.
+
+Autostart and single-instance (named mutex) are not implemented yet.
 
 ## Develop / test on Linux
 
@@ -77,4 +90,5 @@ echo 'www.example.com/?fbclid=XYZ' | cargo run
 - `src/modules/link_detector.rs` — module 1
 - `src/modules/fbclid_stripper.rs` — module 2
 - `src/win.rs` — Windows-only hidden window, tray, clipboard listener
+- `src/settings_ui.rs` — Windows-only egui settings window (own thread)
 - `src/main.rs` — entry point, config loading

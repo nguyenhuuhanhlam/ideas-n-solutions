@@ -24,7 +24,7 @@ fn main() {
 
     #[cfg(windows)]
     {
-        if let Err(e) = clipboard_tool::win::run(config) {
+        if let Err(e) = clipboard_tool::win::run(config, path) {
             eprintln!("clipboard-tool: {}", e);
             std::process::exit(1);
         }
