@@ -21,6 +21,7 @@
         border-radius: 14px; padding: 20px 22px; transition: border-color 0.15s;
       }
       .card:hover { border-color: rgba(255, 209, 102, 0.6); }
+      .card--static:hover { border-color: rgba(255, 255, 255, 0.14); cursor: default; }
       .card h2 { font-size: 18px; margin: 0 0 6px; color: #ffd166; }
       .card p { margin: 0 0 14px; color: #c6cdd9; font-size: 14px; line-height: 1.6; }
       .open { font-size: 13.5px; color: #8ab8ff; }
@@ -41,6 +42,11 @@
         <p>Dạng sơ đồ node: giả lập cách 1 trợ lý trung tâm nhận lệnh từ kênh riêng của từng member team kiến trúc (10 người), tách việc giao cho các AI chuyên môn, trả bản nháp về đúng người yêu cầu, qua cổng duyệt lai (AI tự duyệt / chờ quản lý), leo thang khi mâu thuẫn, chỉ ghi nhận vào workspace chung sau khi duyệt, và báo lên nhóm bằng tin ngắn. Task chạy thành token vàng lướt trên các edge.</p>
         <span class="open">Mở bản mẫu →</span>
       </a>
+      <div class="card card--static" style="margin-top: 14px;">
+        <h2>Clipboard Tool</h2>
+        <p>Tool tray thường trú trên Windows, viết bằng Rust, chỉ xử lý text thuần: mỗi lần copy, các module chạy tự động và ghi đè clipboard — phát hiện và chuẩn hoá link http/https, loại bỏ tham số fbclid nhưng giữ tất cả tham số còn lại. Không lưu clipboard xuống đĩa, tắt máy là hết; chỉnh module và tham số trong cửa sổ Settings Win32.</p>
+        <span class="open" style="color: #8b95a9;">Ứng dụng Windows desktop — không có bản demo web</span>
+      </div>
       <p class="note">Các ý tưởng và giải pháp khác sẽ xuất hiện tại đây khi được thêm vào repo.</p>
     </main>
   </body>
