@@ -1,0 +1,1 @@
+{"auto_run":true,"max_chars":1000000,"modules":[{"enabled":true,"id":"link_detector","order":1,"params":{"allow_ip":true,"allow_localhost":true,"allow_missing_scheme":true,"default_scheme":"https","max_len":2048}},{"enabled":true,"id":"fbclid_stripper","order":2,"params":{"case_insensitive":true,"strip":["fbclid"]}}],"overwrite_clipboard":true}
