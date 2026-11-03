@@ -34,6 +34,34 @@ Windows tray clipboard tool, in Rust. Plain text only, for now.
 Example: `www.example.com/bai-viet?a=1&fbclid=XYZ&b=2`
 becomes `https://www.example.com/bai-viet?a=1&b=2`.
 
+## Translator (skeleton, notifier only)
+
+`translator` is a second kind of module: a notifier, not a
+transformer. It is deliberately outside the `TextModule` registry
+and outside the overwrite pipeline.
+
+- On every copy it reads the *original* text (not pipeline output).
+- It only attempts a lookup when the text looks like one English
+  word or a short phrase: 1–3 words, at most 40 chars, ASCII
+  letters / spaces / hyphens / apostrophes only. Links, sentences,
+  code, numbers and Vietnamese text are ignored silently.
+- On a dictionary hit it shows a tray balloon: the copied word as
+  the title, the Vietnamese gloss as the body. Clicking the balloon
+  does nothing and the clipboard is left untouched, so the English
+  word is never lost. On a miss it shows nothing.
+- Lookup is exact-match only (no stemming in the skeleton), on a
+  sorted static table, so it is a binary search with no runtime
+  parsing and no network.
+
+The skeleton ships with a small sample dictionary (~36 entries:
+`hello`, `machine learning`, `take off`, ...). It is a placeholder
+to prove the balloon, gating and lookup paths end to end. The real
+dataset (Wiktionary via kaikki.org, trimmed to short glosses and
+frequency, measured separately) will replace it; the kaikki
+measurement is still pending and is deliberately not blocking this
+skeleton. Settings: `translator.enabled` in `config.json`, plus the
+"Show translation balloon" checkbox in the Settings window.
+
 Loop protection: the hash of the last text we wrote is kept in RAM;
 a clipboard update matching it is ignored, so the pipeline never
 re-processes its own output. Stale results are discarded by sequence
@@ -58,7 +86,8 @@ can be open at a time (a second click brings the open one forward).
 It edits: auto-run, overwrite-clipboard, max chars, each module's
 enabled flag and order (↑ / ↓), and each module's own parameters
 (link detector: missing scheme / localhost / IP / default scheme /
-max length; fbclid stripper: strip list / case-insensitive).
+max length; fbclid stripper: strip list / case-insensitive), plus
+the translator balloon toggle on the Save row.
 Unknown modules show their params as raw JSON.
 
 Save writes `config.json` (settings only, never clipboard text) and
@@ -90,6 +119,7 @@ echo 'www.example.com/?fbclid=XYZ' | cargo run
 - `src/modules/mod.rs` — the `TextModule` trait and registry
 - `src/modules/link_detector.rs` — module 1
 - `src/modules/fbclid_stripper.rs` — module 2
+- `src/modules/translator.rs` — translator notifier + sample dictionary
 - `src/win.rs` — Windows-only hidden window, tray, clipboard listener
 - `src/settings_ui.rs` — Windows-only native Win32 settings window
 - `src/main.rs` — entry point, config loading

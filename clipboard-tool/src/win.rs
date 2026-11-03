@@ -32,8 +32,8 @@ use windows::Win32::System::DataExchange::{
 };
 use windows::Win32::System::Memory::{GlobalAlloc, GlobalLock, GlobalUnlock, GMEM_MOVEABLE};
 use windows::Win32::UI::Shell::{
-    Shell_NotifyIconW, NIM_ADD, NIM_DELETE, NIF_ICON, NIF_MESSAGE, NIF_TIP,
-    NOTIFYICONDATAW,
+    Shell_NotifyIconW, NIIF_INFO, NIM_ADD, NIM_DELETE, NIM_MODIFY, NIF_ICON, NIF_INFO,
+    NIF_MESSAGE, NIF_TIP, NOTIFYICONDATAW,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
     AppendMenuW, CreatePopupMenu, CreateWindowExW, DefWindowProcW, DestroyWindow,
@@ -69,8 +69,19 @@ struct PipelineOutput {
     changed: bool,
 }
 
+/// A translator hit waiting to be shown as a tray balloon. Kept
+/// separate from pipeline output on purpose: a balloon is never a
+/// clipboard write, and it is shown from the Win32 thread, never
+/// from the worker thread.
+struct BalloonOutput {
+    seq: u64,
+    title: String,
+    body: String,
+}
+
 static STATE: OnceLock<Mutex<State>> = OnceLock::new();
 static RESULT_QUEUE: OnceLock<Mutex<VecDeque<PipelineOutput>>> = OnceLock::new();
+static BALLOON_QUEUE: OnceLock<Mutex<VecDeque<BalloonOutput>>> = OnceLock::new();
 
 fn state() -> &'static Mutex<State> {
     STATE.get_or_init(|| {
@@ -86,6 +97,32 @@ fn state() -> &'static Mutex<State> {
 
 fn result_queue() -> &'static Mutex<VecDeque<PipelineOutput>> {
     RESULT_QUEUE.get_or_init(|| Mutex::new(VecDeque::new()))
+}
+
+fn balloon_queue() -> &'static Mutex<VecDeque<BalloonOutput>> {
+    BALLOON_QUEUE.get_or_init(|| Mutex::new(VecDeque::new()))
+}
+
+/// Show a tray balloon (NIF_INFO). Title/body are truncated to the
+/// Win32 limits (63 / 255 chars). Clicking the balloon does nothing:
+/// the tray handler ignores balloon clicks, and the clipboard is
+/// left exactly as the user copied it.
+fn show_balloon(hwnd: HWND, title: &str, body: &str) {
+    unsafe {
+        let mut data = NOTIFYICONDATAW::default();
+        data.cbSize = std::mem::size_of::<NOTIFYICONDATAW>() as u32;
+        data.hWnd = hwnd;
+        data.uID = 1;
+        data.uFlags = NIF_INFO;
+        data.dwInfoFlags = NIIF_INFO;
+        let title_w: Vec<u16> = title.encode_utf16().collect();
+        let title_len = title_w.len().min(data.szInfoTitle.len() - 1);
+        data.szInfoTitle[..title_len].copy_from_slice(&title_w[..title_len]);
+        let body_w: Vec<u16> = body.encode_utf16().collect();
+        let body_len = body_w.len().min(data.szInfo.len() - 1);
+        data.szInfo[..body_len].copy_from_slice(&body_w[..body_len]);
+        let _ = Shell_NotifyIconW(NIM_MODIFY, &mut data);
+    }
 }
 
 /// FNV-1a 64, loop-guard only, not cryptographic.
@@ -239,6 +276,25 @@ unsafe extern "system" fn wnd_proc(
                                     changed: true,
                                 });
                             }
+                            // Translator: runs on the *original* text,
+                            // never on pipeline output, and never writes
+                            // the clipboard. A miss (or a non-candidate)
+                            // pushes nothing, so there is no balloon spam.
+                            if config.translator.enabled {
+                                if let Some((word, gloss)) =
+                                    crate::modules::translator::translate(
+                                        &text,
+                                        config.translator.max_words,
+                                        config.translator.max_len,
+                                    )
+                                {
+                                    balloon_queue().lock().unwrap().push_back(BalloonOutput {
+                                        seq,
+                                        title: word,
+                                        body: gloss,
+                                    });
+                                }
+                            }
                             unsafe {
                                 let hwnd2 = HWND(hwnd_addr as *mut std::ffi::c_void);
                                 let _ =
@@ -265,6 +321,19 @@ unsafe extern "system" fn wnd_proc(
                     s.last_written_hash = hash_text(&item.output);
                 }
                 write_clipboard_text(hwnd, &item.output);
+            }
+            drop(queue);
+            // Balloons: only the newest copy's balloon is shown, so a
+            // slow lookup never pops up a translation for an older copy.
+            let balloons: Vec<BalloonOutput> = {
+                let mut q = balloon_queue().lock().unwrap();
+                std::mem::take(&mut *q).into_iter().collect()
+            };
+            let current_seq = state().lock().unwrap().seq;
+            for b in balloons {
+                if b.seq == current_seq {
+                    show_balloon(hwnd, &b.title, &b.body);
+                }
             }
             LRESULT(0)
         }

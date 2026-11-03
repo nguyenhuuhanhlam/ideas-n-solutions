@@ -2,6 +2,11 @@ use serde_json::Value;
 
 pub mod fbclid_stripper;
 pub mod link_detector;
+/// Translator: a *notifier*, not a `TextModule`. It lives here for
+/// organisation, but it is deliberately absent from `all_modules()`:
+/// it must never transform text or write the clipboard, only return
+/// a gloss for the tray balloon. See `translator.rs`.
+pub mod translator;
 
 pub use fbclid_stripper::FbclidStripper;
 pub use link_detector::LinkDetector;

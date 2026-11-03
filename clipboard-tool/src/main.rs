@@ -58,6 +58,17 @@ fn main() {
             if let Some(err) = result.error {
                 eprintln!("pipeline error: {}", err);
             }
+            // Balloon demo: on Linux there is no tray, so print what
+            // the balloon would show on Windows.
+            if config.translator.enabled {
+                if let Some((word, gloss)) = clipboard_tool::modules::translator::translate(
+                    line,
+                    config.translator.max_words,
+                    config.translator.max_len,
+                ) {
+                    println!("balloon: {} -> {}", word, gloss);
+                }
+            }
         }
     }
 }

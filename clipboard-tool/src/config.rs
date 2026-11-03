@@ -34,10 +34,47 @@ pub struct AppConfig {
     pub max_chars: usize,
     #[serde(default = "default_modules")]
     pub modules: Vec<ModuleConfig>,
+    /// Translator balloon settings. `#[serde(default)]` keeps old
+    /// config.json files (without this section) loading fine.
+    #[serde(default)]
+    pub translator: TranslatorConfig,
 }
 
 fn default_max_chars() -> usize {
     1_000_000
+}
+
+/// Translator (balloon notifier) settings. This is NOT a pipeline
+/// module: it never transforms text or writes the clipboard, so it
+/// does not appear in `modules[]` or in the order listbox.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TranslatorConfig {
+    #[serde(default = "default_true")]
+    pub enabled: bool,
+    /// Maximum words in a copied phrase to attempt a lookup.
+    #[serde(default = "default_translator_max_words")]
+    pub max_words: usize,
+    /// Maximum chars in a copied phrase to attempt a lookup.
+    #[serde(default = "default_translator_max_len")]
+    pub max_len: usize,
+}
+
+fn default_translator_max_words() -> usize {
+    3
+}
+
+fn default_translator_max_len() -> usize {
+    40
+}
+
+impl Default for TranslatorConfig {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            max_words: default_translator_max_words(),
+            max_len: default_translator_max_len(),
+        }
+    }
 }
 
 fn default_modules() -> Vec<ModuleConfig> {
@@ -73,6 +110,7 @@ impl Default for AppConfig {
             overwrite_clipboard: true,
             max_chars: default_max_chars(),
             modules: default_modules(),
+            translator: TranslatorConfig::default(),
         }
     }
 }

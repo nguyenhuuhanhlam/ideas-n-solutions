@@ -13,6 +13,12 @@
 //! - A module must be pure, fast and local. No network in the
 //!   auto-overwrite pipeline: a slow module makes the user paste the
 //!   original text before the overwrite lands.
+//! - The translator is a second kind of module, a *notifier*, not a
+//!   transformer: it reads the copied text, looks it up in an offline
+//!   dictionary, and shows the gloss in a tray balloon. It never
+//!   writes the clipboard, so the English word the user copied is
+//!   never lost. It is therefore outside the `TextModule` registry
+//!   and outside the overwrite pipeline.
 
 pub mod config;
 pub mod modules;

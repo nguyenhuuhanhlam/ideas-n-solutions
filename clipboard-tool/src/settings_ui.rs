@@ -55,6 +55,7 @@ const IDC_ORDER_DOWN: usize = 2032;
 const IDC_SAVE: usize = 2040;
 const IDC_CANCEL: usize = 2041;
 const IDC_STATUS: usize = 2042;
+const IDC_TRANSLATOR: usize = 2050;
 
 // Win32 message numbers not exported as constants in windows 0.58.
 const LB_ADDSTRING: u32 = 0x0180;
@@ -645,6 +646,23 @@ fn create_controls(parent: HWND) {
             IDC_CANCEL,
         ),
     );
+    // Translator balloon toggle, on the Save row so no other section
+    // has to move. It is a notifier, not a pipeline module, so it
+    // does not appear in the module order listbox above.
+    put(
+        IDC_TRANSLATOR,
+        create_control(
+            parent,
+            w!("BUTTON"),
+            "Show translation balloon",
+            style_button_checkbox(),
+            280,
+            524,
+            260,
+            28,
+            IDC_TRANSLATOR,
+        ),
+    );
     put(
         IDC_STATUS,
         create_control(
@@ -670,6 +688,9 @@ fn create_controls(parent: HWND) {
         }
         if let Some(addr) = s.ctrl.get(&IDC_OVERWRITE).copied() {
             set_check(hwnd_from(addr), config.overwrite_clipboard);
+        }
+        if let Some(addr) = s.ctrl.get(&IDC_TRANSLATOR).copied() {
+            set_check(hwnd_from(addr), config.translator.enabled);
         }
     }
 }
@@ -800,6 +821,9 @@ fn do_save(hwnd: HWND) {
     };
     new_config.auto_run = ctrl(IDC_AUTO_RUN).map(get_check).unwrap_or(true);
     new_config.overwrite_clipboard = ctrl(IDC_OVERWRITE).map(get_check).unwrap_or(true);
+    if let Some(v) = ctrl(IDC_TRANSLATOR).map(get_check) {
+        new_config.translator.enabled = v;
+    }
     new_config.max_chars = max_chars;
     // Order from the listbox; modules not in the list keep their order.
     for (idx, id) in order.iter().enumerate() {
