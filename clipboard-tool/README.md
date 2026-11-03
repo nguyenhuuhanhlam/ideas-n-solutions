@@ -49,10 +49,14 @@ and outside the overwrite pipeline.
   the title, the Vietnamese gloss as the body. Clicking the balloon
   does nothing and the clipboard is left untouched, so the English
   word is never lost. On a miss it shows nothing.
-- Lookup is exact-match only (no stemming in the skeleton), in a
+- Lookup is exact-match first, in a
   hash map built once from `assets/dictionary.tsv` (one entry per
   line: `english<TAB>vietnamese gloss`), embedded into the binary at
   compile time, so there is no runtime file to ship and no network.
+  For a single word with no exact hit, a lemma fallback tries plural,
+  -ed and -ing suffix rules plus a small irregular table, and takes
+  the first candidate that is actually a dictionary key, so a wrong
+  guess can never invent a gloss. Phrases keep exact match only.
   A balloon that is still on screen is replaced immediately: the old
   balloon is dismissed first, then the new one is shown.
 
