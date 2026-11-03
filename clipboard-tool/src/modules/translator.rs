@@ -22,9 +22,13 @@
 //! compile time with `include_str!`. Editing the dictionary therefore
 //! means editing that file and rebuilding, and distribution stays a
 //! single exe: no separate dictionary file needs to ship with it.
-//! The sample data is a placeholder, not the real dictionary, and
-//! must be replaced by the measured kaikki.org dataset, in the same
-//! file and format.
+//!
+//! Data source: English Wiktionary via kaikki.org (dump 2026-10-01,
+//! CC-BY-SA 4.0, see README). Meanings are kept in Wiktionary sense
+//! order (main sense first), up to what fits in a 240-char balloon,
+//! and affix keys (starting/ending with '-') are excluded. The file
+//! only holds keys the app can actually trigger (1-3 words, at most
+//! 40 chars, ASCII letters/spaces/hyphens/apostrophes).
 
 use std::collections::HashMap;
 use std::sync::LazyLock;
@@ -103,19 +107,26 @@ mod tests {
             .lines()
             .filter(|line| !line.trim().is_empty())
             .collect();
-        assert_eq!(lines.len(), 36, "sample dictionary must stay at 36 entries");
+        assert!(lines.len() > 10_000, "full dictionary unexpectedly small: {}", lines.len());
         for line in &lines {
             assert!(line.contains('\t'), "entry without a tab separator: {line:?}");
+            let (key, gloss) = line.split_once('\t').unwrap();
+            assert!(!key.starts_with('-') && !key.ends_with('-'), "affix key: {key:?}");
+            assert!(gloss.chars().count() <= 240, "gloss over balloon limit: {key:?}");
         }
         // No duplicate keys: the map must hold exactly one entry per line.
         assert_eq!(DICTIONARY.len(), lines.len(), "duplicate dictionary key");
-        assert_eq!(DICTIONARY.get("hello"), Some(&"xin chào"));
+        // Sense order: the main sense comes first, not a short secondary one.
+        let hello = DICTIONARY.get("hello").copied().unwrap_or("");
+        assert!(hello.starts_with("xin chào"), "hello gloss: {hello:?}");
+        assert!(DICTIONARY.get("time").copied().unwrap_or("").contains("thời gian"));
     }
 
     #[test]
     fn lookup_is_case_insensitive_via_translate() {
-        assert_eq!(translate("Hello", 3, 40).map(|(_, g)| g), Some("xin chào".to_string()));
-        assert_eq!(translate("HELLO", 3, 40).map(|(_, g)| g), Some("xin chào".to_string()));
+        // Full dictionary: the gloss has several senses, main sense first.
+        assert!(translate("Hello", 3, 40).map(|(_, g)| g).unwrap_or_default().starts_with("xin chào"));
+        assert!(translate("HELLO", 3, 40).map(|(_, g)| g).unwrap_or_default().starts_with("xin chào"));
         assert_eq!(
             translate("Machine Learning", 3, 40).map(|(_, g)| g),
             Some("học máy".to_string())

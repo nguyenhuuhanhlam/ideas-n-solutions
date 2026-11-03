@@ -56,13 +56,14 @@ and outside the overwrite pipeline.
   A balloon that is still on screen is replaced immediately: the old
   balloon is dismissed first, then the new one is shown.
 
-The skeleton ships with a small sample dictionary (~36 entries:
-`hello`, `machine learning`, `take off`, ...). It is a placeholder
-to prove the balloon, gating and lookup paths end to end. The real
-dataset (Wiktionary via kaikki.org, trimmed to short glosses and
-frequency, measured separately) will replace it; the kaikki
-measurement is still pending and is deliberately not blocking this
-skeleton. Settings: `translator.enabled` in `config.json`, plus the
+The dictionary is the full filtered dataset: 16,092 English words and
+short phrases from English Wiktionary via kaikki.org (dump 2026-10-01,
+filtered 2026-11-03 from 11,121,531 dump lines, keeping only entries
+with a Vietnamese translation that the app can trigger). Meanings are
+kept in Wiktionary sense order (main sense first) up to the 240-char
+balloon limit, so `hello` opens with `xin chào` and `time` with `thời
+gian`. Dictionary data: Wiktionary, CC-BY-SA 4.0, via kaikki.org.
+Settings: `translator.enabled` in `config.json`, plus the
 "Show translation balloon" checkbox in the Settings window.
 
 Loop protection: the hash of the last text we wrote is kept in RAM;
