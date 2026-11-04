@@ -35,9 +35,10 @@ thật, skill, trang bị...).
   thêm địch dùng ngay, hiện chưa có mục tiêu.
 - HUD RPG khung sẵn (chưa có nguồn tăng/giảm thật): Lv 1, HP 100/100,
   MP 50/50, EXP 0/100.
-- Môi trường vẽ bằng code (không asset ngoài): bầu trời gradient,
-  mặt trời, núi xa parallax 0.3, cây gần parallax 0.6, cỏ + đất +
-  đá + cỏ dại theo vị trí thế giới.
+ - Môi trường: bầu trời gradient, mặt trời, núi xa parallax 0.3,
+  cây gần parallax 0.6 (vẽ bằng code); mặt đất vẽ bằng Tileset.png
+  (xem mục Tileset dưới đây), không còn nền đất vẽ bằng hình chữ
+  nhật màu nữa.
 - Âm thanh tối giản bằng WebAudio: tiếng nhảy, tiếng chém, không
   nhạc nền.
 
@@ -63,7 +64,29 @@ thật, skill, trang bị...).
   `fall` 4 (0.06s/frame, lúc bắt đầu rơi), `fall_loop` 3 (0.1s/frame,
   rơi ổn định), `combo_1` 3 + `combo_1_end` 4 (chém). Vùng chém
   trước mặt cũng thu theo tỷ lệ: rộng 35, cao 25.
-- Lật ngang khi quay trái bằng cách scale(-1, 1) quanh tâm nhân vật.
+ - Lật ngang khi quay trái bằng cách scale(-1, 1) quanh tâm nhân vật.
+
+## Tileset nền đất / platform (file Tileset.png 256x128)
+
+- File gốc do user cung cấp ngày 2026-11-04, nhúng base64 vào game,
+  vẽ đúng tỷ lệ 1/1. Alpha của file chỉ có 0/255; các vùng xanh lá
+  / đen ở mép file có alpha=0 nên trong game sẽ trong suốt, không
+  phải tile thật — chỉ dùng các vùng alpha>0 đã đo dưới đây.
+- Mặt đất hiện tại: dải cỏ x192-255, y13-31 (64x19, cỏ thưa y13-17,
+  đặc từ y18) lặp ngang, đỉnh cỏ nhô 5px trên đường chân GROUND_Y;
+  thân đất là ô đất vuông x48-63, y48-63 (16x16, đặc 255/256) lặp
+  từ GROUND_Y+14 (= đáy dải cỏ) xuống hết màn hình.
+- Platform nổi cho tương lai (đã chuẩn bị, chưa đặt vào màn chơi):
+  mảng `platforms` đang rỗng; mỗi platform { x, y, w } với y là đường
+  mặt đứng, w là chiều rộng (bội số 16). Hàm `drawPlatform()` vẽ mặt
+  bằng mảnh cỏ hẹp x16-31, y13-31 (16x19) lặp ngang + 1 hàng ô đất
+  dưới mặt cỏ. Bước sau chỉ cần thêm platform vào mảng + va chạm
+  dùng đúng x/y/w này là chạy.
+- Mẫu khác đã đo, để dành: khối đất lớn x112-175, y13-79 (64x67),
+  cột đất x80-95, y13-79 (16x67), khối trang trí đầu lâu x80-111,
+  y96-127 và khối ô cửa x128-159, y96-127 (32x32), ô đất vuông
+  x48-63, y80-95 và y112-127, cửa x16-31, y48-63, gai x16-31,
+  y82-95 (16x14).
 
 ## Deploy
 
