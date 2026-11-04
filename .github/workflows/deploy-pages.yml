@@ -28,7 +28,6 @@ jobs:
             team-assistant-sim/package-lock.json
             platformer-game/package-lock.json
             english-learning/package-lock.json
-            chia-dong-tu/package-lock.json
       # Mỗi app nằm trong thư mục riêng; build với base là subpath Pages của app đó
       - run: npm ci
         working-directory: timeline-projects
@@ -46,18 +45,13 @@ jobs:
         working-directory: english-learning
       - run: npm run build -- --base=/ideas-n-solutions/english-learning/
         working-directory: english-learning
-      - run: npm ci
-        working-directory: chia-dong-tu
-      - run: npm run build -- --base=/ideas-n-solutions/chia-dong-tu/
-        working-directory: chia-dong-tu
       # Ghép các app + trang chủ ở root thành một site duy nhất
       - run: |
-          mkdir -p _site/timeline-projects _site/team-assistant-sim _site/platformer-game _site/english-learning _site/chia-dong-tu
+          mkdir -p _site/timeline-projects _site/team-assistant-sim _site/platformer-game _site/english-learning
           cp -r timeline-projects/dist/* _site/timeline-projects/
           cp -r team-assistant-sim/dist/* _site/team-assistant-sim/
           cp -r platformer-game/dist/* _site/platformer-game/
           cp -r english-learning/dist/* _site/english-learning/
-          cp -r chia-dong-tu/dist/* _site/chia-dong-tu/
           cp index.html _site/index.html
       - uses: actions/configure-pages@v5
         with:

@@ -51,3 +51,14 @@ button { font: inherit; cursor: pointer; }
 .review p { margin: 5px 0; }
 .wrong { color: #c53030; font-weight: 600; }
 .right { color: #276749; font-weight: 600; }
+
+.tabs { display: flex; gap: 0; border-bottom: 2px solid #e2e8f0; margin: 24px 0 8px; flex-wrap: wrap; }
+.tab { background: none; border: none; border-bottom: 3px solid transparent; padding: 10px 16px; margin-bottom: -2px; font-weight: 600; color: #4a5568; }
+.tab.active { color: #2b6cb0; border-bottom-color: #2b6cb0; }
+.sub-tabs { border-bottom: 1px solid #e2e8f0; margin-top: 8px; }
+.sub-tabs .tab { font-size: 14px; padding: 8px 12px; }
+.verb-table { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; margin-top: 12px; }
+.verb-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1.4fr; gap: 8px; padding: 9px 14px; border-top: 1px solid #edf2f7; font-size: 14px; }
+.verb-row:first-child { border-top: none; }
+.verb-head { background: #ebf4ff; font-weight: 700; color: #2b6cb0; }
+@media (max-width: 600px) { .verb-row { grid-template-columns: 1fr 1fr; } }

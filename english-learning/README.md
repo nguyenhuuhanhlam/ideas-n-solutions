@@ -2,31 +2,44 @@
 
 App web (Vite + React), giao diện tiếng Việt, nội dung tiếng Anh cơ bản.
 Nhấn mạnh làm bài tập có chấm điểm, không phải chỉ đọc lý thuyết.
+Nội dung phân loại bằng tabs trên trang chính.
+
+## Các tab
+
+- **Tất cả**: toàn bộ bài cơ bản + nhóm chia động từ.
+- **Bài cơ bản**: 6 bài giao tiếp và từ vựng (mỗi bài 10 câu).
+- **Chia động từ**: 6 tab con, mỗi tab là 1 cách chia khác nhau
+  (mỗi nhóm 15 câu) — to be, hiện tại đơn, hiện tại tiếp diễn,
+  quá khứ đơn có quy tắc (-ed), quá khứ đơn bất quy tắc,
+  tương lai (will / be going to).
+- **Tra cứu**: bảng 47 động từ bất quy tắc (V1 — V2 — V3 — nghĩa),
+  gõ tiếng Anh hoặc tiếng Việt để lọc.
 
 ## Cách học
 
-1. Mỗi bài: đọc nhanh 1 quy tắc/mẫu câu + 8 từ vựng (kèm ví dụ).
-2. Làm bài tập: trắc nghiệm, điền từ/chia động từ vào chỗ trống, dịch câu.
+1. Mỗi bài/nhóm: đọc nhanh 1 quy tắc/mẫu câu + 8 mục dạng mẫu (kèm ví dụ).
+2. Làm bài tập: trắc nghiệm, điền dạng đúng vào chỗ trống, dịch câu.
 3. Chấm ngay sau mỗi câu: đúng/sai + giải thích.
 4. Cuối bài: tổng điểm và tỉ lệ % đúng, số sao (≥ 90%: 3 sao,
    ≥ 70%: 2 sao, ≥ 50%: 1 sao), danh sách câu sai để ôn lại.
 5. Đạt từ 70% được tính là hoàn thành bài.
 
-Ngoài ra có chế độ **Ôn tập tổng hợp**: 10 câu ngẫu nhiên từ tất cả các bài.
+Ngoài ra có chế độ **Ôn tập tổng hợp**: 20 câu ngẫu nhiên từ tất cả
+các bài và nhóm.
 
 Tiến độ (điểm cao nhất, số lần làm, bài đã đạt) lưu trên trình duyệt
-qua localStorage, không cần tài khoản.
+qua localStorage, không cần tài khoản. Điểm cũ của 2 bài chia động từ
+trước khi gộp thành tabs được chuyển sang nhóm mới tương ứng
+(to-be, present-simple).
 
-## Các bài (90 câu)
+## Các bài (150 câu)
 
-1. Chào hỏi và giới thiệu (10 câu)
-2. Số đếm và tuổi (10 câu)
-3. Gia đình (10 câu)
-4. Sinh hoạt hằng ngày (thì hiện tại đơn với he/she) (10 câu)
-5. Màu sắc và đồ vật (a/an, This is…) (10 câu)
-6. Đồ ăn và thức uống (like / do not like) (10 câu)
-7. Chia động từ to be — am / is / are, phủ định, câu hỏi (lớp 6) (15 câu)
-8. Chia động từ thường — hiện tại đơn: -s / -es / -ies, do / does, don't / doesn't (lớp 6) (15 câu)
+Bài cơ bản (6 × 10 câu): chào hỏi và giới thiệu; số đếm và tuổi;
+gia đình; sinh hoạt hằng ngày; màu sắc và đồ vật; đồ ăn và thức uống.
+
+Chia động từ (6 × 15 câu): to be hiện tại/quá khứ; hiện tại đơn;
+hiện tại tiếp diễn (be + V-ing); quá khứ đơn có quy tắc (-ed);
+quá khứ đơn bất quy tắc; tương lai (will / be going to).
 
 ## Chạy local
 
