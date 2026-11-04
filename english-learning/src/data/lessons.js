@@ -1,7 +1,7 @@
 // Nội dung cơ bản, giao diện tiếng Việt, bài tập tiếng Anh.
 // Dạng câu hỏi: choice = trắc nghiệm, fill = điền từ vào chỗ trống,
 // translate = dịch câu (nhập đáp án, chấm không phân biệt hoa/thường và dấu câu cuối câu).
-export const POINTS_PER_QUESTION = 10
+export const POINTS_PER_QUESTION = 1 // Mỗi câu 1 điểm, cho dễ hình dung (phiên 25 câu = tối đa 25 điểm)
 
 export const lessons = [
   {
