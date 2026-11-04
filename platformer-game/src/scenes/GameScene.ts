@@ -18,6 +18,8 @@ export class GameScene extends Phaser.Scene {
   private solids: Phaser.GameObjects.GameObject[] = [];
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
   private paused = false;
+  private prevJump = false;
+  private prevAttack = false;
 
   constructor() {
     super("game");
@@ -42,10 +44,35 @@ export class GameScene extends Phaser.Scene {
     tex.refresh();
   }
 
+  // Thân đất: khối đất lớn 64x48 (112,32) + cùng khối lật gương sang phải,
+  // thành texture 128x48 nên chu kỳ lặp là 128px thay vì 16px như ô đất cũ.
+  // Xen giữa là 2 mảng đất tối ("khoảng đen") để mặt đất không phẳng lì.
+  private makeDirtBodyTexture(): void {
+    const source = this.textures.get("terrain").getSourceImage() as HTMLImageElement;
+    const tex = this.textures.createCanvas("dirt-body", 128, 48);
+    if (!tex) return;
+    const ctx = tex.getContext();
+    ctx.drawImage(source, 112, 32, 64, 48, 0, 0, 64, 48);
+    ctx.save();
+    ctx.translate(128, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(source, 112, 32, 64, 48, 0, 0, 64, 48);
+    ctx.restore();
+    ctx.fillStyle = "#0d131b";
+    ctx.fillRect(88, 14, 16, 20);
+    ctx.fillStyle = "#14232a";
+    ctx.fillRect(92, 18, 8, 12);
+    ctx.fillRect(24, 30, 10, 10);
+    ctx.fillStyle = "#284232";
+    ctx.fillRect(90, 16, 4, 4);
+    ctx.fillRect(26, 32, 4, 4);
+    tex.refresh();
+  }
+
   create(): void {
     // Texture cắt từ tileset (đo từ file gốc, xem README mục Tileset).
     this.makeTileTexture("ground-top", 192, 13, 64, 19);
-    this.makeTileTexture("dirt", 48, 48, 16, 16);
+    this.makeDirtBodyTexture();
     this.makeTileTexture("plat-top", 16, 13, 16, 19);
 
     // Bầu trời gradient (đứng yên theo màn hình).
@@ -89,7 +116,7 @@ export class GameScene extends Phaser.Scene {
 
     // Mặt đất bằng tileset: dải cỏ lặp ngang + ô đất lặp lấp thân đất.
     this.add.tileSprite(0, GROUND_Y - 5, WORLD_W, 19, "ground-top").setOrigin(0, 0);
-    this.add.tileSprite(0, GROUND_Y + 14, WORLD_W, VIEW_H - (GROUND_Y + 14), "dirt").setOrigin(0, 0);
+    this.add.tileSprite(0, GROUND_Y + 14, WORLD_W, VIEW_H - (GROUND_Y + 14), "dirt-body").setOrigin(0, 0);
 
     // Thân va chạm mặt đất (vô hình, chỉ để physics đứng lên).
     const groundBody = this.add.rectangle(WORLD_W / 2, GROUND_Y + 60, WORLD_W, 120);
@@ -100,7 +127,7 @@ export class GameScene extends Phaser.Scene {
     // Platform nổi mẫu + thân va chạm của chúng.
     for (const plat of PLATFORMS) {
       this.add.tileSprite(plat.x, plat.y - 5, plat.w, 19, "plat-top").setOrigin(0, 0);
-      this.add.tileSprite(plat.x, plat.y + 14, plat.w, 16, "dirt").setOrigin(0, 0);
+      this.add.tileSprite(plat.x, plat.y + 14, plat.w, 16, "dirt-body").setOrigin(0, 0);
       const body = this.add.rectangle(plat.x + plat.w / 2, plat.y + 15, plat.w, 30);
       body.setFillStyle(0xffffff, 0);
       this.physics.add.existing(body, true);
@@ -149,13 +176,21 @@ export class GameScene extends Phaser.Scene {
     }
     if (this.paused) return;
     const dt = Math.min(delta / 1000, 0.05);
+    // Nhảy/chém: chỉ tính cạnh bấm xuống (vừa bấm), giữ phím không tự nhảy
+    // lại khi vừa chạm đất, không tự chém lặp trên không. Di chuyển/chạy
+    // thì vẫn giữ phím như thường.
+    const jumpHeld =
+      this.keys.jump.isDown || this.keys.jumpSpace.isDown || this.keys.jumpUp.isDown || touchInput.jump;
+    const attackHeld = this.keys.attack.isDown || touchInput.attack;
     const input: InputState = {
       left: this.keys.left.isDown || this.keys.leftA.isDown || touchInput.left,
       right: this.keys.right.isDown || this.keys.rightD.isDown || touchInput.right,
       run: this.keys.run.isDown || this.keys.runX.isDown || touchInput.run,
-      jump: this.keys.jump.isDown || this.keys.jumpSpace.isDown || this.keys.jumpUp.isDown || touchInput.jump,
-      attack: this.keys.attack.isDown || touchInput.attack,
+      jump: jumpHeld && !this.prevJump,
+      attack: attackHeld && !this.prevAttack,
     };
+    this.prevJump = jumpHeld;
+    this.prevAttack = attackHeld;
     this.player.update(input, dt);
   }
 }

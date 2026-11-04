@@ -88,10 +88,19 @@ Asset do user gửi lẻ, assistant phải tách riêng và đặt tên để th
 - Alpha của file chỉ có 0/255; các vùng xanh lá/đen ở mép file có
   alpha=0 nên trong game sẽ trong suốt, không phải tile thật.
 - Mặt đất: dải cỏ x192-255, y13-31 (64x19, cỏ thưa y13-17, đặc từ
-  y18) lặp ngang, đỉnh cỏ nhô 5px trên đường chân; thân đất là ô
-  đất vuông x48-63, y48-63 (16x16) lặp từ GROUND_Y+14 xuống hết màn.
+  y18) lặp ngang, đỉnh cỏ nhô 5px trên đường chân; thân đất là
+  texture `dirt-body` 128x48 (khối đất lớn x112-175, y32-79 + cùng
+  khối lật gương, xen 2 mảng đất tối) lặp từ GROUND_Y+14 xuống hết
+  màn. Ô đất 16x16 cũ (x48-63, y48-63 và 2 ô dưới nó) gần như giống
+  hệt nhau nên lặp mỗi 16px nhìn đều như giấy dán tường — đã bỏ,
+  không dùng nữa.
 - Platform: mặt bằng mảnh cỏ hẹp x16-31, y13-31 (16x19) lặp ngang +
-  1 hàng ô đất dưới mặt cỏ; xem `PLATFORMS` trong `src/config.ts`.
+  1 hàng thân đất `dirt-body` dưới mặt cỏ; xem `PLATFORMS` trong
+  `src/config.ts`.
+- Nhảy/chém là bấm 1 lần (edge-trigger): giữ phím nhảy không tự nhảy
+  lại khi vừa chạm đất, giữ phím chém không tự chém lặp trên không
+  (sửa từ bản ceb5d7d, nơi giữ phím là lặp — nguyên nhân khiến nhân
+  vật trông như bay mãi).
 - Mẫu khác đã đo, để dành: khối đất lớn x112-175, y13-79 (64x67),
   cột đất x80-95, y13-79, khối đầu lâu x80-111, y96-127 và khối ô
   cửa x128-159, y96-127 (32x32), cửa x16-31, y48-63, gai x16-31,
