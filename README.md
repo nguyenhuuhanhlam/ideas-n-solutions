@@ -11,6 +11,7 @@ thư mục mới và một thẻ vào trang chủ ở `index.html`.
 | Timeline Projects — quản lý dự án trên 1 trục thời gian | `timeline-projects/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/timeline-projects/ |
 | Team Assistant — mô phỏng trợ lý trung tâm cho team kiến trúc | `team-assistant-sim/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/team-assistant-sim/ |
 | Platformer Game — prototype màn 1 kiểu NES, Canvas 2D + JS thuần, 1 file HTML tĩnh (không cần build) | `platformer-game/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/platformer-game/ |
+| English Basic — học tiếng Anh cơ bản qua bài tập có chấm điểm (6 bài × 10 câu, ôn tập tổng hợp) | `english-learning/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/english-learning/ |
 
 ## App desktop (không deploy lên Pages)
 
