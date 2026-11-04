@@ -2,7 +2,10 @@
 
 App web (Vite + React), giao diện tiếng Việt, nội dung tiếng Anh cơ bản.
 Giao diện dùng Astryx thật (`@astryxdesign/core` + `@astryxdesign/theme-neutral`
-0.7.7, theme Neutral, font Figtree) giống NSDT: bọc `<Theme>` trong `main.jsx`,
+0.7.7, theme Neutral) giống NSDT: bọc `<Theme>` trong `main.jsx`, và theme
+theo đúng NSDT — toàn app dùng font Cascadia Mono (bundle qua
+`@fontsource/cascadia-mono`, `src/app-fonts.css` ghi đè 3 biến font của
+theme, y hệt NSDT), thay cho font Figtree mặc định của theme Neutral.
 component Button, Card, ClickableCard, TabList/Tab, TextInput, Table,
 ProgressBar, Banner, Badge, Heading, Text, VStack/HStack — props tra bằng
 `npx @astryxdesign/cli component <Tên>` trước khi dùng, không CSS tự vẽ lại.
