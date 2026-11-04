@@ -18,7 +18,11 @@ mặc định của theme khoảng 25% (body 16px → 20px, ghi đè các biến
 nhất quán ở menu trái, thẻ bài, chi tiết bài và màn hình làm bài
 (variant màu phân loại của Astryx): Bài cơ bản 🔵 xanh dương, Chia
 động từ 🟣 tím, Tra cứu 🟢 xanh lá, Ôn tập tổng hợp 🟠 cam; nút hành
-động vẫn giữ primary, đúng/sai vẫn xanh lá/đỏ theo trạng thái.
+động vẫn giữ primary, đúng/sai vẫn xanh lá/đỏ theo trạng thái. Riêng
+dạng động từ được tô nhẹ: bảng tra cứu dùng Badge xanh lá nhạt cho
+V1/V2/V3, dạng mẫu của nhóm chia động từ dùng Badge tím nhạt cho dạng
+động từ. Nút "Chấm câu này" tách ra ngoài thẻ câu hỏi, nhỏ gọn (sm)
+và màu secondary nhạt để không lẫn với nút đáp án đang chọn (primary).
 
 ## Các tab
 

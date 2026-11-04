@@ -99,9 +99,11 @@ function IrregularLookup() {
         isStriped
         hasHover
         columns={[
-          { key: 'v1', header: 'V1', renderCell: (row) => <Text weight="bold">{row.v1}</Text> },
-          { key: 'v2', header: 'V2 (quá khứ)' },
-          { key: 'v3', header: 'V3' },
+          // Động từ (V1/V2/V3) dùng Badge xanh lá nhạt — màu nhẹ của nhóm Tra cứu,
+          // để mắt trẻ phân biệt ngay dạng động từ với cột nghĩa tiếng Việt.
+          { key: 'v1', header: 'V1', renderCell: (row) => <Badge variant="green" label={row.v1} /> },
+          { key: 'v2', header: 'V2 (quá khứ)', renderCell: (row) => <Badge variant="green" label={row.v2} /> },
+          { key: 'v3', header: 'V3', renderCell: (row) => <Badge variant="green" label={row.v3} /> },
           { key: 'vi', header: 'Nghĩa' },
         ]}
       />
@@ -182,13 +184,15 @@ function GrammarExamples({ grammar, card }) {
   )
 }
 
-function VocabList({ items }) {
+function VocabList({ items, verbTint }) {
   return (
     <VStack gap={3}>
       {items.map((v, i) => (
         <VStack key={v.en} gap={1}>
           <HStack gap={2} wrap="wrap">
-            <Text weight="bold" size="lg">{i + 1}. {v.en}</Text>
+            {verbTint
+              ? (<><Text weight="bold">{i + 1}.</Text><Badge variant="purple" label={v.en} /></>)
+              : (<Text weight="bold" size="lg">{i + 1}. {v.en}</Text>)}
             <Text type="supporting">— {v.vi}</Text>
           </HStack>
           <HStack gap={2} wrap="wrap">
@@ -490,11 +494,16 @@ export default function App() {
                 collapsible={false}
               />
             )}
-            {!quiz.checked
-              ? <Button variant="primary" label="Chấm câu này" isDisabled={!quiz.input.trim()} onClick={checkAnswer} />
-              : <Button variant="primary" label={quiz.index + 1 >= quiz.questions.length ? 'Xem kết quả' : 'Câu tiếp theo →'} onClick={nextQuestion} />}
           </VStack>
         </Card>
+        {/* Nút hành động tách hẳn ra khỏi thẻ câu hỏi (và khỏi danh sách chọn
+            đáp án) để không lẫn với các nút đáp án: "Chấm câu này" nhỏ gọn
+            (sm) và màu khác (secondary, nhạt) thay vì primary đậm như đáp án
+            đang chọn; nút "Câu tiếp theo" giữ primary vì lúc đó danh sách
+            đáp án đã khóa, không còn gây nhầm. */}
+        {!quiz.checked
+          ? <Button variant="secondary" size="sm" label="Chấm câu này" isDisabled={!quiz.input.trim()} onClick={checkAnswer} />
+          : <Button variant="primary" label={quiz.index + 1 >= quiz.questions.length ? 'Xem kết quả' : 'Câu tiếp theo →'} onClick={nextQuestion} />}
       </Page>
     )
   }
@@ -565,7 +574,7 @@ export default function App() {
               <Heading level={4} weight="bold">📖 {conjLesson.grammarTitle}</Heading>
               <GrammarExamples grammar={conjLesson.grammar} card="purple" />
               <Heading level={4} weight="bold">📚 Dạng mẫu ({conjLesson.vocab.length} mục)</Heading>
-              <VocabList items={conjLesson.vocab} />
+              <VocabList items={conjLesson.vocab} verbTint />
               <Button variant="primary" size="lg" label={`Bắt đầu làm ${conjLesson.questions.length} câu →`} onClick={() => startQuiz(conjLesson)} />
             </VStack>
           </Card>
