@@ -1022,7 +1022,8 @@
     function drawWaves(){
       // Vệt kiếm trắng đơn giản kiểu polygon: 1 đa giác phẳng, góc nhọn,
       // không hào quang, không blur, không trail phía sau
-      // (mũi nhọn phía trước, lõm ở giữa cạnh sau tạo dáng lưỡi liềm)
+      // (mũi nhọn phía trước, lõm ở giữa cạnh sau tạo dáng lưỡi liềm;
+      // mảnh: dày tối đa 12px, dài 20px, khớp hitbox cao 12px của vệt)
       for (var i=0;i<waves.length;i++){
         var w = waves[i];
         var sx = w.x - camX, sy = w.y;
@@ -1033,11 +1034,11 @@
         ctx.scale(dir, 1);
         ctx.fillStyle = "#ffffff";
         ctx.beginPath();
-        ctx.moveTo(-8, -8);
-        ctx.lineTo(4, -10);
+        ctx.moveTo(-8, -4);
+        ctx.lineTo(5, -6);
         ctx.lineTo(12, 0);
-        ctx.lineTo(4, 10);
-        ctx.lineTo(-8, 8);
+        ctx.lineTo(5, 6);
+        ctx.lineTo(-8, 4);
         ctx.lineTo(-2, 0);
         ctx.closePath(); ctx.fill();
         ctx.restore();
