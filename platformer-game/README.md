@@ -1,4 +1,4 @@
-# Platformer Game — Prototype màn 1 kiểu NES
+# Samurai in Mario World
 
 Bản dựng lại gameplay kiểu Super Mario Bros (NES) bằng Canvas 2D +
 JavaScript thuần, ở độ phân giải logic 256x240, tile 16px.
