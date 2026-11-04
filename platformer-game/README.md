@@ -10,8 +10,9 @@ của Nintendo.
 - Mở `index.html` trực tiếp trong trình duyệt, hoặc qua GitHub Pages:
   https://nguyenhuuhanhlam.github.io/ideas-n-solutions/platformer-game/
 - Phím: `←` `→` hoặc `A` `D` di chuyển, `Z` / `Space` / `↑` nhảy
-  (giữ lâu = nhảy cao), `X` hoặc `Shift` chạy nhanh, `P` tạm dừng,
-  `R` chơi lại, `M` tắt/bật tiếng. Trên mobile có nút cảm ứng.
+  (giữ lâu = nhảy cao), `X` hoặc `Shift` chạy nhanh, `J` phóng kiếm,
+  `P` tạm dừng, `R` chơi lại, `M` tắt/bật tiếng. Trên mobile có nút
+  cảm ứng, gồm nút kiếm.
 
 ## Cơ chế trong prototype
 
@@ -19,6 +20,9 @@ của Nintendo.
 - Nhảy biến thiên theo thời gian giữ phím, coyote time + jump buffer nhẹ
 - Block `?` đập từ dưới ra xu, gạch, ống, hố, cầu thang, cờ cuối màn
 - Địch đi tuần tra: đạp từ trên thì thắng, chạm ngang thì mất mạng
+- Kiếm boomerang: nhân vật cầm kiếm, bấm `J` phóng kiếm bay ngang
+  tối đa 80px rồi quay về tay; chạm tường thì quay lại ngay, chạm
+  địch thì địch chết, lúc kiếm bay không phóng thêm được
 - Camera chỉ cuộn tới, HUD điểm / xu / mạng / thời gian, nhạc chiptune
   tổng hợp bằng WebAudio
 

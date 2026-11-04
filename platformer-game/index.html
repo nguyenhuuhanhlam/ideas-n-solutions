@@ -87,6 +87,8 @@
       }
       .tbtn:active{ background:var(--accent); color:var(--accent-ink); }
       .tbtn.jump{ width:70px; height:70px; font-size:14px; font-weight:700; }
+      .tbtn.sword{ font-size:26px; }
+      .tbtn.sword:disabled{ opacity:.45; }
       @media (pointer:coarse){ .touch{ display:flex; } }
 
       /* ---------- Hướng dẫn + ghi chú ---------- */
@@ -111,6 +113,7 @@
         Bản dựng lại gameplay kiểu <b>Super Mario Bros (NES)</b> bằng Canvas 2D + JavaScript thuần:
         nhân vật, hình vẽ và nhạc đều tự làm, không dùng tài nguyên gốc của Nintendo.
         Chạy hết màn, đạp địch, đập block <b>?</b> lấy xu và chạm cột cờ ở cuối để thắng.
+        Nhân vật nay có thêm <b>kiếm phóng boomerang</b>: bấm <b>J</b> để phóng kiếm bay ra rồi tự quay về tay, hạ địch từ xa mà không cần nhảy lên đạp.
       </p>
 
       <div class="hud" aria-label="Thông tin màn chơi">
@@ -127,9 +130,9 @@
         <canvas id="game" width="256" height="240" aria-label="Khung game platform 2D"></canvas>
         <div class="overlay" id="ovStart">
           <h2>MÀN 1-1</h2>
-          <p>Camera chỉ cuộn tới, không quay lui được — đúng kiểu NES. Giữ phím chạy để chạy nhanh và nhảy xa hơn, thả phím nhảy sớm để nhảy thấp.</p>
+          <p>Camera chỉ cuộn tới, không quay lui được — đúng kiểu NES. Giữ phím chạy để chạy nhanh và nhảy xa hơn, thả phím nhảy sớm để nhảy thấp. Bấm J để phóng kiếm — kiếm bay ra khoảng 5 ô rồi quay về tay.</p>
           <button type="button" class="big-btn" id="btnPlay">▶ Chơi</button>
-          <span class="keys-hint">← → di chuyển · Z / Space nhảy · X chạy nhanh</span>
+          <span class="keys-hint">← → di chuyển · Z / Space nhảy · X chạy nhanh · J phóng kiếm</span>
         </div>
         <div class="overlay" id="ovEnd" hidden>
           <h2 id="endTitle">Hoàn thành màn!</h2>
@@ -149,6 +152,7 @@
           <button type="button" class="tbtn" id="tRight">▶</button>
         </div>
         <div class="grp">
+          <button type="button" class="tbtn sword" id="tSword" aria-label="Phóng kiếm">🗡️</button>
           <button type="button" class="tbtn" id="tRun">B</button>
           <button type="button" class="tbtn jump" id="tJump">A</button>
         </div>
@@ -161,6 +165,7 @@
             <li><kbd>←</kbd> <kbd>→</kbd> hoặc <kbd>A</kbd> <kbd>D</kbd> — đi / chạy</li>
             <li><kbd>Z</kbd> · <kbd>Space</kbd> · <kbd>↑</kbd> — nhảy (giữ lâu = nhảy cao)</li>
             <li><kbd>X</kbd> hoặc <kbd>Shift</kbd> — giữ để chạy nhanh</li>
+            <li><kbd>J</kbd> — phóng kiếm (kiếm bay ra ~5 ô rồi quay về tay; trên mobile bấm nút 🗡️)</li>
             <li><kbd>P</kbd> — tạm dừng · <kbd>R</kbd> — chơi lại · <kbd>M</kbd> — tắt/bật tiếng</li>
           </ul>
         </section>
@@ -171,6 +176,7 @@
             <li>Nhảy biến thiên theo thời gian giữ phím, thêm <i>coyote time</i> + <i>jump buffer</i> nhẹ cho dễ chơi</li>
             <li>Đập block <b>?</b> từ dưới ra xu, gạch nảy, ống, hố, cầu thang, cờ cuối màn</li>
             <li>Địch Bụp đi tuần tra: đạp từ trên thì thắng, chạm ngang thì mất mạng</li>
+            <li>Kiếm boomerang: nhân vật cầm kiếm theo hướng mặt, bấm <b>J</b> phóng kiếm bay ngang ~5 ô (80px) rồi tự quay về vị trí hiện tại của nhân vật để thu lại; chạm tường/gạch/ống thì quay lại ngay, chạm địch thì địch chết (+100 điểm như đạp) và kiếm bay tiếp; kiếm đang bay thì xoay và không phóng thêm được cho tới khi bắt lại</li>
             <li>Nhạc nền và hiệu ứng chiptune tổng hợp bằng WebAudio</li>
           </ul>
         </section>
@@ -292,6 +298,10 @@
       bump:  function(){ beep(140, 0.09, "square", 0.12, 90); },
       die:   function(){ beep(600, 0.5, "square", 0.12, 60); },
       kick:  function(){ beep(700, 0.1, "square", 0.1, 1400); },
+      throwS:function(){ beep(300, 0.16, "sawtooth", 0.07, 1250); },
+      slash: function(){ beep(920, 0.1, "square", 0.1, 170); },
+      clink: function(){ beep(1560, 0.06, "square", 0.08); beep(1080, 0.08, "square", 0.06, null, 0.04); },
+      catchS:function(){ beep(740, 0.07, "square", 0.07); },
       win:   function(){ var n=[523,659,784,1047,784,1047]; for (var i=0;i<n.length;i++) beep(n[i], 0.16, "square", 0.11, null, i*0.13); },
       over:  function(){ var n=[392,370,349,311]; for (var i=0;i<n.length;i++) beep(n[i], 0.22, "triangle", 0.13, null, i*0.2); }
     };
@@ -317,6 +327,39 @@
     var score = 0, coins = 0, lives = 3, timeLeft = 300, timeAcc = 0;
     var camX = 0, shake = 0, deadTimer = 0, winTimer = 0, flagSlide = 0;
 
+    /* ---------------- Kiếm boomerang ----------------
+       active=false: nhân vật đang cầm kiếm. active=true: kiếm đang bay,
+       phase "out" bay ra theo hướng mặt, phase "return" bay về nhân vật. */
+    var SWORD_RANGE = 80;              // 5 ô x 16px
+    var SWORD_SPEED = 255;             // px/giây — vừa phải, nhìn rõ đường bay
+    var sword = { active:false, phase:"held", cx:0, cy:0, dir:1, dist:0, angle:0 };
+    function swordBox(){ return { x: sword.cx - 6, y: sword.cy - 6, w: 12, h: 12 }; }
+    function throwSword(){
+      if (!player || state !== "play" || paused || sword.active) return;
+      sword.active = true;
+      sword.phase = "out";
+      sword.dir = player.face || 1;
+      sword.cx = player.x + player.w/2 + sword.dir * 11;
+      sword.cy = player.y + 8;
+      sword.dist = 0;
+      sword.angle = 0;
+      SFX.throwS();
+      syncSwordBtn();
+    }
+    function catchSword(){
+      sword.active = false; sword.phase = "held"; sword.dist = 0;
+      SFX.catchS();
+      syncSwordBtn();
+    }
+    function dropSword(){ // chết / rơi hố / thắng màn: kiếm biến mất, hồi sinh sẽ cầm lại
+      sword.active = false; sword.phase = "held"; sword.dist = 0;
+      syncSwordBtn();
+    }
+    function syncSwordBtn(){
+      var b = document.getElementById("tSword");
+      if (b) b.disabled = sword.active;
+    }
+
     var player = null;
     function newPlayer(){
       return {
@@ -337,6 +380,7 @@
     function reset(full){
       buildLevel(); spawnEnemies();
       player = newPlayer();
+      dropSword();
       camX = 0; paused = false; deadTimer = 0; winTimer = 0; flagSlide = 0; shake = 0;
       if (full){ score = 0; coins = 0; lives = 3; }
       timeLeft = 300; timeAcc = 0;
@@ -394,12 +438,18 @@
     }
     bindTouch("tLeft","left"); bindTouch("tRight","right");
     bindTouch("tRun","run"); bindTouch("tJump","jump");
+    // Nút kiếm cảm ứng: bấm 1 lần là phóng, không phải giữ
+    (function(){
+      var el = document.getElementById("tSword");
+      el.addEventListener("pointerdown", function(ev){ ev.preventDefault(); audio(); throwSword(); });
+    })();
 
     window.addEventListener("keydown", function(ev){
       var k = ev.key;
       if (["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"," "].indexOf(k) >= 0) ev.preventDefault();
       if (!keys[k]) { // cạnh xuống phím
         if (k==="z"||k==="Z"||k===" "||k==="ArrowUp"||k==="w"||k==="W") pressJump();
+        if (k==="j"||k==="J") throwSword();
         if (k==="p"||k==="P") togglePause();
         if (k==="r"||k==="R"){ if (state!=="menu") restart(); }
         if (k==="m"||k==="M") toggleSound();
@@ -436,6 +486,7 @@
 
     function die(){
       if (state !== "play") return;
+      dropSword();
       state = "dead"; deadTimer = 0; player.vy = -330; player.vx = 0;
       SFX.die();
     }
@@ -443,6 +494,52 @@
       score += n;
       floatTexts.push({x:x, y:y, txt:"+"+n, t:0});
       updateHUD();
+    }
+
+    /* Cập nhật kiếm đang bay: bay ra → chạm tường/hết tầm thì quay lại → bắt lại khi chạm nhân vật */
+    function updateSword(dt){
+      if (!sword.active || !player) return;
+      sword.angle += dt * 16;                       // xoay khi bay
+      var i, e;
+      if (sword.phase === "out"){
+        var step = SWORD_SPEED * dt;
+        sword.cx += sword.dir * step;
+        sword.dist += step;
+        // Chạm tường / gạch / ống / block cứng → quay lại ngay, không xuyên
+        var tiles = tilesOverlap(swordBox());
+        if (tiles.length > 0){
+          var t0 = tiles[0];
+          if (sword.dir > 0) sword.cx = Math.min(sword.cx, t0.tx*TILE - 6 - 0.01);
+          else sword.cx = Math.max(sword.cx, (t0.tx+1)*TILE + 6 + 0.01);
+          sword.phase = "return";
+          SFX.clink();
+          for (i=0;i<4;i++) particles.push({x:sword.cx, y:sword.cy, vx:(Math.random()-0.5)*90, vy:-Math.random()*70, t:0, col:"#ffe066"});
+        } else if (sword.dist >= SWORD_RANGE){
+          sword.phase = "return";
+        }
+      } else { // return: bay về vị trí HIỆN TẠI của nhân vật (nhân vật di chuyển thì kiếm đuổi theo)
+        var txp = player.x + player.w/2, typ = player.y + player.h/2;
+        var dx = txp - sword.cx, dy = typ - sword.cy;
+        var d = Math.sqrt(dx*dx + dy*dy);
+        var stepR = SWORD_SPEED * 1.15 * dt;
+        if (d <= Math.max(9, stepR + 3)){ catchSword(); return; }
+        sword.cx += (dx/d) * stepR;
+        sword.cy += (dy/d) * stepR;
+        // Chạm thân nhân vật thì thu lại
+        var b = swordBox();
+        if (b.x < player.x + player.w && b.x + b.w > player.x && b.y < player.y + player.h && b.y + b.h > player.y){ catchSword(); return; }
+      }
+      /* Chạm địch tuần tra: địch chết tính điểm như đạp, kiếm bay tiếp (cả chiều đi lẫn chiều về) */
+      var sb = swordBox();
+      for (i=0;i<enemies.length;i++){
+        e = enemies[i];
+        if (!e.alive) continue;
+        if (sb.x < e.x + e.w && sb.x + sb.w > e.x && sb.y < e.y + e.h && sb.y + sb.h > e.y){
+          e.alive = false; e.squash = 0;
+          SFX.slash(); addScore(100, e.x, e.y - 6);
+          for (var k=0;k<6;k++) particles.push({x:e.x+6, y:e.y+4, vx:(Math.random()-0.5)*110, vy:-Math.random()*70, t:0, col:"#b5651d"});
+        }
+      }
     }
 
     function update(dt){
@@ -531,6 +628,10 @@
       if (p.x < camX) p.x = camX;                 // chặn lùi quá mép trái camera
       camX = Math.min(camX, LEVEL_W*TILE - VIEW_W);
 
+      /* --- Kiếm boomerang (trước địch, để kiếm hạ địch kịp cứu nhân vật khi chạm cùng khung hình) --- */
+      updateSword(dt);
+      if (state !== "play") return; // bắt kiếm không đổi state, nhưng giữ an toàn luồng
+
       /* --- Xu tĩnh --- */
       for (i=0;i<coinTiles.length;i++){
         var c = coinTiles[i];
@@ -568,6 +669,7 @@
 
       /* --- Cờ cuối màn --- */
       if (p.x + p.w >= FLAG_X && state === "play"){
+        dropSword();
         state = "win"; winTimer = 0;
         score += Math.max(0, Math.ceil(timeLeft)) * 10;
         SFX.win(); updateHUD();
@@ -690,6 +792,40 @@
       if (air){ px(x+3, y+12, 3, 3, "#704214"); px(x+8, y+11, 3, 3, "#704214"); }
       else if (legA===0){ px(x+3, y+12, 3, 3, "#704214"); px(x+7, y+12, 3, 3, "#704214"); }
       else { px(x+2, y+12, 3, 3, "#704214"); px(x+8, y+12, 3, 3, "#704214"); }
+      /* Kiếm cầm tay (chỉ khi kiếm chưa phóng): cán nâu trong tay, chắn vàng, lưỡi bạc chĩa về hướng mặt — không xoay */
+      if (!sword.active){
+        var hy = y + 9;
+        if (f > 0){
+          px(x+8, hy, 4, 2, "#8a5a2b");        // cán kiếm
+          px(x+12, hy-2, 2, 6, "#e6a817");     // chắn kiếm
+          px(x+14, hy, 10, 2, "#e9ecef");      // lưỡi
+          px(x+14, hy, 10, 1, "#ffffff");
+          px(x+24, hy, 2, 2, "#ced4da");       // mũi kiếm
+        } else {
+          px(x, hy, 4, 2, "#8a5a2b");
+          px(x-2, hy-2, 2, 6, "#e6a817");
+          px(x-12, hy, 10, 2, "#e9ecef");
+          px(x-12, hy, 10, 1, "#ffffff");
+          px(x-14, hy, 2, 2, "#ced4da");
+        }
+      }
+    }
+
+    function drawFlyingSword(){
+      if (!sword.active) return;
+      var sx = sword.cx - camX, sy = sword.cy;
+      if (sx < -24 || sx > VIEW_W + 24) return;
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.rotate(sword.angle);               // xoay liên tục khi bay
+      ctx.fillStyle = "#e9ecef";             // lưỡi bạc
+      ctx.fillRect(0, -1.5, 11, 3);
+      ctx.beginPath(); ctx.moveTo(11, -1.5); ctx.lineTo(15.5, 0); ctx.lineTo(11, 1.5); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#adb5bd"; ctx.fillRect(1, -0.5, 9, 1);
+      ctx.fillStyle = "#e6a817"; ctx.fillRect(-2.5, -4, 2.5, 8);   // chắn vàng
+      ctx.fillStyle = "#8a5a2b"; ctx.fillRect(-7.5, -1.5, 5, 3);   // cán nâu
+      ctx.fillStyle = "#e6a817"; ctx.fillRect(-9, -1.5, 1.8, 3);   // chuôi
+      ctx.restore();
     }
 
     function drawEnemy(e){
@@ -739,6 +875,7 @@
       }
       for (i=0;i<enemies.length;i++) drawEnemy(enemies[i]);
       if (player && state !== "over") drawHero(player.x - camX, player.y);
+      if (state !== "over") drawFlyingSword();
       for (i=0;i<particles.length;i++){
         var p = particles[i];
         ctx.globalAlpha = 1 - p.t*2;
