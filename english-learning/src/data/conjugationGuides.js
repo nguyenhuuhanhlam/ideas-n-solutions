@@ -1,7 +1,9 @@
 // Hướng dẫn chia động từ chi tiết cho từng nhóm (hiển thị ở chi tiết nhóm).
-// Mỗi hướng dẫn gồm: sơ đồ bảng (diagram), các bước làm, mẹo nhớ và
-// ví dụ đặc biệt về số ít / số nhiều — phần hay gây nhầm nhất cho trẻ.
-// Nội dung ở trình độ tiểu học: chỉ dùng quy tắc và ví dụ đã kiểm chứng.
+// Mỗi hướng dẫn gồm: sơ đồ bảng (diagram), sơ đồ luồng các bước làm
+// (flow: hộp bước nối bằng mũi tên, gặp câu hỏi thì rẽ 2 nhánh rồi đi
+// tiếp), mẹo nhớ và ví dụ đặc biệt về số ít / số nhiều — phần hay gây
+// nhầm nhất cho trẻ. Nội dung ở trình độ tiểu học: chỉ dùng quy tắc và
+// ví dụ đã kiểm chứng.
 export const conjugationGuides = {
   'to-be': {
     table: {
@@ -20,11 +22,17 @@ export const conjugationGuides = {
         { subject: 'Lan and Minh (2 người)', present: 'are', past: 'were', example: 'Lan and Minh are kind.' },
       ],
     },
-    steps: [
-      'Đếm chủ ngữ: 1 người/vật hay nhiều người/vật?',
-      '1 người → is/was (riêng "I" dùng am/was); nhiều người → are/were.',
-      'Phủ định: thêm not — isn’t, aren’t, wasn’t, weren’t.',
-      'Câu hỏi: đảo be lên trước chủ ngữ — Is she happy? / Are they happy?',
+    flow: [
+      { label: 'Tìm chủ ngữ', sub: 'Ai hoặc cái gì làm chủ ngữ trong câu?' },
+      {
+        decision: 'Chủ ngữ là 1 hay nhiều?',
+        branches: [
+          { tag: '1 người / vật', result: 'is / was', note: 'Riêng "I" dùng am / was' },
+          { tag: 'Nhiều người / vật', result: 'are / were', note: 'You, we, they, 2 tên trở lên' },
+        ],
+      },
+      { label: 'Phủ định: thêm not', sub: "isn't, aren't, wasn't, weren't" },
+      { label: 'Câu hỏi: đảo be lên trước', sub: 'Is she happy? / Are they happy?' },
     ],
     tips: [
       'Chỉ mình "I" dùng am — gặp "I" là nhớ ngay am.',
@@ -56,11 +64,17 @@ export const conjugationGuides = {
         { subject: 'Nguyên âm + y', verb: '+ -s', example: 'play → plays (trước y là nguyên âm a nên giữ y)' },
       ],
     },
-    steps: [
-      'Tìm chủ ngữ trong câu.',
-      'Đếm: he/she/it hoặc 1 tên → thêm -s; còn lại (I/you/we/they, 2 tên) giữ nguyên thể.',
-      'Xem đuôi động từ để chọn -s, -es hay -ies.',
-      'Phủ định và câu hỏi: dùng don’t/doesn’t, Do/Does + động từ NGUYÊN THỂ (không thêm -s nữa!). Ví dụ: She doesn’t play (không phải plays).',
+    flow: [
+      { label: 'Tìm chủ ngữ', sub: 'Ai hoặc cái gì làm hành động?' },
+      {
+        decision: 'Chủ ngữ là ai?',
+        branches: [
+          { tag: 'he / she / it, 1 tên', result: '+ -s / -es / -ies', note: 'She plays, Lan plays' },
+          { tag: 'I / you / we / they, 2 tên', result: 'giữ nguyên thể', note: 'They play, Lan and Minh play' },
+        ],
+      },
+      { label: 'Xem đuôi động từ để chọn -s, -es hay -ies', sub: 's/x/ch/sh → -es · phụ âm + y → -ies · nguyên âm + y → -s' },
+      { label: 'Phủ định / câu hỏi: dùng don’t / doesn’t, Do / Does', sub: 'Động từ về NGUYÊN THỂ — She doesn’t play (không phải plays)' },
     ],
     tips: [
       'Đọc thành vần: "He, She, It — nhớ thêm s".',
@@ -91,11 +105,11 @@ export const conjugationGuides = {
         { subject: 'Lan and Minh (2 người)', be: 'are', verb: 'reading', example: 'Lan and Minh are reading now.' },
       ],
     },
-    steps: [
-      'Chọn be theo chủ ngữ: I → am, he/she/it → is, còn lại → are.',
-      'Thêm -ing vào động từ.',
-      'Xem cách viết -ing: thường + -ing; bỏ e cuối (make → making); gấp đôi phụ âm cuối với động từ 1 âm tiết (run → running, swim → swimming); lie → lying.',
-      'Phủ định: be + not + V-ing (is not playing). Câu hỏi: đảo be lên trước (Is she playing?).',
+    flow: [
+      { label: 'Tìm chủ ngữ', sub: 'Ai đang làm hành động ngay lúc nói?' },
+      { label: 'Chọn be theo chủ ngữ', sub: 'I → am · he/she/it → is · you/we/they → are' },
+      { label: 'Thêm -ing vào động từ', sub: 'bỏ e cuối (make → making) · gấp đôi phụ âm (run → running) · lie → lying' },
+      { label: 'Phủ định / câu hỏi', sub: 'be + not + V-ing (is not playing) · đảo be lên trước: Is she playing?' },
     ],
     tips: [
       'Dấu hiệu: now, at the moment, Look!, Listen!, right now.',
@@ -122,10 +136,11 @@ export const conjugationGuides = {
         { rule: '1 âm tiết, nguyên âm ngắn + 1 phụ âm: gấp đôi phụ âm + -ed', example: 'stop → stopped, plan → planned' },
       ],
     },
-    steps: [
-      'Xem đuôi động từ rồi áp đúng quy tắc trong bảng trên.',
-      'Nhớ điều quan trọng nhất: quá khứ KHÔNG chia theo chủ ngữ — He played cũng như They played, dạng giống hệt nhau.',
-      'Phủ định và câu hỏi: dùng didn’t / Did + động từ NGUYÊN THỂ (didn’t play, không phải played).',
+    flow: [
+      { label: 'Xem đuôi động từ', sub: 'Động từ tận cùng bằng gì?' },
+      { label: 'Áp đúng quy tắc', sub: '+ -ed · tận cùng e → + -d · phụ âm + y → -ied · gấp đôi phụ âm → -ed' },
+      { label: 'Nhớ: quá khứ KHÔNG chia theo chủ ngữ', sub: 'He played = They played — dạng giống hệt nhau' },
+      { label: 'Phủ định / câu hỏi: didn’t / Did', sub: 'Động từ về nguyên thể — didn’t play (không phải played)' },
     ],
     tips: [
       'Dấu hiệu: yesterday, last night, last week, ago, in 2020.',
@@ -152,10 +167,11 @@ export const conjugationGuides = {
         { group: 'Học thuộc riêng', example: 'go → went, see → saw, eat → ate, take → took, give → gave, find → found' },
       ],
     },
-    steps: [
-      'Nhớ: quá khứ bất quy tắc không có quy tắc chung — học theo nhóm trong bảng trên.',
-      'Quên thì tra bảng V1–V2–V3 ở phần Tra cứu (đừng đoán).',
-      'Phủ định và câu hỏi: dùng didn’t / Did + V1 (không dùng V2!). Ví dụ: Did you go…? (không phải went).',
+    flow: [
+      { label: 'Nhận dạng nhóm của động từ', sub: 'đổi nguyên âm · -ought/-aught · giữ nguyên · học thuộc riêng' },
+      { label: 'Lấy dạng V2 của nhóm đó', sub: 'Quên thì tra bảng V1–V2–V3 ở phần Tra cứu, đừng đoán' },
+      { label: 'Nhớ: quá khứ KHÔNG chia theo chủ ngữ', sub: 'He went = They went' },
+      { label: 'Phủ định / câu hỏi: didn’t / Did', sub: 'Dùng V1 — Did you go…? (không phải went)' },
     ],
     tips: [
       'Đọc to thành vần 3 cột: go – went – gone, see – saw – seen.',
@@ -183,11 +199,17 @@ export const conjugationGuides = {
         { use: 'Kế hoạch đã định từ trước', form: 'am/is/are + going to + V', example: 'We are going to travel next month.' },
       ],
     },
-    steps: [
-      'Hỏi: việc này đã định từ trước chưa? Chưa → will; đã định rồi → be going to.',
-      'will KHÔNG đổi theo chủ ngữ: I will = He will = They will.',
-      'be going to thì be đổi theo chủ ngữ: I am, he/she/it is, you/we/they are.',
-      'Sau will và sau going to, động từ LUÔN ở nguyên thể (không thêm -s, -ing, -ed).',
+    flow: [
+      {
+        decision: 'Việc này đã định từ trước chưa?',
+        branches: [
+          { tag: 'Chưa — vừa nghĩ ra', result: 'will + V nguyên thể', note: 'I will help you!' },
+          { tag: 'Rồi — đã lên kế hoạch', result: 'be going to + V', note: 'We are going to travel.' },
+        ],
+      },
+      { label: 'will không đổi theo chủ ngữ', sub: 'I will = He will = They will' },
+      { label: 'be going to thì be đổi theo chủ ngữ', sub: 'I am · he/she/it is · you/we/they are' },
+      { label: 'Sau will và going to, động từ luôn nguyên thể', sub: 'không thêm -s, -ing, -ed' },
     ],
     tips: [
       'Dấu hiệu: tomorrow, tonight, next week, next month, soon.',

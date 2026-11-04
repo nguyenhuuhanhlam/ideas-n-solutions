@@ -213,50 +213,102 @@ function VocabList({ items, verbTint }) {
   )
 }
 
-// Hướng dẫn chia động từ chi tiết: sơ đồ bảng + các bước + mẹo nhớ +
-// ví dụ đặc biệt về số ít/số nhiều (phần trẻ hay nhầm nhất).
+// Hướng dẫn chia động từ chi tiết: sơ đồ bảng + sơ đồ luồng các bước
+// làm (phần quan trọng nhất) + mẹo nhớ + ví dụ đặc biệt về số ít/số
+// nhiều (phần trẻ hay nhầm nhất). Trình bày theo nguyên tắc: các
+// section tách nhau bằng khoảng trắng lớn, KHÔNG tô màu cả cụm — màu
+// chỉ xuất hiện ở nhãn nhỏ (số bước, thẻ nhánh) để dẫn mắt, nền các
+// khối giữ trung tính; hướng dẫn nằm NGOÀI thẻ tím của bài để khỏi
+// chìm trong một khối màu dài.
+// Sơ đồ luồng: hộp bước nối nhau bằng mũi tên đi xuống; gặp nút hỏi
+// thì rẽ sang 1 trong 2 nhánh rồi đi tiếp xuống dưới.
+function FlowDiagram({ flow }) {
+  let stepNo = 0
+  const nodes = []
+  flow.forEach((node, i) => {
+    if (i > 0) {
+      nodes.push(
+        <HStack key={`arrow-${i}`} justify="center">
+          <Text size="xl">↓</Text>
+        </HStack>,
+      )
+    }
+    if (node.decision) {
+      nodes.push(
+        <VStack key={`node-${i}`} gap={2}>
+          <HStack gap={2} align="center">
+            <Badge variant="purple" label="?" />
+            <Text weight="bold" size="lg">{node.decision}</Text>
+          </HStack>
+          <HStack gap={2} wrap="wrap">
+            {node.branches.map((b, j) => (
+              <Card key={j}>
+                <VStack gap={1}>
+                  <Badge variant={j === 0 ? 'purple' : 'neutral'} label={b.tag} />
+                  <Text weight="bold" size="lg">{b.result}</Text>
+                  {b.note && <Text type="supporting">{b.note}</Text>}
+                </VStack>
+              </Card>
+            ))}
+          </HStack>
+        </VStack>,
+      )
+    } else {
+      stepNo += 1
+      nodes.push(
+        <Card key={`node-${i}`}>
+          <HStack gap={2} align="center">
+            <Badge variant="purple" label={`Bước ${stepNo}`} />
+            <VStack gap={1}>
+              <Text weight="bold" size="lg">{node.label}</Text>
+              {node.sub && <Text type="supporting">{node.sub}</Text>}
+            </VStack>
+          </HStack>
+        </Card>,
+      )
+    }
+  })
+  return <VStack gap={2}>{nodes}</VStack>
+}
+
 function ConjugationGuide({ guide }) {
   if (!guide) return null
   return (
-    <VStack gap={3}>
-      <Heading level={4} weight="bold">🧭 Sơ đồ chia động từ</Heading>
-      <Table
-        data={guide.table.rows}
-        idKey={guide.table.idKey}
-        density="balanced"
-        isStriped
-        hasHover
-        columns={guide.table.columns}
-      />
-      <Heading level={4} weight="bold">🪜 Các bước làm</Heading>
+    <VStack gap={6}>
       <VStack gap={2}>
-        {guide.steps.map((step, i) => (
-          <Card key={i}>
-            <HStack gap={2}>
-              <Text weight="bold">Bước {i + 1}.</Text>
-              <Text>{step}</Text>
-            </HStack>
-          </Card>
-        ))}
+        <Heading level={4} weight="bold">🧭 Sơ đồ chia động từ</Heading>
+        <Table
+          data={guide.table.rows}
+          idKey={guide.table.idKey}
+          density="balanced"
+          isStriped
+          hasHover
+          columns={guide.table.columns}
+        />
       </VStack>
-      <Heading level={4} weight="bold">💡 Mẹo nhớ</Heading>
       <VStack gap={2}>
-        {guide.tips.map((tip, i) => (
-          <Card key={i}>
-            <Text>💡 {tip}</Text>
-          </Card>
-        ))}
+        <Heading level={4} weight="bold">🪜 Các bước làm — đi theo sơ đồ này</Heading>
+        <Text type="supporting">Đi từ trên xuống dưới; gặp nút hỏi thì rẽ sang nhánh đúng rồi đi tiếp.</Text>
+        <FlowDiagram flow={guide.flow} />
       </VStack>
-      <Heading level={4} weight="bold">⚠️ Số ít / Số nhiều — ví dụ đặc biệt</Heading>
       <VStack gap={2}>
-        {guide.specials.map((sp, i) => (
-          <Card key={i}>
-            <VStack gap={1}>
+        <Heading level={4} weight="bold">💡 Mẹo nhớ</Heading>
+        <VStack gap={1}>
+          {guide.tips.map((tip, i) => (
+            <Text key={i}>💡 {tip}</Text>
+          ))}
+        </VStack>
+      </VStack>
+      <VStack gap={2}>
+        <Heading level={4} weight="bold">⚠️ Số ít / Số nhiều — ví dụ đặc biệt</Heading>
+        <VStack gap={2}>
+          {guide.specials.map((sp, i) => (
+            <VStack key={i} gap={1}>
               <Text weight="bold" size="lg">{sp.example}</Text>
               <Text>{sp.why}</Text>
             </VStack>
-          </Card>
-        ))}
+          ))}
+        </VStack>
       </VStack>
     </VStack>
   )
@@ -650,7 +702,7 @@ export default function App() {
       )}
 
       {isConjSection && (
-        <VStack gap={3}>
+        <VStack gap={4}>
           <Badge variant="purple" label="Chia động từ" />
           <Heading level={4} weight="bold">Chia động từ — {CONJ_TAB_LABELS[conjLesson.id] || conjLesson.topic}</Heading>
           <Text type="supporting">Mỗi nhóm là 1 cách chia khác nhau. Gặp dạng nào thì chia theo nhóm đó: to be thì đổi be, hiện tại đơn thì thêm -s/-es, đang diễn ra thì be + V-ing, quá khứ có quy tắc thì -ed, quá khứ bất quy tắc thì học thuộc V2, tương lai thì will/be going to. Chọn nhóm khác ở menu trái.</Text>
@@ -663,10 +715,10 @@ export default function App() {
               <GrammarExamples grammar={conjLesson.grammar} card="purple" />
               <Heading level={4} weight="bold">📚 Dạng mẫu ({conjLesson.vocab.length} mục)</Heading>
               <VocabList items={conjLesson.vocab} verbTint />
-              <ConjugationGuide guide={conjugationGuides[conjLesson.id]} />
-              <Button variant="primary" size="lg" label="Bắt đầu làm 25 câu →" onClick={() => startQuiz(conjLesson)} />
             </VStack>
           </Card>
+          <ConjugationGuide guide={conjugationGuides[conjLesson.id]} />
+          <Button variant="primary" size="lg" label="Bắt đầu làm 25 câu →" onClick={() => startQuiz(conjLesson)} />
         </VStack>
       )}
 
