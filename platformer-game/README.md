@@ -1,95 +1,98 @@
 # PixeLab
 
-Game 2D side-scroller chặt chém có yếu tố RPG, viết bằng Canvas 2D +
-JavaScript thuần, 1 file HTML tĩnh duy nhất, không cần build.
+Game 2D side-scroller chặt chém có yếu tố RPG, dựng bằng
+Phaser 3 + TypeScript + Vite. Bản vanilla 1 file cũ đã được thay
+thế hoàn toàn ngày 2026-11-04 theo quyết định cấu trúc lại của user
+(ở lại repo ideas-n-solutions, không giữ dữ liệu cũ).
 
-## Bước 1 (hiện tại): mặt đất + nhân vật
+## Chạy và build
 
-Bản cũ kiểu Mario (địch, xu, gạch, ống, hố, lâu đài, vệt kiếm gồng)
-đã được gỡ bỏ hoàn toàn ngày 2026-11-04. Bản mới bắt đầu lại từ:
-mặt đất phẳng dài 2400px, camera bám theo nhân vật, và nhân vật
-chính dùng bộ sprite mới do user cung cấp. Chưa có địch, chưa có
-màn thắng/thua — các bước sau sẽ bổ sung từng phần (địch, HP/EXP
-thật, skill, trang bị...).
-
-- Mở `index.html` trực tiếp trong trình duyệt, hoặc qua GitHub Pages:
+- Chạy dev: `cd platformer-game && npm install && npm run dev`
+- Build: `npm run build` (ra `dist/`, đã cấu hình `base: "./"` để
+  chạy dưới subpath Pages `/ideas-n-solutions/platformer-game/`).
+- Deploy: workflow `.github/workflows/deploy-pages.yml` build app này
+  bằng `npm ci` + `npm run build -- --base=...` rồi copy `dist/` vào
+  `_site/platformer-game/`; link live giữ nguyên
   https://nguyenhuuhanhlam.github.io/ideas-n-solutions/platformer-game/
-- Phím: `←` `→` hoặc `A` `D` đi bộ, giữ `Shift`/`X` để chạy,
-  `Z` / `Space` / `↑` nhảy, `J` chém combo, `P` tạm dừng,
-  `R` chơi lại, `M` tắt/bật tiếng. Trên mobile là tay kiểu NES:
-  D-pad chữ thập bên trái (◀ ▶ di chuyển, ▲ nhảy), giữa có nút dẹt
-  Chạy (giữ) và Dừng, bên phải 2 nút tròn đỏ B = Nhảy, A = Chém.
 
-## Cơ chế bước 1
+## Phạm vi hiện tại: di chuyển + cảnh trí (chưa có RPG thật)
 
-- Màn hình logic 480x270 (16:9), mặt đất tại y=210, thế giới rộng
-  2400px, camera kẹp trong biên thế giới.
-  - Vật lý: đi bộ 90px/s, chạy 150px/s, nhảy vận tốc -260px/s với
-  trọng lực 700px/s² (cao khoảng 48px, thời gian bay 0.74s), chạm
-  đất có bụi nhẹ.
-- Chém combo: `J` đánh 1 chuỗi 7 frame (combo_1 3 frame + combo_1_end
-  4 frame, 0.06s/frame, tổng 0.42s), chém được cả khi đang nhảy
-  (chém dưới đất thì khóa di chuyển, chém trên không thì giữ đà bay
-  và vẫn lái được theo hướng),
-  vùng chém trước mặt đã để sẵn trong code (`attackBox()`) để bước
-  thêm địch dùng ngay, hiện chưa có mục tiêu.
-- HUD RPG khung sẵn (chưa có nguồn tăng/giảm thật): Lv 1, HP 100/100,
-  MP 50/50, EXP 0/100.
- - Môi trường: bầu trời gradient, mặt trời, núi xa parallax 0.3,
-  cây gần parallax 0.6 (vẽ bằng code); mặt đất vẽ bằng Tileset.png
-  (xem mục Tileset dưới đây), không còn nền đất vẽ bằng hình chữ
-  nhật màu nữa.
-- Âm thanh tối giản bằng WebAudio: tiếng nhảy, tiếng chém, không
-  nhạc nền.
+Theo quyết định ngày 2026-11-04, bước này chỉ tập trung vào di chuyển
+vật lý của nhân vật và cảnh trí xung quanh, chưa làm hệ thống RPG
+(địch, HP/EXP thật, đồ, skill, lưu game — làm sau):
 
-## Sprite nhân vật (đo trực tiếp từ file PNG)
+- Khung hình 960x540 (gấp đôi bản vanilla 480x270). Sprite gốc
+  128x128 vẽ với scale 2 nên nhân vật cao 74px trong logic 960x540,
+  tức chiếm cùng tỷ lệ màn hình như bản vanilla 1/1 (37px trên
+  480x270). Nếu muốn giữ sprite 37px tuyệt đối trên khung 960x540
+  thì nhân vật sẽ nhỏ đi một nửa — báo lại để đổi.
+- Vật lý Arcade: đi bộ 180px/s, chạy 300px/s, nhảy -520 với trọng
+  lực 1400 (cao khoảng 96px, thời gian bay 0.74s) — tất cả đều gấp
+  đôi bản vanilla để giữ nguyên cảm giác theo tỷ lệ nhân vật/khung.
+- Chém combo 7 frame (0.06s/frame, tổng 0.42s), chém được cả khi nhảy;
+  chém dưới đất khóa di chuyển, chém trên không giữ đà bay và vẫn
+  lái được hướng. Vùng chém đã tính sẵn trong `Player.attackBox()`
+  để bước địch dùng ngay, hiện chưa có mục tiêu.
+- Camera bám theo nhân vật (lerp 0.1), kẹp trong thế giới 4800x540,
+  mặt đất tại y=420.
+- Cảnh trí: trời gradient, mặt trời parallax 0.05, núi xa parallax
+  0.3, cây gần parallax 0.6, mặt đất + platform nổi bằng Tileset.
+- Platform nổi mẫu (đặc, đứng được trên mặt): (700, 340, 128),
+  (1000, 260, 96), (1250, 340, 160) — xem `src/config.ts`.
+- Phím: A/D hoặc ←/→ di chuyển, giữ Shift/X chạy, Z/Space/↑ nhảy,
+  J chém, P tạm dừng, R chơi lại. Mobile: tay NES (D-pad ◀ ▶ ▲,
+  nút dẹt Chạy/Dừng, nút tròn đỏ B = Nhảy, A = Chém).
 
-- Mỗi sheet là dãy frame 128x128, nền trong suốt. File
-  `male_hero-design.png` (1 frame) làm mốc: bbox x41-73, y43-80.
- - Nhân vật đứng (sau khi khử viền đen): rộng 30px, cao 36px, tâm
-  ngang vẫn x=57, đường chân vẫn y=80 trong frame. Viền đen được khử
-  bằng cách xóa các pixel đen thuần (0,0,0) ở mép ngoài của nhân vật
-  (pixel đen có kề trong suốt), giữ nguyên các pixel đen bên trong
-  (mắt...) và các màu tối khác; alpha của sheet chỉ có 0/255 nên
-  không còn quầng mờ. Tất cả frame khác đều neo theo đúng 2 mốc này
-  (không neo theo đáy bbox từng frame, vì frame nhảy/rơi có chân
-  co lên tới y=75).
-  - Vẽ đúng tỷ lệ 1/1 (SCALE=1): khung vẽ 128x128 nguyên gốc, nhân
-  vật cao 36px (sau khử viền), rộng thân 30px, chân trùng chân hitbox,
-  tâm trùng tâm hitbox.
-- Hitbox: rộng 15, cao 32 (thu đúng nửa từ 30x64), chân tại mặt đất.
-- Animation đã dùng (8 sheet nhúng base64 vào file):
-  `idle` 10 frame (0.12s/frame), `walk` 10 (0.09s), `run` 10 (0.07s),
-  `jump` 6 (lấy frame 0 lúc cất bước, frame 2 lúc đang lên),
-  `fall` 4 (0.06s/frame, lúc bắt đầu rơi), `fall_loop` 3 (0.1s/frame,
-  rơi ổn định), `combo_1` 3 + `combo_1_end` 4 (chém). Vùng chém
-  trước mặt cũng thu theo tỷ lệ: rộng 35, cao 25.
- - Lật ngang khi quay trái bằng cách scale(-1, 1) quanh tâm nhân vật.
+## Cấu trúc code
+
+- `src/main.ts` — cấu hình Phaser (960x540, FIT, pixelArt, roundPixels)
+  và gắn nút cảm ứng NES vào input.
+- `src/config.ts` — mọi hằng số gameplay (khung hình, thế giới, tốc
+  độ, nhảy, hitbox, platform) để chỉnh số không cần đụng logic.
+- `src/input.ts` — trạng thái nút chung cho bàn phím + cảm ứng.
+- `src/entities/Player.ts` — nhân vật: physics Arcade, hitbox
+  30x64 (offset 99, 96 so với góc khung vẽ), animation điều khiển
+  thủ công theo đúng nhịp frame bản vanilla (idle 0.12s, walk 0.09s,
+  run 0.07s, chém 0.06s, nhảy/rơi theo thời gian bay).
+- `src/scenes/GameScene.ts` — 1 scene duy nhất hiện tại: load asset,
+  cắt texture từ tileset, vẽ cảnh trí, mặt đất, platform, camera,
+  phím tắt. Scene HUD, menu, địch sẽ tách sau.
+
+## Asset: tách riêng, đặt tên rõ
+
+Asset do user gửi lẻ, assistant phải tách riêng và đặt tên để thay
+đổi sau này dễ dàng. Quy tắc:
+
+- `assets/raw/` — file gốc, **không bao giờ sửa**:
+  `assets/raw/hero/male_hero-*.png` (9 sheet, kể cả design),
+  `assets/raw/tileset/Tileset.png` (256x128).
+- `assets/sprites/player/` — bản đã xử lý, tên rõ:
+  `hero-idle/walk/run/jump/fall/fall-loop/combo-1/combo-1-end.png`
+  và `hero-attack.png` (gộp combo-1 3 frame + combo-1-end 4 frame
+  thành 7 frame, 896x128).
+- `assets/tilesets/terrain-tileset.png` — copy nguyên Tileset.png,
+  chỉ đổi tên.
+- `public/assets/` — bản sao của processed để Vite copy vào `dist/`.
+- `tools/process-assets.py` — script sinh processed từ raw (khử viền
+  đen hero: xóa pixel đen thuần ở mép ngoài, giữ pixel đen trong;
+  gộp đòn chém; copy tileset; đồng bộ sang `public/`). Chạy lại
+  script mỗi khi raw thay đổi, đừng sửa tay file processed.
+- Sprite nhân vật (đo từ file gốc): frame 128x128, nhân vật đứng
+  32x37 (bbox x41-73, y43-80, tâm x=57, đường chân y=80); sau khử
+  viền còn 30x36, tâm và đường chân không đổi. Mọi frame đều neo
+  theo tâm và đường chân này, không neo theo đáy bbox từng frame
+  (frame nhảy/rơi có chân co lên tới y=75).
 
 ## Tileset nền đất / platform (file Tileset.png 256x128)
 
-- File gốc do user cung cấp ngày 2026-11-04, nhúng base64 vào game,
-  vẽ đúng tỷ lệ 1/1. Alpha của file chỉ có 0/255; các vùng xanh lá
-  / đen ở mép file có alpha=0 nên trong game sẽ trong suốt, không
-  phải tile thật — chỉ dùng các vùng alpha>0 đã đo dưới đây.
-- Mặt đất hiện tại: dải cỏ x192-255, y13-31 (64x19, cỏ thưa y13-17,
-  đặc từ y18) lặp ngang, đỉnh cỏ nhô 5px trên đường chân GROUND_Y;
-  thân đất là ô đất vuông x48-63, y48-63 (16x16, đặc 255/256) lặp
-  từ GROUND_Y+14 (= đáy dải cỏ) xuống hết màn hình.
-- Platform nổi cho tương lai (đã chuẩn bị, chưa đặt vào màn chơi):
-  mảng `platforms` đang rỗng; mỗi platform { x, y, w } với y là đường
-  mặt đứng, w là chiều rộng (bội số 16). Hàm `drawPlatform()` vẽ mặt
-  bằng mảnh cỏ hẹp x16-31, y13-31 (16x19) lặp ngang + 1 hàng ô đất
-  dưới mặt cỏ. Bước sau chỉ cần thêm platform vào mảng + va chạm
-  dùng đúng x/y/w này là chạy.
+- Alpha của file chỉ có 0/255; các vùng xanh lá/đen ở mép file có
+  alpha=0 nên trong game sẽ trong suốt, không phải tile thật.
+- Mặt đất: dải cỏ x192-255, y13-31 (64x19, cỏ thưa y13-17, đặc từ
+  y18) lặp ngang, đỉnh cỏ nhô 5px trên đường chân; thân đất là ô
+  đất vuông x48-63, y48-63 (16x16) lặp từ GROUND_Y+14 xuống hết màn.
+- Platform: mặt bằng mảnh cỏ hẹp x16-31, y13-31 (16x19) lặp ngang +
+  1 hàng ô đất dưới mặt cỏ; xem `PLATFORMS` trong `src/config.ts`.
 - Mẫu khác đã đo, để dành: khối đất lớn x112-175, y13-79 (64x67),
-  cột đất x80-95, y13-79 (16x67), khối trang trí đầu lâu x80-111,
-  y96-127 và khối ô cửa x128-159, y96-127 (32x32), ô đất vuông
-  x48-63, y80-95 và y112-127, cửa x16-31, y48-63, gai x16-31,
+  cột đất x80-95, y13-79, khối đầu lâu x80-111, y96-127 và khối ô
+  cửa x128-159, y96-127 (32x32), cửa x16-31, y48-63, gai x16-31,
   y82-95 (16x14).
-
-## Deploy
-
-App này là 1 file HTML tĩnh duy nhất, không có `package.json` và
-không cần build. Workflow Pages chỉ copy `platformer-game/index.html`
-vào `_site/platformer-game/` (khác với các app Vite/React còn lại).
