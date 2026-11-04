@@ -1,4 +1,4 @@
-# Samurai in Mario World
+# PixeLab
 
 Game 2D side-scroller chặt chém có yếu tố RPG, viết bằng Canvas 2D +
 JavaScript thuần, 1 file HTML tĩnh duy nhất, không cần build.
@@ -16,8 +16,9 @@ thật, skill, trang bị...).
   https://nguyenhuuhanhlam.github.io/ideas-n-solutions/platformer-game/
 - Phím: `←` `→` hoặc `A` `D` đi bộ, giữ `Shift`/`X` để chạy,
   `Z` / `Space` / `↑` nhảy, `J` chém combo, `P` tạm dừng,
-  `R` chơi lại, `M` tắt/bật tiếng. Trên mobile có nút ◀ ▶, Chạy,
-  Nhảy, Chém.
+  `R` chơi lại, `M` tắt/bật tiếng. Trên mobile là tay kiểu NES:
+  D-pad chữ thập bên trái (◀ ▶ di chuyển, ▲ nhảy), giữa có nút dẹt
+  Chạy (giữ) và Dừng, bên phải 2 nút tròn đỏ B = Nhảy, A = Chém.
 
 ## Cơ chế bước 1
 
@@ -42,13 +43,17 @@ thật, skill, trang bị...).
 
 - Mỗi sheet là dãy frame 128x128, nền trong suốt. File
   `male_hero-design.png` (1 frame) làm mốc: bbox x41-73, y43-80.
-- Nhân vật đứng: rộng 32px, cao 37px, tâm ngang x=57, đường chân
-  y=80 trong frame. Tất cả frame khác đều neo theo đúng 2 mốc này
+ - Nhân vật đứng (sau khi khử viền đen): rộng 30px, cao 36px, tâm
+  ngang vẫn x=57, đường chân vẫn y=80 trong frame. Viền đen được khử
+  bằng cách xóa các pixel đen thuần (0,0,0) ở mép ngoài của nhân vật
+  (pixel đen có kề trong suốt), giữ nguyên các pixel đen bên trong
+  (mắt...) và các màu tối khác; alpha của sheet chỉ có 0/255 nên
+  không còn quầng mờ. Tất cả frame khác đều neo theo đúng 2 mốc này
   (không neo theo đáy bbox từng frame, vì frame nhảy/rơi có chân
   co lên tới y=75).
- - Vẽ đúng tỷ lệ 1/1 (SCALE=1): khung vẽ 128x128 nguyên gốc, nhân
-  vật cao 37px, rộng thân 32px, chân trùng chân hitbox, tâm trùng
-  tâm hitbox. Bản trước vẽ SCALE=2 (cao 74px) nên nhìn quá lớn.
+  - Vẽ đúng tỷ lệ 1/1 (SCALE=1): khung vẽ 128x128 nguyên gốc, nhân
+  vật cao 36px (sau khử viền), rộng thân 30px, chân trùng chân hitbox,
+  tâm trùng tâm hitbox.
 - Hitbox: rộng 15, cao 32 (thu đúng nửa từ 30x64), chân tại mặt đất.
 - Animation đã dùng (8 sheet nhúng base64 vào file):
   `idle` 10 frame (0.12s/frame), `walk` 10 (0.09s), `run` 10 (0.07s),
