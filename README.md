@@ -10,6 +10,7 @@ thư mục mới và một thẻ vào trang chủ ở `index.html`.
 | --- | --- | --- |
 | Timeline Projects — quản lý dự án trên 1 trục thời gian | `timeline-projects/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/timeline-projects/ |
 | Team Assistant — mô phỏng trợ lý trung tâm cho team kiến trúc | `team-assistant-sim/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/team-assistant-sim/ |
+| Platformer Game — prototype màn 1 kiểu NES, Canvas 2D + JS thuần, 1 file HTML tĩnh (không cần build) | `platformer-game/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/platformer-game/ |
 
 ## App desktop (không deploy lên Pages)
 
@@ -34,3 +35,7 @@ từng app với base là subpath Pages của nó, rồi ghép với trang chủ
    `--base=/ideas-n-solutions/my-new-app/` và copy `my-new-app/dist` vào
    thư mục deploy.
 3. Thêm một thẻ app vào trang chủ `index.html` và một dòng vào bảng trên.
+
+Ngoại lệ: `platformer-game/` là app HTML tĩnh 1 file, không cần build —
+workflow chỉ copy `platformer-game/index.html` vào site, không có bước
+`npm ci` / `npm run build` cho nó.

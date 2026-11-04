@@ -37,9 +37,10 @@ jobs:
         working-directory: team-assistant-sim
       # Ghép các app + trang chủ ở root thành một site duy nhất
       - run: |
-          mkdir -p _site/timeline-projects _site/team-assistant-sim
+          mkdir -p _site/timeline-projects _site/team-assistant-sim _site/platformer-game
           cp -r timeline-projects/dist/* _site/timeline-projects/
           cp -r team-assistant-sim/dist/* _site/team-assistant-sim/
+          cp platformer-game/index.html _site/platformer-game/index.html
           cp index.html _site/index.html
       - uses: actions/configure-pages@v5
         with:
