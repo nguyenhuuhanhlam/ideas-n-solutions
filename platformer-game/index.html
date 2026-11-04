@@ -109,7 +109,7 @@
       <p class="lede">
         Bản dựng lại gameplay kiểu <b>Super Mario Bros (NES)</b> bằng Canvas 2D + JavaScript thuần:
         hình vẽ nền, địch và nhạc tự làm, nhân vật chính dùng bộ sprite mới do bạn cung cấp, không dùng tài nguyên gốc của Nintendo.
-        Chạy hết màn, đạp địch, đập block <b>?</b> lấy xu và chạm cột cờ ở cuối để thắng.
+        Chạy hết màn, đạp địch, đập block <b>?</b> lấy xu và bước vào lâu đài ở cuối để thắng.
         Nhân vật nay dùng <b>kiếm cận chiến</b>: bấm <b>J</b> để chém ngay trước mặt, chém vỡ gạch, hạ địch và chém tan hạt lửa; không còn phóng kiếm.
       </p>
 
@@ -160,7 +160,7 @@
       <p class="foot">
         Gợi ý đường đi: đoạn đầu có block ? ở trên cao chứa xu; mấy ống xanh càng về sau càng cao;
         giữa màn có cầu thang lên xuống và dãy gạch lấy xu, qua dãy gạch là con phun lửa đứng canh trước ống — né hạt lửa của nó, đạp lên đầu nó hoặc chém kiếm khi đứng gần (chém tan được hạt lửa);
-        cuối màn leo cầu thang 8 bậc rồi nhảy chạm cột cờ.
+        cuối màn leo cầu thang 8 bậc rồi bước vào lâu đài.
         Rơi xuống hố hoặc hết giờ cũng mất mạng như chạm địch.
         Sprite nhân vật: bộ sprite mới do bạn cung cấp (IDLE / RUN / ATTACK_1 / HURT), chỉ đổi kích thước hiển thị, giữ nguyên hitbox.
       </p>
@@ -208,8 +208,8 @@
 
     /* ---------------- Tile ----------------
        0 trống · 1 đất · 2 gạch · 3 block ? · 4 block đã dùng
-       5 block cứng (cầu thang) · 6 ống (vẽ riêng theo vị trí) · 7 cột cờ */
-    var T = { EMPTY:0, GROUND:1, BRICK:2, QUES:3, USED:4, HARD:5, PIPE:6, FLAG:7 };
+       5 block cứng (cầu thang) · 6 ống (vẽ riêng theo vị trí) */
+    var T = { EMPTY:0, GROUND:1, BRICK:2, QUES:3, USED:4, HARD:5, PIPE:6 };
     var level = [], LEVEL_W = 0;
     var coinTiles = [];       // xu tĩnh ăn bằng cách chạm vào
     var bumpAnims = [];       // block nảy lên khi bị đập
@@ -270,14 +270,12 @@
       pipe(140, 2);
       coin(143,9); coin(144,9); coin(145,9);
 
-      /* --- Đoạn cuối: cầu thang lớn + cờ --- */
+      /* --- Đoạn cuối: cầu thang lớn + lâu đài --- */
       stairsUp(158, 8);
-      setTile(168, 12, T.HARD);          // bệ cột cờ
-      setTile(168, 4, T.FLAG);           // đánh dấu vị trí cột (vẽ thủ công)
       coin(155,9); coin(156,8);
     }
 
-    var FLAG_X = 168 * TILE + 8;         // tọa độ px của cột cờ
+    var CASTLE_X = 168 * TILE + 60;      // mép trái lâu đài cuối màn
 
     /* ---------------- Âm thanh chiptune (WebAudio) ---------------- */
     var AC = null, musicOn = true, musicTimer = null, musicStep = 0;
@@ -330,14 +328,15 @@
     var state = "menu";        // menu | play | dead | win | over
     var paused = false;
     var score = 0, coins = 0, lives = 3, timeLeft = 300, timeAcc = 0;
-    var camX = 0, shake = 0, deadTimer = 0, winTimer = 0, flagSlide = 0;
+    var camX = 0, shake = 0, deadTimer = 0, winTimer = 0;
 
     /* ---------------- Kiếm cận chiến ----------------
        Bấm J: chém 1 nhát (0.49s, trùng animation ATTACK_1), không phóng kiếm nữa.
-       Vùng chém: 24px ngay trước mặt, cao 24px (từ trên đầu xuống quá chân 1 chút),
-       đủ chém gạch ở ngang tầm khi nhảy tới, địch đứng gần và hạt lửa bay tới.
+       Vùng chém: 12px ngay trước mặt, cao 24px (từ trên đầu xuống quá chân 1 chút),
+       khớp vệt chém trong sprite (vệt chém chỉ vươn ~9px quá mép hitbox) nên địch
+       phải đứng sát mới trúng; đủ chém gạch ở ngang tầm khi nhảy tới và hạt lửa bay tới.
        Phóng kiếm sẽ là skill nhặt được — tính sau, chưa làm ở bản này. */
-    var MELEE_RANGE = 24;
+    var MELEE_RANGE = 12;
     function meleeBox(){
       var f = player.face || 1;
       return { x: f > 0 ? player.x + player.w : player.x - MELEE_RANGE,
@@ -359,7 +358,7 @@
     }
     /* ---------------- Địch phun lửa (đúng 1 con, đứng yên) ----------------
        Đặt ở ô 135: mặt đất phẳng đoạn giữa màn (sau dãy gạch 128–132,
-       trước ống ở 140), không chồng ống / hố / cờ, hai phía đều trống
+       trước ống ở 140), không chồng ống / hố, hai phía đều trống
        để hạt lửa bay ngang không bị chặn oan ngay khi vừa phun. */
     var FIREBALL_SPEED = 115;          // px/giây, vừa phải
     var FIREBALL_RANGE = 6 * TILE;     // bay quá 6 ô thì biến mất
@@ -390,7 +389,7 @@
     function reset(full){
       buildLevel(); spawnEnemies(); spawnSpitter();
       player = newPlayer();
-      camX = 0; paused = false; deadTimer = 0; winTimer = 0; flagSlide = 0; shake = 0;
+      camX = 0; paused = false; deadTimer = 0; winTimer = 0; shake = 0;
       if (full){ score = 0; coins = 0; lives = 3; }
       timeLeft = 300; timeAcc = 0;
       updateHUD();
@@ -628,9 +627,7 @@
       }
       if (state === "win"){
         winTimer += dt;
-        if (flagSlide < 1) flagSlide = Math.min(1, flagSlide + dt*1.4);
-        if (player.x < FLAG_X + 26){ player.x += 40*dt; player.animT += dt*8; }
-        return;
+        return;   // nhân vật đứng ở cửa lâu đài, màn hình kết thúc hiện sau 1.4s
       }
       if (state !== "play" || paused) return;
 
@@ -738,8 +735,8 @@
       updateSpitter(dt);
       if (state !== "play") return;
 
-      /* --- Cờ cuối màn --- */
-      if (p.x + p.w >= FLAG_X && state === "play"){
+      /* --- Lâu đài cuối màn: tâm nhân vật tới giữa cửa (CASTLE_X+22) là qua cửa --- */
+      if (p.x + p.w/2 >= CASTLE_X + 22 && state === "play"){
         state = "win"; winTimer = 0;
         score += Math.max(0, Math.ceil(timeLeft)) * 10;
         SFX.win(); updateHUD();
@@ -828,18 +825,11 @@
       }
     }
 
-    function drawFlagAndCastle(){
-      var fx = FLAG_X - camX;
-      if (fx < -40 || fx > VIEW_W + 90) return;
-      var baseY = 13*TILE, topY = 4*TILE + 6;
-      var slideY = topY + flagSlide * (baseY - topY - 26);
-      px(fx-1, topY, 2, baseY-topY, "#2b8a3e");
-      px(fx-4, topY-4, 8, 8, "#ffd43b");                       // núm vàng
-      // Lá cờ tam giác (tự vẽ, màu đỏ)
-      ctx.fillStyle = "#e03131";
-      ctx.beginPath(); ctx.moveTo(fx-1, slideY); ctx.lineTo(fx-15, slideY+6); ctx.lineTo(fx-1, slideY+12); ctx.closePath(); ctx.fill();
-      // Lâu đài nhỏ sau cờ
-      var cx0 = fx + 52;
+    function drawCastle(){
+      var cx0 = CASTLE_X - camX;
+      if (cx0 < -60 || cx0 > VIEW_W + 90) return;
+      var baseY = 13*TILE;
+      // Lâu đài nhỏ cuối màn
       px(cx0, baseY-30, 44, 30, "#c84c0c");
       px(cx0+4, baseY-38, 10, 8, "#c84c0c"); px(cx0+30, baseY-38, 10, 8, "#c84c0c");
       px(cx0+17, baseY-44, 10, 14, "#c84c0c");
@@ -960,9 +950,9 @@
       var x0 = Math.max(0, Math.floor(camX/TILE)), x1 = Math.min(LEVEL_W-1, x0 + 17);
       for (var ty=0; ty<ROWS; ty++) for (var tx=x0; tx<=x1; tx++){
         var t = level[ty][tx];
-        if (t && t !== T.FLAG) drawTile(t, tx*TILE - camX, ty*TILE, tx, ty);
+        if (t) drawTile(t, tx*TILE - camX, ty*TILE, tx, ty);
       }
-      drawFlagAndCastle();
+      drawCastle();
       var i;
       for (i=0;i<coinTiles.length;i++){
         var c = coinTiles[i];

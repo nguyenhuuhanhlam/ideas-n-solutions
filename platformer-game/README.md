@@ -19,7 +19,7 @@ tài nguyên gốc của Nintendo.
 
 - Vòng lặp cố định 60 fps (fixed timestep), va chạm AABB tách trục X rồi Y
 - Nhảy biến thiên theo thời gian giữ phím, coyote time + jump buffer nhẹ
-- Block `?` đập từ dưới ra xu, chém kiếm vỡ gạch (+50), ống, hố, cầu thang, cờ cuối màn
+- Block `?` đập từ dưới ra xu, chém kiếm vỡ gạch (+50), ống, hố, cầu thang, lâu đài cuối màn (bước vào cửa là qua cửa)
 - Địch đi tuần tra: đạp từ trên hoặc chém kiếm thì thắng (+100), chạm ngang thì mất mạng
 - Kiếm cận chiến: bấm `J` chém 1 nhát ngay trước mặt (0.49s, theo animation ATTACK_1);
   chém vỡ gạch, chém địch và địch phun lửa, chém tan hạt lửa. Phóng kiếm
