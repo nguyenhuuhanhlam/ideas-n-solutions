@@ -57,8 +57,9 @@ export default function App() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress))
   }, [progress])
 
+  // progress.best lưu theo % (bài cũ 10 câu thì điểm /100 trùng với % nên dữ liệu cũ vẫn dùng được)
   const completedCount = lessons.filter((l) => (progress[l.id]?.best || 0) >= 70).length
-  const totalBest = lessons.reduce((sum, l) => sum + (progress[l.id]?.best || 0), 0)
+  const totalQuestions = lessons.reduce((sum, l) => sum + l.questions.length, 0)
 
   function openLesson(lesson) {
     setView({ name: 'lesson', lesson })
@@ -109,15 +110,16 @@ export default function App() {
   function nextQuestion() {
     if (!quiz) return
     if (quiz.index + 1 >= quiz.questions.length) {
-      const finalScore = quiz.score
-      setQuiz({ ...quiz, finished: true })
+      const maxScore = quiz.questions.length * POINTS_PER_QUESTION
+      const finalPercent = Math.round((quiz.score / maxScore) * 100)
+      setQuiz({ ...quiz, finished: true, percent: finalPercent })
       if (quiz.lessonId) {
         setProgress((prev) => {
           const old = prev[quiz.lessonId] || { best: 0, attempts: 0 }
           return {
             ...prev,
             [quiz.lessonId]: {
-              best: Math.max(old.best, finalScore),
+              best: Math.max(old.best, finalPercent),
               attempts: old.attempts + 1,
             },
           }
@@ -131,15 +133,15 @@ export default function App() {
   // ---- Màn hình làm bài ----
   if (view.name === 'quiz' && quiz) {
     if (quiz.finished) {
-      const stars = starsFor(quiz.score)
-      const passed = quiz.score >= 70
+      const stars = starsFor(quiz.percent)
+      const passed = quiz.percent >= 70
       const wrong = quiz.log.filter((x) => !x.correct)
       return (
         <div className="page">
           <header className="top"><button className="link" onClick={() => setView({ name: 'home' })}>← Về trang chính</button></header>
-          <h1>Kết quả: {quiz.score} / {quiz.questions.length * POINTS_PER_QUESTION} điểm</h1>
+          <h1>Kết quả: {quiz.score} / {quiz.questions.length * POINTS_PER_QUESTION} điểm ({quiz.percent}%)</h1>
           <p className="lead">
-            {passed ? '🎉 Đạt! Bạn đã nắm được bài này.' : 'Chưa đạt (cần từ 70 điểm). Xem lại phần sai rồi làm lại nhé!'}
+            {passed ? '🎉 Đạt! Bạn đã nắm được bài này.' : 'Chưa đạt (cần từ 70%). Xem lại phần sai rồi làm lại nhé!'}
             {' '}Số sao: {'★'.repeat(stars)}{'☆'.repeat(3 - stars)}
           </p>
           {wrong.length > 0 && (
@@ -226,7 +228,7 @@ export default function App() {
         <header className="top"><button className="link" onClick={() => setView({ name: 'home' })}>← Tất cả các bài</button></header>
         <h1>{lesson.title}</h1>
         <p className="lead">{lesson.description}</p>
-        {best > 0 && <p className="meta">Điểm cao nhất của bạn ở bài này: <strong>{best} / 100</strong> · Đã làm {progress[lesson.id].attempts} lần</p>}
+        {best > 0 && <p className="meta">Điểm cao nhất của bạn ở bài này: <strong>{best}%</strong> · Đã làm {progress[lesson.id].attempts} lần</p>}
         <h2>📖 {lesson.grammarTitle}</h2>
         <div className="card"><p>{lesson.grammar}</p></div>
         <h2>📚 Từ vựng ({lesson.vocab.length} từ)</h2>
@@ -248,11 +250,11 @@ export default function App() {
   return (
     <div className="page">
       <h1>🇬🇧 English Basic</h1>
-      <p className="lead">Học tiếng Anh cơ bản bằng cách làm bài tập là chính: học nhanh 1 mẫu câu + 8 từ, rồi làm 10 câu có chấm điểm và giải thích ngay sau mỗi câu.</p>
+      <p className="lead">Học tiếng Anh cơ bản bằng cách làm bài tập là chính: học nhanh 1 quy tắc + 8 từ, rồi làm bài tập có chấm điểm và giải thích ngay sau mỗi câu.</p>
       <div className="stats">
-        <div><strong>{completedCount} / {lessons.length}</strong><span>bài đã đạt (≥ 70 điểm)</span></div>
-        <div><strong>{totalBest} / {lessons.length * 100}</strong><span>tổng điểm cao nhất</span></div>
-        <div><strong>{lessons.length * 10}</strong><span>câu hỏi có sẵn</span></div>
+        <div><strong>{completedCount} / {lessons.length}</strong><span>bài đã đạt (≥ 70%)</span></div>
+        <div><strong>{totalQuestions}</strong><span>câu hỏi có sẵn</span></div>
+        <div><strong>{lessons.length}</strong><span>bài học</span></div>
       </div>
       <button className="primary big" onClick={() => startQuiz(null, true)}>🔀 Ôn tập tổng hợp — 10 câu ngẫu nhiên</button>
       <h2>Các bài học</h2>
@@ -266,14 +268,14 @@ export default function App() {
               <span className="lesson-main">
                 <strong>{lesson.title}</strong>
                 <span>{lesson.description}</span>
-                <span className="lesson-meta">{lesson.vocab.length} từ · 10 câu · {best > 0 ? `Điểm cao nhất: ${best}/100 ${done ? '✅' : ''}` : 'Chưa làm'}</span>
+                <span className="lesson-meta">{lesson.vocab.length} từ · {lesson.questions.length} câu · {best > 0 ? `Điểm cao nhất: ${best}% ${done ? '✅' : ''}` : 'Chưa làm'}</span>
               </span>
               <span className="arrow">→</span>
             </button>
           )
         })}
       </div>
-      <p className="note">Tiến độ lưu trên trình duyệt này (localStorage). Đạt từ 70 điểm được tính là hoàn thành bài. Không cần tài khoản, không cần mạng sau khi tải trang.</p>
+      <p className="note">Tiến độ lưu trên trình duyệt này (localStorage). Đạt từ 70% được tính là hoàn thành bài. Không cần tài khoản, không cần mạng sau khi tải trang.</p>
     </div>
   )
 }
