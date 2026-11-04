@@ -24,11 +24,13 @@ thật, skill, trang bị...).
 
 - Màn hình logic 480x270 (16:9), mặt đất tại y=210, thế giới rộng
   2400px, camera kẹp trong biên thế giới.
- - Vật lý (thu cùng tỷ lệ 1/1 để cảm giác không lệch): đi bộ 50px/s,
-  chạy 90px/s, nhảy vận tốc -260px/s với trọng lực 700px/s² (cao
-  khoảng 48px, thời gian bay như cũ 0.74s), chạm đất có bụi nhẹ.
+  - Vật lý: đi bộ 90px/s, chạy 150px/s, nhảy vận tốc -260px/s với
+  trọng lực 700px/s² (cao khoảng 48px, thời gian bay 0.74s), chạm
+  đất có bụi nhẹ.
 - Chém combo: `J` đánh 1 chuỗi 7 frame (combo_1 3 frame + combo_1_end
-  4 frame, 0.06s/frame, tổng 0.42s), khóa di chuyển trong lúc chém,
+  4 frame, 0.06s/frame, tổng 0.42s), chém được cả khi đang nhảy
+  (chém dưới đất thì khóa di chuyển, chém trên không thì giữ đà bay
+  và vẫn lái được theo hướng),
   vùng chém trước mặt đã để sẵn trong code (`attackBox()`) để bước
   thêm địch dùng ngay, hiện chưa có mục tiêu.
 - HUD RPG khung sẵn (chưa có nguồn tăng/giảm thật): Lv 1, HP 100/100,

@@ -52,7 +52,7 @@
     <div class="overlay" id="startOverlay">
       <h2>Bắt đầu</h2>
       <p>Di chuyển: A/D hoặc ←/→ &nbsp;•&nbsp; Chạy: giữ Shift/X<br>
-      Nhảy: Z / Space / ↑ &nbsp;•&nbsp; Chém: J &nbsp;•&nbsp; Dừng: P &nbsp;•&nbsp; Chơi lại: R &nbsp;•&nbsp; Tiếng: M</p>
+      Nhảy: Z / Space / ↑ &nbsp;•&nbsp; Chém: J (cả khi nhảy) &nbsp;•&nbsp; Dừng: P &nbsp;•&nbsp; Chơi lại: R &nbsp;•&nbsp; Tiếng: M</p>
       <button id="startBtn" type="button">Chơi</button>
     </div>
     <div class="overlay hidden" id="pauseOverlay">
@@ -159,20 +159,27 @@ function attackBox() {
     : { x: player.x - w, y: player.y + 2, w: w, h: h };
 }
 function startAttack() {
-  if (player.attacking || !player.grounded) return;
+  if (player.attacking) return;
   player.attacking = true; player.attackT = 0; player.attackHitDone = false;
-  player.vx = 0; sfx("slash");
+  if (player.grounded) player.vx = 0; // chém trên không thì giữ nguyên đà bay
+  sfx("slash");
 }
 function update(dt) {
   var p = player, speed = 0, moving = false;
   if (p.attacking) {
     p.attackT += dt;
     if (p.attackT >= ATTACK_FRAMES.length * 0.06) { p.attacking = false; p.attackT = 0; }
-    // Đòn chém khóa di chuyển, vẫn chịu trọng lực nếu đang ở trên không (không xảy ra ở bước này).
+    if (p.grounded) p.vx = 0; // chém dưới đất khóa di chuyển
+    else {
+      // chém trên không: vẫn lái được theo hướng, giữ đà bay
+      var runA = isDown("run");
+      if (isDown("left")) { p.vx = -(runA ? 150 : 90); p.face = -1; }
+      else if (isDown("right")) { p.vx = (runA ? 150 : 90); p.face = 1; }
+    }
   } else {
     var run = isDown("run");
-    if (isDown("left")) { speed = -(run ? 90 : 50); p.face = -1; moving = true; }
-    else if (isDown("right")) { speed = (run ? 90 : 50); p.face = 1; moving = true; }
+    if (isDown("left")) { speed = -(run ? 150 : 90); p.face = -1; moving = true; }
+    else if (isDown("right")) { speed = (run ? 150 : 90); p.face = 1; moving = true; }
     p.vx = speed;
     if (isDown("jump") && p.grounded) {
       p.vy = -260; p.grounded = false; p.airT = 0; p.fallT = 0; sfx("jump");
