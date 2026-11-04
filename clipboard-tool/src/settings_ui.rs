@@ -18,6 +18,16 @@
 //! open at a time; a second Settings click brings the open one to
 //! the front.
 //!
+//! Layout: a Win32 tab control (`SysTabControl32`) splits the window
+//! into General, Link Detector, Facebook and Translator tabs, so each
+//! module's settings live on its own page instead of one long stacked
+//! form. Save / Cancel / Status and the File: line stay visible on
+//! every tab; switching tabs only shows/hides that tab's controls
+//! (hidden controls still exist, so Save reads all tabs). The tab
+//! control needs `InitCommonControlsEx(ICC_TAB_CLASSES)` before the
+//! window is created; tab switches arrive as `TCN_SELCHANGE` via
+//! `WM_NOTIFY`.
+//!
 //! HWNDs are stored as `isize` addresses in the static state, because
 //! `HWND` itself is not `Send` and a static must be. All access happens
 //! on the Win32 thread, so rebuilding the HWND from its address there
@@ -26,14 +36,17 @@
 use crate::config::AppConfig;
 use std::path::PathBuf;
 use std::sync::{Mutex, OnceLock};
-use windows::core::{w, PCWSTR};
+use windows::core::{w, PCWSTR, PWSTR};
 use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
+use windows::Win32::UI::Controls::{
+    InitCommonControlsEx, INITCOMMONCONTROLSEX, ICC_TAB_CLASSES, TCITEMW, TCIF_TEXT,
+};
 use windows::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DefWindowProcW, DestroyWindow, GetWindowTextW, RegisterClassW,
     SendMessageW, SetForegroundWindow, SetWindowTextW, ShowWindow,
-    BM_GETCHECK, BM_SETCHECK, BN_CLICKED, HMENU, SW_SHOW, WINDOW_EX_STYLE, WINDOW_STYLE,
-    WM_CLOSE, WM_COMMAND, WM_CREATE, WM_DESTROY, WNDCLASSW, WS_BORDER, WS_CHILD,
-    WS_OVERLAPPEDWINDOW, WS_TABSTOP, WS_VISIBLE, WS_VSCROLL,
+    BM_GETCHECK, BM_SETCHECK, BN_CLICKED, HMENU, SW_HIDE, SW_SHOW, WINDOW_EX_STYLE,
+    WINDOW_STYLE, WM_CLOSE, WM_COMMAND, WM_CREATE, WM_DESTROY, WM_NOTIFY, WNDCLASSW,
+    WS_BORDER, WS_CHILD, WS_OVERLAPPEDWINDOW, WS_TABSTOP, WS_VISIBLE, WS_VSCROLL,
 };
 
 // Control ids.
@@ -56,6 +69,56 @@ const IDC_SAVE: usize = 2040;
 const IDC_CANCEL: usize = 2041;
 const IDC_STATUS: usize = 2042;
 const IDC_TRANSLATOR: usize = 2050;
+const IDC_TR_MAX_WORDS: usize = 2051;
+const IDC_TR_MAX_LEN: usize = 2052;
+// The tab control itself, plus static labels that must be shown/hidden
+// with their tab (unlike the File: line above the tabs, which is global).
+const IDC_TABS: usize = 2000;
+const LBL_MAX_CHARS: usize = 2100;
+const LBL_ORDER: usize = 2101;
+const LBL_LINK_SCHEME: usize = 2102;
+const LBL_LINK_MAXLEN: usize = 2103;
+const LBL_FB_STRIP: usize = 2104;
+const LBL_TR_WORDS: usize = 2105;
+const LBL_TR_LEN: usize = 2106;
+const LBL_TR_INFO: usize = 2107;
+
+// Tab control messages / notifications (TCM_FIRST = 0x1300).
+const TCM_GETCURSEL: u32 = 0x130B;
+const TCM_INSERTITEMW: u32 = 0x133E;
+const TCN_SELCHANGE: i32 = -551;
+
+// (control id, tab index): 0 General, 1 Link Detector, 2 Facebook,
+// 3 Translator. Save / Cancel / Status / File: / the tab control
+// itself are deliberately absent: they stay visible on every tab.
+const TAB_CONTROLS: &[(usize, usize)] = &[
+    (IDC_AUTO_RUN, 0),
+    (IDC_OVERWRITE, 0),
+    (LBL_MAX_CHARS, 0),
+    (IDC_MAX_CHARS, 0),
+    (LBL_ORDER, 0),
+    (IDC_ORDER_LIST, 0),
+    (IDC_ORDER_UP, 0),
+    (IDC_ORDER_DOWN, 0),
+    (IDC_LINK_ENABLED, 1),
+    (IDC_LINK_MISSING, 1),
+    (IDC_LINK_LOCALHOST, 1),
+    (IDC_LINK_IP, 1),
+    (LBL_LINK_SCHEME, 1),
+    (IDC_LINK_SCHEME, 1),
+    (LBL_LINK_MAXLEN, 1),
+    (IDC_LINK_MAXLEN, 1),
+    (IDC_FB_ENABLED, 2),
+    (LBL_FB_STRIP, 2),
+    (IDC_FB_STRIP, 2),
+    (IDC_FB_CASE, 2),
+    (IDC_TRANSLATOR, 3),
+    (LBL_TR_WORDS, 3),
+    (IDC_TR_MAX_WORDS, 3),
+    (LBL_TR_LEN, 3),
+    (IDC_TR_MAX_LEN, 3),
+    (LBL_TR_INFO, 3),
+];
 
 // Win32 message numbers not exported as constants in windows 0.58.
 const LB_ADDSTRING: u32 = 0x0180;
@@ -195,6 +258,44 @@ fn ctrl(id: usize) -> Option<HWND> {
         .map(hwnd_from)
 }
 
+/// Show one tab's controls, hide the other tabs'. Controls absent
+/// from TAB_CONTROLS (Save, Cancel, Status, File:, the tab control)
+/// are never touched. Hidden controls still exist, so do_save can
+/// read every tab's fields regardless of the visible tab.
+fn show_tab(index: usize) {
+    for (id, tab) in TAB_CONTROLS {
+        if let Some(h) = ctrl(*id) {
+            unsafe {
+                let _ = ShowWindow(h, if *tab == index { SW_SHOW } else { SW_HIDE });
+            }
+        }
+    }
+}
+
+fn create_tab_control(parent: HWND) -> Option<HWND> {
+    // WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS.
+    let style = WINDOW_STYLE(WS_CHILD.0 | WS_VISIBLE.0 | 0x04000000);
+    let tabs = create_control(parent, w!("SysTabControl32"), "", style, 12, 40, 576, 470, IDC_TABS)?;
+    for (i, title) in ["General", "Link Detector", "Facebook", "Translator"]
+        .iter()
+        .enumerate()
+    {
+        let text_w = wide(title);
+        let mut item = TCITEMW::default();
+        item.mask = TCIF_TEXT;
+        item.pszText = PWSTR(text_w.as_ptr() as *mut u16);
+        unsafe {
+            let _ = SendMessageW(
+                tabs,
+                TCM_INSERTITEMW,
+                WPARAM(i),
+                LPARAM(&item as *const TCITEMW as isize),
+            );
+        }
+    }
+    Some(tabs)
+}
+
 fn get_bool(params: &serde_json::Value, key: &str, default: bool) -> bool {
     params.get(key).and_then(|v| v.as_bool()).unwrap_or(default)
 }
@@ -248,20 +349,9 @@ fn create_controls(parent: HWND) {
             0,
         ),
     );
-    put(
-        0,
-        create_control(
-            parent,
-            w!("STATIC"),
-            "General",
-            style_static(),
-            16,
-            40,
-            200,
-            20,
-            0,
-        ),
-    );
+    // Tab strip under the File: line. Tab content starts below it
+    // (y ~= 76); Save / Cancel / Status stay below the tab control.
+    put(IDC_TABS, create_tab_control(parent));
     put(
         IDC_AUTO_RUN,
         create_control(
@@ -270,7 +360,7 @@ fn create_controls(parent: HWND) {
             "Run automatically on every copy",
             style_button_checkbox(),
             16,
-            64,
+            80,
             300,
             22,
             IDC_AUTO_RUN,
@@ -284,24 +374,24 @@ fn create_controls(parent: HWND) {
             "Overwrite clipboard with the final pipeline result",
             style_button_checkbox(),
             16,
-            88,
+            108,
             360,
             22,
             IDC_OVERWRITE,
         ),
     );
     put(
-        0,
+        LBL_MAX_CHARS,
         create_control(
             parent,
             w!("STATIC"),
             "Max chars (longer text is skipped):",
             style_static(),
             16,
-            116,
+            136,
             320,
             20,
-            0,
+            LBL_MAX_CHARS,
         ),
     );
     put(
@@ -312,7 +402,7 @@ fn create_controls(parent: HWND) {
             &config.max_chars.to_string(),
             style_edit(),
             340,
-            112,
+            132,
             140,
             22,
             IDC_MAX_CHARS,
@@ -321,17 +411,17 @@ fn create_controls(parent: HWND) {
 
     // Module order list.
     put(
-        0,
+        LBL_ORDER,
         create_control(
             parent,
             w!("STATIC"),
             "Module order (runs top to bottom):",
             style_static(),
             16,
-            146,
+            164,
             300,
             20,
-            0,
+            LBL_ORDER,
         ),
     );
     let list = create_control(
@@ -340,7 +430,7 @@ fn create_controls(parent: HWND) {
         "",
         style_listbox(),
         16,
-        168,
+        186,
         320,
         52,
         IDC_ORDER_LIST,
@@ -369,7 +459,7 @@ fn create_controls(parent: HWND) {
             "Up",
             style_button(),
             350,
-            168,
+            186,
             70,
             24,
             IDC_ORDER_UP,
@@ -383,7 +473,7 @@ fn create_controls(parent: HWND) {
             "Down",
             style_button(),
             350,
-            196,
+            214,
             70,
             24,
             IDC_ORDER_DOWN,
@@ -403,27 +493,13 @@ fn create_controls(parent: HWND) {
         ),
         None => (false, true, true, true, "https".to_string(), "2048".to_string()),
     };
-    put(
-        0,
-        create_control(
-            parent,
-            w!("STATIC"),
-            "Module: link_detector",
-            style_static(),
-            16,
-            236,
-            300,
-            20,
-            0,
-        ),
-    );
     let c = create_control(
         parent,
         w!("BUTTON"),
         "Enable this module",
         style_button_checkbox(),
         16,
-        258,
+        80,
         200,
         22,
         IDC_LINK_ENABLED,
@@ -433,9 +509,9 @@ fn create_controls(parent: HWND) {
         set_check(h, link_enabled);
     }
     let checks: [(usize, &str, bool, i32); 3] = [
-        (IDC_LINK_MISSING, "Allow missing scheme (example.com -> https://...)", missing, 282),
-        (IDC_LINK_LOCALHOST, "Allow localhost", localhost, 306),
-        (IDC_LINK_IP, "Allow IP addresses", ip, 330),
+        (IDC_LINK_MISSING, "Allow missing scheme (example.com -> https://...)", missing, 108),
+        (IDC_LINK_LOCALHOST, "Allow localhost", localhost, 136),
+        (IDC_LINK_IP, "Allow IP addresses", ip, 164),
     ];
     for (id, label, value, y) in checks {
         let h = create_control(
@@ -455,17 +531,17 @@ fn create_controls(parent: HWND) {
         }
     }
     put(
-        0,
+        LBL_LINK_SCHEME,
         create_control(
             parent,
             w!("STATIC"),
             "Default scheme:",
             style_static(),
             16,
-            358,
+            196,
             140,
             20,
-            0,
+            LBL_LINK_SCHEME,
         ),
     );
     put(
@@ -476,24 +552,24 @@ fn create_controls(parent: HWND) {
             &scheme,
             style_edit(),
             160,
-            354,
+            192,
             120,
             22,
             IDC_LINK_SCHEME,
         ),
     );
     put(
-        0,
+        LBL_LINK_MAXLEN,
         create_control(
             parent,
             w!("STATIC"),
             "Max length for link detection:",
             style_static(),
             300,
-            358,
+            196,
             180,
             20,
-            0,
+            LBL_LINK_MAXLEN,
         ),
     );
     put(
@@ -504,7 +580,7 @@ fn create_controls(parent: HWND) {
             &maxlen,
             style_edit(),
             480,
-            354,
+            192,
             80,
             22,
             IDC_LINK_MAXLEN,
@@ -533,27 +609,13 @@ fn create_controls(parent: HWND) {
         }
         None => (false, "fbclid".to_string(), true),
     };
-    put(
-        0,
-        create_control(
-            parent,
-            w!("STATIC"),
-            "Module: fbclid_stripper",
-            style_static(),
-            16,
-            390,
-            300,
-            20,
-            0,
-        ),
-    );
     let c = create_control(
         parent,
         w!("BUTTON"),
         "Enable this module",
         style_button_checkbox(),
         16,
-        412,
+        80,
         200,
         22,
         IDC_FB_ENABLED,
@@ -563,17 +625,17 @@ fn create_controls(parent: HWND) {
         set_check(h, fb_enabled);
     }
     put(
-        0,
+        LBL_FB_STRIP,
         create_control(
             parent,
             w!("STATIC"),
             "Parameters to strip (comma-separated):",
             style_static(),
             16,
-            440,
+            108,
             300,
             20,
-            0,
+            LBL_FB_STRIP,
         ),
     );
     put(
@@ -584,7 +646,7 @@ fn create_controls(parent: HWND) {
             &strip,
             style_edit(),
             16,
-            462,
+            132,
             360,
             22,
             IDC_FB_STRIP,
@@ -596,7 +658,7 @@ fn create_controls(parent: HWND) {
         "Match parameter names case-insensitively",
         style_button_checkbox(),
         16,
-        490,
+        164,
         380,
         22,
         IDC_FB_CASE,
@@ -646,21 +708,93 @@ fn create_controls(parent: HWND) {
             IDC_CANCEL,
         ),
     );
-    // Translator balloon toggle, on the Save row so no other section
-    // has to move. It is a notifier, not a pipeline module, so it
-    // does not appear in the module order listbox above.
-    put(
+    // Translator tab. It is a notifier, not a pipeline module, so it
+    // does not appear in the module order listbox on the General tab.
+    // Its max_words / max_len were previously config-only; they are
+    // editable here now that the tab gives them room.
+    let c = create_control(
+        parent,
+        w!("BUTTON"),
+        "Show translation balloon",
+        style_button_checkbox(),
+        16,
+        80,
+        260,
+        22,
         IDC_TRANSLATOR,
+    );
+    put(IDC_TRANSLATOR, c);
+    if let Some(h) = c {
+        set_check(h, config.translator.enabled);
+    }
+    put(
+        LBL_TR_WORDS,
         create_control(
             parent,
-            w!("BUTTON"),
-            "Show translation balloon",
-            style_button_checkbox(),
-            280,
-            524,
-            260,
-            28,
-            IDC_TRANSLATOR,
+            w!("STATIC"),
+            "Max words in a copied phrase:",
+            style_static(),
+            16,
+            108,
+            200,
+            20,
+            LBL_TR_WORDS,
+        ),
+    );
+    put(
+        IDC_TR_MAX_WORDS,
+        create_control(
+            parent,
+            w!("EDIT"),
+            &config.translator.max_words.to_string(),
+            style_edit(),
+            220,
+            104,
+            100,
+            22,
+            IDC_TR_MAX_WORDS,
+        ),
+    );
+    put(
+        LBL_TR_LEN,
+        create_control(
+            parent,
+            w!("STATIC"),
+            "Max chars in a copied phrase:",
+            style_static(),
+            16,
+            136,
+            200,
+            20,
+            LBL_TR_LEN,
+        ),
+    );
+    put(
+        IDC_TR_MAX_LEN,
+        create_control(
+            parent,
+            w!("EDIT"),
+            &config.translator.max_len.to_string(),
+            style_edit(),
+            220,
+            132,
+            100,
+            22,
+            IDC_TR_MAX_LEN,
+        ),
+    );
+    put(
+        LBL_TR_INFO,
+        create_control(
+            parent,
+            w!("STATIC"),
+            "Translator never overwrites the clipboard: it only shows a balloon with the translation of the copied word or short phrase. On a miss it shows nothing.",
+            style_static(),
+            16,
+            168,
+            540,
+            60,
+            LBL_TR_INFO,
         ),
     );
     put(
@@ -693,6 +827,10 @@ fn create_controls(parent: HWND) {
             set_check(hwnd_from(addr), config.translator.enabled);
         }
     }
+    // Start on the General tab; every other tab's controls are hidden
+    // until their tab is clicked. This must run after the map above
+    // is populated, because show_tab reads control HWNDs from it.
+    show_tab(0);
 }
 
 fn listbox_order() -> Vec<String> {
@@ -777,6 +915,32 @@ fn do_save(hwnd: HWND) {
             return;
         }
     };
+    let tr_max_words: usize = match ctrl(IDC_TR_MAX_WORDS).map(get_text) {
+        Some(t) => match t.trim().parse() {
+            Ok(v) if v >= 1 => v,
+            _ => {
+                set_status("Error: Translator max words must be an integer >= 1.");
+                return;
+            }
+        },
+        None => {
+            set_status("Error: Could not read the translator max words field.");
+            return;
+        }
+    };
+    let tr_max_len: usize = match ctrl(IDC_TR_MAX_LEN).map(get_text) {
+        Some(t) => match t.trim().parse() {
+            Ok(v) if v >= 1 => v,
+            _ => {
+                set_status("Error: Translator max chars must be an integer >= 1.");
+                return;
+            }
+        },
+        None => {
+            set_status("Error: Could not read the translator max chars field.");
+            return;
+        }
+    };
     let scheme = ctrl(IDC_LINK_SCHEME).map(get_text).unwrap_or_default();
     let scheme = scheme.trim().to_string();
     if scheme != "http" && scheme != "https" {
@@ -824,6 +988,8 @@ fn do_save(hwnd: HWND) {
     if let Some(v) = ctrl(IDC_TRANSLATOR).map(get_check) {
         new_config.translator.enabled = v;
     }
+    new_config.translator.max_words = tr_max_words;
+    new_config.translator.max_len = tr_max_len;
     new_config.max_chars = max_chars;
     // Order from the listbox; modules not in the list keep their order.
     for (idx, id) in order.iter().enumerate() {
@@ -911,6 +1077,25 @@ unsafe extern "system" fn settings_wnd_proc(
             create_controls(hwnd);
             LRESULT(0)
         }
+        WM_NOTIFY => {
+            // NMHDR layout (64-bit): hwndFrom at 0, idFrom at 8,
+            // code (i32) at 16. Read directly instead of depending on
+            // the crate's NMHDR location.
+            let base = lparam.0 as *const u8;
+            let id_from = unsafe { *(base.add(8) as *const usize) };
+            let code = unsafe { *(base.add(16) as *const i32) };
+            if id_from == IDC_TABS && code == TCN_SELCHANGE {
+                if let Some(tabs) = ctrl(IDC_TABS) {
+                    let cur = unsafe {
+                        SendMessageW(tabs, TCM_GETCURSEL, WPARAM(0), LPARAM(0)).0
+                    };
+                    if cur >= 0 {
+                        show_tab(cur as usize);
+                    }
+                }
+            }
+            LRESULT(0)
+        }
         WM_COMMAND => {
             let id = (wparam.0 & 0xffff) as usize;
             let code = ((wparam.0 >> 16) & 0xffff) as u32;
@@ -965,6 +1150,12 @@ pub fn open_settings(hwnd: HWND, path: PathBuf, config: AppConfig) {
         s.ctrl.clear();
     }
     unsafe {
+        // The SysTabControl32 class needs comctl32 initialised first.
+        let icc = INITCOMMONCONTROLSEX {
+            dwSize: std::mem::size_of::<INITCOMMONCONTROLSEX>() as u32,
+            dwICC: ICC_TAB_CLASSES,
+        };
+        let _ = InitCommonControlsEx(&icc);
         if !CLASS_REGISTERED.swap(true, std::sync::atomic::Ordering::SeqCst) {
             let wc = WNDCLASSW {
                 style: Default::default(),
