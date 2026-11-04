@@ -119,6 +119,67 @@ const CONJ_TAB_LABELS = {
   future: 'Tương lai',
 }
 
+// Trình bày mẫu câu rõ ràng cho trẻ em:
+// - Ngữ pháp: tách thành từng khối riêng (mỗi khối 1 thẻ), không còn là 1 đoạn
+//   dài. Khối dạng "Câu tiếng Anh — nghĩa tiếng Việt" thì tách 2 dòng:
+//   dòng trên là câu tiếng Anh in đậm, dòng dưới là nghĩa.
+//   Khối chỉ là quy tắc/ghi chú thì giữ nguyên 1 dòng.
+// - Từ vựng: mỗi mục 2 dòng riêng biệt: dòng 1 là từ + nghĩa,
+//   dòng 2 là câu ví dụ (có nhãn "Ví dụ:"), không còn dồn chung 1 dòng.
+function splitGrammar(grammar) {
+  return String(grammar || '')
+    .split(/(?<=[.!?])\s+(?=[A-ZÀ-ÝĐ])/)
+    .map((chunk) => chunk.replace(/^\/\s*/, '').trim())
+    .filter(Boolean)
+}
+
+function GrammarExamples({ grammar }) {
+  const chunks = splitGrammar(grammar)
+  return (
+    <VStack gap={2}>
+      {chunks.map((chunk, i) => {
+        const sep = chunk.indexOf(' — ')
+        const left = sep >= 0 ? chunk.slice(0, sep).trim() : ''
+        const isPair = sep >= 0 && /^[A-Za-z0-9\s.,'\u2019?!/()\-:;|]+$/.test(left)
+        if (isPair) {
+          return (
+            <Card key={i}>
+              <VStack gap={1}>
+                <Text weight="bold" size="lg">💬 {left}</Text>
+                <Text>{chunk.slice(sep + 3).trim()}</Text>
+              </VStack>
+            </Card>
+          )
+        }
+        return (
+          <Card key={i}>
+            <Text>{chunk}</Text>
+          </Card>
+        )
+      })}
+    </VStack>
+  )
+}
+
+function VocabList({ items }) {
+  return (
+    <VStack gap={3}>
+      {items.map((v, i) => (
+        <VStack key={v.en} gap={1}>
+          <HStack gap={2} wrap="wrap">
+            <Text weight="bold" size="lg">{i + 1}. {v.en}</Text>
+            <Text type="supporting">— {v.vi}</Text>
+          </HStack>
+          <HStack gap={2} wrap="wrap">
+            <Text type="supporting">💬 Ví dụ:</Text>
+            <Text weight="bold">{v.example}</Text>
+          </HStack>
+        </VStack>
+      ))}
+    </VStack>
+  )
+}
+
 // Khung shell-nav theo template Astryx (giống NSDT App): thanh trên + rail
 // trái có thể kéo giãn, phân loại bài học nằm ở menu trái thay cho tabs.
 function Shell({ activeId, onNavigate, children }) {
@@ -422,18 +483,10 @@ export default function App() {
         <Text type="supporting">{lesson.description}</Text>
         {best > 0 && <Text type="supporting">Điểm cao nhất của bạn ở bài này: {best}% · Đã làm {progress[lesson.id].attempts} lần</Text>}
         <Heading level={4} weight="bold">📖 {lesson.grammarTitle}</Heading>
-        <Card><Text>{lesson.grammar}</Text></Card>
+        <GrammarExamples grammar={lesson.grammar} />
         <Heading level={4} weight="bold">📚 Dạng mẫu ({lesson.vocab.length} mục)</Heading>
         <Card>
-          <VStack gap={2}>
-            {lesson.vocab.map((v) => (
-              <HStack key={v.en} gap={2} wrap="wrap">
-                <Text weight="bold">{v.en}</Text>
-                <Text>{v.vi}</Text>
-                <Text type="supporting">{v.example}</Text>
-              </HStack>
-            ))}
-          </VStack>
+          <VocabList items={lesson.vocab} />
         </Card>
         <Heading level={4} weight="bold">✏️ Bài tập ({lesson.questions.length} câu, mỗi câu 10 điểm)</Heading>
         <Text type="supporting">3 dạng: trắc nghiệm, điền dạng đúng vào chỗ trống và dịch câu. Trả lời xong bấm “Chấm câu này” để xem giải thích ngay, cuối bài có tổng điểm, tỉ lệ % và danh sách câu sai để ôn lại.</Text>
@@ -479,17 +532,9 @@ export default function App() {
               <Text type="supporting">{conjLesson.description}</Text>
               {conjBest > 0 && <Text type="supporting">Điểm cao nhất của bạn ở nhóm này: {conjBest}% · Đã làm {progress[conjLesson.id].attempts} lần</Text>}
               <Heading level={4} weight="bold">📖 {conjLesson.grammarTitle}</Heading>
-              <Text>{conjLesson.grammar}</Text>
+              <GrammarExamples grammar={conjLesson.grammar} />
               <Heading level={4} weight="bold">📚 Dạng mẫu ({conjLesson.vocab.length} mục)</Heading>
-              <VStack gap={2}>
-                {conjLesson.vocab.map((v) => (
-                  <HStack key={v.en} gap={2} wrap="wrap">
-                    <Text weight="bold">{v.en}</Text>
-                    <Text>{v.vi}</Text>
-                    <Text type="supporting">{v.example}</Text>
-                  </HStack>
-                ))}
-              </VStack>
+              <VocabList items={conjLesson.vocab} />
               <Button variant="primary" size="lg" label={`Bắt đầu làm ${conjLesson.questions.length} câu →`} onClick={() => startQuiz(conjLesson)} />
             </VStack>
           </Card>
