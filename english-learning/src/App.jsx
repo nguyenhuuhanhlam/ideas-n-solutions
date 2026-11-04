@@ -119,6 +119,27 @@ const CONJ_TAB_LABELS = {
   future: 'Tương lai',
 }
 
+// Hệ màu cho trẻ em: MỖI Ý CHÍNH MỘT MÀU, dùng nhất quán ở mọi nơi
+// (menu trái, thẻ bài, chi tiết bài, màn hình làm bài) để trẻ nhận ra
+// bằng màu trước khi đọc chữ. Dùng đúng variant màu phân loại của Astryx
+// (Card/ClickableCard/Badge) — theo tài liệu Astryx, variant màu dùng để
+// phân loại, còn variant success/error chỉ dùng cho trạng thái đúng/sai.
+// Nút hành động vẫn giữ primary để không lẫn với màu phân loại.
+const CATEGORY_COLORS = {
+  basic: { dot: '🔵', badge: 'blue', card: 'blue', label: 'Bài cơ bản' },
+  conjugation: { dot: '🟣', badge: 'purple', card: 'purple', label: 'Chia động từ' },
+  lookup: { dot: '🟢', badge: 'green', card: 'green', label: 'Tra cứu' },
+  practice: { dot: '🟠', badge: 'orange', card: 'orange', label: 'Ôn tập tổng hợp' },
+}
+function categoryOfLesson(lesson) {
+  return conjugationGroups.some((g) => g.id === lesson.id) ? CATEGORY_COLORS.conjugation : CATEGORY_COLORS.basic
+}
+function categoryOfQuiz(quiz) {
+  if (!quiz?.lessonId) return CATEGORY_COLORS.practice
+  const lesson = allLessons.find((l) => l.id === quiz.lessonId)
+  return lesson ? categoryOfLesson(lesson) : CATEGORY_COLORS.basic
+}
+
 // Trình bày mẫu câu rõ ràng cho trẻ em:
 // - Ngữ pháp: tách thành từng khối riêng (mỗi khối 1 thẻ), không còn là 1 đoạn
 //   dài. Khối dạng "Câu tiếng Anh — nghĩa tiếng Việt" thì tách 2 dòng:
@@ -133,7 +154,7 @@ function splitGrammar(grammar) {
     .filter(Boolean)
 }
 
-function GrammarExamples({ grammar }) {
+function GrammarExamples({ grammar, card }) {
   const chunks = splitGrammar(grammar)
   return (
     <VStack gap={2}>
@@ -143,7 +164,7 @@ function GrammarExamples({ grammar }) {
         const isPair = sep >= 0 && /^[A-Za-z0-9\s.,'\u2019?!/()\-:;|]+$/.test(left)
         if (isPair) {
           return (
-            <Card key={i}>
+            <Card key={i} variant={card || 'default'}>
               <VStack gap={1}>
                 <Text weight="bold" size="lg">💬 {left}</Text>
                 <Text>{chunk.slice(sep + 3).trim()}</Text>
@@ -152,7 +173,7 @@ function GrammarExamples({ grammar }) {
           )
         }
         return (
-          <Card key={i}>
+          <Card key={i} variant={card || 'default'}>
             <Text>{chunk}</Text>
           </Card>
         )
@@ -190,9 +211,9 @@ function Shell({ activeId, onNavigate, children }) {
         label: <Text maxLines={1}>Bài học</Text>,
         isExpanded: true,
         children: [
-          { id: 'all', label: <Text maxLines={1}>Tất cả các bài</Text> },
-          { id: 'basic', label: <Text maxLines={1}>Bài cơ bản</Text> },
-          { id: 'practice', label: <Text maxLines={1}>Ôn tập tổng hợp</Text> },
+          { id: 'all', label: <Text maxLines={1}>Tất cả các bài</Text>, startContent: <Text>🌈</Text> },
+          { id: 'basic', label: <Text maxLines={1}>Bài cơ bản</Text>, startContent: <Text>🔵</Text> },
+          { id: 'practice', label: <Text maxLines={1}>Ôn tập tổng hợp</Text>, startContent: <Text>🟠</Text> },
         ].map((item) => ({ ...item, isSelected: item.id === activeId, onClick: () => onNavigate(item.id) })),
       },
       {
@@ -202,6 +223,7 @@ function Shell({ activeId, onNavigate, children }) {
         children: conjugationGroups.map((g) => ({
           id: `conj:${g.id}`,
           label: <Text maxLines={1}>{CONJ_TAB_LABELS[g.id] || g.topic}</Text>,
+          startContent: <Text>🟣</Text>,
           isSelected: `conj:${g.id}` === activeId,
           onClick: () => onNavigate(`conj:${g.id}`),
         })),
@@ -214,6 +236,7 @@ function Shell({ activeId, onNavigate, children }) {
           {
             id: 'lookup',
             label: <Text maxLines={1}>Động từ bất quy tắc</Text>,
+            startContent: <Text>🟢</Text>,
             isSelected: 'lookup' === activeId,
             onClick: () => onNavigate('lookup'),
           },
@@ -368,12 +391,14 @@ export default function App() {
   // ---- Màn hình làm bài ----
   if (view.name === 'quiz' && quiz) {
     if (quiz.finished) {
+      const quizCat = categoryOfQuiz(quiz)
       const stars = starsFor(quiz.percent)
       const passed = quiz.percent >= 70
       const wrong = quiz.log.filter((x) => !x.correct)
       return (
         <Page activeId={activeId} onNavigate={handleNavigate}>
           <Button variant="ghost" label="← Về trang chính" onClick={() => setView({ name: 'home' })} />
+          <Badge variant={quizCat.badge} label={quizCat.label} />
           <Heading level={2}>Kết quả: {quiz.score} / {quiz.questions.length * POINTS_PER_QUESTION} điểm ({quiz.percent}%)</Heading>
           <Banner
             status={passed ? 'success' : 'error'}
@@ -408,9 +433,11 @@ export default function App() {
     }
 
     const q = quiz.questions[quiz.index]
+    const quizCat = categoryOfQuiz(quiz)
     return (
       <Page activeId={activeId} onNavigate={handleNavigate}>
         <Button variant="ghost" label="← Thoát bài (không lưu điểm)" onClick={() => setView({ name: 'home' })} />
+        <Badge variant={quizCat.badge} label={quizCat.label} />
         <Heading level={2}>{quiz.title}</Heading>
         <ProgressBar
           label="Tiến độ bài làm"
@@ -422,7 +449,7 @@ export default function App() {
           Câu {quiz.index + 1} / {quiz.questions.length} · Điểm hiện tại: {quiz.score} · {typeLabel(q.type)}
           {q.lessonTitle ? ` · ${q.lessonTitle}` : ''}
         </Text>
-        <Card>
+        <Card variant={quizCat.card}>
           <VStack gap={3}>
             <Text weight="bold" size="lg">{q.prompt}</Text>
             {q.type === 'choice' ? (
@@ -475,17 +502,19 @@ export default function App() {
   // ---- Màn hình chi tiết bài ----
   if (view.name === 'lesson') {
     const lesson = view.lesson
+    const lessonCat = categoryOfLesson(lesson)
     const best = progress[lesson.id]?.best || 0
     return (
       <Page activeId={activeId} onNavigate={handleNavigate}>
         <Button variant="ghost" label="← Về danh sách bài" onClick={() => setView({ name: 'home' })} />
+        <Badge variant={lessonCat.badge} label={lessonCat.label} />
         <Heading level={2}>{lesson.title}</Heading>
         <Text type="supporting">{lesson.description}</Text>
         {best > 0 && <Text type="supporting">Điểm cao nhất của bạn ở bài này: {best}% · Đã làm {progress[lesson.id].attempts} lần</Text>}
         <Heading level={4} weight="bold">📖 {lesson.grammarTitle}</Heading>
-        <GrammarExamples grammar={lesson.grammar} />
+        <GrammarExamples grammar={lesson.grammar} card={lessonCat.card} />
         <Heading level={4} weight="bold">📚 Dạng mẫu ({lesson.vocab.length} mục)</Heading>
-        <Card>
+        <Card variant={lessonCat.card}>
           <VocabList items={lesson.vocab} />
         </Card>
         <Heading level={4} weight="bold">✏️ Bài tập ({lesson.questions.length} câu, mỗi câu 10 điểm)</Heading>
@@ -516,6 +545,7 @@ export default function App() {
 
       {section === 'lookup' && (
         <VStack gap={2}>
+          <Badge variant="green" label="Tra cứu" />
           <Heading level={4} weight="bold">📖 Tra cứu động từ bất quy tắc</Heading>
           <Text type="supporting">Bảng này dùng cho nhóm Quá khứ bất quy tắc trong Chia động từ. Gõ tiếng Anh hoặc tiếng Việt để lọc, ví dụ “go”, “went” hoặc “mua”.</Text>
           <IrregularLookup />
@@ -524,15 +554,16 @@ export default function App() {
 
       {isConjSection && (
         <VStack gap={3}>
+          <Badge variant="purple" label="Chia động từ" />
           <Heading level={4} weight="bold">Chia động từ — {CONJ_TAB_LABELS[conjLesson.id] || conjLesson.topic}</Heading>
           <Text type="supporting">Mỗi nhóm là 1 cách chia khác nhau. Gặp dạng nào thì chia theo nhóm đó: to be thì đổi be, hiện tại đơn thì thêm -s/-es, đang diễn ra thì be + V-ing, quá khứ có quy tắc thì -ed, quá khứ bất quy tắc thì học thuộc V2, tương lai thì will/be going to. Chọn nhóm khác ở menu trái.</Text>
-          <Card>
+          <Card variant="purple">
             <VStack gap={3}>
               <Heading level={4} weight="bold">{conjLesson.title}</Heading>
               <Text type="supporting">{conjLesson.description}</Text>
               {conjBest > 0 && <Text type="supporting">Điểm cao nhất của bạn ở nhóm này: {conjBest}% · Đã làm {progress[conjLesson.id].attempts} lần</Text>}
               <Heading level={4} weight="bold">📖 {conjLesson.grammarTitle}</Heading>
-              <GrammarExamples grammar={conjLesson.grammar} />
+              <GrammarExamples grammar={conjLesson.grammar} card="purple" />
               <Heading level={4} weight="bold">📚 Dạng mẫu ({conjLesson.vocab.length} mục)</Heading>
               <VocabList items={conjLesson.vocab} />
               <Button variant="primary" size="lg" label={`Bắt đầu làm ${conjLesson.questions.length} câu →`} onClick={() => startQuiz(conjLesson)} />
@@ -549,7 +580,7 @@ export default function App() {
             const done = best >= 70
             const isConj = conjugationGroups.some((g) => g.id === lesson.id)
             return (
-              <ClickableCard key={lesson.id} label={lesson.title} onClick={() => openLesson(lesson)}>
+              <ClickableCard key={lesson.id} label={lesson.title} variant={isConj ? 'purple' : 'blue'} onClick={() => openLesson(lesson)}>
                 <HStack gap={2}>
                   <Text weight="bold">{i + 1}.</Text>
                   <VStack gap={1}>
@@ -557,7 +588,9 @@ export default function App() {
                     <Text type="supporting">{lesson.description}</Text>
                     <HStack gap={2} wrap="wrap">
                       <Badge variant="neutral" label={`${lesson.questions.length} câu`} />
-                      {isConj && <Badge variant="info" label="Chia động từ" />}
+                      {isConj
+                        ? <Badge variant="purple" label="Chia động từ" />
+                        : <Badge variant="blue" label="Bài cơ bản" />}
                       {best > 0 && <Badge variant={done ? 'success' : 'neutral'} label={`Cao nhất: ${best}%`} />}
                     </HStack>
                   </VStack>

@@ -14,7 +14,11 @@ Layout theo template shell-nav của Astryx (giống khung NSDT): thanh trên
 (TopNav) + menu trái có thể kéo giãn (SideNav + TreeList), phân loại bài
 học nằm ở menu trái thay cho tabs. App dành cho trẻ em nên chữ to hơn
 mặc định của theme khoảng 25% (body 16px → 20px, ghi đè các biến
-`--font-size-*` trong `src/app-fonts.css`).
+`--font-size-*` trong `src/app-fonts.css`). Mỗi ý chính một màu, dùng
+nhất quán ở menu trái, thẻ bài, chi tiết bài và màn hình làm bài
+(variant màu phân loại của Astryx): Bài cơ bản 🔵 xanh dương, Chia
+động từ 🟣 tím, Tra cứu 🟢 xanh lá, Ôn tập tổng hợp 🟠 cam; nút hành
+động vẫn giữ primary, đúng/sai vẫn xanh lá/đỏ theo trạng thái.
 
 ## Các tab
 
