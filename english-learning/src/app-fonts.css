@@ -14,5 +14,20 @@
     --font-family-body: 'Cascadia Mono', ui-monospace, 'SF Mono', Consolas, monospace;
     --font-family-heading: 'Cascadia Mono', ui-monospace, 'SF Mono', Consolas, monospace;
     --font-family-code: 'Cascadia Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+    /* App dành cho trẻ em: chữ to hơn mặc định của theme khoảng 25%.
+       Body mặc định của theme là 1rem (16px) -> 1.25rem (20px); các cỡ
+       khác tăng theo cùng tỉ lệ để heading, nút, bảng, menu đều to lên. */
+    --font-size-base: 1.25rem;
+    --font-size-sm: 1.0625rem;
+    --font-size-xs: 0.875rem;
+    --font-size-2xs: 0.75rem;
+    --font-size-3xs: 0.625rem;
+    --font-size-4xs: 0.5rem;
+    --font-size-lg: 1.4375rem;
+    --font-size-xl: 1.625rem;
+    --font-size-2xl: 1.875rem;
+    --font-size-3xl: 2.25rem;
+    --font-size-4xl: 2.75rem;
+    --font-size-5xl: 3.25rem;
   }
 }

@@ -6,11 +6,15 @@ Giao diện dùng Astryx thật (`@astryxdesign/core` + `@astryxdesign/theme-neu
 theo đúng NSDT — toàn app dùng font Cascadia Mono (bundle qua
 `@fontsource/cascadia-mono`, `src/app-fonts.css` ghi đè 3 biến font của
 theme, y hệt NSDT), thay cho font Figtree mặc định của theme Neutral.
-component Button, Card, ClickableCard, TabList/Tab, TextInput, Table,
+component Button, Card, ClickableCard, TextInput, Table,
 ProgressBar, Banner, Badge, Heading, Text, VStack/HStack — props tra bằng
 `npx @astryxdesign/cli component <Tên>` trước khi dùng, không CSS tự vẽ lại.
 Nhấn mạnh làm bài tập có chấm điểm, không phải chỉ đọc lý thuyết.
-Nội dung phân loại bằng tabs trên trang chính.
+Layout theo template shell-nav của Astryx (giống khung NSDT): thanh trên
+(TopNav) + menu trái có thể kéo giãn (SideNav + TreeList), phân loại bài
+học nằm ở menu trái thay cho tabs. App dành cho trẻ em nên chữ to hơn
+mặc định của theme khoảng 25% (body 16px → 20px, ghi đè các biến
+`--font-size-*` trong `src/app-fonts.css`).
 
 ## Các tab
 

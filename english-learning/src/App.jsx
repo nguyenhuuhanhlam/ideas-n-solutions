@@ -2,17 +2,19 @@ import { Badge } from '@astryxdesign/core/Badge'
 import { Banner } from '@astryxdesign/core/Banner'
 import { Button } from '@astryxdesign/core/Button'
 import { Card } from '@astryxdesign/core/Card'
-import { Center } from '@astryxdesign/core/Center'
+import { AppShell } from '@astryxdesign/core/AppShell'
 import { ClickableCard } from '@astryxdesign/core/ClickableCard'
 import { Heading } from '@astryxdesign/core/Heading'
 import { HStack } from '@astryxdesign/core/HStack'
 import { ProgressBar } from '@astryxdesign/core/ProgressBar'
-import { Tab, TabList } from '@astryxdesign/core/TabList'
+import { SideNav } from '@astryxdesign/core/SideNav'
+import { TopNav } from '@astryxdesign/core/TopNav'
+import { TreeList } from '@astryxdesign/core/TreeList'
 import { Table } from '@astryxdesign/core/Table'
 import { Text } from '@astryxdesign/core/Text'
 import { TextInput } from '@astryxdesign/core/TextInput'
 import { VStack } from '@astryxdesign/core/VStack'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { lessons, conjugationGroups, POINTS_PER_QUESTION } from './data/lessons.js'
 import { irregularVerbs } from './data/irregular.js'
 
@@ -117,13 +119,79 @@ const CONJ_TAB_LABELS = {
   future: 'Tương lai',
 }
 
-function Page({ children }) {
+// Khung shell-nav theo template Astryx (giống NSDT App): thanh trên + rail
+// trái có thể kéo giãn, phân loại bài học nằm ở menu trái thay cho tabs.
+function Shell({ activeId, onNavigate, children }) {
+  const items = useMemo(
+    () => [
+      {
+        id: 'group-lessons',
+        label: <Text maxLines={1}>Bài học</Text>,
+        isExpanded: true,
+        children: [
+          { id: 'all', label: <Text maxLines={1}>Tất cả các bài</Text> },
+          { id: 'basic', label: <Text maxLines={1}>Bài cơ bản</Text> },
+          { id: 'practice', label: <Text maxLines={1}>Ôn tập tổng hợp</Text> },
+        ].map((item) => ({ ...item, isSelected: item.id === activeId, onClick: () => onNavigate(item.id) })),
+      },
+      {
+        id: 'group-conjugation',
+        label: <Text maxLines={1}>Chia động từ</Text>,
+        isExpanded: true,
+        children: conjugationGroups.map((g) => ({
+          id: `conj:${g.id}`,
+          label: <Text maxLines={1}>{CONJ_TAB_LABELS[g.id] || g.topic}</Text>,
+          isSelected: `conj:${g.id}` === activeId,
+          onClick: () => onNavigate(`conj:${g.id}`),
+        })),
+      },
+      {
+        id: 'group-lookup',
+        label: <Text maxLines={1}>Tra cứu</Text>,
+        isExpanded: true,
+        children: [
+          {
+            id: 'lookup',
+            label: <Text maxLines={1}>Động từ bất quy tắc</Text>,
+            isSelected: 'lookup' === activeId,
+            onClick: () => onNavigate('lookup'),
+          },
+        ],
+      },
+    ],
+    [activeId, onNavigate],
+  )
   return (
-    <Center axis="horizontal">
-      <VStack gap={4} padding={4} width="100%" maxWidth={760}>
+    <AppShell
+      height="fill"
+      contentPadding={4}
+      topNav={
+        <TopNav
+          label="Thanh điều hướng chính"
+          heading={<Heading level={4} weight="bold">🇬🇧 TuTi Learn English</Heading>}
+        />
+      }
+      sideNav={
+        <SideNav
+          label="Phân loại bài học"
+          resizable={{ defaultWidth: 280, minWidth: 220, maxWidth: 420 }}
+        >
+          <TreeList items={items} density="spacious" />
+        </SideNav>
+      }
+    >
+      {children}
+    </AppShell>
+  )
+}
+
+function Page({ activeId, onNavigate, children }) {
+  return (
+    <Shell activeId={activeId} onNavigate={onNavigate}>
+      <VStack gap={4} width="100%" maxWidth={900}>
         {children}
       </VStack>
-    </Center>
+    </Shell>
   )
 }
 
@@ -140,8 +208,7 @@ export default function App() {
   const [progress, setProgress] = useState(loadProgress)
   const [view, setView] = useState({ name: 'home' }) // home | lesson | quiz
   const [quiz, setQuiz] = useState(null)
-  const [tab, setTab] = useState('all') // all | basic | conjugation | lookup
-  const [conjId, setConjId] = useState('to-be')
+  const [section, setSection] = useState('all') // all | basic | lookup | conj:<id> | practice
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress))
@@ -178,6 +245,23 @@ export default function App() {
       finished: false,
     })
     setView({ name: 'quiz' })
+  }
+
+  // Mục đang chọn trên menu trái: màn hình bài/quiz suy ra từ bài đang mở,
+  // màn hình chính dùng section hiện tại.
+  const activeLessonId = view.name === 'lesson' ? view.lesson.id : view.name === 'quiz' && quiz?.lessonId ? quiz.lessonId : null
+  const activeId = view.name === 'quiz' && !quiz?.lessonId
+    ? 'practice'
+    : activeLessonId
+      ? (conjugationGroups.some((g) => g.id === activeLessonId) ? `conj:${activeLessonId}` : 'basic')
+      : section
+  function handleNavigate(id) {
+    if (id === 'practice') {
+      startQuiz(null, true)
+    } else {
+      setSection(id)
+      setView({ name: 'home' })
+    }
   }
 
   function checkAnswer() {
@@ -227,7 +311,7 @@ export default function App() {
       const passed = quiz.percent >= 70
       const wrong = quiz.log.filter((x) => !x.correct)
       return (
-        <Page>
+        <Page activeId={activeId} onNavigate={handleNavigate}>
           <Button variant="ghost" label="← Về trang chính" onClick={() => setView({ name: 'home' })} />
           <Heading level={2}>Kết quả: {quiz.score} / {quiz.questions.length * POINTS_PER_QUESTION} điểm ({quiz.percent}%)</Heading>
           <Banner
@@ -264,7 +348,7 @@ export default function App() {
 
     const q = quiz.questions[quiz.index]
     return (
-      <Page>
+      <Page activeId={activeId} onNavigate={handleNavigate}>
         <Button variant="ghost" label="← Thoát bài (không lưu điểm)" onClick={() => setView({ name: 'home' })} />
         <Heading level={2}>{quiz.title}</Heading>
         <ProgressBar
@@ -332,8 +416,8 @@ export default function App() {
     const lesson = view.lesson
     const best = progress[lesson.id]?.best || 0
     return (
-      <Page>
-        <Button variant="ghost" label="← Tất cả các bài" onClick={() => setView({ name: 'home' })} />
+      <Page activeId={activeId} onNavigate={handleNavigate}>
+        <Button variant="ghost" label="← Về danh sách bài" onClick={() => setView({ name: 'home' })} />
         <Heading level={2}>{lesson.title}</Heading>
         <Text type="supporting">{lesson.description}</Text>
         {best > 0 && <Text type="supporting">Điểm cao nhất của bạn ở bài này: {best}% · Đã làm {progress[lesson.id].attempts} lần</Text>}
@@ -358,12 +442,14 @@ export default function App() {
     )
   }
 
-  // ---- Trang chính: phân loại bằng tabs ----
-  const shownLessons = tab === 'basic' ? lessons : tab === 'all' ? allLessons : []
+  // ---- Trang chính: phân loại ở menu trái (shell-nav), không dùng tabs nữa ----
+  const isConjSection = section.startsWith('conj:')
+  const conjId = isConjSection ? section.slice(5) : 'to-be'
+  const shownLessons = section === 'basic' ? lessons : section === 'all' ? allLessons : []
   const conjLesson = conjugationGroups.find((l) => l.id === conjId) || conjugationGroups[0]
   const conjBest = progress[conjLesson.id]?.best || 0
   return (
-    <Page>
+    <Page activeId={activeId} onNavigate={handleNavigate}>
       <Heading level={1} type="display-2">🇬🇧 TuTi Learn English</Heading>
       <Text type="supporting">Học tiếng Anh cơ bản bằng cách làm bài tập là chính: học nhanh 1 quy tắc + 8 mục dạng mẫu, rồi làm bài tập có chấm điểm và giải thích ngay sau mỗi câu.</Text>
       <Card>
@@ -375,30 +461,18 @@ export default function App() {
       </Card>
       <Button variant="primary" size="lg" label="🔀 Ôn tập tổng hợp — 20 câu ngẫu nhiên" onClick={() => startQuiz(null, true)} />
 
-      <TabList value={tab} onChange={setTab} hasDivider>
-        <Tab value="all" label="Tất cả" />
-        <Tab value="basic" label="Bài cơ bản" />
-        <Tab value="conjugation" label="Chia động từ" />
-        <Tab value="lookup" label="Tra cứu" />
-      </TabList>
-
-      {tab === 'lookup' && (
+      {section === 'lookup' && (
         <VStack gap={2}>
           <Heading level={4} weight="bold">📖 Tra cứu động từ bất quy tắc</Heading>
-          <Text type="supporting">Bảng này dùng cho nhóm Quá khứ bất quy tắc trong tab Chia động từ. Gõ tiếng Anh hoặc tiếng Việt để lọc, ví dụ “go”, “went” hoặc “mua”.</Text>
+          <Text type="supporting">Bảng này dùng cho nhóm Quá khứ bất quy tắc trong Chia động từ. Gõ tiếng Anh hoặc tiếng Việt để lọc, ví dụ “go”, “went” hoặc “mua”.</Text>
           <IrregularLookup />
         </VStack>
       )}
 
-      {tab === 'conjugation' && (
+      {isConjSection && (
         <VStack gap={3}>
-          <Heading level={4} weight="bold">Chia động từ — chọn 1 nhóm</Heading>
-          <Text type="supporting">Mỗi tab là 1 cách chia khác nhau. Gặp dạng nào thì chia theo tab đó: to be thì đổi be, hiện tại đơn thì thêm -s/-es, đang diễn ra thì be + V-ing, quá khứ có quy tắc thì -ed, quá khứ bất quy tắc thì học thuộc V2, tương lai thì will/be going to.</Text>
-          <TabList value={conjId} onChange={setConjId} hasDivider>
-            {conjugationGroups.map((g) => (
-              <Tab key={g.id} value={g.id} label={CONJ_TAB_LABELS[g.id] || g.topic} />
-            ))}
-          </TabList>
+          <Heading level={4} weight="bold">Chia động từ — {CONJ_TAB_LABELS[conjLesson.id] || conjLesson.topic}</Heading>
+          <Text type="supporting">Mỗi nhóm là 1 cách chia khác nhau. Gặp dạng nào thì chia theo nhóm đó: to be thì đổi be, hiện tại đơn thì thêm -s/-es, đang diễn ra thì be + V-ing, quá khứ có quy tắc thì -ed, quá khứ bất quy tắc thì học thuộc V2, tương lai thì will/be going to. Chọn nhóm khác ở menu trái.</Text>
           <Card>
             <VStack gap={3}>
               <Heading level={4} weight="bold">{conjLesson.title}</Heading>
@@ -422,9 +496,9 @@ export default function App() {
         </VStack>
       )}
 
-      {(tab === 'all' || tab === 'basic') && (
+      {(section === 'all' || section === 'basic') && (
         <VStack gap={2}>
-          <Heading level={4} weight="bold">{tab === 'basic' ? 'Các bài cơ bản' : 'Tất cả các bài'}</Heading>
+          <Heading level={4} weight="bold">{section === 'basic' ? 'Các bài cơ bản' : 'Tất cả các bài'}</Heading>
           {shownLessons.map((lesson, i) => {
             const best = progress[lesson.id]?.best || 0
             const done = best >= 70
