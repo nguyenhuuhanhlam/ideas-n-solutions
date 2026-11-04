@@ -1,6 +1,11 @@
 # TuTi Learn English — Học tiếng Anh cơ bản qua bài tập
 
 App web (Vite + React), giao diện tiếng Việt, nội dung tiếng Anh cơ bản.
+Giao diện dùng Astryx thật (`@astryxdesign/core` + `@astryxdesign/theme-neutral`
+0.7.7, theme Neutral, font Figtree) giống NSDT: bọc `<Theme>` trong `main.jsx`,
+component Button, Card, ClickableCard, TabList/Tab, TextInput, Table,
+ProgressBar, Banner, Badge, Heading, Text, VStack/HStack — props tra bằng
+`npx @astryxdesign/cli component <Tên>` trước khi dùng, không CSS tự vẽ lại.
 Nhấn mạnh làm bài tập có chấm điểm, không phải chỉ đọc lý thuyết.
 Nội dung phân loại bằng tabs trên trang chính.
 

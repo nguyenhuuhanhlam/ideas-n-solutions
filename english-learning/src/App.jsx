@@ -1,3 +1,17 @@
+import { Badge } from '@astryxdesign/core/Badge'
+import { Banner } from '@astryxdesign/core/Banner'
+import { Button } from '@astryxdesign/core/Button'
+import { Card } from '@astryxdesign/core/Card'
+import { Center } from '@astryxdesign/core/Center'
+import { ClickableCard } from '@astryxdesign/core/ClickableCard'
+import { Heading } from '@astryxdesign/core/Heading'
+import { HStack } from '@astryxdesign/core/HStack'
+import { ProgressBar } from '@astryxdesign/core/ProgressBar'
+import { Tab, TabList } from '@astryxdesign/core/TabList'
+import { Table } from '@astryxdesign/core/Table'
+import { Text } from '@astryxdesign/core/Text'
+import { TextInput } from '@astryxdesign/core/TextInput'
+import { VStack } from '@astryxdesign/core/VStack'
 import { useEffect, useState } from 'react'
 import { lessons, conjugationGroups, POINTS_PER_QUESTION } from './data/lessons.js'
 import { irregularVerbs } from './data/irregular.js'
@@ -64,24 +78,33 @@ function IrregularLookup() {
     !q || [v.v1, v.v2, v.v3, v.vi].join(' ').toLowerCase().includes(q),
   )
   return (
-    <div>
-      <input
-        className="text-input"
-        value={query}
+    <VStack gap={2}>
+      <TextInput
+        label="Tra cứu động từ"
+        isLabelHidden
         placeholder="Gõ để tra: go, went, mua, ate…"
-        onChange={(e) => setQuery(e.target.value)}
+        value={query}
+        onChange={(v) => setQuery(v)}
+        hasClear
       />
-      <p className="meta">Hiển thị {rows.length} / {irregularVerbs.length} động từ. Cột V2 dùng cho quá khứ đơn, cột V3 dùng sau have/has (sẽ học ở cấp cao hơn).</p>
-      <div className="verb-table">
-        <div className="verb-row verb-head"><span>V1</span><span>V2 (quá khứ)</span><span>V3</span><span>Nghĩa</span></div>
-        {rows.map((v) => (
-          <div className="verb-row" key={v.v1}>
-            <span><strong>{v.v1}</strong></span><span>{v.v2}</span><span>{v.v3}</span><span>{v.vi}</span>
-          </div>
-        ))}
-      </div>
-      {rows.length === 0 && <p className="lead">Không tìm thấy động từ nào khớp.</p>}
-    </div>
+      <Text type="supporting">
+        Hiển thị {rows.length} / {irregularVerbs.length} động từ. Cột V2 dùng cho quá khứ đơn, cột V3 dùng sau have/has (sẽ học ở cấp cao hơn).
+      </Text>
+      <Table
+        data={rows}
+        idKey="v1"
+        density="balanced"
+        isStriped
+        hasHover
+        columns={[
+          { key: 'v1', header: 'V1', renderCell: (row) => <Text weight="bold">{row.v1}</Text> },
+          { key: 'v2', header: 'V2 (quá khứ)' },
+          { key: 'v3', header: 'V3' },
+          { key: 'vi', header: 'Nghĩa' },
+        ]}
+      />
+      {rows.length === 0 && <Text>Không tìm thấy động từ nào khớp.</Text>}
+    </VStack>
   )
 }
 
@@ -92,6 +115,25 @@ const CONJ_TAB_LABELS = {
   'past-regular': 'Quá khứ -ed',
   'past-irregular': 'Quá khứ bất quy tắc',
   future: 'Tương lai',
+}
+
+function Page({ children }) {
+  return (
+    <Center axis="horizontal">
+      <VStack gap={4} padding={4} width="100%" maxWidth={760}>
+        {children}
+      </VStack>
+    </Center>
+  )
+}
+
+function Stat({ label, value }) {
+  return (
+    <VStack gap={1}>
+      <Text type="supporting">{label}</Text>
+      <Heading level={4} weight="bold">{value}</Heading>
+    </VStack>
+  )
 }
 
 export default function App() {
@@ -185,85 +227,103 @@ export default function App() {
       const passed = quiz.percent >= 70
       const wrong = quiz.log.filter((x) => !x.correct)
       return (
-        <div className="page">
-          <header className="top"><button className="link" onClick={() => setView({ name: 'home' })}>← Về trang chính</button></header>
-          <h1>Kết quả: {quiz.score} / {quiz.questions.length * POINTS_PER_QUESTION} điểm ({quiz.percent}%)</h1>
-          <p className="lead">
-            {passed ? '🎉 Đạt! Bạn đã nắm được bài này.' : 'Chưa đạt (cần từ 70%). Xem lại phần sai rồi làm lại nhé!'}
-            {' '}Số sao: {'★'.repeat(stars)}{'☆'.repeat(3 - stars)}
-          </p>
+        <Page>
+          <Button variant="ghost" label="← Về trang chính" onClick={() => setView({ name: 'home' })} />
+          <Heading level={2}>Kết quả: {quiz.score} / {quiz.questions.length * POINTS_PER_QUESTION} điểm ({quiz.percent}%)</Heading>
+          <Banner
+            status={passed ? 'success' : 'error'}
+            title={passed ? 'Đạt! Bạn đã nắm được bài này.' : 'Chưa đạt (cần từ 70%). Xem lại phần sai rồi làm lại nhé!'}
+            description={`Số sao: ${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}`}
+            collapsible={false}
+          />
           {wrong.length > 0 && (
-            <>
-              <h2>Câu làm sai — xem lại</h2>
+            <VStack gap={2}>
+              <Heading level={4} weight="bold">Câu làm sai — xem lại</Heading>
               {wrong.map((x, i) => (
-                <div className="review" key={i}>
-                  <p><strong>{x.question.prompt}</strong></p>
-                  <p>Bạn trả lời: <span className="wrong">{x.userAnswer}</span></p>
-                  <p>Đáp án đúng: <span className="right">{x.correctAnswer}</span></p>
-                  <p className="explain">{x.question.explanation}</p>
-                </div>
+                <Card key={i}>
+                  <VStack gap={1}>
+                    <Text weight="bold">{x.question.prompt}</Text>
+                    <Text>Bạn trả lời: {x.userAnswer}</Text>
+                    <Text>Đáp án đúng: {x.correctAnswer}</Text>
+                    <Text type="supporting">{x.question.explanation}</Text>
+                  </VStack>
+                </Card>
               ))}
-            </>
+            </VStack>
           )}
-          <div className="row">
-            <button className="primary" onClick={() => setView({ name: 'home' })}>Về trang chính</button>
+          <HStack gap={2} wrap="wrap">
+            <Button variant="primary" label="Về trang chính" onClick={() => setView({ name: 'home' })} />
             {quiz.lessonId && (
-              <button onClick={() => startQuiz(allLessons.find((l) => l.id === quiz.lessonId))}>Làm lại bài này</button>
+              <Button label="Làm lại bài này" onClick={() => startQuiz(allLessons.find((l) => l.id === quiz.lessonId))} />
             )}
-            <button onClick={() => startQuiz(null, true)}>Ôn tập tổng hợp</button>
-          </div>
-        </div>
+            <Button label="Bài tổng hợp phân loại" onClick={() => startQuiz(null, true)} />
+          </HStack>
+        </Page>
       )
     }
 
     const q = quiz.questions[quiz.index]
-    const progressPct = Math.round(((quiz.index + (quiz.checked ? 1 : 0)) / quiz.questions.length) * 100)
     return (
-      <div className="page">
-        <header className="top"><button className="link" onClick={() => setView({ name: 'home' })}>← Thoát bài (không lưu điểm)</button></header>
-        <h1>{quiz.title}</h1>
-        <div className="bar"><div style={{ width: `${progressPct}%` }} /></div>
-        <p className="meta">Câu {quiz.index + 1} / {quiz.questions.length} · Điểm hiện tại: {quiz.score} · {typeLabel(q.type)}
-          {q.lessonTitle ? ` · ${q.lessonTitle}` : ''}</p>
-        <div className="card">
-          <p className="question">{q.prompt}</p>
-          {q.type === 'choice' ? (
-            <div className="options">
-              {q.options.map((opt) => (
-                <button
-                  key={opt}
-                  className={`option ${quiz.input === opt ? 'selected' : ''} ${quiz.checked && opt === q.answer ? 'correct' : ''} ${quiz.checked && quiz.input === opt && !quiz.checked.correct ? 'incorrect' : ''}`}
-                  disabled={!!quiz.checked}
-                  onClick={() => setQuiz({ ...quiz, input: opt })}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <input
-              className="text-input"
-              value={quiz.input}
-              disabled={!!quiz.checked}
-              placeholder={q.type === 'fill' ? 'Nhập từ còn thiếu…' : 'Nhập câu tiếng Anh…'}
-              onChange={(e) => setQuiz({ ...quiz, input: e.target.value })}
-              onKeyDown={(e) => { if (e.key === 'Enter') quiz.checked ? nextQuestion() : checkAnswer() }}
-              autoFocus
-            />
-          )}
-          {quiz.checked && (
-            <div className={`feedback ${quiz.checked.correct ? 'ok' : 'bad'}`}>
-              <p>{quiz.checked.correct ? '✅ Đúng rồi!' : `❌ Chưa đúng. Đáp án: ${q.type === 'choice' ? q.answer : q.answers[0]}`}</p>
-              <p className="explain">{q.explanation}</p>
-            </div>
-          )}
-          <div className="row">
+      <Page>
+        <Button variant="ghost" label="← Thoát bài (không lưu điểm)" onClick={() => setView({ name: 'home' })} />
+        <Heading level={2}>{quiz.title}</Heading>
+        <ProgressBar
+          label="Tiến độ bài làm"
+          value={quiz.index + (quiz.checked ? 1 : 0)}
+          max={quiz.questions.length}
+          hasValueLabel
+        />
+        <Text type="supporting">
+          Câu {quiz.index + 1} / {quiz.questions.length} · Điểm hiện tại: {quiz.score} · {typeLabel(q.type)}
+          {q.lessonTitle ? ` · ${q.lessonTitle}` : ''}
+        </Text>
+        <Card>
+          <VStack gap={3}>
+            <Text weight="bold" size="lg">{q.prompt}</Text>
+            {q.type === 'choice' ? (
+              <VStack gap={2}>
+                {q.options.map((opt) => {
+                  let variant = 'secondary'
+                  if (quiz.checked && opt === q.answer) variant = 'primary'
+                  else if (quiz.checked && quiz.input === opt && !quiz.checked.correct) variant = 'destructive'
+                  else if (quiz.input === opt) variant = 'primary'
+                  return (
+                    <Button
+                      key={opt}
+                      label={opt}
+                      variant={variant}
+                      isDisabled={!!quiz.checked}
+                      onClick={() => setQuiz({ ...quiz, input: opt })}
+                    />
+                  )
+                })}
+              </VStack>
+            ) : (
+              <TextInput
+                label="Câu trả lời"
+                isLabelHidden
+                placeholder={q.type === 'fill' ? 'Nhập từ / dạng đúng còn thiếu…' : 'Nhập câu tiếng Anh…'}
+                value={quiz.input}
+                isDisabled={!!quiz.checked}
+                hasAutoFocus
+                onChange={(v) => setQuiz({ ...quiz, input: v })}
+                onEnter={() => { if (quiz.checked) nextQuestion(); else checkAnswer() }}
+              />
+            )}
+            {quiz.checked && (
+              <Banner
+                status={quiz.checked.correct ? 'success' : 'error'}
+                title={quiz.checked.correct ? 'Đúng rồi!' : `Chưa đúng. Đáp án: ${q.type === 'choice' ? q.answer : q.answers[0]}`}
+                description={q.explanation}
+                collapsible={false}
+              />
+            )}
             {!quiz.checked
-              ? <button className="primary" disabled={!quiz.input.trim()} onClick={checkAnswer}>Chấm câu này</button>
-              : <button className="primary" onClick={nextQuestion}>{quiz.index + 1 >= quiz.questions.length ? 'Xem kết quả' : 'Câu tiếp theo →'}</button>}
-          </div>
-        </div>
-      </div>
+              ? <Button variant="primary" label="Chấm câu này" isDisabled={!quiz.input.trim()} onClick={checkAnswer} />
+              : <Button variant="primary" label={quiz.index + 1 >= quiz.questions.length ? 'Xem kết quả' : 'Câu tiếp theo →'} onClick={nextQuestion} />}
+          </VStack>
+        </Card>
+      </Page>
     )
   }
 
@@ -272,25 +332,29 @@ export default function App() {
     const lesson = view.lesson
     const best = progress[lesson.id]?.best || 0
     return (
-      <div className="page">
-        <header className="top"><button className="link" onClick={() => setView({ name: 'home' })}>← Tất cả các bài</button></header>
-        <h1>{lesson.title}</h1>
-        <p className="lead">{lesson.description}</p>
-        {best > 0 && <p className="meta">Điểm cao nhất của bạn ở bài này: <strong>{best}%</strong> · Đã làm {progress[lesson.id].attempts} lần</p>}
-        <h2>📖 {lesson.grammarTitle}</h2>
-        <div className="card"><p>{lesson.grammar}</p></div>
-        <h2>📚 Từ vựng ({lesson.vocab.length} từ)</h2>
-        <div className="vocab">
-          {lesson.vocab.map((v) => (
-            <div className="vocab-item" key={v.en}>
-              <strong>{v.en}</strong><span>{v.vi}</span><em>{v.example}</em>
-            </div>
-          ))}
-        </div>
-        <h2>✏️ Bài tập ({lesson.questions.length} câu, mỗi câu 10 điểm)</h2>
-        <p className="lead">3 dạng: trắc nghiệm, điền từ vào chỗ trống và dịch câu. Trả lời xong bấm “Chấm câu này” để xem giải thích ngay, cuối bài có tổng điểm và danh sách câu sai để ôn lại.</p>
-        <button className="primary big" onClick={() => startQuiz(lesson)}>Bắt đầu làm bài →</button>
-      </div>
+      <Page>
+        <Button variant="ghost" label="← Tất cả các bài" onClick={() => setView({ name: 'home' })} />
+        <Heading level={2}>{lesson.title}</Heading>
+        <Text type="supporting">{lesson.description}</Text>
+        {best > 0 && <Text type="supporting">Điểm cao nhất của bạn ở bài này: {best}% · Đã làm {progress[lesson.id].attempts} lần</Text>}
+        <Heading level={4} weight="bold">📖 {lesson.grammarTitle}</Heading>
+        <Card><Text>{lesson.grammar}</Text></Card>
+        <Heading level={4} weight="bold">📚 Dạng mẫu ({lesson.vocab.length} mục)</Heading>
+        <Card>
+          <VStack gap={2}>
+            {lesson.vocab.map((v) => (
+              <HStack key={v.en} gap={2} wrap="wrap">
+                <Text weight="bold">{v.en}</Text>
+                <Text>{v.vi}</Text>
+                <Text type="supporting">{v.example}</Text>
+              </HStack>
+            ))}
+          </VStack>
+        </Card>
+        <Heading level={4} weight="bold">✏️ Bài tập ({lesson.questions.length} câu, mỗi câu 10 điểm)</Heading>
+        <Text type="supporting">3 dạng: trắc nghiệm, điền dạng đúng vào chỗ trống và dịch câu. Trả lời xong bấm “Chấm câu này” để xem giải thích ngay, cuối bài có tổng điểm, tỉ lệ % và danh sách câu sai để ôn lại.</Text>
+        <Button variant="primary" size="lg" label="Bắt đầu làm bài →" onClick={() => startQuiz(lesson)} />
+      </Page>
     )
   }
 
@@ -299,87 +363,92 @@ export default function App() {
   const conjLesson = conjugationGroups.find((l) => l.id === conjId) || conjugationGroups[0]
   const conjBest = progress[conjLesson.id]?.best || 0
   return (
-    <div className="page">
-      <h1>🇬🇧 TuTi Learn English</h1>
-      <p className="lead">Học tiếng Anh cơ bản bằng cách làm bài tập là chính: học nhanh 1 quy tắc + 8 từ, rồi làm bài tập có chấm điểm và giải thích ngay sau mỗi câu.</p>
-      <div className="stats">
-        <div><strong>{completedCount} / {allLessons.length}</strong><span>bài đã đạt (≥ 70%)</span></div>
-        <div><strong>{totalQuestions}</strong><span>câu hỏi có sẵn</span></div>
-        <div><strong>{lessons.length} + {conjugationGroups.length}</strong><span>bài cơ bản + nhóm chia động từ</span></div>
-      </div>
-      <button className="primary big" onClick={() => startQuiz(null, true)}>🔀 Ôn tập tổng hợp — 20 câu ngẫu nhiên</button>
+    <Page>
+      <Heading level={1} type="display-2">🇬🇧 TuTi Learn English</Heading>
+      <Text type="supporting">Học tiếng Anh cơ bản bằng cách làm bài tập là chính: học nhanh 1 quy tắc + 8 mục dạng mẫu, rồi làm bài tập có chấm điểm và giải thích ngay sau mỗi câu.</Text>
+      <Card>
+        <HStack gap={8} wrap="wrap">
+          <Stat label="Bài đã đạt (≥ 70%)" value={`${completedCount} / ${allLessons.length}`} />
+          <Stat label="Câu hỏi có sẵn" value={String(totalQuestions)} />
+          <Stat label="Bài cơ bản + nhóm chia động từ" value={`${lessons.length} + ${conjugationGroups.length}`} />
+        </HStack>
+      </Card>
+      <Button variant="primary" size="lg" label="🔀 Ôn tập tổng hợp — 20 câu ngẫu nhiên" onClick={() => startQuiz(null, true)} />
 
-      <div className="tabs" role="tablist">
-        <button className={`tab ${tab === 'all' ? 'active' : ''}`} onClick={() => setTab('all')}>Tất cả</button>
-        <button className={`tab ${tab === 'basic' ? 'active' : ''}`} onClick={() => setTab('basic')}>Bài cơ bản</button>
-        <button className={`tab ${tab === 'conjugation' ? 'active' : ''}`} onClick={() => setTab('conjugation')}>Chia động từ</button>
-        <button className={`tab ${tab === 'lookup' ? 'active' : ''}`} onClick={() => setTab('lookup')}>Tra cứu</button>
-      </div>
+      <TabList value={tab} onChange={setTab} hasDivider>
+        <Tab value="all" label="Tất cả" />
+        <Tab value="basic" label="Bài cơ bản" />
+        <Tab value="conjugation" label="Chia động từ" />
+        <Tab value="lookup" label="Tra cứu" />
+      </TabList>
 
       {tab === 'lookup' && (
-        <>
-          <h2>📖 Tra cứu động từ bất quy tắc</h2>
-          <p className="lead">Bảng này dùng cho nhóm Quá khứ bất quy tắc trong tab Chia động từ. Gõ tiếng Anh hoặc tiếng Việt để lọc, ví dụ “go”, “went” hoặc “mua”.</p>
+        <VStack gap={2}>
+          <Heading level={4} weight="bold">📖 Tra cứu động từ bất quy tắc</Heading>
+          <Text type="supporting">Bảng này dùng cho nhóm Quá khứ bất quy tắc trong tab Chia động từ. Gõ tiếng Anh hoặc tiếng Việt để lọc, ví dụ “go”, “went” hoặc “mua”.</Text>
           <IrregularLookup />
-        </>
+        </VStack>
       )}
 
       {tab === 'conjugation' && (
-        <>
-          <h2>Chia động từ — chọn 1 nhóm</h2>
-          <p className="lead">Mỗi tab là 1 cách chia khác nhau. Gặp dạng nào thì chia theo tab đó: to be thì đổi be, hiện tại đơn thì thêm -s/-es, đang diễn ra thì be + V-ing, quá khứ có quy tắc thì -ed, quá khứ bất quy tắc thì học thuộc V2, tương lai thì will/be going to.</p>
-          <div className="tabs sub-tabs" role="tablist">
+        <VStack gap={3}>
+          <Heading level={4} weight="bold">Chia động từ — chọn 1 nhóm</Heading>
+          <Text type="supporting">Mỗi tab là 1 cách chia khác nhau. Gặp dạng nào thì chia theo tab đó: to be thì đổi be, hiện tại đơn thì thêm -s/-es, đang diễn ra thì be + V-ing, quá khứ có quy tắc thì -ed, quá khứ bất quy tắc thì học thuộc V2, tương lai thì will/be going to.</Text>
+          <TabList value={conjId} onChange={setConjId} hasDivider>
             {conjugationGroups.map((g) => (
-              <button key={g.id} className={`tab ${conjId === g.id ? 'active' : ''}`} onClick={() => setConjId(g.id)}>
-                {CONJ_TAB_LABELS[g.id] || g.topic}
-              </button>
+              <Tab key={g.id} value={g.id} label={CONJ_TAB_LABELS[g.id] || g.topic} />
             ))}
-          </div>
-          <div className="card">
-            <h2 style={{ marginTop: 0 }}>{conjLesson.title}</h2>
-            <p className="lead">{conjLesson.description}</p>
-            {conjBest > 0 && <p className="meta">Điểm cao nhất của bạn ở nhóm này: <strong>{conjBest}%</strong> · Đã làm {progress[conjLesson.id].attempts} lần</p>}
-            <h2>📖 {conjLesson.grammarTitle}</h2>
-            <p>{conjLesson.grammar}</p>
-            <h2>📚 Dạng mẫu ({conjLesson.vocab.length} mục)</h2>
-            <div className="vocab">
-              {conjLesson.vocab.map((v) => (
-                <div className="vocab-item" key={v.en}>
-                  <strong>{v.en}</strong><span>{v.vi}</span><em>{v.example}</em>
-                </div>
-              ))}
-            </div>
-            <div className="row">
-              <button className="primary big" onClick={() => startQuiz(conjLesson)}>Bắt đầu làm {conjLesson.questions.length} câu →</button>
-            </div>
-          </div>
-        </>
+          </TabList>
+          <Card>
+            <VStack gap={3}>
+              <Heading level={4} weight="bold">{conjLesson.title}</Heading>
+              <Text type="supporting">{conjLesson.description}</Text>
+              {conjBest > 0 && <Text type="supporting">Điểm cao nhất của bạn ở nhóm này: {conjBest}% · Đã làm {progress[conjLesson.id].attempts} lần</Text>}
+              <Heading level={4} weight="bold">📖 {conjLesson.grammarTitle}</Heading>
+              <Text>{conjLesson.grammar}</Text>
+              <Heading level={4} weight="bold">📚 Dạng mẫu ({conjLesson.vocab.length} mục)</Heading>
+              <VStack gap={2}>
+                {conjLesson.vocab.map((v) => (
+                  <HStack key={v.en} gap={2} wrap="wrap">
+                    <Text weight="bold">{v.en}</Text>
+                    <Text>{v.vi}</Text>
+                    <Text type="supporting">{v.example}</Text>
+                  </HStack>
+                ))}
+              </VStack>
+              <Button variant="primary" size="lg" label={`Bắt đầu làm ${conjLesson.questions.length} câu →`} onClick={() => startQuiz(conjLesson)} />
+            </VStack>
+          </Card>
+        </VStack>
       )}
 
       {(tab === 'all' || tab === 'basic') && (
-        <>
-          <h2>{tab === 'basic' ? 'Các bài cơ bản' : 'Tất cả các bài'}</h2>
-          <div className="lesson-list">
-            {shownLessons.map((lesson, i) => {
-              const best = progress[lesson.id]?.best || 0
-              const done = best >= 70
-              const isConj = conjugationGroups.some((g) => g.id === lesson.id)
-              return (
-                <button className="lesson-card" key={lesson.id} onClick={() => openLesson(lesson)}>
-                  <span className="lesson-num">{i + 1}</span>
-                  <span className="lesson-main">
-                    <strong>{lesson.title}</strong>
-                    <span>{lesson.description}</span>
-                    <span className="lesson-meta">{isConj ? 'Chia động từ · ' : ''}{lesson.vocab.length} mục · {lesson.questions.length} câu · {best > 0 ? `Điểm cao nhất: ${best}% ${done ? '✅' : ''}` : 'Chưa làm'}</span>
-                  </span>
-                  <span className="arrow">→</span>
-                </button>
-              )
-            })}
-          </div>
-        </>
+        <VStack gap={2}>
+          <Heading level={4} weight="bold">{tab === 'basic' ? 'Các bài cơ bản' : 'Tất cả các bài'}</Heading>
+          {shownLessons.map((lesson, i) => {
+            const best = progress[lesson.id]?.best || 0
+            const done = best >= 70
+            const isConj = conjugationGroups.some((g) => g.id === lesson.id)
+            return (
+              <ClickableCard key={lesson.id} label={lesson.title} onClick={() => openLesson(lesson)}>
+                <HStack gap={2}>
+                  <Text weight="bold">{i + 1}.</Text>
+                  <VStack gap={1}>
+                    <Heading level={4} weight="bold">{lesson.title}</Heading>
+                    <Text type="supporting">{lesson.description}</Text>
+                    <HStack gap={2} wrap="wrap">
+                      <Badge variant="neutral" label={`${lesson.questions.length} câu`} />
+                      {isConj && <Badge variant="info" label="Chia động từ" />}
+                      {best > 0 && <Badge variant={done ? 'success' : 'neutral'} label={`Cao nhất: ${best}%`} />}
+                    </HStack>
+                  </VStack>
+                </HStack>
+              </ClickableCard>
+            )
+          })}
+        </VStack>
       )}
-      <p className="note">Tiến độ lưu trên trình duyệt này (localStorage). Đạt từ 70% được tính là hoàn thành bài. Không cần tài khoản, không cần mạng sau khi tải trang.</p>
-    </div>
+      <Text type="supporting">Tiến độ lưu trên trình duyệt này (localStorage). Đạt từ 70% được tính là hoàn thành bài. Không cần tài khoản, không cần mạng sau khi tải trang.</Text>
+    </Page>
   )
 }
