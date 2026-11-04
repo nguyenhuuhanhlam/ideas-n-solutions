@@ -1,51 +1,59 @@
 # Samurai in Mario World
 
-Bản dựng lại gameplay kiểu Super Mario Bros (NES) bằng Canvas 2D +
-JavaScript thuần, ở độ phân giải logic 256x240, tile 16px.
-Hình vẽ nền, địch và nhạc tự làm, nhân vật chính dùng bộ sprite
-mới do user cung cấp (IDLE / RUN / ATTACK_1 / HURT), không dùng
-tài nguyên gốc của Nintendo.
+Game 2D side-scroller chặt chém có yếu tố RPG, viết bằng Canvas 2D +
+JavaScript thuần, 1 file HTML tĩnh duy nhất, không cần build.
 
-## Chơi
+## Bước 1 (hiện tại): mặt đất + nhân vật
+
+Bản cũ kiểu Mario (địch, xu, gạch, ống, hố, lâu đài, vệt kiếm gồng)
+đã được gỡ bỏ hoàn toàn ngày 2026-11-04. Bản mới bắt đầu lại từ:
+mặt đất phẳng dài 2400px, camera bám theo nhân vật, và nhân vật
+chính dùng bộ sprite mới do user cung cấp. Chưa có địch, chưa có
+màn thắng/thua — các bước sau sẽ bổ sung từng phần (địch, HP/EXP
+thật, skill, trang bị...).
 
 - Mở `index.html` trực tiếp trong trình duyệt, hoặc qua GitHub Pages:
   https://nguyenhuuhanhlam.github.io/ideas-n-solutions/platformer-game/
-- Phím: `←` `→` hoặc `A` `D` di chuyển, `Z` / `Space` / `↑` nhảy
-  (giữ lâu = nhảy cao), `X` hoặc `Shift` chạy nhanh, `J` chém kiếm
-  cận chiến (giữ 0.5s phóng vệt kiếm), `P` tạm dừng, `R` chơi lại, `M` tắt/bật tiếng. Trên mobile có nút
-  cảm ứng, gồm nút kiếm.
+- Phím: `←` `→` hoặc `A` `D` đi bộ, giữ `Shift`/`X` để chạy,
+  `Z` / `Space` / `↑` nhảy, `J` chém combo, `P` tạm dừng,
+  `R` chơi lại, `M` tắt/bật tiếng. Trên mobile có nút ◀ ▶, Chạy,
+  Nhảy, Chém.
 
-## Cơ chế trong prototype
+## Cơ chế bước 1
 
-- Vòng lặp cố định 60 fps (fixed timestep), va chạm AABB tách trục X rồi Y
-- Nhảy biến thiên theo thời gian giữ phím, coyote time + jump buffer nhẹ
-- Block `?` đập từ dưới ra xu, chém kiếm vỡ gạch (+50), ống, hố, cầu thang, lâu đài cuối màn (bước vào cửa là qua cửa)
-- Địch đi tuần tra: đạp từ trên hoặc chém kiếm thì thắng (+100), chạm ngang thì mất mạng
-- Kiếm cận chiến: bấm `J` chém 1 nhát ngay trước mặt (0.49s, theo animation ATTACK_1);
-  chém vỡ gạch, chém địch và địch phun lửa, chém tan hạt lửa. Giữ `J` 0.5s
-  để gồng (chỉ còn hạt năng lượng quanh nhân vật) rồi tự phóng vệt kiếm
-  hình đa giác trắng phẳng kiểu lưỡi liềm, mảnh dày 8px, không trail, mờ dần nửa sau quãng bay, bay xa 36px từ mép nhân vật (gấp 3 lần tầm chém 12px),
-  xuyên địch, phá gạch,
-  tan hạt lửa; thả sớm thì chém thường
-- Địch phun lửa (đúng 1 con, đứng yên ở ô 135): khoảng 2 giây phun
-  1 hạt lửa bay ngang về phía nhân vật, chạm tường thì tắt, chạm
-  nhân vật thì mất mạng; đạp từ trên hoặc chém kiếm khi đứng gần đều giết được,
-  chém tan được hạt lửa
-- Nhân vật chính: bộ sprite mới nhúng trực tiếp vào file
-  (IDLE khi đứng, RUN khi di chuyển và khi bay, ATTACK_1 khi bấm
-  `J`, HURT khi chết), lật ngang khi quay trái, hitbox 12x15 và
-  vật lý giữ nguyên; nhân vật đã cầm kiếm đỏ trong sprite nên
-  không vẽ thêm kiếm cầm tay
-- Camera chỉ cuộn tới, HUD điểm / xu / mạng / thời gian, nhạc chiptune
-  tổng hợp bằng WebAudio
+- Màn hình logic 480x270 (16:9), mặt đất tại y=210, thế giới rộng
+  2400px, camera kẹp trong biên thế giới.
+- Vật lý: đi bộ 100px/s, chạy 180px/s, nhảy vận tốc -520px/s với
+  trọng lực 1400px/s² (cao khoảng 96px), chạm đất có bụi nhẹ.
+- Chém combo: `J` đánh 1 chuỗi 7 frame (combo_1 3 frame + combo_1_end
+  4 frame, 0.06s/frame, tổng 0.42s), khóa di chuyển trong lúc chém,
+  vùng chém trước mặt đã để sẵn trong code (`attackBox()`) để bước
+  thêm địch dùng ngay, hiện chưa có mục tiêu.
+- HUD RPG khung sẵn (chưa có nguồn tăng/giảm thật): Lv 1, HP 100/100,
+  MP 50/50, EXP 0/100.
+- Môi trường vẽ bằng code (không asset ngoài): bầu trời gradient,
+  mặt trời, núi xa parallax 0.3, cây gần parallax 0.6, cỏ + đất +
+  đá + cỏ dại theo vị trí thế giới.
+- Âm thanh tối giản bằng WebAudio: tiếng nhảy, tiếng chém, không
+  nhạc nền.
 
-## Sprite nhân vật
+## Sprite nhân vật (đo trực tiếp từ file PNG)
 
-- Bộ sprite mới do user cung cấp ngày 2026-11-04, gồm 4 sheet
-  trong suốt 96x96: `IDLE.png` (10 frame), `RUN.png` (16 frame),
-  `ATTACK_1.png` (7 frame), `HURT.png` (4 frame, frame đầu là
-  chớp trắng khi trúng đòn). Không còn dùng sheet Ozzbit ở bản
-  trước, và trang game cũng không còn ghi credit Ozzbit nữa.
+- Mỗi sheet là dãy frame 128x128, nền trong suốt. File
+  `male_hero-design.png` (1 frame) làm mốc: bbox x41-73, y43-80.
+- Nhân vật đứng: rộng 32px, cao 37px, tâm ngang x=57, đường chân
+  y=80 trong frame. Tất cả frame khác đều neo theo đúng 2 mốc này
+  (không neo theo đáy bbox từng frame, vì frame nhảy/rơi có chân
+  co lên tới y=75).
+- Vẽ với SCALE=2: khung vẽ 256x256, nhân vật cao 74px, rộng thân
+  64px, chân trùng chân hitbox, tâm trùng tâm hitbox.
+- Hitbox: rộng 30, cao 64, chân tại mặt đất.
+- Animation đã dùng (8 sheet nhúng base64 vào file):
+  `idle` 10 frame (0.12s/frame), `walk` 10 (0.09s), `run` 10 (0.07s),
+  `jump` 6 (lấy frame 0 lúc cất bước, frame 2 lúc đang lên),
+  `fall` 4 (0.06s/frame, lúc bắt đầu rơi), `fall_loop` 3 (0.1s/frame,
+  rơi ổn định), `combo_1` 3 + `combo_1_end` 4 (chém).
+- Lật ngang khi quay trái bằng cách scale(-1, 1) quanh tâm nhân vật.
 
 ## Deploy
 
