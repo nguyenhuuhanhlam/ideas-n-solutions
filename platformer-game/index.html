@@ -327,7 +327,7 @@
        CHARGE_TIME = 0.5s. Trong lúc gồng, updateCharge() rải hạt năng lượng
        quanh nhân vật và tăng dần độ sáng; đủ 0.5s thì fireWave() tự chạy,
        không cần thả tay. Thả trước 0.5s: endCharge() chém thường 1 nhát.
-       Vệt kiếm: hình trăng lưỡi liềm như vệt chém trong sprite ATTACK_1,
+       Vệt kiếm: 1 đa giác trắng phẳng kiểu trăng lưỡi liềm, không trail, không blur,
        bay ngang theo hướng mặt, tốc độ 150px/s, bay xa WAVE_RANGE
        = 36px tính từ mép nhân vật (gấp 3 lần tầm chém vật lý 12px), xuyên địch,
        phá gạch, tan hạt lửa, gặp ống/tường/block cứng thì tan. */
@@ -352,7 +352,7 @@
       waves.push({
         x: f > 0 ? player.x + player.w : player.x - 14,
         y: player.y + 1, w: 14, h: 12,
-        vx: f * WAVE_SPEED, dist: 0, ph: Math.random()*6.28
+        vx: f * WAVE_SPEED, dist: 0
       });
       player.charging = false; player.chargeFired = true; player.chargeT = 0;
       SFX.wave();
@@ -375,10 +375,7 @@
       var i, e, tx, ty, tt, w;
       for (i=waves.length-1;i>=0;i--){
         w = waves[i];
-        w.ph += dt*18;
         w.x += w.vx * dt; w.dist += Math.abs(w.vx) * dt;
-        // Vệt bay để lại hạt sáng
-        if (Math.random() < 0.7) particles.push({x:w.x+7, y:w.y+4, vx:-w.vx*0.1, vy:(Math.random()-0.5)*20, t:0, col:"#ffffff"});
         var gone = false;
         if (w.dist >= WAVE_RANGE) gone = true;
         else {
@@ -1023,8 +1020,9 @@
     }
 
     function drawWaves(){
-      // Vệt kiếm trắng đơn giản: 1 cung tròn trắng như vệt chém trong sprite mẫu,
-      // không còn hào quang xanh hay 2 lớp màu nữa
+      // Vệt kiếm trắng đơn giản kiểu polygon: 1 đa giác phẳng, góc nhọn,
+      // không hào quang, không blur, không trail phía sau
+      // (mũi nhọn phía trước, lõm ở giữa cạnh sau tạo dáng lưỡi liềm)
       for (var i=0;i<waves.length;i++){
         var w = waves[i];
         var sx = w.x - camX, sy = w.y;
@@ -1033,8 +1031,15 @@
         ctx.save();
         ctx.translate(sx + 7, sy + 6);
         ctx.scale(dir, 1);
-        ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 5; ctx.lineCap = "round";
-        ctx.beginPath(); ctx.arc(0, 0, 8, -1.25, 1.25); ctx.stroke();
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.moveTo(-8, -8);
+        ctx.lineTo(4, -10);
+        ctx.lineTo(12, 0);
+        ctx.lineTo(4, 10);
+        ctx.lineTo(-8, 8);
+        ctx.lineTo(-2, 0);
+        ctx.closePath(); ctx.fill();
         ctx.restore();
       }
     }

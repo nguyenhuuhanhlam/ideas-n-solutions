@@ -24,7 +24,7 @@ tài nguyên gốc của Nintendo.
 - Kiếm cận chiến: bấm `J` chém 1 nhát ngay trước mặt (0.49s, theo animation ATTACK_1);
   chém vỡ gạch, chém địch và địch phun lửa, chém tan hạt lửa. Giữ `J` 0.5s
   để gồng (chỉ còn hạt năng lượng quanh nhân vật) rồi tự phóng vệt kiếm
-  hình trăng lưỡi liềm trắng bay xa 36px từ mép nhân vật (gấp 3 lần tầm chém 12px),
+  hình đa giác trắng phẳng kiểu lưỡi liềm, không trail, bay xa 36px từ mép nhân vật (gấp 3 lần tầm chém 12px),
   xuyên địch, phá gạch,
   tan hạt lửa; thả sớm thì chém thường
 - Địch phun lửa (đúng 1 con, đứng yên ở ô 135): khoảng 2 giây phun
