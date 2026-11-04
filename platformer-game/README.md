@@ -11,27 +11,28 @@ tài nguyên gốc của Nintendo.
 - Mở `index.html` trực tiếp trong trình duyệt, hoặc qua GitHub Pages:
   https://nguyenhuuhanhlam.github.io/ideas-n-solutions/platformer-game/
 - Phím: `←` `→` hoặc `A` `D` di chuyển, `Z` / `Space` / `↑` nhảy
-  (giữ lâu = nhảy cao), `X` hoặc `Shift` chạy nhanh, `J` phóng kiếm,
-  `P` tạm dừng, `R` chơi lại, `M` tắt/bật tiếng. Trên mobile có nút
+  (giữ lâu = nhảy cao), `X` hoặc `Shift` chạy nhanh, `J` chém kiếm
+  cận chiến, `P` tạm dừng, `R` chơi lại, `M` tắt/bật tiếng. Trên mobile có nút
   cảm ứng, gồm nút kiếm.
 
 ## Cơ chế trong prototype
 
 - Vòng lặp cố định 60 fps (fixed timestep), va chạm AABB tách trục X rồi Y
 - Nhảy biến thiên theo thời gian giữ phím, coyote time + jump buffer nhẹ
-- Block `?` đập từ dưới ra xu, gạch, ống, hố, cầu thang, cờ cuối màn
-- Địch đi tuần tra: đạp từ trên thì thắng, chạm ngang thì mất mạng
-- Kiếm boomerang: nhân vật cầm kiếm, bấm `J` phóng kiếm bay ngang
-  tối đa 80px rồi quay về tay; chạm tường thì quay lại ngay, chạm
-  địch thì địch chết, lúc kiếm bay không phóng thêm được
+- Block `?` đập từ dưới ra xu, chém kiếm vỡ gạch (+50), ống, hố, cầu thang, cờ cuối màn
+- Địch đi tuần tra: đạp từ trên hoặc chém kiếm thì thắng (+100), chạm ngang thì mất mạng
+- Kiếm cận chiến: bấm `J` chém 1 nhát ngay trước mặt (0.49s, theo animation ATTACK_1);
+  chém vỡ gạch, chém địch và địch phun lửa, chém tan hạt lửa. Phóng kiếm
+  chưa có — sẽ là skill nhặt được, tính sau
 - Địch phun lửa (đúng 1 con, đứng yên ở ô 135): khoảng 2 giây phun
   1 hạt lửa bay ngang về phía nhân vật, chạm tường thì tắt, chạm
-  nhân vật thì mất mạng; đạp từ trên hoặc chém kiếm đều giết được
+  nhân vật thì mất mạng; đạp từ trên hoặc chém kiếm khi đứng gần đều giết được,
+  chém tan được hạt lửa
 - Nhân vật chính: bộ sprite mới nhúng trực tiếp vào file
   (IDLE khi đứng, RUN khi di chuyển và khi bay, ATTACK_1 khi bấm
   `J`, HURT khi chết), lật ngang khi quay trái, hitbox 12x15 và
   vật lý giữ nguyên; nhân vật đã cầm kiếm đỏ trong sprite nên
-  không vẽ thêm kiếm cầm tay, kiếm bay đổi sang lưỡi đỏ cho khớp
+  không vẽ thêm kiếm cầm tay
 - Camera chỉ cuộn tới, HUD điểm / xu / mạng / thời gian, nhạc chiptune
   tổng hợp bằng WebAudio
 
