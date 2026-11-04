@@ -36,10 +36,16 @@ vật lý của nhân vật và cảnh trí xung quanh, chưa làm hệ thống 
 - Camera bám theo nhân vật (lerp 0.1), kẹp trong thế giới 4800x540,
   mặt đất tại y=468 (hạ 1 block 48px so với y=420 ban đầu theo phản hồi
   ngày 2026-11-04, platform hạ theo để vẫn nhảy lên được).
-- Cảnh trí: trời gradient, mặt trời parallax 0.05, núi xa parallax
-  0.3, cây gần parallax 0.6, mặt đất + platform nổi bằng Tileset.
+- Cảnh trí: nền xa nhất là ảnh núi `far-mountains.png` (384x216)
+  vẽ full màn hình, cố định theo màn hình (scrollFactor 0) — ảnh đã
+  có đủ trời, mây, núi, nền đất phẳng nên không vẽ thêm trời
+  gradient, núi tam giác hay mặt trời bằng code nữa; cây gần
+  parallax 0.6, mặt đất + platform nổi bằng Tileset.
 - Platform nổi mẫu (đặc, đứng được trên mặt): (700, 388, 128),
-  (1000, 308, 96), (1250, 388, 160) — xem `src/config.ts`.
+  (1000, 308, 96), (1250, 388, 160) — xem `src/config.ts`. Platform
+  dày đúng tỷ lệ khối đất gốc: cỏ 19px + thân đất 48px = 67px, đáy
+  là hàng đáy gồ ghề của khối gốc (không còn đường thẳng sắc như
+  bản mỏng 35px trước đây); thân va chạm từ mặt đứng y xuống y+62.
 - Phím: A/D hoặc ←/→ di chuyển, giữ Shift/X chạy, Z/Space/↑ nhảy,
   J chém, P tạm dừng, R chơi lại. Mobile: tay NES (D-pad ◀ ▶ ▲,
   nút dẹt Chạy/Dừng, nút tròn đỏ B = Nhảy, A = Chém).
@@ -76,6 +82,8 @@ Asset do user gửi lẻ, assistant phải tách riêng và đặt tên để th
   thành 7 frame, 896x128).
 - `assets/tilesets/terrain-tileset.png` — copy nguyên Tileset.png,
   chỉ đổi tên.
+- `assets/backgrounds/far-mountains.png` — copy nguyên Background.png
+  (384x216, núi xa), chỉ đổi tên; script cũng copy sang `public/`.
 - `public/assets/` — bản sao của processed để Vite copy vào `dist/`.
 - `tools/process-assets.py` — script sinh processed từ raw (khử viền
   đen hero: xóa pixel đen thuần ở mép ngoài, giữ pixel đen trong;

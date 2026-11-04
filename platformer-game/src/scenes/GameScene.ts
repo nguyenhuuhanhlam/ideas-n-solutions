@@ -33,6 +33,7 @@ export class GameScene extends Phaser.Scene {
       });
     }
     this.load.image("terrain", "assets/tilesets/terrain-tileset.png");
+    this.load.image("far-mountains", "assets/backgrounds/far-mountains.png");
   }
 
   private makeTileTexture(key: string, sx: number, sy: number, w: number, h: number): void {
@@ -75,31 +76,14 @@ export class GameScene extends Phaser.Scene {
     this.makeDirtBodyTexture();
     this.makeTileTexture("plat-top", 16, 13, 16, 19);
 
-    // Bầu trời gradient (đứng yên theo màn hình).
-    const sky = this.add.graphics();
-    sky.setScrollFactor(0);
-    sky.fillGradientStyle(0x79c4f2, 0x79c4f2, 0xd9f2ff, 0xd9f2ff, 1);
-    sky.fillRect(0, 0, VIEW_W, VIEW_H);
-
-    // Mặt trời (parallax rất nhẹ).
-    const sun = this.add.graphics();
-    sun.setScrollFactor(0.05);
-    sun.fillStyle(0xffd94d, 1);
-    sun.fillCircle(800, 80, 36);
-
-    // Núi xa (parallax 0.3).
-    for (let i = 0; i < 6; i++) {
-      const x = i * 640;
-      const m = this.add.graphics();
-      m.setScrollFactor(0.3);
-      m.fillStyle(0x7fa8c9, 1);
-      m.beginPath();
-      m.moveTo(x, GROUND_Y);
-      m.lineTo(x + 440, GROUND_Y - 180);
-      m.lineTo(x + 880, GROUND_Y);
-      m.closePath();
-      m.fillPath();
-    }
+    // Nền xa nhất: ảnh núi 384x216 đúng tỷ lệ 16:9 với khung 960x540 nên
+    // vẽ full màn hình, cố định theo màn hình (scrollFactor 0). Ảnh đã có
+    // đủ trời, mây, núi, nền đất phẳng nên không vẽ thêm trời gradient,
+    // núi tam giác hay mặt trời bằng code nữa.
+    const far = this.add.image(0, 0, "far-mountains");
+    far.setOrigin(0, 0);
+    far.setDisplaySize(VIEW_W, VIEW_H);
+    far.setScrollFactor(0);
 
     // Cây gần (parallax 0.6).
     for (let i = 0; i < 7; i++) {
@@ -124,11 +108,14 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.existing(groundBody, true);
     this.solids.push(groundBody);
 
-    // Platform nổi mẫu + thân va chạm của chúng.
+    // Platform nổi mẫu + thân va chạm của chúng. Platform dày đúng tỷ lệ
+    // khối đất gốc trong tileset: cỏ 19px + thân đất 48px = 67px, đáy là
+    // hàng đáy gồ ghề của khối gốc nên không còn đường thẳng sắc; thân va
+    // chạm kéo từ mặt đứng y xuống y+62 theo đúng hình vẽ.
     for (const plat of PLATFORMS) {
       this.add.tileSprite(plat.x, plat.y - 5, plat.w, 19, "plat-top").setOrigin(0, 0);
-      this.add.tileSprite(plat.x, plat.y + 14, plat.w, 16, "dirt-body").setOrigin(0, 0);
-      const body = this.add.rectangle(plat.x + plat.w / 2, plat.y + 15, plat.w, 30);
+      this.add.tileSprite(plat.x, plat.y + 14, plat.w, 48, "dirt-body").setOrigin(0, 0);
+      const body = this.add.rectangle(plat.x + plat.w / 2, plat.y + 31, plat.w, 62);
       body.setFillStyle(0xffffff, 0);
       this.physics.add.existing(body, true);
       this.solids.push(body);

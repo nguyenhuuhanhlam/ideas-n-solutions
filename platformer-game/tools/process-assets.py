@@ -19,6 +19,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent.parent
 RAW_HERO = ROOT / "assets" / "raw" / "hero"
 RAW_TILESET = ROOT / "assets" / "raw" / "tileset" / "Tileset.png"
+RAW_BACKGROUND = ROOT / "assets" / "raw" / "background" / "Background.png"
 OUT_PLAYER = ROOT / "assets" / "sprites" / "player"
 OUT_TILESET = ROOT / "assets" / "tilesets"
 
@@ -77,9 +78,18 @@ def main() -> None:
     assert RAW_TILESET.exists(), f"thiếu file raw: {RAW_TILESET}"
     (OUT_TILESET / "terrain-tileset.png").write_bytes(RAW_TILESET.read_bytes())
     print("Tileset.png -> terrain-tileset.png (copy nguyên)")
+    # Nền xa: copy nguyên, chỉ đổi tên (ảnh đã đúng tỷ lệ 16:9 với khung game).
+    assert RAW_BACKGROUND.exists(), f"thiếu file raw: {RAW_BACKGROUND}"
+    bg_out = ROOT / "assets" / "backgrounds" / "far-mountains.png"
+    bg_out.parent.mkdir(parents=True, exist_ok=True)
+    bg_out.write_bytes(RAW_BACKGROUND.read_bytes())
+    print("Background.png -> far-mountains.png (copy nguyên, 384x216)")
     # Đồng bộ sang public/ để Vite copy vào dist khi build.
     public_player = ROOT / "public" / "assets" / "sprites" / "player"
     public_tileset = ROOT / "public" / "assets" / "tilesets"
+    public_bg = ROOT / "public" / "assets" / "backgrounds"
+    public_bg.mkdir(parents=True, exist_ok=True)
+    (public_bg / "far-mountains.png").write_bytes(bg_out.read_bytes())
     public_player.mkdir(parents=True, exist_ok=True)
     public_tileset.mkdir(parents=True, exist_ok=True)
     for f in OUT_PLAYER.glob("*.png"):
