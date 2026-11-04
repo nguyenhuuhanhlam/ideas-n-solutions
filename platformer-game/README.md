@@ -12,7 +12,7 @@ tài nguyên gốc của Nintendo.
   https://nguyenhuuhanhlam.github.io/ideas-n-solutions/platformer-game/
 - Phím: `←` `→` hoặc `A` `D` di chuyển, `Z` / `Space` / `↑` nhảy
   (giữ lâu = nhảy cao), `X` hoặc `Shift` chạy nhanh, `J` chém kiếm
-  cận chiến (giữ 1.5s phóng vệt kiếm), `P` tạm dừng, `R` chơi lại, `M` tắt/bật tiếng. Trên mobile có nút
+  cận chiến (giữ 1s phóng vệt kiếm), `P` tạm dừng, `R` chơi lại, `M` tắt/bật tiếng. Trên mobile có nút
   cảm ứng, gồm nút kiếm.
 
 ## Cơ chế trong prototype
@@ -22,9 +22,10 @@ tài nguyên gốc của Nintendo.
 - Block `?` đập từ dưới ra xu, chém kiếm vỡ gạch (+50), ống, hố, cầu thang, lâu đài cuối màn (bước vào cửa là qua cửa)
 - Địch đi tuần tra: đạp từ trên hoặc chém kiếm thì thắng (+100), chạm ngang thì mất mạng
 - Kiếm cận chiến: bấm `J` chém 1 nhát ngay trước mặt (0.49s, theo animation ATTACK_1);
-  chém vỡ gạch, chém địch và địch phun lửa, chém tan hạt lửa. Giữ `J` 1.5s
-  để gồng (hạt năng lượng + thanh gồng trên đầu) rồi tự phóng vệt kiếm bay
-  xa 24px từ mép nhân vật (gấp đôi tầm chém 12px), xuyên địch, phá gạch,
+  chém vỡ gạch, chém địch và địch phun lửa, chém tan hạt lửa. Giữ `J` 1s
+  để gồng (hạt năng lượng + vòng sáng quanh nhân vật) rồi tự phóng vệt kiếm
+  hình trăng lưỡi liềm bay xa 36px từ mép nhân vật (gấp 3 lần tầm chém 12px),
+  xuyên địch, phá gạch,
   tan hạt lửa; thả sớm thì chém thường
 - Địch phun lửa (đúng 1 con, đứng yên ở ô 135): khoảng 2 giây phun
   1 hạt lửa bay ngang về phía nhân vật, chạm tường thì tắt, chạm

@@ -108,9 +108,9 @@
         <canvas id="game" width="256" height="240" aria-label="Khung game platform 2D"></canvas>
         <div class="overlay" id="ovStart">
           <h2>MÀN 1-1</h2>
-          <p>Camera chỉ cuộn tới, không quay lui được — đúng kiểu NES. Giữ phím chạy để chạy nhanh và nhảy xa hơn, thả phím nhảy sớm để nhảy thấp. Bấm J để chém kiếm cận chiến ngay trước mặt; giữ J 1.5s để gồng rồi phóng vệt kiếm.</p>
+          <p>Camera chỉ cuộn tới, không quay lui được — đúng kiểu NES. Giữ phím chạy để chạy nhanh và nhảy xa hơn, thả phím nhảy sớm để nhảy thấp. Bấm J để chém kiếm cận chiến ngay trước mặt; giữ J 1s để gồng rồi phóng vệt kiếm.</p>
           <button type="button" class="big-btn" id="btnPlay">▶ Chơi</button>
-          <span class="keys-hint">← → di chuyển · Z / Space nhảy · X chạy nhanh · J chém kiếm · giữ J 1.5s phóng vệt kiếm</span>
+          <span class="keys-hint">← → di chuyển · Z / Space nhảy · X chạy nhanh · J chém kiếm · giữ J 1s phóng vệt kiếm</span>
         </div>
         <div class="overlay" id="ovEnd" hidden>
           <h2 id="endTitle">Hoàn thành màn!</h2>
@@ -324,13 +324,14 @@
     }
 
     /* ---------------- Vệt kiếm gồng (giữ J) ----------------
-       CHARGE_TIME = 1.5s. Trong lúc gồng, updateCharge() rải hạt năng lượng
-       quanh nhân vật và tăng dần độ sáng; đủ 1.5s thì fireWave() tự chạy,
-       không cần thả tay. Thả trước 1.5s: endCharge() chém thường 1 nhát.
-       Vệt kiếm: bay ngang theo hướng mặt, tốc độ 150px/s, bay xa WAVE_RANGE
-       = 24px tính từ mép nhân vật (gấp đôi tầm chém vật lý 12px), xuyên địch,
+       CHARGE_TIME = 1s. Trong lúc gồng, updateCharge() rải hạt năng lượng
+       quanh nhân vật và tăng dần độ sáng; đủ 1s thì fireWave() tự chạy,
+       không cần thả tay. Thả trước 1s: endCharge() chém thường 1 nhát.
+       Vệt kiếm: hình trăng lưỡi liềm như vệt chém trong sprite ATTACK_1,
+       bay ngang theo hướng mặt, tốc độ 150px/s, bay xa WAVE_RANGE
+       = 36px tính từ mép nhân vật (gấp 3 lần tầm chém vật lý 12px), xuyên địch,
        phá gạch, tan hạt lửa, gặp ống/tường/block cứng thì tan. */
-    var CHARGE_TIME = 1.5, WAVE_RANGE = 24, WAVE_SPEED = 150;
+    var CHARGE_TIME = 1.0, WAVE_RANGE = 36, WAVE_SPEED = 150;
     var waves = [];
     function startCharge(){
       if (!player || state !== "play" || paused) return;
@@ -340,7 +341,7 @@
     }
     function endCharge(){
       if (!player) return;
-      // Vệt đã phóng ở đủ 1.5s: thả tay chỉ gỡ khóa, không chém thường nữa
+      // Vệt đã phóng ở đủ 1s: thả tay chỉ gỡ khóa, không chém thường nữa
       if (player.chargeFired){ player.chargeFired = false; player.chargeT = 0; return; }
       if (!player.charging) return;
       player.charging = false; player.chargeT = 0;
@@ -350,7 +351,7 @@
       var f = player.face || 1;
       waves.push({
         x: f > 0 ? player.x + player.w : player.x - 14,
-        y: player.y + 3, w: 14, h: 8,
+        y: player.y + 1, w: 14, h: 12,
         vx: f * WAVE_SPEED, dist: 0, ph: Math.random()*6.28
       });
       player.charging = false; player.chargeFired = true; player.chargeT = 0;
@@ -360,7 +361,7 @@
     function updateCharge(dt){
       if (!player || !player.charging) return;
       player.chargeT += dt;
-      // Hạt năng lượng xoáy quanh nhân vật, càng gần đủ 1.5s càng dày và sáng
+      // Hạt năng lượng xoáy quanh nhân vật, càng gần đủ 1s càng dày và sáng
       var prog = Math.min(1, player.chargeT / CHARGE_TIME);
       if (Math.random() < 0.35 + prog*0.55){
         var a = Math.random()*6.28, r = 10 + Math.random()*6;
@@ -526,7 +527,7 @@
     }
     bindTouch("tLeft","left"); bindTouch("tRight","right");
     bindTouch("tRun","run"); bindTouch("tJump","jump");
-    // Nút kiếm cảm ứng: chạm giữ để gồng, thả sớm thì chém thường, đủ 1.5s tự phóng vệt
+    // Nút kiếm cảm ứng: chạm giữ để gồng, thả sớm thì chém thường, đủ 1s tự phóng vệt
     (function(){
       var el = document.getElementById("tSword");
       el.addEventListener("pointerdown", function(ev){ ev.preventDefault(); audio(); startCharge(); });
@@ -1022,6 +1023,8 @@
     }
 
     function drawWaves(){
+      // Vệt kiếm hình trăng lưỡi liềm: cung tròn dày vẽ theo hướng bay,
+      // giống vệt chém trắng trong sprite ATTACK_1 (không phải vệt thẳng nữa)
       for (var i=0;i<waves.length;i++){
         var w = waves[i];
         var sx = w.x - camX, sy = w.y;
@@ -1029,26 +1032,25 @@
         var dir = w.vx > 0 ? 1 : -1;
         var flick = Math.sin(w.ph) > 0 ? 1 : 0;
         ctx.save();
-        ctx.translate(sx + 7, sy + 4);
+        ctx.translate(sx + 7, sy + 6);
         ctx.scale(dir, 1);
-        ctx.globalAlpha = 0.45; ctx.fillStyle = "#22b8cf"; ctx.fillRect(-9, -5, 18, 10);
-        ctx.globalAlpha = 0.9; ctx.fillStyle = flick ? "#99e9f2" : "#66d9e8"; ctx.fillRect(-7, -3, 14, 6);
-        ctx.globalAlpha = 1; ctx.fillStyle = "#ffffff"; ctx.fillRect(-5, -1.5, 10, 3);
-        ctx.fillStyle = "#e3fafc";
-        ctx.beginPath(); ctx.moveTo(7, -3); ctx.lineTo(11, 0); ctx.lineTo(7, 3); ctx.closePath(); ctx.fill();
+        ctx.globalAlpha = 0.25; ctx.fillStyle = "#22b8cf";
+        ctx.beginPath(); ctx.arc(0, 0, 12, 0, 6.3); ctx.fill();
+        ctx.globalAlpha = 0.95; ctx.strokeStyle = flick ? "#99e9f2" : "#66d9e8";
+        ctx.lineWidth = 5; ctx.lineCap = "round";
+        ctx.beginPath(); ctx.arc(0, 0, 8, -1.25, 1.25); ctx.stroke();
+        ctx.globalAlpha = 1; ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(0, 0, 8, -1.0, 1.0); ctx.stroke();
         ctx.restore();
       }
     }
 
     function drawCharge(){
-      // Thanh gồng trên đầu + vòng sáng nhấp nháy quanh nhân vật, đầy dần theo 1.5s
+      // Khi gồng chỉ còn vòng sáng nhấp nháy quanh nhân vật (đã bỏ thanh bar trên đầu),
+      // vòng nở dần và chuyển sang vàng khi gần đủ thời gian gồng
       var prog = Math.min(1, player.chargeT / CHARGE_TIME);
       var sx = player.x - camX, sy = player.y;
       ctx.save();
-      ctx.globalAlpha = 0.85;
-      ctx.fillStyle = "#212529"; ctx.fillRect(sx - 5, sy - 9, 22, 3);
-      ctx.fillStyle = prog > 0.66 ? "#ffe066" : "#66d9e8";
-      ctx.fillRect(sx - 5, sy - 9, 22 * prog, 3);
       ctx.globalAlpha = 0.5 + 0.4 * Math.sin(performance.now() / 90);
       ctx.strokeStyle = prog > 0.66 ? "#ffe066" : "#66d9e8"; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.arc(sx + 6, sy + 7, 11 + prog * 3, 0, 6.3); ctx.stroke();
