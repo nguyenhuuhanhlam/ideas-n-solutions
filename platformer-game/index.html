@@ -351,7 +351,7 @@
       var f = player.face || 1;
       waves.push({
         x: f > 0 ? player.x + player.w : player.x - 14,
-        y: player.y + 1, w: 14, h: 12,
+        y: player.y + 3, w: 14, h: 8,
         vx: f * WAVE_SPEED, dist: 0
       });
       player.charging = false; player.chargeFired = true; player.chargeT = 0;
@@ -1023,22 +1023,27 @@
       // Vệt kiếm trắng đơn giản kiểu polygon: 1 đa giác phẳng, góc nhọn,
       // không hào quang, không blur, không trail phía sau
       // (mũi nhọn phía trước, lõm ở giữa cạnh sau tạo dáng lưỡi liềm;
-      // mảnh: dày tối đa 12px, dài 20px, khớp hitbox cao 12px của vệt)
+      // mảnh: dày tối đa 8px, dài 20px, khớp hitbox cao 8px của vệt;
+      // mờ dần: nửa đầu quãng bay giữ nguyên độ đậm, nửa sau mờ dần
+      // về trong suốt khi tới giới hạn 36px rồi mới biến mất)
       for (var i=0;i<waves.length;i++){
         var w = waves[i];
         var sx = w.x - camX, sy = w.y;
         if (sx < -24 || sx > VIEW_W + 24) continue;
         var dir = w.vx > 0 ? 1 : -1;
+        var prog = w.dist / WAVE_RANGE;
+        var alpha = prog < 0.5 ? 1 : Math.max(0, 2 * (1 - prog));
         ctx.save();
-        ctx.translate(sx + 7, sy + 6);
+        ctx.translate(sx + 7, sy + 4);
         ctx.scale(dir, 1);
+        ctx.globalAlpha = alpha;
         ctx.fillStyle = "#ffffff";
         ctx.beginPath();
-        ctx.moveTo(-8, -4);
-        ctx.lineTo(5, -6);
+        ctx.moveTo(-8, -3);
+        ctx.lineTo(5, -4);
         ctx.lineTo(12, 0);
-        ctx.lineTo(5, 6);
-        ctx.lineTo(-8, 4);
+        ctx.lineTo(5, 4);
+        ctx.lineTo(-8, 3);
         ctx.lineTo(-2, 0);
         ctx.closePath(); ctx.fill();
         ctx.restore();
