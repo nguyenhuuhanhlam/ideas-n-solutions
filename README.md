@@ -12,6 +12,7 @@ thư mục mới và một thẻ vào trang chủ ở `index.html`.
 | Team Assistant — mô phỏng trợ lý trung tâm cho team kiến trúc | `team-assistant-sim/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/team-assistant-sim/ |
 | Platformer Game — prototype màn 1 kiểu NES, Canvas 2D + JS thuần, 1 file HTML tĩnh (không cần build) | `platformer-game/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/platformer-game/ |
 | English Basic — học tiếng Anh cơ bản qua bài tập có chấm điểm (8 bài, 90 câu, gồm 2 bài chia động từ lớp 6, ôn tập tổng hợp) | `english-learning/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/english-learning/ |
+| Chia Động Từ — hệ thống bài riêng về chia động từ, phân loại 6 nhóm × 15 câu + bài tổng hợp phân loại + tra cứu 47 động từ bất quy tắc | `chia-dong-tu/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/chia-dong-tu/ |
 
 ## App desktop (không deploy lên Pages)
 
