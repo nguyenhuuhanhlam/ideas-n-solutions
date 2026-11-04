@@ -91,12 +91,10 @@
       @media (pointer:coarse){ .touch{ display:flex; } }
 
       /* ---------- Hướng dẫn + ghi chú ---------- */
-      .cols{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:16px; }
-      @media (max-width:640px){ .cols{ grid-template-columns:1fr; } h1{ font-size:22px; } }
-      .card{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 18px 16px; }
-      .card h3{ margin:0 0 10px; font-size:14px; letter-spacing:.02em; }
-      .card ul{ margin:0; padding-left:18px; font-size:14px; line-height:1.7; color:var(--ink); }
-      .card p{ margin:0; font-size:14px; line-height:1.65; }
+      @media (max-width:640px){ h1{ font-size:22px; } }
+      /* Dải phím gọn 1 khối thay cho 2 thẻ hướng dẫn + cơ chế trước đây */
+      .keys{ margin-top:12px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:9px 14px; font-size:13px; line-height:1.9; color:var(--ink); }
+      .keys b{ color:var(--muted); font-size:11px; letter-spacing:.12em; text-transform:uppercase; margin-right:8px; }
       kbd{
         font-family:ui-monospace, Consolas, monospace; font-size:12px;
         background:var(--page); border:1px solid var(--btn-line); border-bottom-width:2px;
@@ -157,31 +155,7 @@
         </div>
       </div>
 
-      <div class="cols">
-        <section class="card">
-          <h3>Phím điều khiển</h3>
-          <ul>
-            <li><kbd>←</kbd> <kbd>→</kbd> hoặc <kbd>A</kbd> <kbd>D</kbd> — đi / chạy</li>
-            <li><kbd>Z</kbd> · <kbd>Space</kbd> · <kbd>↑</kbd> — nhảy (giữ lâu = nhảy cao)</li>
-            <li><kbd>X</kbd> hoặc <kbd>Shift</kbd> — giữ để chạy nhanh</li>
-            <li><kbd>J</kbd> — chém kiếm cận chiến (tầm chém ngay trước mặt; trên mobile bấm nút 🗡️)</li>
-            <li><kbd>P</kbd> — tạm dừng · <kbd>R</kbd> — chơi lại · <kbd>M</kbd> — tắt/bật tiếng</li>
-          </ul>
-        </section>
-        <section class="card">
-          <h3>Cơ chế đã làm trong prototype</h3>
-          <ul>
-            <li>Vòng lặp cố định 60 fps (fixed timestep), va chạm AABB tách trục X → Y</li>
-            <li>Nhảy biến thiên theo thời gian giữ phím, thêm <i>coyote time</i> + <i>jump buffer</i> nhẹ cho dễ chơi</li>
-            <li>Đập block <b>?</b> từ dưới ra xu, chém kiếm vỡ gạch (+50), ống, hố, cầu thang, cờ cuối màn</li>
-            <li>Địch Bụp đi tuần tra: đạp từ trên hoặc chém kiếm thì thắng (+100), chạm ngang thì mất mạng; chém tan được hạt lửa</li>
-            <li>Địch phun lửa (1 con, ở đoạn giữa màn, sau dãy gạch và trước ống gần cuối đoạn giữa): đứng yên không đi tuần tra, đầu đỏ cam có sừng vàng nên khác hẳn Bụp nâu; khi bạn tới gần mới bắt đầu phun, cứ ~2 giây phun 1 hạt lửa bay thẳng ngang về phía bạn — hạt lửa chạm tường/gạch/ống hoặc bay quá ~6 ô thì tắt, chạm vào bạn thì mất mạng. Cách đối phó: nhảy đạp từ trên xuống cho nó chết (+100 điểm), hoặc đứng gần chém kiếm <b>J</b> (chém tan được hạt lửa bay tới)</li>
-            <li>Kiếm cận chiến: bấm <b>J</b> chém 1 nhát ngay trước mặt (0.49s, theo animation ATTACK_1, hết nhát mới chém tiếp được); chém vỡ gạch (+50), chém địch và địch phun lửa (+100), chém tan hạt lửa. Phóng kiếm chưa có — sẽ là skill nhặt được, tính sau</li>
-            <li>Nhân vật chính dùng bộ sprite mới: IDLE khi đứng, RUN khi di chuyển và khi bay, ATTACK_1 khi bấm <b>J</b>, HURT khi chết, hitbox và vật lý giữ nguyên</li>
-            <li>Nhạc nền và hiệu ứng chiptune tổng hợp bằng WebAudio</li>
-          </ul>
-        </section>
-      </div>
+      <p class="keys"><b>Điều khiển</b> <kbd>←</kbd> <kbd>→</kbd> / <kbd>A</kbd> <kbd>D</kbd> di chuyển · <kbd>Z</kbd> / <kbd>Space</kbd> / <kbd>↑</kbd> nhảy (giữ = cao) · <kbd>X</kbd> / <kbd>Shift</kbd> chạy nhanh · <kbd>J</kbd> chém kiếm · <kbd>P</kbd> dừng · <kbd>R</kbd> chơi lại · <kbd>M</kbd> tiếng · mobile: nút 🗡️ chém</p>
 
       <p class="foot">
         Gợi ý đường đi: đoạn đầu có block ? ở trên cao chứa xu; mấy ống xanh càng về sau càng cao;
