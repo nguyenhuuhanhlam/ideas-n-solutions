@@ -111,7 +111,7 @@
       <h1>Chú Bé Ống Nước — Prototype Màn 1</h1>
       <p class="lede">
         Bản dựng lại gameplay kiểu <b>Super Mario Bros (NES)</b> bằng Canvas 2D + JavaScript thuần:
-        nhân vật, hình vẽ và nhạc đều tự làm, không dùng tài nguyên gốc của Nintendo.
+        hình vẽ nền, địch và nhạc tự làm, nhân vật chính dùng sprite template của Ozzbit Games (bản free, phi thương mại), không dùng tài nguyên gốc của Nintendo.
         Chạy hết màn, đạp địch, đập block <b>?</b> lấy xu và chạm cột cờ ở cuối để thắng.
         Nhân vật nay có thêm <b>kiếm phóng boomerang</b>: bấm <b>J</b> để phóng kiếm bay ra rồi tự quay về tay, hạ địch từ xa mà không cần nhảy lên đạp.
       </p>
@@ -176,7 +176,9 @@
             <li>Nhảy biến thiên theo thời gian giữ phím, thêm <i>coyote time</i> + <i>jump buffer</i> nhẹ cho dễ chơi</li>
             <li>Đập block <b>?</b> từ dưới ra xu, gạch nảy, ống, hố, cầu thang, cờ cuối màn</li>
             <li>Địch Bụp đi tuần tra: đạp từ trên thì thắng, chạm ngang thì mất mạng</li>
-            <li>Kiếm boomerang: nhân vật cầm kiếm theo hướng mặt, bấm <b>J</b> phóng kiếm bay ngang ~5 ô (80px) rồi tự quay về vị trí hiện tại của nhân vật để thu lại; chạm tường/gạch/ống thì quay lại ngay, chạm địch thì địch chết (+100 điểm như đạp) và kiếm bay tiếp; kiếm đang bay thì xoay và không phóng thêm được cho tới khi bắt lại</li>
+            <li>Địch phun lửa (1 con, ở đoạn giữa màn, sau dãy gạch và trước ống gần cuối đoạn giữa): đứng yên không đi tuần tra, đầu đỏ cam có sừng vàng nên khác hẳn Bụp nâu; khi bạn tới gần mới bắt đầu phun, cứ ~2 giây phun 1 hạt lửa bay thẳng ngang về phía bạn — hạt lửa chạm tường/gạch/ống hoặc bay quá ~6 ô thì tắt, chạm vào bạn thì mất mạng. Cách đối phó: nhảy đạp từ trên xuống cho nó chết (+100 điểm), hoặc phóng kiếm <b>J</b> chém nó từ xa; kiếm đang bay cũng phá được hạt lửa giữa đường mà vẫn bay tiếp</li>
+            <li>Kiếm boomerang: nhân vật cầm kiếm theo hướng mặt (lưỡi kiếm nay ngắn còn 3/4 so với trước), bấm <b>J</b> phóng kiếm bay ngang ~5 ô (80px) rồi tự quay về vị trí hiện tại của nhân vật để thu lại; chạm tường/gạch/ống thì quay lại ngay, chạm địch thì địch chết (+100 điểm như đạp) và kiếm bay tiếp; kiếm đang bay thì xoay và không phóng thêm được cho tới khi bắt lại</li>
+            <li>Nhân vật chính dùng sprite template Ozzbit Games: idle / walk / run / jump / fall / combo chém khi bấm <b>J</b>, hitbox và vật lý giữ nguyên</li>
             <li>Nhạc nền và hiệu ứng chiptune tổng hợp bằng WebAudio</li>
           </ul>
         </section>
@@ -184,8 +186,10 @@
 
       <p class="foot">
         Gợi ý đường đi: đoạn đầu có block ? ở trên cao chứa xu; mấy ống xanh càng về sau càng cao;
-        giữa màn có cầu thang lên xuống và dãy block lấy xu; cuối màn leo cầu thang 8 bậc rồi nhảy chạm cột cờ.
+        giữa màn có cầu thang lên xuống và dãy gạch lấy xu, qua dãy gạch là con phun lửa đứng canh trước ống — né hạt lửa của nó, đạp lên đầu nó hoặc phóng kiếm từ xa;
+        cuối màn leo cầu thang 8 bậc rồi nhảy chạm cột cờ.
         Rơi xuống hố hoặc hết giờ cũng mất mạng như chạm địch.
+        Sprite nhân vật: Ozzbit Games (bản free, phi thương mại, chỉ đổi kích thước hiển thị, giữ nguyên hitbox).
       </p>
     </div>
 
@@ -198,6 +202,39 @@
     var TILE = 16, ROWS = 15, VIEW_W = 256, VIEW_H = 240;
     var canvas = document.getElementById("game");
     var ctx = canvas.getContext("2d");
+    /* ---------------- Sprite nhân vật chính (Ozzbit Games, bản free) ----------------
+       Template: male_hero_template, mỗi frame 128x128, nhân vật thật chỉ chiếm
+       khoảng 20x32px trong frame. Cắt vùng cố định chứa nhân vật (x40-90, y35-82,
+       riêng combo rộng tới x118 để giữ vệt chém) rồi vẽ cao 24px, căn chân sprite
+       đúng chân hitbox. Hitbox và vật lý KHÔNG đổi: w12 h15 như cũ.
+       Credit bắt buộc theo LICENSE của template: Ozzbit Games, personal
+       non-commercial only, không bán lại asset. */
+    var SPRITE_DATA = {
+      idle: "data:image/png;base64,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",
+      walk: "data:image/png;base64,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",
+      run: "data:image/png;base64,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",
+      jump: "data:image/png;base64,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",
+      fall: "data:image/png;base64,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",
+      fallLoop: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAYAAAACACAYAAAACsL4LAAAAAXNSR0IArs4c6QAAA1pJREFUeJzt3TFO22AcxuEvVbdeoEeAsQMXQGJmQarUpRtT93SoMiCGsndCXbpUqsTSC3ABDkCHbt25gjuQpE5iJ4EUAt/7PBJSgIBs/yz98+GElAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/PYNsb8EQ1rduOUR79s8X0r2XnmrnPN9mv5sf+cPrJ28uzTX8fD0//bPrfUw071lyPRjNf2D05Kffct5n4E7WfBM+c/tn038CLbW/Ahhbil1LK+GvzjwqmP9P30RWfJ03/bPpv6OW2N+ChXI9GZffkpJmb3M3x5VXn/c/39x5t23h4+mfTfz3PfQWw1Nwjgd74pZRyfHk1WerNqHn5Vzv9s+m/2nMfAIPx3/tWWRq/T+3xK6B/Nv039NwHQFl1EnT9jXAdCfEroX82/TdQwwAod3gkQJ30z6b/PdUyAMrkJFj3RDjf35u58NO+nTL9K6N/Nv3voaYBUMbRFh4NXI9Ga1/lT4pfIf2z6X9HNe9o5wtEll0Map0kNR+XFPpn038Nte/owknwbeem3Lx+v3DHxPgB9M+m/woJOzs9Cb7t3PTe6c3XV3HLvxD6Z9N/idquAXRZ6xkCifFD6J9N/yUSBkDxNLF4+mfTv0fKAABgjgEAEMoAAAiVdtGj+fj9Q+83P7/7UgKPSRL9s+k/xwoAIFS1bwizrvHUJ5T+2dL7Rw6A338OprePzg5mvncxPJx/FyEqo382/f+J2dGW5ujs59I7XAwPS+ixSaB/Nv1bXAMACJU4AAbjCU8m/bPp35I4AJZycmTTP1tafwOg5WJ4WHb2TsvO3mkppTTb3h4el/7ZEvsnDoDOi0CT+FRP/2z6tyQOAAAMgFup059b+mdL7m8AAIRKHACeBpZN/2z6t0S82q3H9Cp/1/Lv19WnEn58aqd/Nv1DVwATg4TA9NI/m/7hAwAgmgHQIWX5Rzf9syX1NwBKGYyDk0n/bNH9DQCAUBHLnDW1//eH45JH/2z6AwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ4y+CCZlt94n1HwAAAABJRU5ErkJggg==",
+      combo: "data:image/png;base64,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",
+    };
+    var SPRITE_IMGS = {};
+    (function(){
+      var k;
+      for (k in SPRITE_DATA){ var im = new Image(); im.src = SPRITE_DATA[k]; SPRITE_IMGS[k] = im; }
+    })();
+    var spriteClock = 0;
+    function drawSpriteFrame(sheet, frame, isCombo, destX, destY, destW, destH, face){
+      var img = SPRITE_IMGS[sheet];
+      if (!img || !img.complete || !img.naturalWidth) return false;
+      var sx = 40, sy = 35, sw = isCombo ? 78 : 50, sh = 47;
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+      if (face < 0){ ctx.translate(destX + destW, destY); ctx.scale(-1, 1); ctx.drawImage(img, sx + frame*128, sy, sw, sh, 0, 0, destW, destH); }
+      else { ctx.drawImage(img, sx + frame*128, sy, sw, sh, destX, destY, destW, destH); }
+      ctx.restore();
+      return true;
+    }
     ctx.imageSmoothingEnabled = false;
 
     /* ---------------- Tile ----------------
@@ -302,6 +339,7 @@
       slash: function(){ beep(920, 0.1, "square", 0.1, 170); },
       clink: function(){ beep(1560, 0.06, "square", 0.08); beep(1080, 0.08, "square", 0.06, null, 0.04); },
       catchS:function(){ beep(740, 0.07, "square", 0.07); },
+      spit:  function(){ beep(220, 0.14, "sawtooth", 0.08, 520); },
       win:   function(){ var n=[523,659,784,1047,784,1047]; for (var i=0;i<n.length;i++) beep(n[i], 0.16, "square", 0.11, null, i*0.13); },
       over:  function(){ var n=[392,370,349,311]; for (var i=0;i<n.length;i++) beep(n[i], 0.22, "triangle", 0.13, null, i*0.2); }
     };
@@ -343,6 +381,7 @@
       sword.cy = player.y + 8;
       sword.dist = 0;
       sword.angle = 0;
+      if (player) player.comboT = 0.28;
       SFX.throwS();
       syncSwordBtn();
     }
@@ -365,9 +404,30 @@
       return {
         x: 2.5*TILE, y: 11*TILE, w: 12, h: 15,
         vx: 0, vy: 0, face: 1, onGround: false,
-        coyote: 0, jumpBuf: 0, jumpHeld: false, animT: 0, deadSpin: 0
+        coyote: 0, jumpBuf: 0, jumpHeld: false, animT: 0, deadSpin: 0, comboT: 0, airT: 0
       };
     }
+    /* ---------------- Địch phun lửa (đúng 1 con, đứng yên) ----------------
+       Đặt ở ô 135: mặt đất phẳng đoạn giữa màn (sau dãy gạch 128–132,
+       trước ống ở 140), không chồng ống / hố / cờ, hai phía đều trống
+       để hạt lửa bay ngang không bị chặn oan ngay khi vừa phun. */
+    var FIREBALL_SPEED = 115;          // px/giây, vừa phải
+    var FIREBALL_RANGE = 6 * TILE;     // bay quá 6 ô thì biến mất
+    var spitter = null;
+    var fireballs = [];
+    function spawnSpitter(){
+      fireballs = [];
+      spitter = { x: 135*TILE + 1, y: 13*TILE - 20, w: 14, h: 20,
+                  alive: true, squash: 0, active: false, face: -1,
+                  shootTimer: 1.0, animT: 0 };
+    }
+    function killSpitter(){
+      if (!spitter || !spitter.alive) return;
+      spitter.alive = false; spitter.squash = 0;
+      addScore(100, spitter.x, spitter.y - 6);
+      for (var k=0;k<7;k++) particles.push({x:spitter.x+7, y:spitter.y+6, vx:(Math.random()-0.5)*110, vy:-Math.random()*80, t:0, col:"#e8590c"});
+    }
+
     var enemies = [];
     function spawnEnemies(){
       enemies = [];
@@ -378,7 +438,7 @@
       }
     }
     function reset(full){
-      buildLevel(); spawnEnemies();
+      buildLevel(); spawnEnemies(); spawnSpitter();
       player = newPlayer();
       dropSword();
       camX = 0; paused = false; deadTimer = 0; winTimer = 0; flagSlide = 0; shake = 0;
@@ -487,6 +547,7 @@
     function die(){
       if (state !== "play") return;
       dropSword();
+      if (player) player.comboT = 0;
       state = "dead"; deadTimer = 0; player.vy = -330; player.vx = 0;
       SFX.die();
     }
@@ -538,6 +599,77 @@
           e.alive = false; e.squash = 0;
           SFX.slash(); addScore(100, e.x, e.y - 6);
           for (var k=0;k<6;k++) particles.push({x:e.x+6, y:e.y+4, vx:(Math.random()-0.5)*110, vy:-Math.random()*70, t:0, col:"#b5651d"});
+        }
+      }
+      /* Chạm địch phun lửa: nó chết như địch thường, kiếm bay tiếp */
+      if (spitter && spitter.alive &&
+          sb.x < spitter.x + spitter.w && sb.x + sb.w > spitter.x &&
+          sb.y < spitter.y + spitter.h && sb.y + sb.h > spitter.y){
+        SFX.slash(); killSpitter();
+      }
+      /* Chạm hạt lửa: hạt lửa biến mất, kiếm bay tiếp */
+      for (i=fireballs.length-1;i>=0;i--){
+        var fb = fireballs[i];
+        if (sb.x < fb.x + fb.w && sb.x + sb.w > fb.x && sb.y < fb.y + fb.h && sb.y + sb.h > fb.y){
+          fireballs.splice(i,1);
+          SFX.clink();
+          for (var k2=0;k2<5;k2++) particles.push({x:fb.x+3, y:fb.y+3, vx:(Math.random()-0.5)*100, vy:-Math.random()*70, t:0, col:"#ff922b"});
+        }
+      }
+    }
+
+    /* Địch phun lửa + hạt lửa: đứng yên, vào gần khung hình mới phun,
+       ~2 giây / hạt, bay thẳng ngang về phía nhân vật */
+    function updateSpitter(dt){
+      var i, fb;
+      if (spitter){
+        if (!spitter.alive){ spitter.squash += dt; }
+        else {
+          spitter.animT += dt*4;
+          if (!spitter.active){
+            if (spitter.x < camX + VIEW_W + 24 && spitter.x + spitter.w > camX - 8) spitter.active = true;
+          }
+          if (spitter.active && player){
+            spitter.face = (player.x + player.w/2 < spitter.x + spitter.w/2) ? -1 : 1;
+            spitter.shootTimer -= dt;
+            if (spitter.shootTimer <= 0){
+              spitter.shootTimer = 2.0;
+              var dirF = spitter.face;
+              fireballs.push({
+                x: dirF > 0 ? spitter.x + spitter.w : spitter.x - 6,
+                y: spitter.y + 4, w: 6, h: 6,
+                vx: dirF * FIREBALL_SPEED, dist: 0, ph: Math.random()*6.28
+              });
+              SFX.spit();
+            }
+            // Va chạm với người chơi: đạp từ trên thì nó chết (+100), chạm ngang thì mất mạng
+            var p = player;
+            if (p.x < spitter.x+spitter.w && p.x+p.w > spitter.x && p.y < spitter.y+spitter.h && p.y+p.h > spitter.y){
+              if (p.vy > 40 && p.y + p.h - spitter.y < 9){
+                SFX.stomp(); killSpitter();
+                p.vy = inputJumpHeld() ? -330 : -210;
+              } else { die(); return; }
+            }
+          }
+        }
+      }
+      /* Hạt lửa */
+      for (i=fireballs.length-1;i>=0;i--){
+        fb = fireballs[i];
+        fb.ph += dt*10;
+        fb.x += fb.vx * dt;
+        fb.dist += Math.abs(fb.vx) * dt;
+        var gone = false;
+        if (fb.dist >= FIREBALL_RANGE) gone = true;
+        else if (tilesOverlap(fb).length > 0) gone = true;   // chạm tường / gạch / ống / đất
+        if (gone){
+          for (var k=0;k<4;k++) particles.push({x:fb.x+3, y:fb.y+3, vx:(Math.random()-0.5)*80, vy:-Math.random()*60, t:0, col:"#ff922b"});
+          fireballs.splice(i,1); continue;
+        }
+        // Chạm nhân vật thì mất mạng như chạm địch
+        if (player && player.x < fb.x+fb.w && player.x+player.w > fb.x && player.y < fb.y+fb.h && player.y+player.h > fb.y){
+          fireballs.splice(i,1);
+          die(); return;
         }
       }
     }
@@ -620,6 +752,8 @@
       if ((hit.left && p.vx < 0) || (hit.right && p.vx > 0)) p.vx = 0;
       if (p.onGround && Math.abs(p.vx) > 1) p.animT += dt * Math.abs(p.vx) * 0.09;
       else if (p.onGround) p.animT = 0;
+      if (p.comboT > 0) p.comboT = Math.max(0, p.comboT - dt);
+      if (p.onGround) p.airT = 0; else p.airT += dt;
 
       if (p.y > ROWS*TILE + 40){ die(); return; }
       // Camera chỉ tiến, không lùi (kiểu NES)
@@ -666,6 +800,10 @@
           } else { die(); return; }
         }
       }
+
+      /* --- Địch phun lửa + hạt lửa --- */
+      updateSpitter(dt);
+      if (state !== "play") return;
 
       /* --- Cờ cuối màn --- */
       if (p.x + p.w >= FLAG_X && state === "play"){
@@ -779,34 +917,53 @@
     }
 
     function drawHero(x, y){
-      // Nhân vật tự vẽ: chú bé mũ đỏ, áo xanh — pixel art bằng rect
-      var f = player.face, run = player.onGround && Math.abs(player.vx) > 8;
-      var legA = run ? Math.floor(player.animT) % 2 : 0;
-      var air = !player.onGround;
-      px(x+2, y, 8, 3, "#e03131");            // mũ
-      px(x+1, y+2, 11, 2, "#e03131");         // vành mũ
-      px(x+3, y+4, 6, 4, "#ffcf9e");          // mặt
-      px(x+(f>0?8:2), y+5, 2, 2, "#212529");  // mắt
-      px(x+4, y+8, 5, 4, "#1971c2");          // áo xanh
-      px(x+(f>0?9:1), y+8, 2, 3, "#ffcf9e");  // tay
-      if (air){ px(x+3, y+12, 3, 3, "#704214"); px(x+8, y+11, 3, 3, "#704214"); }
-      else if (legA===0){ px(x+3, y+12, 3, 3, "#704214"); px(x+7, y+12, 3, 3, "#704214"); }
-      else { px(x+2, y+12, 3, 3, "#704214"); px(x+8, y+12, 3, 3, "#704214"); }
-      /* Kiếm cầm tay (chỉ khi kiếm chưa phóng): cán nâu trong tay, chắn vàng, lưỡi bạc chĩa về hướng mặt — không xoay */
-      if (!sword.active){
+      // Nhân vật chính: sprite template Ozzbit Games (idle/walk/run/jump/fall/combo).
+      // Hitbox giữ nguyên 12x15, chỉ đổi hình vẽ; sprite cao 24px, căn chân đúng chân hitbox.
+      var f = player.face;
+      var sheet = "idle", frame = 0, isCombo = false;
+      if (player.comboT > 0){
+        sheet = "combo"; isCombo = true;
+        frame = Math.min(2, Math.floor((0.28 - player.comboT) / 0.09));
+      } else if (!player.onGround){
+        if (player.airT < 0.5){ sheet = "jump"; frame = Math.min(5, Math.floor(player.airT * 12)); }
+        else if (player.airT < 0.85){ sheet = "fall"; frame = Math.min(3, Math.floor((player.airT - 0.5) * 12)); }
+        else { sheet = "fallLoop"; frame = Math.floor((player.airT - 0.85) * 8) % 3; }
+      } else if (Math.abs(player.vx) > 8){
+        if (inputRun() && Math.abs(player.vx) > 100){ sheet = "run"; }
+        else { sheet = "walk"; }
+        frame = Math.floor(player.animT) % 10;
+      } else {
+        sheet = "idle"; frame = Math.floor(spriteClock * 6) % 10;
+      }
+      var destH = 24;
+      var destW = isCombo ? 40 : 26;
+      var destX = x + player.w/2 - destW/2;
+      var destY = y + player.h - destH;
+      var ok = drawSpriteFrame(sheet, frame, isCombo, destX, destY, destW, destH, f);
+      if (!ok){
+        // Sprite chưa nạp xong: vẽ tạm hình cũ để không bị trống 1 khung hình đầu
+        px(x+2, y, 8, 3, "#e03131");
+        px(x+1, y+2, 11, 2, "#e03131");
+        px(x+3, y+4, 6, 4, "#ffcf9e");
+        px(x+4, y+8, 5, 4, "#1971c2");
+        px(x+3, y+12, 3, 3, "#704214"); px(x+7, y+12, 3, 3, "#704214");
+      }
+      /* Kiếm cầm tay (chỉ khi kiếm chưa phóng và không trong animation chém):
+         cán nâu trong tay, chắn vàng, lưỡi bạc chĩa về hướng mặt, đã ngắn còn 3/4 */
+      if (!sword.active && !(player.comboT > 0)){
         var hy = y + 9;
         if (f > 0){
-          px(x+8, hy, 4, 2, "#8a5a2b");        // cán kiếm
-          px(x+12, hy-2, 2, 6, "#e6a817");     // chắn kiếm
-          px(x+14, hy, 10, 2, "#e9ecef");      // lưỡi
-          px(x+14, hy, 10, 1, "#ffffff");
-          px(x+24, hy, 2, 2, "#ced4da");       // mũi kiếm
+          px(x+8, hy, 4, 2, "#8a5a2b");
+          px(x+12, hy-2, 2, 6, "#e6a817");
+          px(x+14, hy, 7, 2, "#e9ecef");
+          px(x+14, hy, 7, 1, "#ffffff");
+          px(x+21, hy, 2, 2, "#ced4da");
         } else {
           px(x, hy, 4, 2, "#8a5a2b");
           px(x-2, hy-2, 2, 6, "#e6a817");
-          px(x-12, hy, 10, 2, "#e9ecef");
-          px(x-12, hy, 10, 1, "#ffffff");
-          px(x-14, hy, 2, 2, "#ced4da");
+          px(x-9, hy, 7, 2, "#e9ecef");
+          px(x-9, hy, 7, 1, "#ffffff");
+          px(x-11, hy, 2, 2, "#ced4da");
         }
       }
     }
@@ -818,10 +975,10 @@
       ctx.save();
       ctx.translate(sx, sy);
       ctx.rotate(sword.angle);               // xoay liên tục khi bay
-      ctx.fillStyle = "#e9ecef";             // lưỡi bạc
-      ctx.fillRect(0, -1.5, 11, 3);
-      ctx.beginPath(); ctx.moveTo(11, -1.5); ctx.lineTo(15.5, 0); ctx.lineTo(11, 1.5); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = "#adb5bd"; ctx.fillRect(1, -0.5, 9, 1);
+      ctx.fillStyle = "#e9ecef";             // lưỡi bạc (ngắn còn 3/4: ~11.6px thay vì 15.5px)
+      ctx.fillRect(0, -1.5, 8, 3);
+      ctx.beginPath(); ctx.moveTo(8, -1.5); ctx.lineTo(11.6, 0); ctx.lineTo(8, 1.5); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#adb5bd"; ctx.fillRect(1, -0.5, 6, 1);
       ctx.fillStyle = "#e6a817"; ctx.fillRect(-2.5, -4, 2.5, 8);   // chắn vàng
       ctx.fillStyle = "#8a5a2b"; ctx.fillRect(-7.5, -1.5, 5, 3);   // cán nâu
       ctx.fillStyle = "#e6a817"; ctx.fillRect(-9, -1.5, 1.8, 3);   // chuôi
@@ -843,6 +1000,51 @@
       px(x+4, y+1, 5, 2, "#8c5a2b");                  // mũ nấm
       if (step===0){ px(x, y+11, 5, 2, "#7c4a1e"); px(x+8, y+11, 5, 2, "#7c4a1e"); }
       else { px(x+2, y+11, 5, 2, "#7c4a1e"); px(x+6, y+11, 5, 2, "#7c4a1e"); }
+    }
+
+    function drawSpitter(){
+      if (!spitter) return;
+      var x = spitter.x - camX, y = spitter.y;
+      if (x < -32 || x > VIEW_W + 32) return;
+      if (!spitter.alive){ // bị đạp / chém bẹp
+        px(x+1, y+15, 12, 5, "#c2255c"); px(x+3, y+13, 8, 3, "#e8590c");
+        return;
+      }
+      var f = spitter.face || -1;
+      var bob = spitter.active ? Math.round(Math.sin(spitter.animT*2)*1) : 0;
+      // Chân đế + thân (khác hẳn Bụp nâu đi tuần tra: thân cao đỏ cam, bụng vàng)
+      px(x+2, y+17, 10, 3, "#5c2408");
+      px(x+3, y+9+bob, 8, 9, "#e8590c");
+      px(x+5, y+11+bob, 4, 6, "#ffd43b");                 // bụng vàng
+      px(x+1, y+10+bob, 2, 5, "#c2255c"); px(x+11, y+10+bob, 2, 5, "#c2255c"); // tay nhỏ hai bên
+      // Đầu to ở trên, mõm chĩa về phía nhân vật
+      px(x+1, y+bob, 12, 9, "#d9480f");
+      px(x+1, y+bob, 12, 3, "#f76707");
+      px(x+(f>0?9:3), y+3+bob, 2, 2, "#ffffff");
+      px(x+(f>0?9:3), y+4+bob, 2, 2, "#212529");          // mắt
+      px(x+3, y-3+bob, 2, 3, "#ffd43b"); px(x+9, y-3+bob, 2, 3, "#ffd43b"); // sừng vàng
+      if (f > 0){ px(x+12, y+5+bob, 3, 3, "#d9480f"); px(x+13, y+6+bob, 2, 1, "#212529"); } // mõm phải + miệng
+      else { px(x-1, y+5+bob, 3, 3, "#d9480f"); px(x-1, y+6+bob, 2, 1, "#212529"); }        // mõm trái + miệng
+      // Sắp phun (0.35s cuối trước khi nhả hạt): miệng lóe lửa cảnh báo
+      if (spitter.active && spitter.shootTimer < 0.35){
+        var mx = f > 0 ? x+15 : x-4, my = y+5+bob;
+        px(mx, my, 3, 3, "#ff922b"); px(mx+1, my+1, 1, 1, "#ffe066");
+      }
+    }
+
+    function drawFireballs(){
+      for (var i=0;i<fireballs.length;i++){
+        var fb = fireballs[i];
+        var x = fb.x - camX, y = fb.y;
+        if (x < -16 || x > VIEW_W + 16) continue;
+        var fl = Math.sin(fb.ph) > 0 ? 1 : 0;
+        ctx.fillStyle = "#e8590c";
+        ctx.beginPath(); ctx.ellipse(x+3, y+3, 3.6, 3.2, 0, 0, 6.3); ctx.fill();
+        ctx.fillStyle = "#ff922b";
+        ctx.beginPath(); ctx.ellipse(x+3, y+3, 2.6, 2.3, 0, 0, 6.3); ctx.fill();
+        ctx.fillStyle = fl ? "#ffe066" : "#fff3bf";
+        ctx.beginPath(); ctx.ellipse(x+3, y+3, 1.3, 1.1, 0, 0, 6.3); ctx.fill();
+      }
     }
 
     function drawCoinShape(x, y, ph){
@@ -874,6 +1076,8 @@
         drawCoinShape(pc.x - camX, py, pc.t * 9);
       }
       for (i=0;i<enemies.length;i++) drawEnemy(enemies[i]);
+      drawSpitter();
+      drawFireballs();
       if (player && state !== "over") drawHero(player.x - camX, player.y);
       if (state !== "over") drawFlyingSword();
       for (i=0;i<particles.length;i++){
@@ -904,6 +1108,7 @@
       var dt = (ts - lastTs) / 1000; lastTs = ts;
       if (dt > 0.25) dt = 0.25;
       acc += dt;
+      if (!paused) spriteClock += dt;
       while (acc >= STEP){ update(STEP); acc -= STEP; }
       render();
     }
