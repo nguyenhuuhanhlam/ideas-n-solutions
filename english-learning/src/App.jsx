@@ -300,7 +300,7 @@ export default function App() {
   const conjBest = progress[conjLesson.id]?.best || 0
   return (
     <div className="page">
-      <h1>🇬🇧 English Basic</h1>
+      <h1>🇬🇧 TuTi Learn English</h1>
       <p className="lead">Học tiếng Anh cơ bản bằng cách làm bài tập là chính: học nhanh 1 quy tắc + 8 từ, rồi làm bài tập có chấm điểm và giải thích ngay sau mỗi câu.</p>
       <div className="stats">
         <div><strong>{completedCount} / {allLessons.length}</strong><span>bài đã đạt (≥ 70%)</span></div>

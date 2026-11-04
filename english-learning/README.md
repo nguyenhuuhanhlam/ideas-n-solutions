@@ -1,4 +1,4 @@
-# English Basic — Học tiếng Anh cơ bản qua bài tập
+# TuTi Learn English — Học tiếng Anh cơ bản qua bài tập
 
 App web (Vite + React), giao diện tiếng Việt, nội dung tiếng Anh cơ bản.
 Nhấn mạnh làm bài tập có chấm điểm, không phải chỉ đọc lý thuyết.
