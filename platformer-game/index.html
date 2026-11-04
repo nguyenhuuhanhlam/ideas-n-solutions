@@ -108,9 +108,9 @@
         <canvas id="game" width="256" height="240" aria-label="Khung game platform 2D"></canvas>
         <div class="overlay" id="ovStart">
           <h2>MÀN 1-1</h2>
-          <p>Camera chỉ cuộn tới, không quay lui được — đúng kiểu NES. Giữ phím chạy để chạy nhanh và nhảy xa hơn, thả phím nhảy sớm để nhảy thấp. Bấm J để chém kiếm cận chiến ngay trước mặt; giữ J 1s để gồng rồi phóng vệt kiếm.</p>
+          <p>Camera chỉ cuộn tới, không quay lui được — đúng kiểu NES. Giữ phím chạy để chạy nhanh và nhảy xa hơn, thả phím nhảy sớm để nhảy thấp. Bấm J để chém kiếm cận chiến ngay trước mặt; giữ J 0.5s để gồng rồi phóng vệt kiếm.</p>
           <button type="button" class="big-btn" id="btnPlay">▶ Chơi</button>
-          <span class="keys-hint">← → di chuyển · Z / Space nhảy · X chạy nhanh · J chém kiếm · giữ J 1s phóng vệt kiếm</span>
+          <span class="keys-hint">← → di chuyển · Z / Space nhảy · X chạy nhanh · J chém kiếm · giữ J 0.5s phóng vệt kiếm</span>
         </div>
         <div class="overlay" id="ovEnd" hidden>
           <h2 id="endTitle">Hoàn thành màn!</h2>
@@ -324,14 +324,14 @@
     }
 
     /* ---------------- Vệt kiếm gồng (giữ J) ----------------
-       CHARGE_TIME = 1s. Trong lúc gồng, updateCharge() rải hạt năng lượng
-       quanh nhân vật và tăng dần độ sáng; đủ 1s thì fireWave() tự chạy,
-       không cần thả tay. Thả trước 1s: endCharge() chém thường 1 nhát.
+       CHARGE_TIME = 0.5s. Trong lúc gồng, updateCharge() rải hạt năng lượng
+       quanh nhân vật và tăng dần độ sáng; đủ 0.5s thì fireWave() tự chạy,
+       không cần thả tay. Thả trước 0.5s: endCharge() chém thường 1 nhát.
        Vệt kiếm: hình trăng lưỡi liềm như vệt chém trong sprite ATTACK_1,
        bay ngang theo hướng mặt, tốc độ 150px/s, bay xa WAVE_RANGE
        = 36px tính từ mép nhân vật (gấp 3 lần tầm chém vật lý 12px), xuyên địch,
        phá gạch, tan hạt lửa, gặp ống/tường/block cứng thì tan. */
-    var CHARGE_TIME = 1.0, WAVE_RANGE = 36, WAVE_SPEED = 150;
+    var CHARGE_TIME = 0.5, WAVE_RANGE = 36, WAVE_SPEED = 150;
     var waves = [];
     function startCharge(){
       if (!player || state !== "play" || paused) return;
@@ -341,7 +341,7 @@
     }
     function endCharge(){
       if (!player) return;
-      // Vệt đã phóng ở đủ 1s: thả tay chỉ gỡ khóa, không chém thường nữa
+      // Vệt đã phóng ở đủ 0.5s: thả tay chỉ gỡ khóa, không chém thường nữa
       if (player.chargeFired){ player.chargeFired = false; player.chargeT = 0; return; }
       if (!player.charging) return;
       player.charging = false; player.chargeT = 0;
@@ -356,12 +356,12 @@
       });
       player.charging = false; player.chargeFired = true; player.chargeT = 0;
       SFX.wave();
-      for (var k=0;k<8;k++) particles.push({x:player.x+6, y:player.y+7, vx:f*(40+Math.random()*80), vy:(Math.random()-0.5)*60, t:0, col:"#66d9e8"});
+      for (var k=0;k<8;k++) particles.push({x:player.x+6, y:player.y+7, vx:f*(40+Math.random()*80), vy:(Math.random()-0.5)*60, t:0, col:"#ffffff"});
     }
     function updateCharge(dt){
       if (!player || !player.charging) return;
       player.chargeT += dt;
-      // Hạt năng lượng xoáy quanh nhân vật, càng gần đủ 1s càng dày và sáng
+      // Hạt năng lượng xoáy quanh nhân vật, càng gần đủ 0.5s càng dày và sáng
       var prog = Math.min(1, player.chargeT / CHARGE_TIME);
       if (Math.random() < 0.35 + prog*0.55){
         var a = Math.random()*6.28, r = 10 + Math.random()*6;
@@ -378,7 +378,7 @@
         w.ph += dt*18;
         w.x += w.vx * dt; w.dist += Math.abs(w.vx) * dt;
         // Vệt bay để lại hạt sáng
-        if (Math.random() < 0.7) particles.push({x:w.x+7, y:w.y+4, vx:-w.vx*0.1, vy:(Math.random()-0.5)*20, t:0, col:"#a5d8ff"});
+        if (Math.random() < 0.7) particles.push({x:w.x+7, y:w.y+4, vx:-w.vx*0.1, vy:(Math.random()-0.5)*20, t:0, col:"#ffffff"});
         var gone = false;
         if (w.dist >= WAVE_RANGE) gone = true;
         else {
@@ -421,7 +421,7 @@
           }
         }
         if (gone){
-          for (var k4=0;k4<5;k4++) particles.push({x:w.x+7, y:w.y+4, vx:(Math.random()-0.5)*70, vy:-Math.random()*50, t:0, col:"#66d9e8"});
+          for (var k4=0;k4<5;k4++) particles.push({x:w.x+7, y:w.y+4, vx:(Math.random()-0.5)*70, vy:-Math.random()*50, t:0, col:"#ffffff"});
           waves.splice(i,1);
         }
       }
@@ -527,7 +527,7 @@
     }
     bindTouch("tLeft","left"); bindTouch("tRight","right");
     bindTouch("tRun","run"); bindTouch("tJump","jump");
-    // Nút kiếm cảm ứng: chạm giữ để gồng, thả sớm thì chém thường, đủ 1s tự phóng vệt
+    // Nút kiếm cảm ứng: chạm giữ để gồng, thả sớm thì chém thường, đủ 0.5s tự phóng vệt
     (function(){
       var el = document.getElementById("tSword");
       el.addEventListener("pointerdown", function(ev){ ev.preventDefault(); audio(); startCharge(); });
@@ -1023,38 +1023,20 @@
     }
 
     function drawWaves(){
-      // Vệt kiếm hình trăng lưỡi liềm: cung tròn dày vẽ theo hướng bay,
-      // giống vệt chém trắng trong sprite ATTACK_1 (không phải vệt thẳng nữa)
+      // Vệt kiếm trắng đơn giản: 1 cung tròn trắng như vệt chém trong sprite mẫu,
+      // không còn hào quang xanh hay 2 lớp màu nữa
       for (var i=0;i<waves.length;i++){
         var w = waves[i];
         var sx = w.x - camX, sy = w.y;
         if (sx < -24 || sx > VIEW_W + 24) continue;
         var dir = w.vx > 0 ? 1 : -1;
-        var flick = Math.sin(w.ph) > 0 ? 1 : 0;
         ctx.save();
         ctx.translate(sx + 7, sy + 6);
         ctx.scale(dir, 1);
-        ctx.globalAlpha = 0.25; ctx.fillStyle = "#22b8cf";
-        ctx.beginPath(); ctx.arc(0, 0, 12, 0, 6.3); ctx.fill();
-        ctx.globalAlpha = 0.95; ctx.strokeStyle = flick ? "#99e9f2" : "#66d9e8";
-        ctx.lineWidth = 5; ctx.lineCap = "round";
+        ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 5; ctx.lineCap = "round";
         ctx.beginPath(); ctx.arc(0, 0, 8, -1.25, 1.25); ctx.stroke();
-        ctx.globalAlpha = 1; ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(0, 0, 8, -1.0, 1.0); ctx.stroke();
         ctx.restore();
       }
-    }
-
-    function drawCharge(){
-      // Khi gồng chỉ còn vòng sáng nhấp nháy quanh nhân vật (đã bỏ thanh bar trên đầu),
-      // vòng nở dần và chuyển sang vàng khi gần đủ thời gian gồng
-      var prog = Math.min(1, player.chargeT / CHARGE_TIME);
-      var sx = player.x - camX, sy = player.y;
-      ctx.save();
-      ctx.globalAlpha = 0.5 + 0.4 * Math.sin(performance.now() / 90);
-      ctx.strokeStyle = prog > 0.66 ? "#ffe066" : "#66d9e8"; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.arc(sx + 6, sy + 7, 11 + prog * 3, 0, 6.3); ctx.stroke();
-      ctx.restore();
     }
 
     function drawCoinShape(x, y, ph){
@@ -1090,7 +1072,6 @@
       drawFireballs();
       if (player && state !== "over") drawHero(player.x - camX, player.y);
       drawWaves();
-      if (player && state === "play" && player.charging) drawCharge();
       for (i=0;i<particles.length;i++){
         var p = particles[i];
         ctx.globalAlpha = 1 - p.t*2;
