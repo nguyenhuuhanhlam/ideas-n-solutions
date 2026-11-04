@@ -23,8 +23,9 @@ thật, skill, trang bị...).
 
 - Màn hình logic 480x270 (16:9), mặt đất tại y=210, thế giới rộng
   2400px, camera kẹp trong biên thế giới.
-- Vật lý: đi bộ 100px/s, chạy 180px/s, nhảy vận tốc -520px/s với
-  trọng lực 1400px/s² (cao khoảng 96px), chạm đất có bụi nhẹ.
+ - Vật lý (thu cùng tỷ lệ 1/1 để cảm giác không lệch): đi bộ 50px/s,
+  chạy 90px/s, nhảy vận tốc -260px/s với trọng lực 700px/s² (cao
+  khoảng 48px, thời gian bay như cũ 0.74s), chạm đất có bụi nhẹ.
 - Chém combo: `J` đánh 1 chuỗi 7 frame (combo_1 3 frame + combo_1_end
   4 frame, 0.06s/frame, tổng 0.42s), khóa di chuyển trong lúc chém,
   vùng chém trước mặt đã để sẵn trong code (`attackBox()`) để bước
@@ -45,14 +46,16 @@ thật, skill, trang bị...).
   y=80 trong frame. Tất cả frame khác đều neo theo đúng 2 mốc này
   (không neo theo đáy bbox từng frame, vì frame nhảy/rơi có chân
   co lên tới y=75).
-- Vẽ với SCALE=2: khung vẽ 256x256, nhân vật cao 74px, rộng thân
-  64px, chân trùng chân hitbox, tâm trùng tâm hitbox.
-- Hitbox: rộng 30, cao 64, chân tại mặt đất.
+ - Vẽ đúng tỷ lệ 1/1 (SCALE=1): khung vẽ 128x128 nguyên gốc, nhân
+  vật cao 37px, rộng thân 32px, chân trùng chân hitbox, tâm trùng
+  tâm hitbox. Bản trước vẽ SCALE=2 (cao 74px) nên nhìn quá lớn.
+- Hitbox: rộng 15, cao 32 (thu đúng nửa từ 30x64), chân tại mặt đất.
 - Animation đã dùng (8 sheet nhúng base64 vào file):
   `idle` 10 frame (0.12s/frame), `walk` 10 (0.09s), `run` 10 (0.07s),
   `jump` 6 (lấy frame 0 lúc cất bước, frame 2 lúc đang lên),
   `fall` 4 (0.06s/frame, lúc bắt đầu rơi), `fall_loop` 3 (0.1s/frame,
-  rơi ổn định), `combo_1` 3 + `combo_1_end` 4 (chém).
+  rơi ổn định), `combo_1` 3 + `combo_1_end` 4 (chém). Vùng chém
+  trước mặt cũng thu theo tỷ lệ: rộng 35, cao 25.
 - Lật ngang khi quay trái bằng cách scale(-1, 1) quanh tâm nhân vật.
 
 ## Deploy

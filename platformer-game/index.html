@@ -71,10 +71,10 @@
 // - Mỗi sheet là dãy frame 128x128, nền trong suốt.
 // - Nhân vật đứng (design / idle frame 0): bbox x41-73, y43-80
 //   => rộng 32px, cao 37px, tâm ngang x=57, đường chân y=80 trong frame.
-// - Vẽ với SCALE=2: nhân vật cao 74px, rộng thân 64px trên màn hình logic.
-// - Khung hình vẽ: 256x256, đặt sao cho đường chân (y=80*2=160) trùng chân hitbox,
-//   và tâm ngang (x=57*2=114) trùng tâm hitbox.
-var SCALE = 2, FRAME = 128, SPRITE_CX = 57, GROUND_LINE = 80;
+// - Vẽ đúng tỷ lệ 1/1 (SCALE=1): nhân vật cao 37px, rộng thân 32px trên màn hình logic.
+// - Khung hình vẽ: 128x128 nguyên gốc, đặt sao cho đường chân (y=80) trùng chân hitbox,
+//   và tâm ngang (x=57) trùng tâm hitbox.
+var SCALE = 1, FRAME = 128, SPRITE_CX = 57, GROUND_LINE = 80;
 var VIEW_W = 480, VIEW_H = 270, WORLD_W = 2400, GROUND_Y = 210;
 
 function loadSheet(b64, frames) {
@@ -108,7 +108,7 @@ var last = 0;
 
 function reset() {
   player = {
-    x: 60, y: GROUND_Y - 64, w: 30, h: 64, // hitbox: rộng 30, cao 64, chân tại GROUND_Y
+    x: 60, y: GROUND_Y - 32, w: 15, h: 32, // hitbox: rộng 15, cao 32 (thu đúng nửa từ 30x64 theo SCALE=1), chân tại GROUND_Y
     vx: 0, vy: 0, face: 1, grounded: true,
     state: "idle", animT: 0, airT: 0, fallT: 0,
     attacking: false, attackT: 0, attackHitDone: false
@@ -135,10 +135,10 @@ function sfx(kind) {
 function isDown(k) { return !!keys[k]; }
 function attackBox() {
   // Vùng chém trước mặt, để sẵn cho bước thêm địch sau (hiện chưa có mục tiêu).
-  var w = 70, h = 50;
+  var w = 35, h = 25;
   return player.face > 0
-    ? { x: player.x + player.w, y: player.y + 4, w: w, h: h }
-    : { x: player.x - w, y: player.y + 4, w: w, h: h };
+    ? { x: player.x + player.w, y: player.y + 2, w: w, h: h }
+    : { x: player.x - w, y: player.y + 2, w: w, h: h };
 }
 function startAttack() {
   if (player.attacking || !player.grounded) return;
@@ -153,16 +153,16 @@ function update(dt) {
     // Đòn chém khóa di chuyển, vẫn chịu trọng lực nếu đang ở trên không (không xảy ra ở bước này).
   } else {
     var run = isDown("run");
-    if (isDown("left")) { speed = -(run ? 180 : 100); p.face = -1; moving = true; }
-    else if (isDown("right")) { speed = (run ? 180 : 100); p.face = 1; moving = true; }
+    if (isDown("left")) { speed = -(run ? 90 : 50); p.face = -1; moving = true; }
+    else if (isDown("right")) { speed = (run ? 90 : 50); p.face = 1; moving = true; }
     p.vx = speed;
     if (isDown("jump") && p.grounded) {
-      p.vy = -520; p.grounded = false; p.airT = 0; p.fallT = 0; sfx("jump");
+      p.vy = -260; p.grounded = false; p.airT = 0; p.fallT = 0; sfx("jump");
     }
     if (isDown("attack")) startAttack();
   }
   if (!p.grounded) {
-    p.vy += 1400 * dt;
+    p.vy += 700 * dt;
     p.airT += dt;
     if (p.vy > 0) p.fallT += dt;
   }
@@ -172,7 +172,7 @@ function update(dt) {
   if (p.x > WORLD_W - p.w) p.x = WORLD_W - p.w;
   if (p.y + p.h >= GROUND_Y) {
     if (!p.grounded) {
-      for (var i = 0; i < 5; i++) particles.push({ x: p.x + p.w / 2, y: GROUND_Y, vx: (Math.random() - 0.5) * 80, vy: -Math.random() * 60, t: 0 });
+      for (var i = 0; i < 5; i++) particles.push({ x: p.x + p.w / 2, y: GROUND_Y, vx: (Math.random() - 0.5) * 40, vy: -Math.random() * 30, t: 0 });
     }
     p.y = GROUND_Y - p.h; p.vy = 0; p.grounded = true; p.airT = 0; p.fallT = 0;
   }
@@ -250,7 +250,7 @@ function drawPlayer() {
   ctx.save();
   ctx.translate(cx, feet);
   ctx.scale(p.face, 1);
-  // Gốc vẽ: tâm ngang 57 và đường chân 80 của frame, nhân SCALE=2.
+  // Gốc vẽ: tâm ngang 57 và đường chân 80 của frame, tỷ lệ 1/1 (SCALE=1).
   ctx.drawImage(sh.img, f[1] * FRAME, 0, FRAME, FRAME, -SPRITE_CX * SCALE, -GROUND_LINE * SCALE, FRAME * SCALE, FRAME * SCALE);
   ctx.restore();
   ctx.fillStyle = "rgba(255,255,255,0.5)";
