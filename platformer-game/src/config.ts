@@ -6,7 +6,7 @@
 export const VIEW_W = 960;
 export const VIEW_H = 540;
 export const WORLD_W = 4800;
-export const GROUND_Y = 420;
+export const GROUND_Y = 468;
 
 // Nhân vật: frame 128x128, tâm ngang x=57, đường chân y=80 (đo từ file gốc,
 // sau khử viền đen nhân vật đứng còn 30x36 nhưng tâm và đường chân không đổi).
@@ -14,11 +14,15 @@ export const FRAME = 128;
 export const SPRITE_CX = 57;
 export const GROUND_LINE = 80;
 export const SPRITE_SCALE = 2;
-// Hitbox: 30x64, vị trí tương đối so với góc trên-trái của khung vẽ (đã scale 2).
-export const HITBOX_W = 30;
-export const HITBOX_H = 64;
-export const HITBOX_OFF_X = 99;
-export const HITBOX_OFF_Y = 96;
+// Hitbox: hiển thị 30x64, nhưng API body của Phaser (setSize/setOffset)
+// tính bằng pixel GỐC của frame (chưa scale), nên phải chia cho SPRITE_SCALE:
+// size 15x32, offset (49.5, 48) so với góc trên-trái của khung gốc.
+// Đưa nhầm số hiển thị (30x64, 99/96) vào đây từng làm body lệch khỏi sprite
+// và nhân vật nổi lơ lửng trên mặt đất dù không bấm gì — đừng đổi lại.
+export const HITBOX_W = 15;
+export const HITBOX_H = 32;
+export const HITBOX_OFF_X = 49.5;
+export const HITBOX_OFF_Y = 48;
 
 export const WALK_SPEED = 180;
 export const RUN_SPEED = 300;
@@ -38,8 +42,10 @@ export interface PlatformDef {
   y: number;
   w: number;
 }
+// Platform hạ theo mặt đất (cùng +48px) để độ cao cần nhảy từ mặt đất
+// lên platform vẫn là 80px như cũ, không vượt quá tầm nhảy 96px.
 export const PLATFORMS: PlatformDef[] = [
-  { x: 700, y: 340, w: 128 },
-  { x: 1000, y: 260, w: 96 },
-  { x: 1250, y: 340, w: 160 },
+  { x: 700, y: 388, w: 128 },
+  { x: 1000, y: 308, w: 96 },
+  { x: 1250, y: 388, w: 160 },
 ];

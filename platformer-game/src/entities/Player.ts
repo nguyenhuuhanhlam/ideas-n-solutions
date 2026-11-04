@@ -51,6 +51,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     const body = this.body as Phaser.Physics.Arcade.Body;
+    // setSize/setOffset của Phaser tính bằng pixel gốc (xem config.ts),
+    // không phải pixel hiển thị — HITBOX_* đã là số gốc.
     body.setSize(HITBOX_W, HITBOX_H);
     body.setOffset(HITBOX_OFF_X, HITBOX_OFF_Y);
     body.setCollideWorldBounds(true);

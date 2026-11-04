@@ -34,11 +34,12 @@ vật lý của nhân vật và cảnh trí xung quanh, chưa làm hệ thống 
   lái được hướng. Vùng chém đã tính sẵn trong `Player.attackBox()`
   để bước địch dùng ngay, hiện chưa có mục tiêu.
 - Camera bám theo nhân vật (lerp 0.1), kẹp trong thế giới 4800x540,
-  mặt đất tại y=420.
+  mặt đất tại y=468 (hạ 1 block 48px so với y=420 ban đầu theo phản hồi
+  ngày 2026-11-04, platform hạ theo để vẫn nhảy lên được).
 - Cảnh trí: trời gradient, mặt trời parallax 0.05, núi xa parallax
   0.3, cây gần parallax 0.6, mặt đất + platform nổi bằng Tileset.
-- Platform nổi mẫu (đặc, đứng được trên mặt): (700, 340, 128),
-  (1000, 260, 96), (1250, 340, 160) — xem `src/config.ts`.
+- Platform nổi mẫu (đặc, đứng được trên mặt): (700, 388, 128),
+  (1000, 308, 96), (1250, 388, 160) — xem `src/config.ts`.
 - Phím: A/D hoặc ←/→ di chuyển, giữ Shift/X chạy, Z/Space/↑ nhảy,
   J chém, P tạm dừng, R chơi lại. Mobile: tay NES (D-pad ◀ ▶ ▲,
   nút dẹt Chạy/Dừng, nút tròn đỏ B = Nhảy, A = Chém).
@@ -50,8 +51,11 @@ vật lý của nhân vật và cảnh trí xung quanh, chưa làm hệ thống 
 - `src/config.ts` — mọi hằng số gameplay (khung hình, thế giới, tốc
   độ, nhảy, hitbox, platform) để chỉnh số không cần đụng logic.
 - `src/input.ts` — trạng thái nút chung cho bàn phím + cảm ứng.
-- `src/entities/Player.ts` — nhân vật: physics Arcade, hitbox
-  30x64 (offset 99, 96 so với góc khung vẽ), animation điều khiển
+- `src/entities/Player.ts` — nhân vật: physics Arcade, hitbox hiển
+  thị 30x64 nhưng khai báo cho Phaser bằng pixel gốc 15x32 (offset
+  49.5, 48) vì setSize/setOffset của Phaser tính theo pixel gốc rồi
+  tự nhân scale — đưa số hiển thị vào sẽ làm body lệch khỏi sprite,
+  nhân vật nổi trên mặt đất (lỗi đã gặp ngày 2026-11-04). Animation điều khiển
   thủ công theo đúng nhịp frame bản vanilla (idle 0.12s, walk 0.09s,
   run 0.07s, chém 0.06s, nhảy/rơi theo thời gian bay).
 - `src/scenes/GameScene.ts` — 1 scene duy nhất hiện tại: load asset,
