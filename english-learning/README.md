@@ -55,6 +55,17 @@ qua localStorage, không cần tài khoản. Điểm cũ của 2 bài chia độ
 trước khi gộp thành tabs được chuyển sang nhóm mới tương ứng
 (to-be, present-simple).
 
+## Hướng dẫn chia động từ (ở chi tiết nhóm)
+
+Mỗi nhóm chia động từ có thêm mục hướng dẫn chi tiết
+(`src/data/conjugationGuides.js`): sơ đồ bảng (chủ ngữ → dạng động
+từ), các bước làm theo thứ tự, mẹo nhớ, và ví dụ đặc biệt về số ít /
+số nhiều — phần trẻ hay nhầm nhất (everyone → số ít, children/people
+→ số nhiều, Lan and Minh → số nhiều, quá khứ không chia theo số).
+Chi tiết bài cơ bản có thêm hộp nhớ nhanh số ít/số nhiều tương tự
+(kèm danh từ đổi hẳn dạng: child → children, person → people,
+man → men, foot → feet…).
+
 ## Các bài (ngân hàng 1043 câu)
 
 Ngân hàng câu hỏi sinh tự động bằng `tools/generate-questions.mjs`

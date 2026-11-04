@@ -17,6 +17,7 @@ import { VStack } from '@astryxdesign/core/VStack'
 import { useEffect, useMemo, useState } from 'react'
 import { lessons, conjugationGroups, POINTS_PER_QUESTION } from './data/lessons.js'
 import { questionBanks } from './data/questions.js'
+import { conjugationGuides } from './data/conjugationGuides.js'
 import { irregularVerbs } from './data/irregular.js'
 
 const STORAGE_KEY = 'english-learning-progress-v1'
@@ -208,6 +209,85 @@ function VocabList({ items, verbTint }) {
           </HStack>
         </VStack>
       ))}
+    </VStack>
+  )
+}
+
+// Hướng dẫn chia động từ chi tiết: sơ đồ bảng + các bước + mẹo nhớ +
+// ví dụ đặc biệt về số ít/số nhiều (phần trẻ hay nhầm nhất).
+function ConjugationGuide({ guide }) {
+  if (!guide) return null
+  return (
+    <VStack gap={3}>
+      <Heading level={4} weight="bold">🧭 Sơ đồ chia động từ</Heading>
+      <Table
+        data={guide.table.rows}
+        idKey={guide.table.idKey}
+        density="balanced"
+        isStriped
+        hasHover
+        columns={guide.table.columns}
+      />
+      <Heading level={4} weight="bold">🪜 Các bước làm</Heading>
+      <VStack gap={2}>
+        {guide.steps.map((step, i) => (
+          <Card key={i}>
+            <HStack gap={2}>
+              <Text weight="bold">Bước {i + 1}.</Text>
+              <Text>{step}</Text>
+            </HStack>
+          </Card>
+        ))}
+      </VStack>
+      <Heading level={4} weight="bold">💡 Mẹo nhớ</Heading>
+      <VStack gap={2}>
+        {guide.tips.map((tip, i) => (
+          <Card key={i}>
+            <Text>💡 {tip}</Text>
+          </Card>
+        ))}
+      </VStack>
+      <Heading level={4} weight="bold">⚠️ Số ít / Số nhiều — ví dụ đặc biệt</Heading>
+      <VStack gap={2}>
+        {guide.specials.map((sp, i) => (
+          <Card key={i}>
+            <VStack gap={1}>
+              <Text weight="bold" size="lg">{sp.example}</Text>
+              <Text>{sp.why}</Text>
+            </VStack>
+          </Card>
+        ))}
+      </VStack>
+    </VStack>
+  )
+}
+
+// Hộp nhớ nhanh số ít/số nhiều cho bài cơ bản: đếm chủ ngữ trước,
+// rồi mới chia động từ — kèm các trường hợp đặc biệt hay lừa.
+function SingularPluralBox() {
+  return (
+    <VStack gap={2}>
+      <Heading level={4} weight="bold">🔢 Số ít / Số nhiều — nhớ nhanh</Heading>
+      <Table
+        data={[
+          { kind: '1 người/vật', subjects: 'he, she, it, Lan, the dog', verb: '+ -s / is (She plays, Lan is kind)' },
+          { kind: 'Nhiều người/vật', subjects: 'I, you, we, they, Lan and Minh, the dogs', verb: 'nguyên thể / are (They play, Lan and Minh are kind)' },
+          { kind: 'Đặc biệt: everyone, everybody', subjects: 'coi như 1 người', verb: '+ -s / is (Everyone likes ice cream.)' },
+          { kind: 'Đặc biệt: children, people', subjects: 'đã là số nhiều', verb: 'nguyên thể / are (Children play, People are happy.)' },
+          { kind: 'Danh từ đổi hẳn dạng', subjects: 'child → children, person → people, man → men, woman → women, foot → feet, tooth → teeth', verb: 'không thêm -s (Children are happy.)' },
+          { kind: 'Quá khứ', subjects: 'he hay they đều giống nhau', verb: 'played, went (quá khứ không chia theo số)' },
+        ]}
+        idKey="kind"
+        density="balanced"
+        isStriped
+        hasHover
+        columns={[
+          { key: 'kind', header: 'Dạng' },
+          { key: 'subjects', header: 'Chủ ngữ ví dụ' },
+          { key: 'verb', header: 'Động từ đi kèm' },
+        ]}
+      />
+      <Text type="supporting">Mẹo: đếm chủ ngữ trước, rồi mới chia động từ — 1 thì thêm -s (hiện tại đơn), nhiều thì giữ nguyên.</Text>
     </VStack>
   )
 }
@@ -533,6 +613,7 @@ export default function App() {
         <Card variant={lessonCat.card}>
           <VocabList items={lesson.vocab} />
         </Card>
+        <SingularPluralBox />
         <Heading level={4} weight="bold">✏️ Bài tập (ngân hàng {lesson.questions.length} câu — mỗi lần làm 25 câu, mỗi câu 1 điểm)</Heading>
         <Text type="supporting">3 dạng: trắc nghiệm, điền dạng đúng vào chỗ trống và dịch câu. Mỗi lần làm bài lấy ngẫu nhiên 25 câu từ ngân hàng nên làm lại sẽ gặp câu khác. Trả lời xong bấm “Chấm câu này” để xem giải thích ngay, cuối bài có tổng điểm /25, tỉ lệ % và danh sách câu sai để ôn lại.</Text>
         <Button variant="primary" size="lg" label="Bắt đầu làm bài →" onClick={() => startQuiz(lesson)} />
@@ -582,6 +663,7 @@ export default function App() {
               <GrammarExamples grammar={conjLesson.grammar} card="purple" />
               <Heading level={4} weight="bold">📚 Dạng mẫu ({conjLesson.vocab.length} mục)</Heading>
               <VocabList items={conjLesson.vocab} verbTint />
+              <ConjugationGuide guide={conjugationGuides[conjLesson.id]} />
               <Button variant="primary" size="lg" label="Bắt đầu làm 25 câu →" onClick={() => startQuiz(conjLesson)} />
             </VStack>
           </Card>
