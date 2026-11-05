@@ -82,6 +82,11 @@ lưu rồi mới đi tiếp, kết thúc ◎; chữ tự ngắt dòng theo độ
 và nhân với tỉ lệ cỡ chữ đang chọn nên không tràn hộp khi chỉnh cỡ
 chữ lớn; màn hình hẹp thì sơ đồ cuộn ngang thay vì bóp nhỏ chữ.
 Nội dung sơ đồ lấy đúng từ dữ liệu `flow` hiện có, không viết lại.
+Trang chính không còn mục “Tất cả các bài”: chỉ còn 2 chip lọc là
+“Bài cơ bản” và “Chia động từ” (mở app mặc định vào Bài cơ bản, nút
+header “Bài học” cũng về Bài cơ bản), để danh sách khỏi quá dài khi
+sau này thêm nhiều bài; thẻ Ôn tập tổng hợp và thẻ Câu sai vẫn hiện
+trong cả 2 mục.
 
 ## Cài đặt — cỡ chữ
 

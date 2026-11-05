@@ -509,7 +509,7 @@ export default function App() {
   const [confirmClear, setConfirmClear] = useState(false)
   const [view, setView] = useState({ name: 'home' }) // home | lesson | quiz
   const [quiz, setQuiz] = useState(null)
-  const [section, setSection] = useState('all') // all | basic | conjhub | lookup | settings
+  const [section, setSection] = useState('basic') // basic | conjhub | lookup | settings (không còn mục 'tất cả' để danh sách khỏi quá dài khi thêm bài mới)
   const [fontSize, setFontSize] = useState(() => {
     try { return localStorage.getItem(SETTINGS_KEY) || 'medium' } catch { return 'medium' }
   })
@@ -591,7 +591,7 @@ export default function App() {
 
   // Điều hướng mới (không còn menu trái): header + chip lọc.
   function goNav(target) {
-    if (target === 'lessons') setSection('all')
+    if (target === 'lessons') setSection('basic')
     else if (target === 'conj') setSection('conjhub')
     else setSection(target)
     setView({ name: 'home' })
@@ -604,7 +604,7 @@ export default function App() {
       const l = allLessons.find((x) => x.id === quiz.lessonId)
       return l && isConjLesson(l) ? 'conj' : 'lessons'
     }
-    if (section === 'basic' || section === 'all') return 'lessons'
+    if (section === 'basic') return 'lessons'
     if (section === 'conjhub') return 'conj'
     if (section === 'lookup') return 'lookup'
     if (section === 'settings') return 'settings'
@@ -873,7 +873,7 @@ export default function App() {
           />
         )}
       >
-        <Button variant="ghost" label="← Về danh sách bài" onClick={() => { setSection(view.from || 'all'); setView({ name: 'home' }) }} />
+        <Button variant="ghost" label="← Về danh sách bài" onClick={() => { setSection(view.from || 'basic'); setView({ name: 'home' }) }} />
         <div className="learn-card">
           <VStack gap={6}>
             <VStack gap={2}>
@@ -895,8 +895,8 @@ export default function App() {
   // ---- Trang chính: hero + chip lọc + thẻ bài ----
   const basicLessons = allLessons.filter((l) => !isConjLesson(l))
   const conjLessons = allLessons.filter((l) => isConjLesson(l))
-  const shownLessons = section === 'basic' ? basicLessons : section === 'conjhub' ? conjLessons : allLessons
-  const listTitle = section === 'basic' ? 'Bài cơ bản' : section === 'conjhub' ? 'Chia động từ' : 'Tất cả các bài'
+  const shownLessons = section === 'basic' ? basicLessons : conjLessons
+  const listTitle = section === 'basic' ? 'Bài cơ bản' : 'Chia động từ'
   return (
     <Frame
       navActive={currentNav()}
@@ -911,7 +911,6 @@ export default function App() {
       )}
     >
       <HStack gap={2} wrap="wrap">
-        <button type="button" className={`learn-chip${section === 'all' ? ' active' : ''}`} onClick={() => setSection('all')}>Tất cả các bài</button>
         <button type="button" className={`learn-chip${section === 'basic' ? ' active' : ''}`} onClick={() => setSection('basic')}>Bài cơ bản</button>
         <button type="button" className={`learn-chip${section === 'conjhub' ? ' active' : ''}`} onClick={() => setSection('conjhub')}>Chia động từ</button>
       </HStack>
@@ -950,7 +949,7 @@ export default function App() {
         </div>
       )}
 
-      {(section === 'all' || section === 'basic' || section === 'conjhub') && (
+      {(section === 'basic' || section === 'conjhub') && (
         <VStack gap={3}>
           <SectionLabel icon="📚">{listTitle}</SectionLabel>
           <Text type="supporting">Mỗi lần làm bài lấy ngẫu nhiên 25 câu, mỗi câu 1 điểm.</Text>
