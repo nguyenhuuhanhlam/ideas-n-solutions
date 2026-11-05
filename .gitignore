@@ -25,3 +25,6 @@ dist-ssr
 
 # Deploy staging (tạo bởi workflow khi build Pages)
 _site/
+
+# File API tĩnh của surveyjs-demo (sinh lại lúc build bằng tools/generate-form-api.mjs)
+surveyjs-demo/public/forms/

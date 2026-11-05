@@ -1,211 +1,117 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Model } from 'survey-core'
 import { Survey } from 'survey-react-ui'
 import 'survey-core/survey-core.css'
-import { SAMPLES, SAMPLE_KEYS, DEFAULT_SAMPLE } from './samples.js'
+import { SAMPLES, SAMPLE_KEYS } from './samples.js'
 
 // Chỉ dùng SurveyJS Form Library (survey-core + survey-react-ui, giấy phép MIT).
-// KHÔNG dùng Survey Creator (thương mại, cần licence) nên không còn banner licence.
+// KHÔNG dùng Survey Creator (thương mại, cần licence).
+// Form do Muse soạn sẵn trong src/samples.js — app này chỉ liệt kê form,
+// cho điền form, và công bố API/URL để ứng dụng khác dùng.
 
-const LS_KEY = 'surveyjs-demo-json-v1'
-const LS_SAMPLE = 'surveyjs-demo-sample-v1'
+const LIVE_BASE = 'https://nguyenhuuhanhlam.github.io/ideas-n-solutions/surveyjs-demo'
 
-const FIELD_TEMPLATES = {
-  text: { type: 'text', title: 'Câu hỏi ngắn' },
-  comment: { type: 'comment', title: 'Câu hỏi dài' },
-  dropdown: { type: 'dropdown', title: 'Chọn một đáp án', choices: ['Lựa chọn 1', 'Lựa chọn 2'] },
-  radiogroup: { type: 'radiogroup', title: 'Chọn một đáp án', choices: ['Lựa chọn 1', 'Lựa chọn 2'] },
-  checkbox: { type: 'checkbox', title: 'Chọn nhiều đáp án', choices: ['Lựa chọn 1', 'Lựa chọn 2'] },
-  rating: { type: 'rating', title: 'Đánh giá', rateMax: 5 },
-  boolean: { type: 'boolean', title: 'Câu hỏi Có / Không' },
-  date: { type: 'text', title: 'Ngày', inputType: 'date' },
+function countFields(json) {
+  return (json.pages || []).reduce((n, p) => n + (p.elements ? p.elements.length : 0), 0)
 }
 
-function loadInitialJson() {
+// URL gốc của app (bỏ dấu / cuối), để link chạy đúng cả ở local lẫn live.
+function appBase() {
+  return window.location.origin + window.location.pathname.replace(/\/$/, '')
+}
+
+function urlsFor(id) {
+  const base = appBase()
+  return {
+    fillUrl: `${base}?form=${id}`,
+    jsonUrl: `${base}/forms/${id}.json`,
+    embedUrl: `${base}?form=${id}&embed=1`,
+    iframe: `<iframe src="${base}?form=${id}&embed=1" width="100%" height="700" frameborder="0"></iframe>`,
+  }
+}
+
+function initialFormId() {
   try {
-    const saved = localStorage.getItem(LS_KEY)
-    if (saved) return JSON.parse(saved)
-  } catch { /* bỏ qua JSON hỏng, dùng mẫu mặc định */ }
-  return SAMPLES[DEFAULT_SAMPLE].json
+    const id = new URLSearchParams(window.location.search).get('form')
+    return id && SAMPLES[id] ? id : null
+  } catch {
+    return null
+  }
 }
 
-function saveJson(json) {
-  try { localStorage.setItem(LS_KEY, JSON.stringify(json)) } catch { /* ignore */ }
+function isEmbed() {
+  try {
+    return new URLSearchParams(window.location.search).get('embed') === '1'
+  } catch {
+    return false
+  }
 }
 
 export default function App() {
-  const [tab, setTab] = useState('edit')
-  const [sampleKey, setSampleKey] = useState(() => localStorage.getItem(LS_SAMPLE) || DEFAULT_SAMPLE)
-  const [surveyJson, setSurveyJson] = useState(loadInitialJson)
-  const [editorText, setEditorText] = useState(() => JSON.stringify(loadInitialJson(), null, 2))
-  const [editorError, setEditorError] = useState('')
-  const [editorStatus, setEditorStatus] = useState('')
-  const [newFieldType, setNewFieldType] = useState('text')
+  const [selectedId, setSelectedId] = useState(initialFormId)
+  const [showJsonId, setShowJsonId] = useState(null)
+  const [copied, setCopied] = useState('')
   const [result, setResult] = useState(null)
   const [fillKey, setFillKey] = useState(0)
-  const [savedAt, setSavedAt] = useState('')
+  const embed = isEmbed()
 
-  // Đổi mẫu -> nạp JSON mẫu vào state + editor.
-  useEffect(() => {
-    const json = SAMPLES[sampleKey].json
-    setSurveyJson(json)
-    setEditorText(JSON.stringify(json, null, 2))
-    setEditorError('')
-    setEditorStatus('')
-    setResult(null)
-    try { localStorage.setItem(LS_SAMPLE, sampleKey) } catch { /* ignore */ }
-    saveJson(json)
-  }, [sampleKey])
+  const selected = selectedId ? SAMPLES[selectedId] : null
 
-  // Model điền form, tạo lại mỗi khi JSON đổi.
-  const model = useMemo(() => {
-    const m = new Model(surveyJson)
-    m.onComplete.add((sender) => setResult(sender.data))
-    return m
-  }, [surveyJson])
-
-  const applyEditor = () => {
+  const copyText = async (text, label) => {
     try {
-      const json = JSON.parse(editorText)
-      if (!json || typeof json !== 'object' || (!json.pages && !json.elements)) {
-        throw new Error('JSON phải là object có pages hoặc elements.')
-      }
-      setSurveyJson(json)
-      saveJson(json)
-      setEditorError('')
-      setEditorStatus('Đã áp dụng — sang tab Điền thử để xem form mới.')
-      setResult(null)
-    } catch (e) {
-      setEditorError('JSON chưa hợp lệ: ' + e.message)
-      setEditorStatus('')
-    }
-  }
-
-  const addField = () => {
-    let json
-    try {
-      json = JSON.parse(editorText)
-    } catch (e) {
-      setEditorError('JSON chưa hợp lệ, sửa lỗi trước khi thêm câu hỏi: ' + e.message)
-      return
-    }
-    if (!json.pages || !json.pages[0] || !Array.isArray(json.pages[0].elements)) {
-      setEditorError('Form mẫu này không có pages[0].elements nên chưa thêm được câu hỏi nhanh.')
-      return
-    }
-    const existing = new Set(json.pages[0].elements.map((el) => el.name))
-    let n = json.pages[0].elements.length + 1
-    while (existing.has('cauHoi' + n)) n++
-    const field = { ...FIELD_TEMPLATES[newFieldType], name: 'cauHoi' + n }
-    json.pages[0].elements.push(field)
-    setEditorText(JSON.stringify(json, null, 2))
-    setSurveyJson(json)
-    saveJson(json)
-    setEditorError('')
-    setEditorStatus(`Đã thêm "${field.title}" (cauHoi${n}) vào cuối trang 1.`)
-    setResult(null)
-  }
-
-  const resetSample = () => {
-    const json = SAMPLES[sampleKey].json
-    setSurveyJson(json)
-    setEditorText(JSON.stringify(json, null, 2))
-    setEditorError('')
-    setEditorStatus('Đã khôi phục về form mẫu.')
-    setResult(null)
-    saveJson(json)
-  }
-
-  const copyJson = async () => {
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(surveyJson, null, 2))
-      setSavedAt('Đã copy JSON')
+      await navigator.clipboard.writeText(text)
+      setCopied(label)
     } catch {
-      setSavedAt('Không copy được — hãy bôi đen JSON trong ô soạn')
+      setCopied('Không copy được — hãy copy tay từ ô bên dưới.')
     }
   }
 
-  const downloadJson = () => {
-    const blob = new Blob([JSON.stringify(surveyJson, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'form.json'
-    a.click()
-    URL.revokeObjectURL(url)
+  const openForm = (id) => {
+    setSelectedId(id)
+    setResult(null)
+    setShowJsonId(null)
+    try {
+      const url = new URL(window.location.href)
+      url.searchParams.set('form', id)
+      window.history.pushState({}, '', url)
+    } catch { /* ignore */ }
   }
 
-  return (
-    <div className="app">
-      <h1>SurveyJS Demo — React + Vite</h1>
-      <p className="sub">
-        Chỉ dùng SurveyJS Form Library miễn phí (MIT) để render form. Soạn form bằng JSON
-        ở tab Soạn form, điền thử ở tab Điền thử. Form được lưu vào localStorage, tải lại trang vẫn còn.
-      </p>
+  const backToList = () => {
+    setSelectedId(null)
+    setResult(null)
+    try {
+      const url = new URL(window.location.href)
+      url.searchParams.delete('form')
+      window.history.pushState({}, '', url)
+    } catch { /* ignore */ }
+  }
 
-      <div className="toolbar">
-        <label>
-          Form mẫu:{' '}
-          <select value={sampleKey} onChange={(e) => setSampleKey(e.target.value)}>
-            {SAMPLE_KEYS.map((k) => (
-              <option key={k} value={k}>{SAMPLES[k].label}</option>
-            ))}
-          </select>
-        </label>
-        <button onClick={copyJson}>Copy JSON</button>
-        <button onClick={downloadJson}>Tải form.json</button>
-        {savedAt && <span className="hint">{savedAt}</span>}
-      </div>
+  // Model điền form, tạo lại mỗi khi đổi form.
+  const model = useMemo(() => {
+    if (!selected) return null
+    const m = new Model(selected.json)
+    m.onComplete.add((sender) => {
+      setResult(sender.data)
+      // Báo kết quả cho app cha khi form được nhúng bằng iframe.
+      try {
+        if (window.parent !== window) {
+          window.parent.postMessage(
+            { type: 'surveyjs-demo:complete', form: selectedId, data: sender.data },
+            '*',
+          )
+        }
+      } catch { /* ignore */ }
+    })
+    return m
+  }, [selected, selectedId])
 
-      <div className="tabs">
-        <button className={tab === 'edit' ? 'active' : ''} onClick={() => setTab('edit')}>1. Soạn form (JSON)</button>
-        <button className={tab === 'fill' ? 'active' : ''} onClick={() => setTab('fill')}>2. Điền thử (Survey)</button>
-      </div>
-
-      {tab === 'edit' && (
+  // Chế độ nhúng (?embed=1): chỉ hiện form, không hiện danh sách/header.
+  if (embed && selected) {
+    return (
+      <div className="app app--embed">
         <div className="card">
-          <p className="hint">
-            Sửa JSON rồi bấm Áp dụng để xem form mới ở tab Điền thử. Muốn thêm nhanh một câu hỏi
-            thì chọn loại rồi bấm Thêm câu hỏi — câu hỏi mới sẽ chèn vào cuối trang 1.
-            Thử logic: ở form Đơn nghỉ phép, nhập Số ngày nghỉ &gt; 3 sẽ hiện ô Lý do chi tiết.
-          </p>
-          <div className="toolbar">
-            <label>
-              Thêm câu hỏi:{' '}
-              <select value={newFieldType} onChange={(e) => setNewFieldType(e.target.value)}>
-                <option value="text">Câu hỏi ngắn (text)</option>
-                <option value="comment">Câu hỏi dài (comment)</option>
-                <option value="dropdown">Chọn một (dropdown)</option>
-                <option value="radiogroup">Chọn một (radio)</option>
-                <option value="checkbox">Chọn nhiều (checkbox)</option>
-                <option value="rating">Đánh giá (rating)</option>
-                <option value="boolean">Có / Không (boolean)</option>
-                <option value="date">Ngày (date)</option>
-              </select>
-            </label>
-            <button onClick={addField}>Thêm câu hỏi</button>
-            <button className="primary" onClick={applyEditor}>Áp dụng JSON</button>
-            <button onClick={resetSample}>Khôi phục mẫu</button>
-          </div>
-          {editorError && <div className="error">{editorError}</div>}
-          {editorStatus && <div className="success">{editorStatus}</div>}
-          <textarea
-            className="editor"
-            value={editorText}
-            onChange={(e) => setEditorText(e.target.value)}
-            spellCheck={false}
-            aria-label="JSON định nghĩa form"
-          />
-          <p className="hint">
-            Gợi ý: đổi <code>title</code>, <code>isRequired</code>, <code>choices</code> hoặc thêm{' '}
-            <code>visibleIf: {'"{soNgay} > 3"'}</code> cho một câu hỏi để thử logic rẽ nhánh.
-          </p>
-        </div>
-      )}
-
-      {tab === 'fill' && (
-        <div className="card">
-          <Survey key={`${fillKey}-${JSON.stringify(surveyJson).length}`} model={model} />
+          <Survey key={`${fillKey}-${selectedId}`} model={model} />
           {result && (
             <div className="result">
               <div className="success">Đã gửi xong. Dữ liệu nhận được:</div>
@@ -214,7 +120,107 @@ export default function App() {
             </div>
           )}
         </div>
-      )}
+      </div>
+    )
+  }
+
+  if (selected) {
+    const u = urlsFor(selectedId)
+    return (
+      <div className="app">
+        <button onClick={backToList}>← Danh sách form</button>
+        <h1>{selected.json.title}</h1>
+        <p className="sub">{selected.json.description}</p>
+
+        <div className="card">
+          <Survey key={`${fillKey}-${selectedId}`} model={model} />
+          {result && (
+            <div className="result">
+              <div className="success">Đã gửi xong. Dữ liệu nhận được:</div>
+              <pre>{JSON.stringify(result, null, 2)}</pre>
+              <button onClick={() => copyText(JSON.stringify(result, null, 2), 'Đã copy kết quả')}>Copy kết quả</button>{' '}
+              <button onClick={() => { setResult(null); setFillKey((k) => k + 1) }}>Điền lại từ đầu</button>
+            </div>
+          )}
+        </div>
+
+        <div className="card api-box">
+          <h2>API của form này</h2>
+          <UrlRow label="Link điền form" value={u.fillUrl} onCopy={() => copyText(u.fillUrl, 'Đã copy link điền form')} />
+          <UrlRow label="JSON định nghĩa form" value={u.jsonUrl} onCopy={() => copyText(u.jsonUrl, 'Đã copy link JSON')} />
+          <UrlRow label="Link nhúng (chỉ form)" value={u.embedUrl} onCopy={() => copyText(u.embedUrl, 'Đã copy link nhúng')} />
+          <UrlRow label="Mã nhúng iframe" value={u.iframe} onCopy={() => copyText(u.iframe, 'Đã copy mã iframe')} />
+          <p className="hint">
+            Khi điền xong trong iframe, form gửi kết quả ra app cha bằng{' '}
+            <code>postMessage({'{type: "surveyjs-demo:complete", form: "{selectedId}", data: {...}}'})</code>.
+          </p>
+          {copied && <p className="hint">{copied}</p>}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="app">
+      <h1>Danh sách form</h1>
+      <p className="sub">
+        Các form có sẵn, soạn sẵn bởi Muse. Chọn một form để điền, hoặc lấy link/API
+        của form để dùng trong ứng dụng khác. Chỉ dùng SurveyJS Form Library miễn phí (MIT).
+      </p>
+
+      <div className="card api-box">
+        <h2>API danh sách form</h2>
+        <UrlRow
+          label="Danh sách tất cả form (JSON)"
+          value={`${LIVE_BASE}/forms/index.json`}
+          onCopy={() => copyText(`${LIVE_BASE}/forms/index.json`, 'Đã copy link danh sách form')}
+        />
+        <p className="hint">
+          Mỗi form có 1 file JSON riêng: <code>{LIVE_BASE}/forms/&lt;id&gt;.json</code> — ví dụ{' '}
+          <code>{LIVE_BASE}/forms/nghiPhep.json</code>. Ứng dụng khác chỉ cần fetch file JSON
+          đó rồi render bằng SurveyJS Form Library, hoặc mở link điền form là dùng ngay.
+        </p>
+        {copied && <p className="hint">{copied}</p>}
+      </div>
+
+      <div className="form-grid">
+        {SAMPLE_KEYS.map((id) => {
+          const form = SAMPLES[id]
+          const u = urlsFor(id)
+          const open = showJsonId === id
+          return (
+            <div className="card form-card" key={id}>
+              <h2>{form.json.title}</h2>
+              <p className="hint">{form.json.description}</p>
+              <p className="hint">
+                ID: <code>{id}</code> · {countFields(form.json)} câu hỏi ·{' '}
+                {(form.json.pages || []).length} trang
+              </p>
+              <div className="toolbar">
+                <button className="primary" onClick={() => openForm(id)}>Điền form</button>
+                <button onClick={() => copyText(u.fillUrl, `Đã copy link điền form ${form.json.title}`)}>Copy link điền</button>
+                <button onClick={() => copyText(u.jsonUrl, `Đã copy link JSON form ${form.json.title}`)}>Copy link JSON</button>
+                <button onClick={() => copyText(u.iframe, `Đã copy mã iframe form ${form.json.title}`)}>Copy iframe</button>
+                <button onClick={() => setShowJsonId(open ? null : id)}>
+                  {open ? 'Ẩn JSON' : 'Xem JSON'}
+                </button>
+              </div>
+              {open && <pre>{JSON.stringify(form.json, null, 2)}</pre>}
+            </div>
+          )
+        })}
+      </div>
+      {copied && <p className="hint">{copied}</p>}
+    </div>
+  )
+}
+
+function UrlRow({ label, value, onCopy }) {
+  return (
+    <div className="url-row">
+      <span className="hint">{label}</span>
+      <code>{value}</code>
+      <button onClick={onCopy}>Copy</button>
     </div>
   )
 }

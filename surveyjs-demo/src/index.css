@@ -15,5 +15,14 @@ button { font: inherit; cursor: pointer; }
 pre { background: #111827; color: #e5e7eb; padding: 14px; border-radius: 10px; overflow: auto; font-size: 12.5px; line-height: 1.5; }
 .result { margin-top: 16px; }
 .success { background: #ecfdf5; border: 1px solid #a7f3d0; padding: 12px 14px; border-radius: 10px; }
-.error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 12px 14px; border-radius: 10px; margin: 0 0 12px; }
-textarea.editor { width: 100%; min-height: 480px; font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 13px; line-height: 1.55; padding: 12px; border: 1px solid #d0d0d0; border-radius: 10px; resize: vertical; background: #fafafa; }
+.app--embed { max-width: 900px; }
+.form-grid { display: grid; gap: 14px; margin-top: 14px; }
+.form-card h2 { font-size: 17px; margin: 0 0 6px; }
+.api-box { margin-top: 14px; }
+.api-box h2 { font-size: 16px; margin: 0 0 10px; }
+.url-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 8px 0; border-top: 1px solid #eee; }
+.url-row:first-of-type { border-top: 0; }
+.url-row .hint { min-width: 170px; }
+.url-row code { flex: 1; min-width: 220px; overflow-wrap: anywhere; background: #f4f5f7; padding: 6px 8px; border-radius: 6px; font-size: 12.5px; }
+.url-row button { padding: 6px 10px; border: 1px solid #d0d0d0; border-radius: 8px; background: #fff; }
+code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
