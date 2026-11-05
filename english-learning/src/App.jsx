@@ -380,7 +380,7 @@ function ConjugationGuide({ guide, scale }) {
   return (
     <VStack gap={6}>
       <VStack gap={2}>
-        <Heading level={4} weight="bold">🧭 Sơ đồ chia động từ</Heading>
+        <SectionLabel icon="🧭">Sơ đồ chia động từ</SectionLabel>
         <Table
           data={guide.table.rows}
           idKey={guide.table.idKey}
@@ -391,12 +391,12 @@ function ConjugationGuide({ guide, scale }) {
         />
       </VStack>
       <VStack gap={2}>
-        <Heading level={4} weight="bold">🪜 Các bước làm — đi theo sơ đồ này</Heading>
+        <SectionLabel icon="🪜">Các bước làm — đi theo sơ đồ này</SectionLabel>
         <Text type="supporting">Đi từ trên xuống dưới; gặp hình thoi thì rẽ sang nhánh đúng, hai nhánh chập lại rồi đi tiếp.</Text>
         <ActivityDiagram flow={guide.flow} scale={scale} />
       </VStack>
       <VStack gap={2}>
-        <Heading level={4} weight="bold">💡 Mẹo nhớ</Heading>
+        <SectionLabel icon="💡">Mẹo nhớ</SectionLabel>
         <VStack gap={1}>
           {guide.tips.map((tip, i) => (
             <Text key={i}>💡 {tip}</Text>
@@ -404,7 +404,7 @@ function ConjugationGuide({ guide, scale }) {
         </VStack>
       </VStack>
       <VStack gap={2}>
-        <Heading level={4} weight="bold">⚠️ Số ít / Số nhiều — ví dụ đặc biệt</Heading>
+        <SectionLabel icon="⚠️">Số ít / Số nhiều — ví dụ đặc biệt</SectionLabel>
         <VStack gap={2}>
           {guide.specials.map((sp, i) => (
             <VStack key={i} gap={1}>
@@ -423,7 +423,7 @@ function ConjugationGuide({ guide, scale }) {
 function SingularPluralBox() {
   return (
     <VStack gap={2}>
-      <Heading level={4} weight="bold">🔢 Số ít / Số nhiều — nhớ nhanh</Heading>
+      <SectionLabel icon="🔢">Số ít / Số nhiều — nhớ nhanh</SectionLabel>
       <Table
         data={[
           { kind: '1 người/vật', subjects: 'he, she, it, Lan, the dog', verb: '+ -s / is (She plays, Lan is kind)' },
