@@ -6,10 +6,11 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { SAMPLES } from '../src/samples.js'
+import { APP_BASE_URL } from '../src/config.js'
 
-const BASE_URL =
-  process.env.SURVEYJS_DEMO_BASE_URL ||
-  'https://nguyenhuuhanhlam.github.io/ideas-n-solutions/surveyjs-demo'
+// Địa chỉ gốc của app lấy từ src/config.js (đổi 1 chỗ, mọi link trong
+// file API đổi theo). Biến môi trường SURVEYJS_DEMO_BASE_URL ghi đè khi cần.
+const BASE_URL = process.env.SURVEYJS_DEMO_BASE_URL || APP_BASE_URL
 
 const here = dirname(fileURLToPath(import.meta.url))
 const outDir = join(here, '..', 'public', 'forms')

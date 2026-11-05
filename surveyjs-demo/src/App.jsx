@@ -3,13 +3,12 @@ import { Model } from 'survey-core'
 import { Survey } from 'survey-react-ui'
 import 'survey-core/survey-core.css'
 import { SAMPLES, SAMPLE_KEYS } from './samples.js'
+import { APP_BASE_URL } from './config.js'
 
 // Chỉ dùng SurveyJS Form Library (survey-core + survey-react-ui, giấy phép MIT).
 // KHÔNG dùng Survey Creator (thương mại, cần licence).
 // Form do Muse soạn sẵn trong src/samples.js — app này chỉ liệt kê form,
 // cho điền form, và công bố API/URL để ứng dụng khác dùng.
-
-const LIVE_BASE = 'https://nguyenhuuhanhlam.github.io/ideas-n-solutions/surveyjs-demo'
 
 function countFields(json) {
   return (json.pages || []).reduce((n, p) => n + (p.elements ? p.elements.length : 0), 0)
@@ -212,12 +211,12 @@ export default function App() {
         <h2>API danh sách form</h2>
         <UrlRow
           label="Danh sách tất cả form (JSON)"
-          value={`${LIVE_BASE}/forms/index.json`}
-          onCopy={() => copyText(`${LIVE_BASE}/forms/index.json`, 'Đã copy link danh sách form')}
+          value={`${APP_BASE_URL}/forms/index.json`}
+          onCopy={() => copyText(`${APP_BASE_URL}/forms/index.json`, 'Đã copy link danh sách form')}
         />
         <p className="hint">
-          Mỗi form có 1 file JSON riêng: <code>{LIVE_BASE}/forms/&lt;id&gt;.json</code> — ví dụ{' '}
-          <code>{LIVE_BASE}/forms/nghiPhep.json</code>. Ứng dụng khác chỉ cần fetch file JSON
+          Mỗi form có 1 file JSON riêng: <code>{APP_BASE_URL}/forms/&lt;id&gt;.json</code> — ví dụ{' '}
+          <code>{APP_BASE_URL}/forms/nghiPhep.json</code>. Ứng dụng khác chỉ cần fetch file JSON
           đó rồi render bằng SurveyJS Form Library, hoặc mở link điền form là dùng ngay.
         </p>
         {copied && <p className="hint">{copied}</p>}

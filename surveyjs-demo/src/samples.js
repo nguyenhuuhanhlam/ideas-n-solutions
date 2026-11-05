@@ -1,5 +1,9 @@
 // 3 form mẫu bằng JSON của SurveyJS.
 // Mỗi form đều có: bắt buộc, validate, logic rẽ nhánh (visibleIf).
+// Địa chỉ máy n8n KHÔNG ghi cứng ở đây — sửa trong src/config.js
+// (N8N_BASE_URL), mọi form dùng chung sẽ tự đổi theo.
+
+import { APP_BASE_URL, N8N_WEBHOOK_URL } from './config.js'
 
 export const SAMPLES = {
   nghiPhep: {
@@ -7,10 +11,10 @@ export const SAMPLES = {
     // Link điền dán sẵn (đã kèm webhook n8n). App dùng link này làm link
     // điền chính thức của form thay vì tự sinh. Muốn đổi link thì dán link
     // mới vào đây, không cần sửa code chỗ khác.
-    fillUrl: 'https://nguyenhuuhanhlam.github.io/ideas-n-solutions/surveyjs-demo/?form=nghiPhep&webhook=https%3A%2F%2Fnguyens-mac-mini.taila4a8f3.ts.net%2Fwebhook%2Fsurvey-submit',
+    fillUrl: `${APP_BASE_URL}/?form=nghiPhep&webhook=${encodeURIComponent(N8N_WEBHOOK_URL)}`,
     // Webhook mặc định: khi điền xong, app gửi kết quả về đây.
     // Link có ?webhook= sẽ được ưu tiên hơn giá trị này.
-    webhookUrl: 'https://nguyens-mac-mini.taila4a8f3.ts.net/webhook/survey-submit',
+    webhookUrl: N8N_WEBHOOK_URL,
     json: {
       title: 'Đơn nghỉ phép',
       description: 'Mẫu này demo logic rẽ nhánh: nghỉ trên 3 ngày thì bắt buộc ghi lý do chi tiết.',

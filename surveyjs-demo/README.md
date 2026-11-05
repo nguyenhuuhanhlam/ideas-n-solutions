@@ -77,6 +77,15 @@ webhook: `?webhook=` trên link trước, rồi `webhookUrl` trong `samples.js`,
 cả hai đều không có thì form chỉ hiện kết quả như trước. Form không có
 `fillUrl` thì link điền tự sinh như thường.
 
+## Đổi máy chạy n8n
+
+Địa chỉ máy n8n chỉ nằm ở **một chỗ duy nhất**: `src/config.js`, dòng
+`N8N_BASE_URL`. Đổi máy (đổi tên máy, đổi tailnet, chuyển sang domain/VPS
+khác) thì sửa đúng dòng đó rồi chạy `npm run build` và push — link điền,
+webhook mặc định và file `forms/index.json` đều tự đổi theo, không cần
+sửa từng form. `src/config.js` cũng chứa `APP_BASE_URL` (địa chỉ app trên
+Pages) và `N8N_WEBHOOK_PATH` (đường dẫn webhook trong n8n).
+
 ## Build (kiểm chứng trước khi push)
 
 ```bash
