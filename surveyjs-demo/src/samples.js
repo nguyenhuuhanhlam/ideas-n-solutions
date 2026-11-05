@@ -4,6 +4,13 @@
 export const SAMPLES = {
   nghiPhep: {
     label: 'Đơn nghỉ phép',
+    // Link điền dán sẵn (đã kèm webhook n8n). App dùng link này làm link
+    // điền chính thức của form thay vì tự sinh. Muốn đổi link thì dán link
+    // mới vào đây, không cần sửa code chỗ khác.
+    fillUrl: 'https://nguyenhuuhanhlam.github.io/ideas-n-solutions/surveyjs-demo/?form=nghiPhep&webhook=https%3A%2F%2Fnguyens-mac-mini.taila4a8f3.ts.net%2Fwebhook%2Fsurvey-submit',
+    // Webhook mặc định: khi điền xong, app gửi kết quả về đây.
+    // Link có ?webhook= sẽ được ưu tiên hơn giá trị này.
+    webhookUrl: 'https://nguyens-mac-mini.taila4a8f3.ts.net/webhook/survey-submit',
     json: {
       title: 'Đơn nghỉ phép',
       description: 'Mẫu này demo logic rẽ nhánh: nghỉ trên 3 ngày thì bắt buộc ghi lý do chi tiết.',

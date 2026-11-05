@@ -22,11 +22,16 @@ function appBase() {
 
 function urlsFor(id) {
   const base = appBase()
+  const form = SAMPLES[id]
+  const hook = form.webhookUrl
+  const suffix = hook ? `&webhook=${encodeURIComponent(hook)}` : ''
   return {
-    fillUrl: `${base}?form=${id}`,
+    // Link điền dán sẵn trong samples.js (fillUrl) được ưu tiên dùng nguyên
+    // văn; không có thì tự sinh từ ?form= + webhook mặc định (nếu có).
+    fillUrl: form.fillUrl || `${base}?form=${id}${suffix}`,
     jsonUrl: `${base}/forms/${id}.json`,
-    embedUrl: `${base}?form=${id}&embed=1`,
-    iframe: `<iframe src="${base}?form=${id}&embed=1" width="100%" height="700" frameborder="0"></iframe>`,
+    embedUrl: `${base}?form=${id}&embed=1${suffix}`,
+    iframe: `<iframe src="${base}?form=${id}&embed=1${suffix}" width="100%" height="700" frameborder="0"></iframe>`,
   }
 }
 
@@ -47,12 +52,24 @@ function isEmbed() {
   }
 }
 
+// Webhook n8n gắn trên link (?webhook=<url đã mã hóa>). Link có webhook
+// được ưu tiên hơn webhookUrl mặc định của form trong samples.js.
+function webhookUrlFromLink() {
+  try {
+    const w = new URLSearchParams(window.location.search).get('webhook')
+    return w ? decodeURIComponent(w) : ''
+  } catch {
+    return ''
+  }
+}
+
 export default function App() {
   const [selectedId, setSelectedId] = useState(initialFormId)
   const [showJsonId, setShowJsonId] = useState(null)
   const [copied, setCopied] = useState('')
   const [result, setResult] = useState(null)
   const [fillKey, setFillKey] = useState(0)
+  const [sendStatus, setSendStatus] = useState('')
   const embed = isEmbed()
 
   const selected = selectedId ? SAMPLES[selectedId] : null
@@ -93,6 +110,27 @@ export default function App() {
     const m = new Model(selected.json)
     m.onComplete.add((sender) => {
       setResult(sender.data)
+      setSendStatus('')
+      // Gửi kết quả về webhook n8n (nếu có): ưu tiên ?webhook= trên link,
+      // không có thì dùng webhookUrl mặc định của form trong samples.js.
+      // Không có webhook nào thì form chỉ hiện kết quả như trước.
+      const target = webhookUrlFromLink() || selected.webhookUrl || ''
+      if (target) {
+        fetch(target, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            form: selectedId,
+            submittedAt: new Date().toISOString(),
+            data: sender.data,
+          }),
+        })
+          .then((r) => {
+            if (!r.ok) throw new Error('HTTP ' + r.status)
+            setSendStatus('Đã gửi tới n8n.')
+          })
+          .catch(() => setSendStatus('Gửi tới n8n thất bại — kiểm tra lại webhook/CORS.'))
+      }
       // Báo kết quả cho app cha khi form được nhúng bằng iframe.
       try {
         if (window.parent !== window) {
@@ -115,6 +153,7 @@ export default function App() {
           {result && (
             <div className="result">
               <div className="success">Đã gửi xong. Dữ liệu nhận được:</div>
+              {sendStatus && <p className="hint">{sendStatus}</p>}
               <pre>{JSON.stringify(result, null, 2)}</pre>
               <button onClick={() => { setResult(null); setFillKey((k) => k + 1) }}>Điền lại từ đầu</button>
             </div>
@@ -137,6 +176,7 @@ export default function App() {
           {result && (
             <div className="result">
               <div className="success">Đã gửi xong. Dữ liệu nhận được:</div>
+              {sendStatus && <p className="hint">{sendStatus}</p>}
               <pre>{JSON.stringify(result, null, 2)}</pre>
               <button onClick={() => copyText(JSON.stringify(result, null, 2), 'Đã copy kết quả')}>Copy kết quả</button>{' '}
               <button onClick={() => { setResult(null); setFillKey((k) => k + 1) }}>Điền lại từ đầu</button>

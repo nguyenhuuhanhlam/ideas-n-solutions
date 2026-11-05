@@ -53,6 +53,30 @@ window.addEventListener('message', (e) => {
 Ứng dụng khác cũng có thể tự render form bằng SurveyJS Form Library:
 fetch `<base>/forms/<id>.json` rồi `new Model(json)`.
 
+## Link điền dán sẵn và webhook n8n
+
+Mỗi form trong `src/samples.js` có thể có thêm 2 trường (không bắt buộc):
+
+```js
+nghiPhep: {
+  label: 'Đơn nghỉ phép',
+  // Link điền dán sẵn: app dùng nguyên văn làm link điền chính thức
+  // (nút "Copy link điền" và file forms/index.json). Muốn đổi link thì
+  // dán link mới vào đây, không cần sửa code chỗ khác.
+  fillUrl: 'https://nguyenhuuhanhlam.github.io/ideas-n-solutions/surveyjs-demo/?form=nghiPhep&webhook=https%3A%2F%2Fnguyens-mac-mini.taila4a8f3.ts.net%2Fwebhook%2Fsurvey-submit',
+  // Webhook mặc định: khi điền xong, app gửi kết quả về đây.
+  webhookUrl: 'https://nguyens-mac-mini.taila4a8f3.ts.net/webhook/survey-submit',
+  json: { ... },
+},
+```
+
+Khi điền xong, app POST về webhook (nếu có) với nội dung
+`{form: "<id>", submittedAt: "<ISO>", data: {...}}` và hiện trạng thái
+"Đã gửi tới n8n" hoặc "Gửi thất bại" ngay dưới kết quả. Thứ tự ưu tiên
+webhook: `?webhook=` trên link trước, rồi `webhookUrl` trong `samples.js`,
+cả hai đều không có thì form chỉ hiện kết quả như trước. Form không có
+`fillUrl` thì link điền tự sinh như thường.
+
 ## Build (kiểm chứng trước khi push)
 
 ```bash
