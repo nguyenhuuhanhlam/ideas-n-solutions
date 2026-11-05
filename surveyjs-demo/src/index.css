@@ -1,0 +1,19 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: #f4f5f7; color: #1a1a1a; }
+button { font: inherit; cursor: pointer; }
+.app { max-width: 1100px; margin: 0 auto; padding: 20px 16px 48px; }
+.app h1 { font-size: 22px; margin: 4px 0 4px; }
+.app .sub { color: #555; margin: 0 0 16px; }
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+.tabs button { border: 1px solid #d0d0d0; background: #fff; padding: 8px 14px; border-radius: 999px; }
+.tabs button.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+.card { background: #fff; border: 1px solid #e2e2e2; border-radius: 12px; padding: 16px; }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+.toolbar select, .toolbar button { padding: 7px 10px; border: 1px solid #d0d0d0; border-radius: 8px; background: #fff; }
+.toolbar button.primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+.hint { font-size: 13px; color: #555; }
+pre { background: #111827; color: #e5e7eb; padding: 14px; border-radius: 10px; overflow: auto; font-size: 12.5px; line-height: 1.5; }
+.creator-wrap { height: 640px; }
+.creator-wrap .svc-creator { height: 100%; }
+.result { margin-top: 16px; }
+.success { background: #ecfdf5; border: 1px solid #a7f3d0; padding: 12px 14px; border-radius: 10px; }
