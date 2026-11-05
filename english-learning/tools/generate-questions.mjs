@@ -585,6 +585,255 @@ function extraConj(lesson, add) {
   }
 }
 
+// ---- Bài nâng cao: tìm câu sai ----
+// Mỗi cặp = 1 câu đúng + 1 câu sai đúng 1 lỗi ngữ pháp của bài đó.
+// Từ mỗi cặp sinh 2 dạng: pickWrong (1 câu sai + 3 câu đúng cùng bài)
+// và fixSentence (cho câu sai, gõ lại câu đúng). Câu sai sinh ra phải
+// là câu SAI THẬT (không bao giờ là câu đúng của bài), nếu không bài
+// trắc nghiệm sẽ có 2 đáp án đúng — phần kiểm tra cuối file bắt lỗi này.
+const BE_RIGHT = { I: 'am', He: 'is', She: 'is', It: 'is', Lan: 'is', Minh: 'is', This: 'is', That: 'is', We: 'are', You: 'are', They: 'are' }
+const BE_WRONG = { am: 'is', is: 'are', are: 'is' }
+const BE_NEG = { I: 'am not', He: "isn't", She: "isn't", It: "isn't", Lan: "isn't", Minh: "isn't", We: "aren't", You: "aren't", They: "aren't" }
+const BE_NEG_WRONG = { 'am not': 'is not', "isn't": "aren't", "aren't": "isn't" }
+const beExpl = (subj) => `${subj} đi với ${BE_RIGHT[subj]}.`
+const STATES = ['happy', 'sad', 'tired', 'busy', 'hungry', 'thirsty', 'sick', 'ready', 'late', 'early', 'free', 'kind']
+const SUBJ_ALL = ['I', 'He', 'She', 'Lan', 'Minh', 'We', 'You', 'They']
+const SUBJ_3RD = ['He', 'She', 'Lan', 'Minh']
+const SUBJ_BASE = ['I', 'You', 'We', 'They']
+const POSS = { I: 'my', You: 'your', We: 'our', They: 'their', He: 'his', She: 'her', Lan: 'her', Minh: 'his' }
+// Chia -s cho cụm động từ (get up -> gets up): chỉ chia từ đầu tiên.
+function sFormPhrase(v) {
+  if (!v.includes(' ')) return sForm(v)
+  const [first, ...rest] = v.split(' ')
+  return [sForm(first), ...rest].join(' ')
+}
+
+// Lấy lần lượt 1 cặp từ mỗi nhóm để các dạng lỗi phân bố đều trước khi cắt ngọn.
+function interleave(groups, cap) {
+  const out = []
+  let i = 0
+  for (;;) {
+    let added = false
+    for (const g of groups) {
+      if (i < g.length) { out.push(g[i]); added = true; if (out.length >= cap) return out }
+    }
+    if (!added) return out
+    i++
+  }
+}
+
+function errorPairGroups(id) {
+  const P = (correct, wrong, explanation) => ({ correct, wrong, explanation })
+  if (id === 'greetings') {
+    const names = ['Nam', 'Lan', 'Minh', 'Hoa', 'An']
+    return [
+      names.map((n) => P(`Hello, my name is ${n}.`, `Hello, my name are ${n}.`, 'My name đi với is.')),
+      ['six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'].map((w) => P(`I am ${w} years old.`, `I is ${w} years old.`, 'I đi với am.')),
+      names.map((n) => P(`This is my friend ${n}.`, `This are my friend ${n}.`, 'This đi với is.')),
+      SUBJ_3RD.map((s) => P(`${s} is a student.`, `${s} are a student.`, beExpl(s))),
+      ['We', 'They', 'Lan and Minh'].map((s) => P(`${s} are friends.`, `${s} is friends.`, `${s} đi với are.`)),
+      ['She', 'He', 'Miss Hoa'].map((s) => P(`${s} is my teacher.`, `${s} are my teacher.`, `${s} đi với is.`)),
+    ]
+  }
+  if (id === 'numbers') {
+    const objs = [
+      { en: 'pen', plural: 'pens' }, { en: 'book', plural: 'books' }, { en: 'cat', plural: 'cats' },
+      { en: 'dog', plural: 'dogs' }, { en: 'apple', plural: 'apples' }, { en: 'ball', plural: 'balls' },
+    ]
+    const words = ['two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
+    const have = []
+    for (const w of words) for (const o of objs) have.push(P(`I have ${w} ${o.plural}.`, `I have ${w} ${o.en}.`, 'Sau số đếm từ 2 trở lên, danh từ phải thêm -s.'))
+    const there = []
+    for (const w of words) for (const o of objs) {
+      there.push(P(`There are ${w} ${o.plural}.`, `There is ${w} ${o.plural}.`, 'There are đi với danh từ số nhiều.'))
+      there.push(P(`There are ${w} ${o.plural}.`, `There are ${w} ${o.en}.`, 'Sau số đếm từ 2 trở lên, danh từ phải thêm -s.'))
+    }
+    const has = []
+    for (const w of words.slice(0, 5)) for (const o of objs.slice(0, 3)) {
+      has.push(P(`She has ${w} ${o.plural}.`, `She have ${w} ${o.plural}.`, 'She đi với has.'))
+      has.push(P(`He has ${w} ${o.plural}.`, `He have ${w} ${o.plural}.`, 'He đi với has.'))
+    }
+    return [have, there, has]
+  }
+  if (id === 'family') {
+    const rels = ['mother', 'father', 'sister', 'brother', 'grandmother', 'grandfather', 'baby']
+    return [
+      rels.map((r) => P(`This is my ${r}.`, `This are my ${r}.`, 'This đi với is.')),
+      [['He', ['father', 'brother', 'grandfather']], ['She', ['mother', 'sister', 'grandmother']]].flatMap(([s, rs]) => rs.map((r) => P(`${s} is my ${r}.`, `${s} are my ${r}.`, beExpl(s)))),
+      [P('They are my parents.', 'They is my parents.', 'They đi với are.'), P('We are a family.', 'We is a family.', 'We đi với are.')],
+      ['Lan', 'Minh'].flatMap((n) => ['mother', 'father', 'sister', 'brother'].map((r) => P(`This is ${n}'s ${r}.`, `This is ${n} ${r}.`, `Sở hữu: tên người + 's (${n}'s ${r}).`))),
+      [P('She has a brother.', 'She have a brother.', 'She đi với has.'), P('He has two sisters.', 'He have two sisters.', 'He đi với has.'), P('I have a sister.', 'I has a sister.', 'I đi với have, không đi với has.')],
+    ]
+  }
+  if (id === 'daily-routine') {
+    const verbs = ['get up', 'brush', 'watch', 'go', 'eat', 'play', 'read', 'sleep', 'help', 'cook']
+    // Dạng đầy đủ của từng động từ theo chủ ngữ (brush đi kèm sở hữu).
+    const full = (v, s, form) => {
+      if (v === 'brush') return `${form} ${POSS[s]} teeth`
+      if (v === 'get up') return `${form} at six`
+      if (v === 'go') return `${form} to school`
+      if (v === 'watch') return `${form} TV`
+      if (v === 'eat') return `${form} breakfast`
+      if (v === 'play') return `${form} football`
+      if (v === 'read') return `${form} a book`
+      if (v === 'sleep') return `${form} early`
+      if (v === 'help') return `${form} mother`
+      return `${form} dinner`
+    }
+    const missS = SUBJ_3RD.flatMap((s) => verbs.map((v) => P(`${s} ${full(v, s, sFormPhrase(v))}.`, `${s} ${full(v, s, v)}.`, `${s} đi với động từ thêm -s (${sFormPhrase(v)}).`)))
+    const extraS = SUBJ_BASE.flatMap((s) => verbs.map((v) => P(`${s} ${full(v, s, v)}.`, `${s} ${full(v, s, sFormPhrase(v))}.`, `${s} đi với động từ nguyên thể (${v}).`)))
+    const neg = SUBJ_3RD.flatMap((s) => verbs.slice(0, 5).map((v) => P(`${s} doesn't ${full(v, s, v)}.`, `${s} don't ${full(v, s, v)}.`, `${s} đi với doesn't, không đi với don't.`)))
+    const negS = SUBJ_3RD.flatMap((s) => verbs.slice(0, 5).map((v) => P(`${s} doesn't ${full(v, s, v)}.`, `${s} doesn't ${full(v, s, sFormPhrase(v))}.`, `Sau doesn't, động từ giữ nguyên thể (${v}, không phải ${sFormPhrase(v)}).`)))
+    const negPl = SUBJ_BASE.slice(2).flatMap((s) => verbs.slice(0, 5).map((v) => P(`${s} don't ${full(v, s, v)}.`, `${s} doesn't ${full(v, s, v)}.`, `${s} đi với don't, không đi với doesn't.`)))
+    return [missS, extraS, neg, negS, negPl]
+  }
+  if (id === 'colors-objects') {
+    const objs = ['pen', 'book', 'cat', 'dog', 'bag', 'chair']
+    const plurals = ['pens', 'books', 'cats', 'dogs', 'bags', 'chairs']
+    const colors = ['red', 'blue', 'green', 'yellow', 'black', 'white', 'pink', 'orange']
+    const sing = objs.flatMap((o) => colors.slice(0, 4).map((c) => P(`The ${o} is ${c}.`, `The ${o} are ${c}.`, `The ${o} (số ít) đi với is.`)))
+    const plur = plurals.flatMap((o) => colors.slice(0, 4).map((c) => P(`The ${o} are ${c}.`, `The ${o} is ${c}.`, `The ${o} (số nhiều) đi với are.`)))
+    const an = [
+      ...['pen', 'book', 'cat', 'dog', 'bag', 'chair', 'cake', 'ball'].map((o) => P(`This is a ${o}.`, `This is an ${o}.`, `a đi với từ bắt đầu bằng phụ âm (a ${o}).`)),
+      ...['apple', 'orange', 'egg'].map((o) => P(`This is an ${o}.`, `This is a ${o}.`, `an đi với từ bắt đầu bằng nguyên âm (an ${o}).`)),
+    ]
+    const it = colors.map((c) => P(`It is ${c}.`, `It are ${c}.`, 'It đi với is.'))
+    return [sing, plur, an, it]
+  }
+  if (id === 'food-drink') {
+    const foods = ['apples', 'bananas', 'milk', 'rice', 'fish', 'bread', 'eggs', 'oranges', 'cake', 'chicken']
+    const like = [
+      ...SUBJ_BASE.flatMap((s) => foods.slice(0, 5).map((f) => P(`${s} like ${f}.`, `${s} likes ${f}.`, `${s} đi với like, không thêm -s.`))),
+      ...SUBJ_3RD.flatMap((s) => foods.slice(0, 5).map((f) => P(`${s} likes ${f}.`, `${s} like ${f}.`, `${s} đi với likes (thêm -s).`))),
+    ]
+    const neg = [
+      ...SUBJ_3RD.flatMap((s) => foods.slice(0, 4).map((f) => P(`${s} doesn't like ${f}.`, `${s} don't like ${f}.`, `${s} đi với doesn't.`))),
+      ...SUBJ_3RD.flatMap((s) => foods.slice(0, 4).map((f) => P(`${s} doesn't like ${f}.`, `${s} doesn't likes ${f}.`, 'Sau doesn\'t, động từ giữ nguyên thể (like).'))),
+      ...SUBJ_BASE.slice(2).flatMap((s) => foods.slice(0, 4).map((f) => P(`${s} don't like ${f}.`, `${s} doesn't like ${f}.`, `${s} đi với don't.`))),
+    ]
+    const want = SUBJ_3RD.flatMap((s) => foods.slice(0, 5).map((f) => P(`${s} wants ${f}.`, `${s} want ${f}.`, `${s} đi với wants (thêm -s).`)))
+    return [like, neg, want]
+  }
+  if (id === 'to-be') {
+    const pos = SUBJ_ALL.flatMap((s) => STATES.map((a) => P(`${s} ${BE_RIGHT[s]} ${a}.`, `${s} ${BE_WRONG[BE_RIGHT[s]]} ${a}.`, beExpl(s))))
+    const neg = SUBJ_ALL.flatMap((s) => STATES.slice(0, 6).map((a) => P(`${s} ${BE_NEG[s]} ${a}.`, `${s} ${BE_NEG_WRONG[BE_NEG[s]]} ${a}.`, `${s} đi với ${BE_NEG[s]}.`)))
+    const ques = SUBJ_ALL.flatMap((s) => STATES.slice(0, 4).map((a) => {
+      if (s === 'I') return P('Am I happy?', 'Is I happy?', 'Câu hỏi với I dùng Am I.')
+      if (s === 'You') return P(`Are you ${a}?`, `Is you ${a}?`, 'You đi với are.')
+      const q = BE_RIGHT[s] === 'is' ? 'Is' : 'Are'
+      const wrongQ = q === 'Is' ? 'Are' : 'Is'
+      return P(`${q} ${s} ${a}?`, `${wrongQ} ${s} ${a}?`, `${s} đi với ${BE_RIGHT[s]}.`)
+    }))
+    return [pos, neg, ques]
+  }
+  if (id === 'present-simple') {
+    const verbs = [
+      ['go', 'to school'], ['watch', 'TV'], ['play', 'football'], ['read', 'a book'],
+      ['eat', 'breakfast'], ['help', 'mother'], ['cook', 'dinner'], ['like', 'apples'],
+      ['love', 'music'], ['study', 'English'], ['wash', 'hands'], ['do', 'homework'],
+    ]
+    const missS = SUBJ_3RD.flatMap((s) => verbs.map(([v, o]) => P(`${s} ${sForm(v)} ${o}.`, `${s} ${v} ${o}.`, `${s} đi với động từ thêm -s (${sForm(v)}).`)))
+    const extraS = SUBJ_BASE.flatMap((s) => verbs.map(([v, o]) => P(`${s} ${v} ${o}.`, `${s} ${sForm(v)} ${o}.`, `${s} đi với động từ nguyên thể (${v}).`)))
+    const neg = SUBJ_3RD.flatMap((s) => verbs.slice(0, 6).map(([v, o]) => P(`${s} doesn't ${v} ${o}.`, `${s} don't ${v} ${o}.`, `${s} đi với doesn't.`)))
+    const negS = SUBJ_3RD.flatMap((s) => verbs.slice(0, 6).map(([v, o]) => P(`${s} doesn't ${v} ${o}.`, `${s} doesn't ${sForm(v)} ${o}.`, `Sau doesn't, động từ giữ nguyên thể (${v}).`)))
+    const negPl = SUBJ_BASE.slice(2).flatMap((s) => verbs.slice(0, 6).map(([v, o]) => P(`${s} don't ${v} ${o}.`, `${s} doesn't ${v} ${o}.`, `${s} đi với don't.`)))
+    const ques = [
+      ...SUBJ_3RD.flatMap((s) => verbs.slice(0, 6).map(([v, o]) => P(`Does ${s} ${v} ${o}?`, `Does ${s} ${sForm(v)} ${o}?`, `Sau Does, động từ giữ nguyên thể (${v}).`))),
+      ...SUBJ_BASE.slice(2).flatMap((s) => verbs.slice(0, 6).map(([v, o]) => P(`Do ${s} ${v} ${o}?`, `Do ${s} ${sForm(v)} ${o}?`, `Sau Do, động từ giữ nguyên thể (${v}).`))),
+    ]
+    return [missS, extraS, neg, negS, negPl, ques]
+  }
+  if (id === 'present-continuous') {
+    const verbs = [
+      ['play', 'football'], ['read', 'a book'], ['eat', 'breakfast'], ['sing', 'a song'],
+      ['swim', 'in the pool'], ['draw', 'a picture'], ['watch', 'TV'], ['cook', 'dinner'],
+    ]
+    const be = SUBJ_ALL.flatMap((s) => verbs.map(([v, o]) => P(`${s} ${BE_RIGHT[s]} ${ingForm(v)} ${o}.`, `${s} ${BE_WRONG[BE_RIGHT[s]]} ${ingForm(v)} ${o}.`, beExpl(s))))
+    const missIng = SUBJ_ALL.flatMap((s) => verbs.map(([v, o]) => P(`${s} ${BE_RIGHT[s]} ${ingForm(v)} ${o}.`, `${s} ${BE_RIGHT[s]} ${v} ${o}.`, `Hiện tại tiếp diễn: be + V-ing (${ingForm(v)}, không phải ${v}).`)))
+    const missBe = SUBJ_ALL.flatMap((s) => verbs.map(([v, o]) => P(`${s} ${BE_RIGHT[s]} ${ingForm(v)} ${o}.`, `${s} ${ingForm(v)} ${o}.`, 'Câu hiện tại tiếp diễn phải có be (is/are/am).')))
+    const neg = SUBJ_ALL.flatMap((s) => verbs.slice(0, 4).map(([v, o]) => P(`${s} ${BE_NEG[s]} ${ingForm(v)} ${o}.`, `${s} ${BE_NEG_WRONG[BE_NEG[s]]} ${ingForm(v)} ${o}.`, `${s} đi với ${BE_NEG[s]}.`)))
+    return [be, missIng, missBe, neg]
+  }
+  if (id === 'past-regular') {
+    const verbs = [
+      ['play', 'football'], ['watch', 'TV'], ['clean', 'the room'], ['cook', 'dinner'],
+      ['help', 'mother'], ['wash', 'hands'], ['visit', 'grandma'], ['call', 'a friend'],
+      ['study', 'English'], ['walk', 'to school'],
+    ]
+    const times = ['yesterday', 'last night', 'last week']
+    const missEd = SUBJ_ALL.slice(0, 6).flatMap((s) => verbs.map(([v, o], i) => P(`${s} ${edForm(v)} ${o} ${times[i % times.length]}.`, `${s} ${v} ${o} ${times[i % times.length]}.`, `Quá khứ đơn: động từ thêm -ed (${edForm(v)}).`)))
+    const neg = SUBJ_ALL.slice(0, 6).flatMap((s) => verbs.slice(0, 6).map(([v, o]) => P(`${s} didn't ${v} ${o}.`, `${s} didn't ${edForm(v)} ${o}.`, `Sau didn't, động từ giữ nguyên thể (${v}).`)))
+    const ques = SUBJ_ALL.slice(0, 6).flatMap((s) => verbs.slice(0, 6).map(([v, o]) => P(`Did ${s} ${v} ${o}?`, `Did ${s} ${edForm(v)} ${o}?`, `Sau Did, động từ giữ nguyên thể (${v}).`)))
+    return [missEd, neg, ques]
+  }
+  if (id === 'past-irregular') {
+    const verbs = [
+      ['go', 'went', 'to school'], ['buy', 'bought', 'a book'], ['eat', 'ate', 'rice'],
+      ['see', 'saw', 'a bird'], ['make', 'made', 'a cake'], ['take', 'took', 'a pen'],
+      ['drink', 'drank', 'milk'], ['give', 'gave', 'me a pen'], ['find', 'found', 'a ball'],
+      ['sing', 'sang', 'a song'], ['swim', 'swam', 'in the pool'], ['run', 'ran', 'fast'],
+      ['write', 'wrote', 'a letter'], ['read', 'read', 'a book'],
+    ]
+    const over = SUBJ_ALL.slice(0, 6).flatMap((s) => verbs.map(([v1, v2, o]) => P(`${s} ${v2} ${o} yesterday.`, `${s} ${edForm(v1)} ${o} yesterday.`, `Quá khứ của ${v1} là ${v2}, không phải ${edForm(v1)}.`)))
+    const neg = SUBJ_ALL.slice(0, 6).flatMap((s) => verbs.slice(0, 8).map(([v1, v2, o]) => P(`${s} didn't ${v1} ${o}.`, `${s} didn't ${v2} ${o}.`, `Sau didn't, động từ giữ nguyên thể (${v1}).`)))
+    const ques = SUBJ_ALL.slice(0, 6).flatMap((s) => verbs.slice(0, 8).map(([v1, v2, o]) => P(`Did ${s} ${v1} ${o}?`, `Did ${s} ${v2} ${o}?`, `Sau Did, động từ giữ nguyên thể (${v1}).`)))
+    return [over, neg, ques]
+  }
+  if (id === 'future') {
+    const verbs = [
+      ['go', 'to school'], ['play', 'football'], ['help', 'mother'], ['visit', 'grandma'],
+      ['cook', 'dinner'], ['travel', 'next week'], ['call', 'you tonight'], ['read', 'a book tomorrow'],
+    ]
+    const willS = SUBJ_ALL.flatMap((s) => verbs.map(([v, o]) => P(`${s} will ${v} ${o}.`, `${s} will ${sForm(v)} ${o}.`, `Sau will, động từ giữ nguyên thể (${v}).`)))
+    const willIng = SUBJ_3RD.flatMap((s) => verbs.slice(0, 4).map(([v, o]) => P(`${s} will ${v} ${o}.`, `${s} will ${ingForm(v)} ${o}.`, `Sau will, động từ giữ nguyên thể (${v}, không phải ${ingForm(v)}).`)))
+    const goingBe = SUBJ_ALL.flatMap((s) => verbs.map(([v, o]) => P(`${s} ${BE_RIGHT[s]} going to ${v} ${o}.`, `${s} ${BE_WRONG[BE_RIGHT[s]]} going to ${v} ${o}.`, beExpl(s))))
+    const goingS = SUBJ_ALL.flatMap((s) => verbs.slice(0, 4).map(([v, o]) => P(`${s} ${BE_RIGHT[s]} going to ${v} ${o}.`, `${s} ${BE_RIGHT[s]} going to ${sForm(v)} ${o}.`, `Sau be going to, động từ giữ nguyên thể (${v}).`)))
+    const wont = SUBJ_3RD.flatMap((s) => verbs.slice(0, 4).map(([v, o]) => P(`${s} won't ${v} ${o}.`, `${s} won't ${sForm(v)} ${o}.`, `Sau won't, động từ giữ nguyên thể (${v}).`)))
+    return [willS, willIng, goingBe, goingS, wont]
+  }
+  return []
+}
+
+function buildErrorBanks() {
+  const out = {}
+  let total = 0
+  for (const lesson of [...lessons, ...conjugationGroups]) {
+    const pairs = interleave(errorPairGroups(lesson.id), 60)
+    const seen = new Set()
+    const uniq = pairs.filter((p) => {
+      const k = `${p.correct}|${p.wrong}`
+      if (seen.has(k)) return false
+      seen.add(k)
+      return true
+    })
+    const corrects = [...new Set(uniq.map((p) => p.correct))]
+    // 1 câu sai không được ứng với 2 câu đúng khác nhau (mơ hồ khi sửa câu).
+    const wrongToCorrect = new Map()
+    for (const p of uniq) {
+      if (!wrongToCorrect.has(p.wrong)) wrongToCorrect.set(p.wrong, new Set())
+      wrongToCorrect.get(p.wrong).add(p.correct)
+    }
+    for (const [w, cs] of wrongToCorrect) {
+      if (cs.size > 1) throw new Error(`${lesson.id}: câu sai mơ hồ: "${w}" -> ${[...cs].join(' / ')}`)
+    }
+    const qs = []
+    for (const p of uniq) {
+      if (corrects.includes(p.wrong)) throw new Error(`${lesson.id}: câu sai trùng câu đúng: "${p.wrong}"`)
+      const distractors = pick(corrects, 3, [p.correct])
+      if (distractors.length === 3) {
+        qs.push({ type: 'pickWrong', prompt: 'Câu nào viết SAI? Bấm vào câu sai.', options: shuffleArr([p.wrong, ...distractors]), answer: p.wrong, explanation: p.explanation })
+      }
+      qs.push({ type: 'fixSentence', prompt: 'Câu này viết SAI. Gõ lại câu đúng:', wrong: p.wrong, answers: [p.correct], explanation: p.explanation })
+    }
+    if (qs.length < 25) throw new Error(`${lesson.id}: ngân hàng câu sai chỉ có ${qs.length} câu, dưới 25 câu/phiên`)
+    out[lesson.id] = qs
+    total += qs.length
+    console.log(`${lesson.id}: ${qs.length} câu sai (${uniq.length} cặp)`)
+  }
+  console.log(`TỔNG CÂU SAI: ${total} câu`)
+  return out
+}
+
 // ---- Chạy ----
 const banks = {}
 let total = 0
@@ -621,7 +870,9 @@ for (const lesson of [...lessons, ...conjugationGroups]) {
 }
 if (total < 2900) throw new Error(`Tổng chỉ có ${total} câu, chưa đạt 2900`)
 console.log(`TỔNG: ${total} câu`)
+const errorBanks = buildErrorBanks()
 writeFileSync(
   new URL('../src/data/questions.js', import.meta.url),
-  `// Ngân hàng câu hỏi — SINH TỰ ĐỘNG bằng tools/generate-questions.mjs, đừng sửa tay.\n// Câu hỏi mới soạn theo chủ đề/dạng bài chuẩn, không sao chép giáo trình có bản quyền.\nexport const questionBanks = ${JSON.stringify(banks, null, 2)}\n`,
+  `// Ngân hàng câu hỏi — SINH TỰ ĐỘNG bằng tools/generate-questions.mjs, đừng sửa tay.\n// Câu hỏi mới soạn theo chủ đề/dạng bài chuẩn, không sao chép giáo trình có bản quyền.\nexport const questionBanks = ${JSON.stringify(banks, null, 2)}
+export const errorBanks = ${JSON.stringify(errorBanks, null, 2)}\n`,
 )

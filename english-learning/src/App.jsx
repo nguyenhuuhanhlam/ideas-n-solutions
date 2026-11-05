@@ -14,7 +14,7 @@ import { VStack } from '@astryxdesign/core/VStack'
 import { useEffect, useState } from 'react'
 import './learn.css'
 import { lessons, conjugationGroups, POINTS_PER_QUESTION } from './data/lessons.js'
-import { questionBanks } from './data/questions.js'
+import { questionBanks, errorBanks } from './data/questions.js'
 import { conjugationGuides } from './data/conjugationGuides.js'
 import { irregularVerbs } from './data/irregular.js'
 
@@ -26,8 +26,10 @@ const WRONG_BANK_MAX = 100
 // đáp án đúng, để cùng 1 câu dù làm sai ở đâu cũng chỉ ghi 1 lần, và khi
 // làm đúng lại ở bất kỳ bài nào thì câu đó tự xóa khỏi danh sách.
 function wrongKeyFor(lessonTitle, question, correctAnswer) {
-  return `${lessonTitle}||${question.prompt}||${correctAnswer}`
+  return `${lessonTitle}||${question.prompt}||${question.wrong || ''}||${correctAnswer}`
 }
+// pickWrong cham va hien thi nhu trac nghiem (bam chon 1 dap an).
+const isChoiceLike = (q) => q.type === 'choice' || q.type === 'pickWrong'
 function loadWrongBank() {
   try {
     const data = JSON.parse(localStorage.getItem(WRONG_KEY))
@@ -134,13 +136,15 @@ function starsFor(score) {
 
 function prepareQuiz(questions) {
   return questions.map((q) => {
-    if (q.type === 'choice') return { ...q, options: shuffle(q.options) }
+    if (isChoiceLike(q)) return { ...q, options: shuffle(q.options) }
     return { ...q }
   })
 }
 
 function typeLabel(type) {
   if (type === 'choice') return 'Trắc nghiệm'
+  if (type === 'pickWrong') return 'Tìm câu sai'
+  if (type === 'fixSentence') return 'Sửa câu sai'
   if (type === 'fill') return 'Điền vào chỗ trống'
   return 'Dịch câu'
 }
@@ -624,6 +628,27 @@ export default function App() {
     setView({ name: 'quiz' })
   }
 
+  // Phiên nâng cao "tìm câu sai": trộn 2 dạng pickWrong + fixSentence,
+  // không ghi tiến độ bài (như ôn tập), câu sai vẫn ghi vào kho câu sai.
+  function startAdvancedQuiz(lesson) {
+    const pool = (errorBanks[lesson.id] || []).map((q) => ({ ...q, lessonTitle: lesson.title }))
+    const questions = shuffle(pool).slice(0, QUESTIONS_PER_SESSION)
+    setQuiz({
+      title: `Tìm câu sai — nâng cao: ${lesson.title}`,
+      lessonId: null,
+      advanced: true,
+      advancedLessonId: lesson.id,
+      questions: prepareQuiz(questions),
+      index: 0,
+      input: '',
+      checked: null,
+      score: 0,
+      log: [],
+      finished: false,
+    })
+    setView({ name: 'quiz' })
+  }
+
   function openWrongBank() {
     setConfirmClear(false)
     setView({ name: 'wrong' })
@@ -640,6 +665,10 @@ export default function App() {
     if (view.name === 'wrong') return null
     if (view.name === 'lesson') return isConjLesson(view.lesson) ? 'conj' : 'lessons'
     if (view.name === 'quiz') {
+      if (quiz?.advanced) {
+        const l = allLessons.find((x) => x.id === quiz.advancedLessonId)
+        return l && isConjLesson(l) ? 'conj' : 'lessons'
+      }
       if (!quiz?.lessonId) return null
       const l = allLessons.find((x) => x.id === quiz.lessonId)
       return l && isConjLesson(l) ? 'conj' : 'lessons'
@@ -656,10 +685,10 @@ export default function App() {
     const q = quiz.questions[quiz.index]
     const userAnswer = quiz.input.trim()
     if (!userAnswer) return
-    const correct = q.type === 'choice'
+    const correct = isChoiceLike(q)
       ? userAnswer === q.answer
       : q.answers.some((a) => normalize(a) === normalize(userAnswer))
-    const correctAnswer = q.type === 'choice' ? q.answer : q.answers[0]
+    const correctAnswer = isChoiceLike(q) ? q.answer : q.answers[0]
     setQuiz({
       ...quiz,
       checked: { correct, userAnswer },
@@ -744,8 +773,10 @@ export default function App() {
                 <Card key={i}>
                   <VStack gap={1}>
                     <Text weight="bold">{x.question.prompt}</Text>
+                    {x.question.wrong && <Text>Câu sai: {x.question.wrong}</Text>}
+                    {x.question.options && <Text type="supporting">Các câu: {x.question.options.join(' · ')}</Text>}
                     <Text>Bạn trả lời: {x.userAnswer}</Text>
-                    <Text>Đáp án đúng: {x.correctAnswer}</Text>
+                    <Text>{x.question.type === 'pickWrong' ? 'Câu sai cần chọn: ' : 'Đáp án đúng: '}{x.correctAnswer}</Text>
                     <Text type="supporting">{x.question.explanation}</Text>
                   </VStack>
                 </Card>
@@ -763,6 +794,9 @@ export default function App() {
             {quiz.review && wrongBank.length > 0 && (
               <Button label={`Luyện lại ${wrongBank.length} câu sai còn lại →`} onClick={startWrongQuiz} />
             )}
+            {quiz.advanced && (
+              <Button label="Làm bài nâng cao khác →" onClick={() => startAdvancedQuiz(allLessons.find((l) => l.id === quiz.advancedLessonId))} />
+            )}
             {!quiz.review && wrong.length > 0 && (
               <Button label="Mở mục Câu sai cần ôn lại →" onClick={openWrongBank} />
             )}
@@ -773,7 +807,9 @@ export default function App() {
     }
 
     const q = quiz.questions[quiz.index]
-    const quizLabel = quiz.review
+    const quizLabel = quiz.advanced
+      ? 'Tìm câu sai — nâng cao'
+      : quiz.review
       ? 'Ôn lại câu sai'
       : !quiz.lessonId
       ? 'Ôn tập tổng hợp'
@@ -796,7 +832,8 @@ export default function App() {
         <div className="learn-card">
           <VStack gap={3}>
             <Text weight="bold" size="lg">{q.prompt}</Text>
-            {q.type === 'choice' ? (
+            {q.type === 'fixSentence' && <div className="learn-example">{q.wrong}</div>}
+            {isChoiceLike(q) ? (
               <VStack gap={2}>
                 {q.options.map((opt) => {
                   let variant = 'secondary'
@@ -829,7 +866,7 @@ export default function App() {
             {quiz.checked && (
               <Banner
                 status={quiz.checked.correct ? 'success' : 'error'}
-                title={quiz.checked.correct ? 'Đúng rồi!' : `Chưa đúng. Đáp án: ${q.type === 'choice' ? q.answer : q.answers[0]}`}
+                title={quiz.checked.correct ? 'Đúng rồi!' : `Chưa đúng. Đáp án: ${isChoiceLike(q) ? q.answer : q.answers[0]}`}
                 description={q.explanation}
                 collapsible={false}
               />
@@ -880,8 +917,10 @@ export default function App() {
                 <VStack gap={1}>
                   <Text type="supporting">{e.lessonTitle}</Text>
                   <Text weight="bold">{e.question.prompt}</Text>
+                  {e.question.wrong && <Text>Câu sai: {e.question.wrong}</Text>}
+                  {e.question.options && <Text type="supporting">Các câu: {e.question.options.join(' · ')}</Text>}
                   <Text>Bạn trả lời: {e.userAnswer}</Text>
-                  <Text>Đáp án đúng: {e.correctAnswer}</Text>
+                  <Text>{e.question.type === 'pickWrong' ? 'Câu sai cần chọn: ' : 'Đáp án đúng: '}{e.correctAnswer}</Text>
                   {e.question.explanation && <Text type="supporting">{e.question.explanation}</Text>}
                 </VStack>
               </div>
@@ -909,7 +948,7 @@ export default function App() {
             label={isConj ? 'Chia động từ' : 'Bài cơ bản'}
             title={lesson.title}
             intro={lesson.description}
-            pills={[`${lesson.questions.length} câu hỏi`, best > 0 ? `Cao nhất: ${best}%` : 'Chưa làm bài']}
+            pills={[`${lesson.questions.length} câu hỏi`, `Tìm câu sai: ${(errorBanks[lesson.id] || []).length} câu`, best > 0 ? `Cao nhất: ${best}%` : 'Chưa làm bài']}
           />
         )}
       >
@@ -926,6 +965,7 @@ export default function App() {
             </VStack>
             {guide ? <ConjugationGuide guide={guide} scale={fontSizeOpt.scale} /> : <SingularPluralBox />}
             <Button variant="primary" size="lg" label="Bắt đầu làm 25 câu →" onClick={() => startQuiz(lesson)} />
+            <Button variant="secondary" size="lg" label="Tìm câu sai — nâng cao →" onClick={() => startAdvancedQuiz(lesson)} />
           </VStack>
         </div>
       </Frame>

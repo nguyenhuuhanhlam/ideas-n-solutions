@@ -30594,3 +30594,13679 @@ export const questionBanks = {
     }
   ]
 }
+export const errorBanks = {
+  "greetings": [
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am nine years old.",
+        "I am eleven years old.",
+        "Hello, my name are Nam.",
+        "I am seven years old."
+      ],
+      "answer": "Hello, my name are Nam.",
+      "explanation": "My name đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Hello, my name are Nam.",
+      "answers": [
+        "Hello, my name is Nam."
+      ],
+      "explanation": "My name đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I is six years old.",
+        "They are friends.",
+        "Miss Hoa is my teacher.",
+        "I am twelve years old."
+      ],
+      "answer": "I is six years old.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is six years old.",
+      "answers": [
+        "I am six years old."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This are my friend Nam.",
+        "Hello, my name is Lan.",
+        "Hello, my name is Nam.",
+        "This is my friend Lan."
+      ],
+      "answer": "This are my friend Nam.",
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This are my friend Nam.",
+      "answers": [
+        "This is my friend Nam."
+      ],
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is my friend An.",
+        "I am ten years old.",
+        "I am six years old.",
+        "He are a student."
+      ],
+      "answer": "He are a student.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are a student.",
+      "answers": [
+        "He is a student."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We is friends.",
+        "Minh is a student.",
+        "They are friends.",
+        "Miss Hoa is my teacher."
+      ],
+      "answer": "We is friends.",
+      "explanation": "We đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We is friends.",
+      "answers": [
+        "We are friends."
+      ],
+      "explanation": "We đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is my friend Minh.",
+        "She are my teacher.",
+        "Hello, my name is Nam.",
+        "Miss Hoa is my teacher."
+      ],
+      "answer": "She are my teacher.",
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She are my teacher.",
+      "answers": [
+        "She is my teacher."
+      ],
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is my friend An.",
+        "Hello, my name is Hoa.",
+        "This is my friend Hoa.",
+        "Hello, my name are Lan."
+      ],
+      "answer": "Hello, my name are Lan.",
+      "explanation": "My name đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Hello, my name are Lan.",
+      "answers": [
+        "Hello, my name is Lan."
+      ],
+      "explanation": "My name đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is my friend Minh.",
+        "Hello, my name is Minh.",
+        "I am eleven years old.",
+        "I is seven years old."
+      ],
+      "answer": "I is seven years old.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is seven years old.",
+      "answers": [
+        "I am seven years old."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Hello, my name is Nam.",
+        "Hello, my name is Hoa.",
+        "This are my friend Lan.",
+        "Hello, my name is Lan."
+      ],
+      "answer": "This are my friend Lan.",
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This are my friend Lan.",
+      "answers": [
+        "This is my friend Lan."
+      ],
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Miss Hoa is my teacher.",
+        "She are a student.",
+        "This is my friend Hoa.",
+        "Hello, my name is Hoa."
+      ],
+      "answer": "She are a student.",
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She are a student.",
+      "answers": [
+        "She is a student."
+      ],
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am eleven years old.",
+        "They is friends.",
+        "This is my friend Lan.",
+        "This is my friend Hoa."
+      ],
+      "answer": "They is friends.",
+      "explanation": "They đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They is friends.",
+      "answers": [
+        "They are friends."
+      ],
+      "explanation": "They đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She is a student.",
+        "He are my teacher.",
+        "Hello, my name is Lan.",
+        "I am twelve years old."
+      ],
+      "answer": "He are my teacher.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are my teacher.",
+      "answers": [
+        "He is my teacher."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am seven years old.",
+        "This is my friend An.",
+        "Hello, my name are Minh.",
+        "This is my friend Hoa."
+      ],
+      "answer": "Hello, my name are Minh.",
+      "explanation": "My name đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Hello, my name are Minh.",
+      "answers": [
+        "Hello, my name is Minh."
+      ],
+      "explanation": "My name đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Hello, my name is Minh.",
+        "He is a student.",
+        "I is eight years old.",
+        "This is my friend Minh."
+      ],
+      "answer": "I is eight years old.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is eight years old.",
+      "answers": [
+        "I am eight years old."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am ten years old.",
+        "I am nine years old.",
+        "Lan and Minh are friends.",
+        "This are my friend Minh."
+      ],
+      "answer": "This are my friend Minh.",
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This are my friend Minh.",
+      "answers": [
+        "This is my friend Minh."
+      ],
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is my friend Minh.",
+        "Hello, my name is An.",
+        "This is my friend Lan.",
+        "Lan are a student."
+      ],
+      "answer": "Lan are a student.",
+      "explanation": "Lan đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan are a student.",
+      "answers": [
+        "Lan is a student."
+      ],
+      "explanation": "Lan đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am twelve years old.",
+        "Hello, my name is Nam.",
+        "This is my friend Nam.",
+        "Lan and Minh is friends."
+      ],
+      "answer": "Lan and Minh is friends.",
+      "explanation": "Lan and Minh đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan and Minh is friends.",
+      "answers": [
+        "Lan and Minh are friends."
+      ],
+      "explanation": "Lan and Minh đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Miss Hoa are my teacher.",
+        "She is a student.",
+        "Lan and Minh are friends.",
+        "Hello, my name is Hoa."
+      ],
+      "answer": "Miss Hoa are my teacher.",
+      "explanation": "Miss Hoa đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Miss Hoa are my teacher.",
+      "answers": [
+        "Miss Hoa is my teacher."
+      ],
+      "explanation": "Miss Hoa đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Hello, my name are Hoa.",
+        "I am eleven years old.",
+        "I am nine years old.",
+        "Minh is a student."
+      ],
+      "answer": "Hello, my name are Hoa.",
+      "explanation": "My name đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Hello, my name are Hoa.",
+      "answers": [
+        "Hello, my name is Hoa."
+      ],
+      "explanation": "My name đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is my friend Hoa.",
+        "Hello, my name is An.",
+        "I is nine years old.",
+        "This is my friend Lan."
+      ],
+      "answer": "I is nine years old.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is nine years old.",
+      "answers": [
+        "I am nine years old."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am twelve years old.",
+        "I am ten years old.",
+        "Miss Hoa is my teacher.",
+        "This are my friend Hoa."
+      ],
+      "answer": "This are my friend Hoa.",
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This are my friend Hoa.",
+      "answers": [
+        "This is my friend Hoa."
+      ],
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am seven years old.",
+        "Minh are a student.",
+        "She is my teacher.",
+        "I am eleven years old."
+      ],
+      "answer": "Minh are a student.",
+      "explanation": "Minh đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Minh are a student.",
+      "answers": [
+        "Minh is a student."
+      ],
+      "explanation": "Minh đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She is a student.",
+        "She is my teacher.",
+        "Hello, my name is Lan.",
+        "Hello, my name are An."
+      ],
+      "answer": "Hello, my name are An.",
+      "explanation": "My name đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Hello, my name are An.",
+      "answers": [
+        "Hello, my name is An."
+      ],
+      "explanation": "My name đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I is ten years old.",
+        "I am twelve years old.",
+        "Hello, my name is Hoa.",
+        "She is my teacher."
+      ],
+      "answer": "I is ten years old.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is ten years old.",
+      "answers": [
+        "I am ten years old."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This are my friend An.",
+        "Lan and Minh are friends.",
+        "I am six years old.",
+        "I am nine years old."
+      ],
+      "answer": "This are my friend An.",
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This are my friend An.",
+      "answers": [
+        "This is my friend An."
+      ],
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Hello, my name is Hoa.",
+        "I is eleven years old.",
+        "This is my friend Hoa.",
+        "Hello, my name is Minh."
+      ],
+      "answer": "I is eleven years old.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is eleven years old.",
+      "answers": [
+        "I am eleven years old."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Hello, my name is Lan.",
+        "Miss Hoa is my teacher.",
+        "This is my friend Hoa.",
+        "I is twelve years old."
+      ],
+      "answer": "I is twelve years old.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is twelve years old.",
+      "answers": [
+        "I am twelve years old."
+      ],
+      "explanation": "I đi với am."
+    }
+  ],
+  "numbers": [
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She has two cats.",
+        "I have four cats.",
+        "She has three pens.",
+        "I have two pen."
+      ],
+      "answer": "I have two pen.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have two pen.",
+      "answers": [
+        "I have two pens."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "There is two pens.",
+        "There are three dogs.",
+        "She has three pens.",
+        "There are two books."
+      ],
+      "answer": "There is two pens.",
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There is two pens.",
+      "answers": [
+        "There are two pens."
+      ],
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She have two pens.",
+        "I have three books.",
+        "He has two pens.",
+        "I have three balls."
+      ],
+      "answer": "She have two pens.",
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She have two pens.",
+      "answers": [
+        "She has two pens."
+      ],
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have four pens.",
+        "He has two pens.",
+        "He has four books.",
+        "I have two book."
+      ],
+      "answer": "I have two book.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have two book.",
+      "answers": [
+        "I have two books."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "There are two pen.",
+        "There are three pens.",
+        "I have two dogs.",
+        "I have three balls."
+      ],
+      "answer": "There are two pen.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There are two pen.",
+      "answers": [
+        "There are two pens."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He have two pens.",
+        "I have two dogs.",
+        "I have four dogs.",
+        "I have four apples."
+      ],
+      "answer": "He have two pens.",
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He have two pens.",
+      "answers": [
+        "He has two pens."
+      ],
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She has four cats.",
+        "I have two cat.",
+        "She has three cats.",
+        "She has three books."
+      ],
+      "answer": "I have two cat.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have two cat.",
+      "answers": [
+        "I have two cats."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have five books.",
+        "I have three pens.",
+        "There is two books.",
+        "He has four books."
+      ],
+      "answer": "There is two books.",
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There is two books.",
+      "answers": [
+        "There are two books."
+      ],
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She has two pens.",
+        "She have two books.",
+        "I have three pens.",
+        "There are two books."
+      ],
+      "answer": "She have two books.",
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She have two books.",
+      "answers": [
+        "She has two books."
+      ],
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have five books.",
+        "I have four books.",
+        "I have three balls.",
+        "I have two dog."
+      ],
+      "answer": "I have two dog.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have two dog.",
+      "answers": [
+        "I have two dogs."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He has two cats.",
+        "He has two pens.",
+        "There are two book.",
+        "She has three pens."
+      ],
+      "answer": "There are two book.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There are two book.",
+      "answers": [
+        "There are two books."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He have two books.",
+        "She has three cats.",
+        "She has three books.",
+        "I have five pens."
+      ],
+      "answer": "He have two books.",
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He have two books.",
+      "answers": [
+        "He has two books."
+      ],
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have four apples.",
+        "I have three cats.",
+        "He has four cats.",
+        "I have two apple."
+      ],
+      "answer": "I have two apple.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have two apple.",
+      "answers": [
+        "I have two apples."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "There is two cats.",
+        "I have three dogs.",
+        "He has four books.",
+        "There are two books."
+      ],
+      "answer": "There is two cats.",
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There is two cats.",
+      "answers": [
+        "There are two cats."
+      ],
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "There are two balls.",
+        "I have four cats.",
+        "She have two cats.",
+        "I have four dogs."
+      ],
+      "answer": "She have two cats.",
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She have two cats.",
+      "answers": [
+        "She has two cats."
+      ],
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have two ball.",
+        "She has four books.",
+        "She has three pens.",
+        "There are three pens."
+      ],
+      "answer": "I have two ball.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have two ball.",
+      "answers": [
+        "I have two balls."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have two apples.",
+        "There are two cat.",
+        "I have two cats.",
+        "I have five books."
+      ],
+      "answer": "There are two cat.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There are two cat.",
+      "answers": [
+        "There are two cats."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have three balls.",
+        "She has two cats.",
+        "He have two cats.",
+        "There are three pens."
+      ],
+      "answer": "He have two cats.",
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He have two cats.",
+      "answers": [
+        "He has two cats."
+      ],
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "There are two balls.",
+        "There are two books.",
+        "I have three pen.",
+        "I have four pens."
+      ],
+      "answer": "I have three pen.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have three pen.",
+      "answers": [
+        "I have three pens."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have four dogs.",
+        "I have three books.",
+        "There is two dogs.",
+        "She has three books."
+      ],
+      "answer": "There is two dogs.",
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There is two dogs.",
+      "answers": [
+        "There are two dogs."
+      ],
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have three apples.",
+        "She have three pens.",
+        "He has four books.",
+        "I have two pens."
+      ],
+      "answer": "She have three pens.",
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She have three pens.",
+      "answers": [
+        "She has three pens."
+      ],
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have three book.",
+        "He has four pens.",
+        "He has four books.",
+        "I have two pens."
+      ],
+      "answer": "I have three book.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have three book.",
+      "answers": [
+        "I have three books."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have three apples.",
+        "I have three books.",
+        "There are two dog.",
+        "I have four cats."
+      ],
+      "answer": "There are two dog.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There are two dog.",
+      "answers": [
+        "There are two dogs."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "There are two balls.",
+        "I have four apples.",
+        "She has four cats.",
+        "He have three pens."
+      ],
+      "answer": "He have three pens.",
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He have three pens.",
+      "answers": [
+        "He has three pens."
+      ],
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She has five pens.",
+        "I have three cat.",
+        "He has two pens.",
+        "I have two dogs."
+      ],
+      "answer": "I have three cat.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have three cat.",
+      "answers": [
+        "I have three cats."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She has three pens.",
+        "She has two books.",
+        "I have four books.",
+        "There is two apples."
+      ],
+      "answer": "There is two apples.",
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There is two apples.",
+      "answers": [
+        "There are two apples."
+      ],
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She have three books.",
+        "There are three books.",
+        "There are three cats.",
+        "I have two apples."
+      ],
+      "answer": "She have three books.",
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She have three books.",
+      "answers": [
+        "She has three books."
+      ],
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have three dog.",
+        "I have four books.",
+        "I have three pens.",
+        "She has four cats."
+      ],
+      "answer": "I have three dog.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have three dog.",
+      "answers": [
+        "I have three dogs."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "There are three dogs.",
+        "He has four books.",
+        "She has two books.",
+        "There are two apple."
+      ],
+      "answer": "There are two apple.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There are two apple.",
+      "answers": [
+        "There are two apples."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have four pens.",
+        "I have four apples.",
+        "There are two dogs.",
+        "He have three books."
+      ],
+      "answer": "He have three books.",
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He have three books.",
+      "answers": [
+        "He has three books."
+      ],
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have three apple.",
+        "He has two books.",
+        "There are three dogs.",
+        "There are two balls."
+      ],
+      "answer": "I have three apple.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have three apple.",
+      "answers": [
+        "I have three apples."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She has five pens.",
+        "I have four apples.",
+        "There is two balls.",
+        "She has four books."
+      ],
+      "answer": "There is two balls.",
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There is two balls.",
+      "answers": [
+        "There are two balls."
+      ],
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have three apples.",
+        "She has four cats.",
+        "I have four apples.",
+        "She have three cats."
+      ],
+      "answer": "She have three cats.",
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She have three cats.",
+      "answers": [
+        "She has three cats."
+      ],
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She has two cats.",
+        "I have three ball.",
+        "She has two books.",
+        "I have two pens."
+      ],
+      "answer": "I have three ball.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have three ball.",
+      "answers": [
+        "I have three balls."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have four books.",
+        "I have five books.",
+        "I have five pens.",
+        "There are two ball."
+      ],
+      "answer": "There are two ball.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There are two ball.",
+      "answers": [
+        "There are two balls."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "There are two apples.",
+        "There are three books.",
+        "I have three balls.",
+        "He have three cats."
+      ],
+      "answer": "He have three cats.",
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He have three cats.",
+      "answers": [
+        "He has three cats."
+      ],
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He has two cats.",
+        "He has three pens.",
+        "I have four pen.",
+        "I have three apples."
+      ],
+      "answer": "I have four pen.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have four pen.",
+      "answers": [
+        "I have four pens."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He has four cats.",
+        "There is three pens.",
+        "She has four cats.",
+        "I have four cats."
+      ],
+      "answer": "There is three pens.",
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There is three pens.",
+      "answers": [
+        "There are three pens."
+      ],
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "There are three pens.",
+        "I have four dogs.",
+        "There are two pens.",
+        "She have four pens."
+      ],
+      "answer": "She have four pens.",
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She have four pens.",
+      "answers": [
+        "She has four pens."
+      ],
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He has four books.",
+        "I have three cats.",
+        "She has two cats.",
+        "I have four book."
+      ],
+      "answer": "I have four book.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have four book.",
+      "answers": [
+        "I have four books."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have three pens.",
+        "There are three books.",
+        "He has four pens.",
+        "There are three pen."
+      ],
+      "answer": "There are three pen.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There are three pen.",
+      "answers": [
+        "There are three pens."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "There are two books.",
+        "I have four books.",
+        "She has four cats.",
+        "He have four pens."
+      ],
+      "answer": "He have four pens.",
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He have four pens.",
+      "answers": [
+        "He has four pens."
+      ],
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have four cat.",
+        "He has three books.",
+        "He has three pens.",
+        "He has four pens."
+      ],
+      "answer": "I have four cat.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have four cat.",
+      "answers": [
+        "I have four cats."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She has two books.",
+        "She has three books.",
+        "There is three books.",
+        "There are two balls."
+      ],
+      "answer": "There is three books.",
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There is three books.",
+      "answers": [
+        "There are three books."
+      ],
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She has three pens.",
+        "He has three cats.",
+        "She have four books.",
+        "There are two cats."
+      ],
+      "answer": "She have four books.",
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She have four books.",
+      "answers": [
+        "She has four books."
+      ],
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have four balls.",
+        "I have four dog.",
+        "There are two cats.",
+        "I have four cats."
+      ],
+      "answer": "I have four dog.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have four dog.",
+      "answers": [
+        "I have four dogs."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have four books.",
+        "She has two books.",
+        "I have two books.",
+        "There are three book."
+      ],
+      "answer": "There are three book.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There are three book.",
+      "answers": [
+        "There are three books."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have two apples.",
+        "She has five pens.",
+        "He have four books.",
+        "I have two dogs."
+      ],
+      "answer": "He have four books.",
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He have four books.",
+      "answers": [
+        "He has four books."
+      ],
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have four apple.",
+        "She has three cats.",
+        "I have three books.",
+        "She has four books."
+      ],
+      "answer": "I have four apple.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have four apple.",
+      "answers": [
+        "I have four apples."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have three dogs.",
+        "There is three cats.",
+        "He has three cats.",
+        "I have three cats."
+      ],
+      "answer": "There is three cats.",
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There is three cats.",
+      "answers": [
+        "There are three cats."
+      ],
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She has two pens.",
+        "I have two cats.",
+        "She have four cats.",
+        "I have two apples."
+      ],
+      "answer": "She have four cats.",
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She have four cats.",
+      "answers": [
+        "She has four cats."
+      ],
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have four ball.",
+        "He has three books.",
+        "I have four books.",
+        "He has five pens."
+      ],
+      "answer": "I have four ball.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have four ball.",
+      "answers": [
+        "I have four balls."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He has five pens.",
+        "There are three cat.",
+        "I have three balls.",
+        "I have five books."
+      ],
+      "answer": "There are three cat.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There are three cat.",
+      "answers": [
+        "There are three cats."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have two cats.",
+        "He have four cats.",
+        "He has five pens.",
+        "He has two cats."
+      ],
+      "answer": "He have four cats.",
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He have four cats.",
+      "answers": [
+        "He has four cats."
+      ],
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She has five pens.",
+        "There are two books.",
+        "I have four pens.",
+        "I have five pen."
+      ],
+      "answer": "I have five pen.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have five pen.",
+      "answers": [
+        "I have five pens."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "There are two books.",
+        "There are three books.",
+        "There is three dogs.",
+        "He has four cats."
+      ],
+      "answer": "There is three dogs.",
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There is three dogs.",
+      "answers": [
+        "There are three dogs."
+      ],
+      "explanation": "There are đi với danh từ số nhiều."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "There are two apples.",
+        "She have five pens.",
+        "She has two books.",
+        "He has three books."
+      ],
+      "answer": "She have five pens.",
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She have five pens.",
+      "answers": [
+        "She has five pens."
+      ],
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He has five pens.",
+        "There are two cats.",
+        "I have five book.",
+        "He has four cats."
+      ],
+      "answer": "I have five book.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I have five book.",
+      "answers": [
+        "I have five books."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I have four dogs.",
+        "She has two pens.",
+        "There are three dog.",
+        "She has three books."
+      ],
+      "answer": "There are three dog.",
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "There are three dog.",
+      "answers": [
+        "There are three dogs."
+      ],
+      "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She has five pens.",
+        "He has two books.",
+        "I have three balls.",
+        "He have five pens."
+      ],
+      "answer": "He have five pens.",
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He have five pens.",
+      "answers": [
+        "He has five pens."
+      ],
+      "explanation": "He đi với has."
+    }
+  ],
+  "family": [
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This are my mother.",
+        "This is Minh's father.",
+        "This is Lan's brother.",
+        "This is Lan's father."
+      ],
+      "answer": "This are my mother.",
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This are my mother.",
+      "answers": [
+        "This is my mother."
+      ],
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is my mother.",
+        "This is Lan's sister.",
+        "He are my father.",
+        "We are a family."
+      ],
+      "answer": "He are my father.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are my father.",
+      "answers": [
+        "He is my father."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She has a brother.",
+        "This is Lan's brother.",
+        "This is Lan's mother.",
+        "They is my parents."
+      ],
+      "answer": "They is my parents.",
+      "explanation": "They đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They is my parents.",
+      "answers": [
+        "They are my parents."
+      ],
+      "explanation": "They đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is Minh's mother.",
+        "This is Lan mother.",
+        "This is Minh's sister.",
+        "This is my father."
+      ],
+      "answer": "This is Lan mother.",
+      "explanation": "Sở hữu: tên người + 's (Lan's mother)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is Lan mother.",
+      "answers": [
+        "This is Lan's mother."
+      ],
+      "explanation": "Sở hữu: tên người + 's (Lan's mother)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She is my grandmother.",
+        "This is Minh's brother.",
+        "We are a family.",
+        "She have a brother."
+      ],
+      "answer": "She have a brother.",
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She have a brother.",
+      "answers": [
+        "She has a brother."
+      ],
+      "explanation": "She đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is Lan's brother.",
+        "This are my father.",
+        "This is my grandmother.",
+        "He is my brother."
+      ],
+      "answer": "This are my father.",
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This are my father.",
+      "answers": [
+        "This is my father."
+      ],
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He are my brother.",
+        "This is Minh's mother.",
+        "They are my parents.",
+        "We are a family."
+      ],
+      "answer": "He are my brother.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are my brother.",
+      "answers": [
+        "He is my brother."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We is a family.",
+        "This is my sister.",
+        "This is Minh's sister.",
+        "This is Minh's brother."
+      ],
+      "answer": "We is a family.",
+      "explanation": "We đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We is a family.",
+      "answers": [
+        "We are a family."
+      ],
+      "explanation": "We đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is Lan father.",
+        "This is my mother.",
+        "This is my father.",
+        "This is Minh's mother."
+      ],
+      "answer": "This is Lan father.",
+      "explanation": "Sở hữu: tên người + 's (Lan's father)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is Lan father.",
+      "answers": [
+        "This is Lan's father."
+      ],
+      "explanation": "Sở hữu: tên người + 's (Lan's father)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He have two sisters.",
+        "He is my brother.",
+        "This is Lan's father.",
+        "This is Lan's sister."
+      ],
+      "answer": "He have two sisters.",
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He have two sisters.",
+      "answers": [
+        "He has two sisters."
+      ],
+      "explanation": "He đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She is my grandmother.",
+        "This is my father.",
+        "He is my father.",
+        "This are my sister."
+      ],
+      "answer": "This are my sister.",
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This are my sister.",
+      "answers": [
+        "This is my sister."
+      ],
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is my brother.",
+        "He are my grandfather.",
+        "She is my grandmother.",
+        "This is my brother."
+      ],
+      "answer": "He are my grandfather.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are my grandfather.",
+      "answers": [
+        "He is my grandfather."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is Minh's mother.",
+        "This is Lan sister.",
+        "This is Minh's brother.",
+        "This is Minh's father."
+      ],
+      "answer": "This is Lan sister.",
+      "explanation": "Sở hữu: tên người + 's (Lan's sister)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is Lan sister.",
+      "answers": [
+        "This is Lan's sister."
+      ],
+      "explanation": "Sở hữu: tên người + 's (Lan's sister)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is Minh's sister.",
+        "We are a family.",
+        "This is Lan's mother.",
+        "I has a sister."
+      ],
+      "answer": "I has a sister.",
+      "explanation": "I đi với have, không đi với has."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I has a sister.",
+      "answers": [
+        "I have a sister."
+      ],
+      "explanation": "I đi với have, không đi với has."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This are my brother.",
+        "She has a brother.",
+        "I have a sister.",
+        "We are a family."
+      ],
+      "answer": "This are my brother.",
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This are my brother.",
+      "answers": [
+        "This is my brother."
+      ],
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She is my sister.",
+        "He is my brother.",
+        "She are my mother.",
+        "He is my father."
+      ],
+      "answer": "She are my mother.",
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She are my mother.",
+      "answers": [
+        "She is my mother."
+      ],
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is Lan brother.",
+        "This is my baby.",
+        "We are a family.",
+        "This is my grandmother."
+      ],
+      "answer": "This is Lan brother.",
+      "explanation": "Sở hữu: tên người + 's (Lan's brother)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is Lan brother.",
+      "answers": [
+        "This is Lan's brother."
+      ],
+      "explanation": "Sở hữu: tên người + 's (Lan's brother)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This are my grandmother.",
+        "This is Minh's sister.",
+        "This is Lan's father.",
+        "I have a sister."
+      ],
+      "answer": "This are my grandmother.",
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This are my grandmother.",
+      "answers": [
+        "This is my grandmother."
+      ],
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is Minh's brother.",
+        "This is Lan's father.",
+        "This is Lan's sister.",
+        "She are my sister."
+      ],
+      "answer": "She are my sister.",
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She are my sister.",
+      "answers": [
+        "She is my sister."
+      ],
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is Minh mother.",
+        "He has two sisters.",
+        "This is Lan's mother.",
+        "She has a brother."
+      ],
+      "answer": "This is Minh mother.",
+      "explanation": "Sở hữu: tên người + 's (Minh's mother)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is Minh mother.",
+      "answers": [
+        "This is Minh's mother."
+      ],
+      "explanation": "Sở hữu: tên người + 's (Minh's mother)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She is my sister.",
+        "This is Minh's mother.",
+        "This are my grandfather.",
+        "She has a brother."
+      ],
+      "answer": "This are my grandfather.",
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This are my grandfather.",
+      "answers": [
+        "This is my grandfather."
+      ],
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is Lan's brother.",
+        "She are my grandmother.",
+        "This is Lan's father.",
+        "This is Lan's sister."
+      ],
+      "answer": "She are my grandmother.",
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She are my grandmother.",
+      "answers": [
+        "She is my grandmother."
+      ],
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is Lan's sister.",
+        "She is my sister.",
+        "This is Minh father.",
+        "I have a sister."
+      ],
+      "answer": "This is Minh father.",
+      "explanation": "Sở hữu: tên người + 's (Minh's father)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is Minh father.",
+      "answers": [
+        "This is Minh's father."
+      ],
+      "explanation": "Sở hữu: tên người + 's (Minh's father)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is my sister.",
+        "This are my baby.",
+        "She is my mother.",
+        "I have a sister."
+      ],
+      "answer": "This are my baby.",
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This are my baby.",
+      "answers": [
+        "This is my baby."
+      ],
+      "explanation": "This đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is Minh sister.",
+        "This is Lan's mother.",
+        "This is Lan's brother.",
+        "This is my father."
+      ],
+      "answer": "This is Minh sister.",
+      "explanation": "Sở hữu: tên người + 's (Minh's sister)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is Minh sister.",
+      "answers": [
+        "This is Minh's sister."
+      ],
+      "explanation": "Sở hữu: tên người + 's (Minh's sister)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They are my parents.",
+        "This is Minh brother.",
+        "This is my grandfather.",
+        "I have a sister."
+      ],
+      "answer": "This is Minh brother.",
+      "explanation": "Sở hữu: tên người + 's (Minh's brother)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is Minh brother.",
+      "answers": [
+        "This is Minh's brother."
+      ],
+      "explanation": "Sở hữu: tên người + 's (Minh's brother)."
+    }
+  ],
+  "daily-routine": [
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He watches TV.",
+        "He get up at six.",
+        "He helps mother.",
+        "I sleep early."
+      ],
+      "answer": "He get up at six.",
+      "explanation": "He đi với động từ thêm -s (gets up)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He get up at six.",
+      "answers": [
+        "He gets up at six."
+      ],
+      "explanation": "He đi với động từ thêm -s (gets up)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "You watch TV.",
+        "He goes to school.",
+        "Lan doesn't get up at six.",
+        "I gets up at six."
+      ],
+      "answer": "I gets up at six.",
+      "explanation": "I đi với động từ nguyên thể (get up)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I gets up at six.",
+      "answers": [
+        "I get up at six."
+      ],
+      "explanation": "I đi với động từ nguyên thể (get up)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I play football.",
+        "He don't get up at six.",
+        "He doesn't go to school.",
+        "Lan doesn't brush her teeth."
+      ],
+      "answer": "He don't get up at six.",
+      "explanation": "He đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He don't get up at six.",
+      "answers": [
+        "He doesn't get up at six."
+      ],
+      "explanation": "He đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He doesn't gets up at six.",
+        "She doesn't watch TV.",
+        "He brushes his teeth.",
+        "I watch TV."
+      ],
+      "answer": "He doesn't gets up at six.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (get up, không phải gets up)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He doesn't gets up at six.",
+      "answers": [
+        "He doesn't get up at six."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (get up, không phải gets up)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We doesn't get up at six.",
+        "You get up at six.",
+        "She doesn't go to school.",
+        "We don't go to school."
+      ],
+      "answer": "We doesn't get up at six.",
+      "explanation": "We đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We doesn't get up at six.",
+      "answers": [
+        "We don't get up at six."
+      ],
+      "explanation": "We đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He brush his teeth.",
+        "I go to school.",
+        "He doesn't go to school.",
+        "He plays football."
+      ],
+      "answer": "He brush his teeth.",
+      "explanation": "He đi với động từ thêm -s (brushes)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He brush his teeth.",
+      "answers": [
+        "He brushes his teeth."
+      ],
+      "explanation": "He đi với động từ thêm -s (brushes)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I sleep early.",
+        "He doesn't get up at six.",
+        "She brushes her teeth.",
+        "I brushes my teeth."
+      ],
+      "answer": "I brushes my teeth.",
+      "explanation": "I đi với động từ nguyên thể (brush)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I brushes my teeth.",
+      "answers": [
+        "I brush my teeth."
+      ],
+      "explanation": "I đi với động từ nguyên thể (brush)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They don't eat breakfast.",
+        "I watch TV.",
+        "I brush my teeth.",
+        "He don't brush his teeth."
+      ],
+      "answer": "He don't brush his teeth.",
+      "explanation": "He đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He don't brush his teeth.",
+      "answers": [
+        "He doesn't brush his teeth."
+      ],
+      "explanation": "He đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I go to school.",
+        "She gets up at six.",
+        "I sleep early.",
+        "He doesn't brushes his teeth."
+      ],
+      "answer": "He doesn't brushes his teeth.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (brush, không phải brushes)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He doesn't brushes his teeth.",
+      "answers": [
+        "He doesn't brush his teeth."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (brush, không phải brushes)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I play football.",
+        "We doesn't brush our teeth.",
+        "I sleep early.",
+        "She doesn't watch TV."
+      ],
+      "answer": "We doesn't brush our teeth.",
+      "explanation": "We đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We doesn't brush our teeth.",
+      "answers": [
+        "We don't brush our teeth."
+      ],
+      "explanation": "We đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They don't get up at six.",
+        "He watch TV.",
+        "We don't brush our teeth.",
+        "She doesn't eat breakfast."
+      ],
+      "answer": "He watch TV.",
+      "explanation": "He đi với động từ thêm -s (watches)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He watch TV.",
+      "answers": [
+        "He watches TV."
+      ],
+      "explanation": "He đi với động từ thêm -s (watches)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He doesn't go to school.",
+        "I cook dinner.",
+        "I watches TV.",
+        "We don't get up at six."
+      ],
+      "answer": "I watches TV.",
+      "explanation": "I đi với động từ nguyên thể (watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I watches TV.",
+      "answers": [
+        "I watch TV."
+      ],
+      "explanation": "I đi với động từ nguyên thể (watch)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They don't brush their teeth.",
+        "We don't brush our teeth.",
+        "He don't watch TV.",
+        "He cooks dinner."
+      ],
+      "answer": "He don't watch TV.",
+      "explanation": "He đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He don't watch TV.",
+      "answers": [
+        "He doesn't watch TV."
+      ],
+      "explanation": "He đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't watch TV.",
+        "He doesn't eat breakfast.",
+        "She brushes her teeth.",
+        "He doesn't watches TV."
+      ],
+      "answer": "He doesn't watches TV.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (watch, không phải watches)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He doesn't watches TV.",
+      "answers": [
+        "He doesn't watch TV."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (watch, không phải watches)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They don't get up at six.",
+        "We doesn't watch TV.",
+        "They don't watch TV.",
+        "I play football."
+      ],
+      "answer": "We doesn't watch TV.",
+      "explanation": "We đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We doesn't watch TV.",
+      "answers": [
+        "We don't watch TV."
+      ],
+      "explanation": "We đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He gets up at six.",
+        "Lan doesn't get up at six.",
+        "I play football.",
+        "He go to school."
+      ],
+      "answer": "He go to school.",
+      "explanation": "He đi với động từ thêm -s (goes)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He go to school.",
+      "answers": [
+        "He goes to school."
+      ],
+      "explanation": "He đi với động từ thêm -s (goes)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He brushes his teeth.",
+        "I goes to school.",
+        "I get up at six.",
+        "They don't eat breakfast."
+      ],
+      "answer": "I goes to school.",
+      "explanation": "I đi với động từ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I goes to school.",
+      "answers": [
+        "I go to school."
+      ],
+      "explanation": "I đi với động từ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He don't go to school.",
+        "He doesn't eat breakfast.",
+        "She doesn't go to school.",
+        "He plays football."
+      ],
+      "answer": "He don't go to school.",
+      "explanation": "He đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He don't go to school.",
+      "answers": [
+        "He doesn't go to school."
+      ],
+      "explanation": "He đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We don't go to school.",
+        "He doesn't goes to school.",
+        "He eats breakfast.",
+        "She doesn't watch TV."
+      ],
+      "answer": "He doesn't goes to school.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (go, không phải goes)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He doesn't goes to school.",
+      "answers": [
+        "He doesn't go to school."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (go, không phải goes)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We doesn't go to school.",
+        "She watches TV.",
+        "I eat breakfast.",
+        "I watch TV."
+      ],
+      "answer": "We doesn't go to school.",
+      "explanation": "We đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We doesn't go to school.",
+      "answers": [
+        "We don't go to school."
+      ],
+      "explanation": "We đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He eat breakfast.",
+        "She doesn't get up at six.",
+        "You brush your teeth.",
+        "She watches TV."
+      ],
+      "answer": "He eat breakfast.",
+      "explanation": "He đi với động từ thêm -s (eats)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He eat breakfast.",
+      "answers": [
+        "He eats breakfast."
+      ],
+      "explanation": "He đi với động từ thêm -s (eats)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't eat breakfast.",
+        "I eats breakfast.",
+        "He doesn't eat breakfast.",
+        "She doesn't brush her teeth."
+      ],
+      "answer": "I eats breakfast.",
+      "explanation": "I đi với động từ nguyên thể (eat)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I eats breakfast.",
+      "answers": [
+        "I eat breakfast."
+      ],
+      "explanation": "I đi với động từ nguyên thể (eat)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He eats breakfast.",
+        "He don't eat breakfast.",
+        "I play football.",
+        "I get up at six."
+      ],
+      "answer": "He don't eat breakfast.",
+      "explanation": "He đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He don't eat breakfast.",
+      "answers": [
+        "He doesn't eat breakfast."
+      ],
+      "explanation": "He đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He doesn't eats breakfast.",
+        "I eat breakfast.",
+        "He doesn't brush his teeth.",
+        "He doesn't go to school."
+      ],
+      "answer": "He doesn't eats breakfast.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (eat, không phải eats)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He doesn't eats breakfast.",
+      "answers": [
+        "He doesn't eat breakfast."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (eat, không phải eats)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I brush my teeth.",
+        "They don't go to school.",
+        "He gets up at six.",
+        "We doesn't eat breakfast."
+      ],
+      "answer": "We doesn't eat breakfast.",
+      "explanation": "We đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We doesn't eat breakfast.",
+      "answers": [
+        "We don't eat breakfast."
+      ],
+      "explanation": "We đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He doesn't brush his teeth.",
+        "He helps mother.",
+        "He play football.",
+        "You get up at six."
+      ],
+      "answer": "He play football.",
+      "explanation": "He đi với động từ thêm -s (plays)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He play football.",
+      "answers": [
+        "He plays football."
+      ],
+      "explanation": "He đi với động từ thêm -s (plays)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't brush her teeth.",
+        "We don't brush our teeth.",
+        "They don't get up at six.",
+        "I plays football."
+      ],
+      "answer": "I plays football.",
+      "explanation": "I đi với động từ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I plays football.",
+      "answers": [
+        "I play football."
+      ],
+      "explanation": "I đi với động từ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He plays football.",
+        "She doesn't brush her teeth.",
+        "I play football.",
+        "She don't get up at six."
+      ],
+      "answer": "She don't get up at six.",
+      "explanation": "She đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She don't get up at six.",
+      "answers": [
+        "She doesn't get up at six."
+      ],
+      "explanation": "She đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't eat breakfast.",
+        "She doesn't gets up at six.",
+        "You watch TV.",
+        "Lan doesn't get up at six."
+      ],
+      "answer": "She doesn't gets up at six.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (get up, không phải gets up)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She doesn't gets up at six.",
+      "answers": [
+        "She doesn't get up at six."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (get up, không phải gets up)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They doesn't get up at six.",
+        "He goes to school.",
+        "They don't brush their teeth.",
+        "We don't get up at six."
+      ],
+      "answer": "They doesn't get up at six.",
+      "explanation": "They đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They doesn't get up at six.",
+      "answers": [
+        "They don't get up at six."
+      ],
+      "explanation": "They đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I cook dinner.",
+        "He read a book.",
+        "He plays football.",
+        "She doesn't watch TV."
+      ],
+      "answer": "He read a book.",
+      "explanation": "He đi với động từ thêm -s (reads)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He read a book.",
+      "answers": [
+        "He reads a book."
+      ],
+      "explanation": "He đi với động từ thêm -s (reads)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We don't brush our teeth.",
+        "I reads a book.",
+        "I sleep early.",
+        "We don't eat breakfast."
+      ],
+      "answer": "I reads a book.",
+      "explanation": "I đi với động từ nguyên thể (read)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I reads a book.",
+      "answers": [
+        "I read a book."
+      ],
+      "explanation": "I đi với động từ nguyên thể (read)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan doesn't get up at six.",
+        "She don't brush her teeth.",
+        "He plays football.",
+        "You brush your teeth."
+      ],
+      "answer": "She don't brush her teeth.",
+      "explanation": "She đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She don't brush her teeth.",
+      "answers": [
+        "She doesn't brush her teeth."
+      ],
+      "explanation": "She đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I go to school.",
+        "He doesn't brush his teeth.",
+        "She doesn't brushes her teeth.",
+        "We don't watch TV."
+      ],
+      "answer": "She doesn't brushes her teeth.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (brush, không phải brushes)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She doesn't brushes her teeth.",
+      "answers": [
+        "She doesn't brush her teeth."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (brush, không phải brushes)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They doesn't brush their teeth.",
+        "They don't watch TV.",
+        "They don't get up at six.",
+        "I eat breakfast."
+      ],
+      "answer": "They doesn't brush their teeth.",
+      "explanation": "They đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They doesn't brush their teeth.",
+      "answers": [
+        "They don't brush their teeth."
+      ],
+      "explanation": "They đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan doesn't get up at six.",
+        "We don't brush our teeth.",
+        "He sleep early.",
+        "They don't eat breakfast."
+      ],
+      "answer": "He sleep early.",
+      "explanation": "He đi với động từ thêm -s (sleeps)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He sleep early.",
+      "answers": [
+        "He sleeps early."
+      ],
+      "explanation": "He đi với động từ thêm -s (sleeps)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They don't brush their teeth.",
+        "I sleeps early.",
+        "You brush your teeth.",
+        "He watches TV."
+      ],
+      "answer": "I sleeps early.",
+      "explanation": "I đi với động từ nguyên thể (sleep)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I sleeps early.",
+      "answers": [
+        "I sleep early."
+      ],
+      "explanation": "I đi với động từ nguyên thể (sleep)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She don't watch TV.",
+        "She doesn't go to school.",
+        "I read a book.",
+        "He goes to school."
+      ],
+      "answer": "She don't watch TV.",
+      "explanation": "She đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She don't watch TV.",
+      "answers": [
+        "She doesn't watch TV."
+      ],
+      "explanation": "She đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She gets up at six.",
+        "I sleep early.",
+        "She doesn't watches TV.",
+        "They don't get up at six."
+      ],
+      "answer": "She doesn't watches TV.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (watch, không phải watches)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She doesn't watches TV.",
+      "answers": [
+        "She doesn't watch TV."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (watch, không phải watches)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I play football.",
+        "He reads a book.",
+        "He doesn't watch TV.",
+        "They doesn't watch TV."
+      ],
+      "answer": "They doesn't watch TV.",
+      "explanation": "They đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They doesn't watch TV.",
+      "answers": [
+        "They don't watch TV."
+      ],
+      "explanation": "They đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't eat breakfast.",
+        "She doesn't brush her teeth.",
+        "He help mother.",
+        "She gets up at six."
+      ],
+      "answer": "He help mother.",
+      "explanation": "He đi với động từ thêm -s (helps)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He help mother.",
+      "answers": [
+        "He helps mother."
+      ],
+      "explanation": "He đi với động từ thêm -s (helps)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We don't brush our teeth.",
+        "She doesn't watch TV.",
+        "You brush your teeth.",
+        "I helps mother."
+      ],
+      "answer": "I helps mother.",
+      "explanation": "I đi với động từ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I helps mother.",
+      "answers": [
+        "I help mother."
+      ],
+      "explanation": "I đi với động từ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They don't watch TV.",
+        "She doesn't brush her teeth.",
+        "She don't go to school.",
+        "He sleeps early."
+      ],
+      "answer": "She don't go to school.",
+      "explanation": "She đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She don't go to school.",
+      "answers": [
+        "She doesn't go to school."
+      ],
+      "explanation": "She đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't goes to school.",
+        "She brushes her teeth.",
+        "She doesn't get up at six.",
+        "I brush my teeth."
+      ],
+      "answer": "She doesn't goes to school.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (go, không phải goes)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She doesn't goes to school.",
+      "answers": [
+        "She doesn't go to school."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (go, không phải goes)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He doesn't brush his teeth.",
+        "They doesn't go to school.",
+        "They don't eat breakfast.",
+        "He cooks dinner."
+      ],
+      "answer": "They doesn't go to school.",
+      "explanation": "They đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They doesn't go to school.",
+      "answers": [
+        "They don't go to school."
+      ],
+      "explanation": "They đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We don't go to school.",
+        "He doesn't go to school.",
+        "He doesn't eat breakfast.",
+        "He cook dinner."
+      ],
+      "answer": "He cook dinner.",
+      "explanation": "He đi với động từ thêm -s (cooks)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He cook dinner.",
+      "answers": [
+        "He cooks dinner."
+      ],
+      "explanation": "He đi với động từ thêm -s (cooks)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I cooks dinner.",
+        "You get up at six.",
+        "We don't eat breakfast.",
+        "I eat breakfast."
+      ],
+      "answer": "I cooks dinner.",
+      "explanation": "I đi với động từ nguyên thể (cook)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I cooks dinner.",
+      "answers": [
+        "I cook dinner."
+      ],
+      "explanation": "I đi với động từ nguyên thể (cook)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He plays football.",
+        "She don't eat breakfast.",
+        "He brushes his teeth.",
+        "Lan doesn't brush her teeth."
+      ],
+      "answer": "She don't eat breakfast.",
+      "explanation": "She đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She don't eat breakfast.",
+      "answers": [
+        "She doesn't eat breakfast."
+      ],
+      "explanation": "She đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't go to school.",
+        "We don't go to school.",
+        "She doesn't eats breakfast.",
+        "We don't brush our teeth."
+      ],
+      "answer": "She doesn't eats breakfast.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (eat, không phải eats)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She doesn't eats breakfast.",
+      "answers": [
+        "She doesn't eat breakfast."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (eat, không phải eats)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They don't go to school.",
+        "I help mother.",
+        "They doesn't eat breakfast.",
+        "He sleeps early."
+      ],
+      "answer": "They doesn't eat breakfast.",
+      "explanation": "They đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They doesn't eat breakfast.",
+      "answers": [
+        "They don't eat breakfast."
+      ],
+      "explanation": "They đi với don't, không đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't get up at six.",
+        "She get up at six.",
+        "We don't go to school.",
+        "He sleeps early."
+      ],
+      "answer": "She get up at six.",
+      "explanation": "She đi với động từ thêm -s (gets up)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She get up at six.",
+      "answers": [
+        "She gets up at six."
+      ],
+      "explanation": "She đi với động từ thêm -s (gets up)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She watches TV.",
+        "We don't get up at six.",
+        "He goes to school.",
+        "You gets up at six."
+      ],
+      "answer": "You gets up at six.",
+      "explanation": "You đi với động từ nguyên thể (get up)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "You gets up at six.",
+      "answers": [
+        "You get up at six."
+      ],
+      "explanation": "You đi với động từ nguyên thể (get up)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I go to school.",
+        "They don't watch TV.",
+        "They don't brush their teeth.",
+        "Lan don't get up at six."
+      ],
+      "answer": "Lan don't get up at six.",
+      "explanation": "Lan đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan don't get up at six.",
+      "answers": [
+        "Lan doesn't get up at six."
+      ],
+      "explanation": "Lan đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They don't watch TV.",
+        "Lan doesn't gets up at six.",
+        "She doesn't go to school.",
+        "He goes to school."
+      ],
+      "answer": "Lan doesn't gets up at six.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (get up, không phải gets up)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan doesn't gets up at six.",
+      "answers": [
+        "Lan doesn't get up at six."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (get up, không phải gets up)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We don't go to school.",
+        "She doesn't get up at six.",
+        "They don't watch TV.",
+        "She brush her teeth."
+      ],
+      "answer": "She brush her teeth.",
+      "explanation": "She đi với động từ thêm -s (brushes)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She brush her teeth.",
+      "answers": [
+        "She brushes her teeth."
+      ],
+      "explanation": "She đi với động từ thêm -s (brushes)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't go to school.",
+        "She brushes her teeth.",
+        "We don't eat breakfast.",
+        "You brushes your teeth."
+      ],
+      "answer": "You brushes your teeth.",
+      "explanation": "You đi với động từ nguyên thể (brush)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "You brushes your teeth.",
+      "answers": [
+        "You brush your teeth."
+      ],
+      "explanation": "You đi với động từ nguyên thể (brush)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He goes to school.",
+        "We don't go to school.",
+        "Lan don't brush her teeth.",
+        "We don't get up at six."
+      ],
+      "answer": "Lan don't brush her teeth.",
+      "explanation": "Lan đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan don't brush her teeth.",
+      "answers": [
+        "Lan doesn't brush her teeth."
+      ],
+      "explanation": "Lan đi với doesn't, không đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She brushes her teeth.",
+        "I watch TV.",
+        "He doesn't get up at six.",
+        "Lan doesn't brushes her teeth."
+      ],
+      "answer": "Lan doesn't brushes her teeth.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (brush, không phải brushes)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan doesn't brushes her teeth.",
+      "answers": [
+        "Lan doesn't brush her teeth."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (brush, không phải brushes)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He doesn't watch TV.",
+        "She watch TV.",
+        "We don't brush our teeth.",
+        "He helps mother."
+      ],
+      "answer": "She watch TV.",
+      "explanation": "She đi với động từ thêm -s (watches)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She watch TV.",
+      "answers": [
+        "She watches TV."
+      ],
+      "explanation": "She đi với động từ thêm -s (watches)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't eat breakfast.",
+        "We don't get up at six.",
+        "You get up at six.",
+        "You watches TV."
+      ],
+      "answer": "You watches TV.",
+      "explanation": "You đi với động từ nguyên thể (watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "You watches TV.",
+      "answers": [
+        "You watch TV."
+      ],
+      "explanation": "You đi với động từ nguyên thể (watch)."
+    }
+  ],
+  "colors-objects": [
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The pen are red.",
+        "It is blue.",
+        "The book is green.",
+        "It is pink."
+      ],
+      "answer": "The pen are red.",
+      "explanation": "The pen (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The pen are red.",
+      "answers": [
+        "The pen is red."
+      ],
+      "explanation": "The pen (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The pens is red.",
+        "The bags are green.",
+        "The cats are green.",
+        "It is pink."
+      ],
+      "answer": "The pens is red.",
+      "explanation": "The pens (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The pens is red.",
+      "answers": [
+        "The pens are red."
+      ],
+      "explanation": "The pens (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is an pen.",
+        "This is a cake.",
+        "The book is red.",
+        "This is a chair."
+      ],
+      "answer": "This is an pen.",
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a pen)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is an pen.",
+      "answers": [
+        "This is a pen."
+      ],
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a pen)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "It is orange.",
+        "It is blue.",
+        "This is a dog.",
+        "It are red."
+      ],
+      "answer": "It are red.",
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "It are red.",
+      "answers": [
+        "It is red."
+      ],
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The books are yellow.",
+        "The book is green.",
+        "The cats are red.",
+        "The pen are blue."
+      ],
+      "answer": "The pen are blue.",
+      "explanation": "The pen (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The pen are blue.",
+      "answers": [
+        "The pen is blue."
+      ],
+      "explanation": "The pen (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The pens is blue.",
+        "The cats are yellow.",
+        "It is orange.",
+        "The dogs are blue."
+      ],
+      "answer": "The pens is blue.",
+      "explanation": "The pens (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The pens is blue.",
+      "answers": [
+        "The pens are blue."
+      ],
+      "explanation": "The pens (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The pens are red.",
+        "The books are green.",
+        "The bag is yellow.",
+        "This is an book."
+      ],
+      "answer": "This is an book.",
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a book)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is an book.",
+      "answers": [
+        "This is a book."
+      ],
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a book)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The books are red.",
+        "The books are blue.",
+        "This is a bag.",
+        "It are blue."
+      ],
+      "answer": "It are blue.",
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "It are blue.",
+      "answers": [
+        "It is blue."
+      ],
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The pen are green.",
+        "The pen is red.",
+        "The cat is blue.",
+        "The bag is blue."
+      ],
+      "answer": "The pen are green.",
+      "explanation": "The pen (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The pen are green.",
+      "answers": [
+        "The pen is green."
+      ],
+      "explanation": "The pen (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The pens is green.",
+        "The dogs are yellow.",
+        "The book is blue.",
+        "The bag is red."
+      ],
+      "answer": "The pens is green.",
+      "explanation": "The pens (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The pens is green.",
+      "answers": [
+        "The pens are green."
+      ],
+      "explanation": "The pens (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The book is blue.",
+        "The bags are red.",
+        "This is an cat.",
+        "The book is yellow."
+      ],
+      "answer": "This is an cat.",
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a cat)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is an cat.",
+      "answers": [
+        "This is a cat."
+      ],
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a cat)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is a book.",
+        "It is yellow.",
+        "This is a cake.",
+        "It are green."
+      ],
+      "answer": "It are green.",
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "It are green.",
+      "answers": [
+        "It is green."
+      ],
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The cats are red.",
+        "The pen are yellow.",
+        "The books are yellow.",
+        "This is a dog."
+      ],
+      "answer": "The pen are yellow.",
+      "explanation": "The pen (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The pen are yellow.",
+      "answers": [
+        "The pen is yellow."
+      ],
+      "explanation": "The pen (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The pen is blue.",
+        "The book is blue.",
+        "The books are red.",
+        "The pens is yellow."
+      ],
+      "answer": "The pens is yellow.",
+      "explanation": "The pens (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The pens is yellow.",
+      "answers": [
+        "The pens are yellow."
+      ],
+      "explanation": "The pens (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The dogs are red.",
+        "The bag is yellow.",
+        "This is an dog.",
+        "The bag is red."
+      ],
+      "answer": "This is an dog.",
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a dog)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is an dog.",
+      "answers": [
+        "This is a dog."
+      ],
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a dog)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "It are yellow.",
+        "The pen is blue.",
+        "The dog is red.",
+        "The cats are red."
+      ],
+      "answer": "It are yellow.",
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "It are yellow.",
+      "answers": [
+        "It is yellow."
+      ],
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The cats are yellow.",
+        "The books are green.",
+        "The book are red.",
+        "The dog is blue."
+      ],
+      "answer": "The book are red.",
+      "explanation": "The book (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The book are red.",
+      "answers": [
+        "The book is red."
+      ],
+      "explanation": "The book (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is a pen.",
+        "The dogs are red.",
+        "The cat is red.",
+        "The books is red."
+      ],
+      "answer": "The books is red.",
+      "explanation": "The books (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The books is red.",
+      "answers": [
+        "The books are red."
+      ],
+      "explanation": "The books (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "It is blue.",
+        "The books are green.",
+        "This is an bag.",
+        "The chair is red."
+      ],
+      "answer": "This is an bag.",
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a bag)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is an bag.",
+      "answers": [
+        "This is a bag."
+      ],
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a bag)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is a book.",
+        "The pen is red.",
+        "The dogs are blue.",
+        "It are black."
+      ],
+      "answer": "It are black.",
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "It are black.",
+      "answers": [
+        "It is black."
+      ],
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The pens are blue.",
+        "The book are blue.",
+        "The cat is yellow.",
+        "It is white."
+      ],
+      "answer": "The book are blue.",
+      "explanation": "The book (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The book are blue.",
+      "answers": [
+        "The book is blue."
+      ],
+      "explanation": "The book (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The cat is yellow.",
+        "The dogs are yellow.",
+        "The books is blue.",
+        "The bag is blue."
+      ],
+      "answer": "The books is blue.",
+      "explanation": "The books (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The books is blue.",
+      "answers": [
+        "The books are blue."
+      ],
+      "explanation": "The books (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "It is green.",
+        "This is an chair.",
+        "The pens are blue.",
+        "The pens are yellow."
+      ],
+      "answer": "This is an chair.",
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a chair)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is an chair.",
+      "answers": [
+        "This is a chair."
+      ],
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a chair)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The cats are green.",
+        "The book is blue.",
+        "It are white.",
+        "This is a book."
+      ],
+      "answer": "It are white.",
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "It are white.",
+      "answers": [
+        "It is white."
+      ],
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The pen is red.",
+        "This is a cat.",
+        "The book is red.",
+        "The book are green."
+      ],
+      "answer": "The book are green.",
+      "explanation": "The book (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The book are green.",
+      "answers": [
+        "The book is green."
+      ],
+      "explanation": "The book (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is an apple.",
+        "The books are yellow.",
+        "The books is green.",
+        "This is a pen."
+      ],
+      "answer": "The books is green.",
+      "explanation": "The books (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The books is green.",
+      "answers": [
+        "The books are green."
+      ],
+      "explanation": "The books (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The book is yellow.",
+        "The bag is red.",
+        "This is an cake.",
+        "The dog is red."
+      ],
+      "answer": "This is an cake.",
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a cake)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is an cake.",
+      "answers": [
+        "This is a cake."
+      ],
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a cake)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The book is red.",
+        "The dog is blue.",
+        "This is an apple.",
+        "It are pink."
+      ],
+      "answer": "It are pink.",
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "It are pink.",
+      "answers": [
+        "It is pink."
+      ],
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The bag is yellow.",
+        "The book are yellow.",
+        "The cats are green.",
+        "It is green."
+      ],
+      "answer": "The book are yellow.",
+      "explanation": "The book (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The book are yellow.",
+      "answers": [
+        "The book is yellow."
+      ],
+      "explanation": "The book (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The cat is red.",
+        "The books is yellow.",
+        "The dog is yellow.",
+        "This is a pen."
+      ],
+      "answer": "The books is yellow.",
+      "explanation": "The books (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The books is yellow.",
+      "answers": [
+        "The books are yellow."
+      ],
+      "explanation": "The books (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The bags are green.",
+        "This is a cat.",
+        "This is an ball.",
+        "The books are yellow."
+      ],
+      "answer": "This is an ball.",
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a ball)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is an ball.",
+      "answers": [
+        "This is a ball."
+      ],
+      "explanation": "a đi với từ bắt đầu bằng phụ âm (a ball)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The books are red.",
+        "The pen is red.",
+        "It are orange.",
+        "The cats are green."
+      ],
+      "answer": "It are orange.",
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "It are orange.",
+      "answers": [
+        "It is orange."
+      ],
+      "explanation": "It đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The bag is yellow.",
+        "It is green.",
+        "The bags are blue.",
+        "The cat are red."
+      ],
+      "answer": "The cat are red.",
+      "explanation": "The cat (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The cat are red.",
+      "answers": [
+        "The cat is red."
+      ],
+      "explanation": "The cat (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is a book.",
+        "The cats is red.",
+        "The dog is red.",
+        "This is a cake."
+      ],
+      "answer": "The cats is red.",
+      "explanation": "The cats (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The cats is red.",
+      "answers": [
+        "The cats are red."
+      ],
+      "explanation": "The cats (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The pen is blue.",
+        "This is a book.",
+        "This is a apple.",
+        "The bags are blue."
+      ],
+      "answer": "This is a apple.",
+      "explanation": "an đi với từ bắt đầu bằng nguyên âm (an apple)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is a apple.",
+      "answers": [
+        "This is an apple."
+      ],
+      "explanation": "an đi với từ bắt đầu bằng nguyên âm (an apple)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The book is red.",
+        "The bags are blue.",
+        "The bag is green.",
+        "The cat are blue."
+      ],
+      "answer": "The cat are blue.",
+      "explanation": "The cat (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The cat are blue.",
+      "answers": [
+        "The cat is blue."
+      ],
+      "explanation": "The cat (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The dogs are yellow.",
+        "The cats is blue.",
+        "The pen is red.",
+        "The dog is yellow."
+      ],
+      "answer": "The cats is blue.",
+      "explanation": "The cats (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The cats is blue.",
+      "answers": [
+        "The cats are blue."
+      ],
+      "explanation": "The cats (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is a orange.",
+        "The chair is red.",
+        "The cat is red.",
+        "The dog is red."
+      ],
+      "answer": "This is a orange.",
+      "explanation": "an đi với từ bắt đầu bằng nguyên âm (an orange)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is a orange.",
+      "answers": [
+        "This is an orange."
+      ],
+      "explanation": "an đi với từ bắt đầu bằng nguyên âm (an orange)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The cat are green.",
+        "The books are yellow.",
+        "This is an egg.",
+        "The dog is blue."
+      ],
+      "answer": "The cat are green.",
+      "explanation": "The cat (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The cat are green.",
+      "answers": [
+        "The cat is green."
+      ],
+      "explanation": "The cat (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The dog is green.",
+        "The cats is green.",
+        "This is a pen.",
+        "It is orange."
+      ],
+      "answer": "The cats is green.",
+      "explanation": "The cats (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The cats is green.",
+      "answers": [
+        "The cats are green."
+      ],
+      "explanation": "The cats (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The pens are green.",
+        "The book is yellow.",
+        "This is a egg.",
+        "The books are yellow."
+      ],
+      "answer": "This is a egg.",
+      "explanation": "an đi với từ bắt đầu bằng nguyên âm (an egg)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This is a egg.",
+      "answers": [
+        "This is an egg."
+      ],
+      "explanation": "an đi với từ bắt đầu bằng nguyên âm (an egg)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The dogs are red.",
+        "This is a ball.",
+        "The book is green.",
+        "The cat are yellow."
+      ],
+      "answer": "The cat are yellow.",
+      "explanation": "The cat (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The cat are yellow.",
+      "answers": [
+        "The cat is yellow."
+      ],
+      "explanation": "The cat (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The books are red.",
+        "The cats is yellow.",
+        "The pens are green.",
+        "The cat is red."
+      ],
+      "answer": "The cats is yellow.",
+      "explanation": "The cats (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The cats is yellow.",
+      "answers": [
+        "The cats are yellow."
+      ],
+      "explanation": "The cats (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The pen is blue.",
+        "The pen is green.",
+        "The pens are yellow.",
+        "The dog are red."
+      ],
+      "answer": "The dog are red.",
+      "explanation": "The dog (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The dog are red.",
+      "answers": [
+        "The dog is red."
+      ],
+      "explanation": "The dog (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is a ball.",
+        "The cat is green.",
+        "The dog is green.",
+        "The dogs is red."
+      ],
+      "answer": "The dogs is red.",
+      "explanation": "The dogs (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The dogs is red.",
+      "answers": [
+        "The dogs are red."
+      ],
+      "explanation": "The dogs (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is a dog.",
+        "It is black.",
+        "The dog are blue.",
+        "It is blue."
+      ],
+      "answer": "The dog are blue.",
+      "explanation": "The dog (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The dog are blue.",
+      "answers": [
+        "The dog is blue."
+      ],
+      "explanation": "The dog (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "It is white.",
+        "The books are yellow.",
+        "The dogs is blue.",
+        "It is blue."
+      ],
+      "answer": "The dogs is blue.",
+      "explanation": "The dogs (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The dogs is blue.",
+      "answers": [
+        "The dogs are blue."
+      ],
+      "explanation": "The dogs (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "It is red.",
+        "The dog are green.",
+        "This is a book.",
+        "The cat is red."
+      ],
+      "answer": "The dog are green.",
+      "explanation": "The dog (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The dog are green.",
+      "answers": [
+        "The dog is green."
+      ],
+      "explanation": "The dog (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "It is yellow.",
+        "The bag is blue.",
+        "The dogs is green.",
+        "This is a book."
+      ],
+      "answer": "The dogs is green.",
+      "explanation": "The dogs (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The dogs is green.",
+      "answers": [
+        "The dogs are green."
+      ],
+      "explanation": "The dogs (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The dog are yellow.",
+        "The books are blue.",
+        "The chair is red.",
+        "The bags are yellow."
+      ],
+      "answer": "The dog are yellow.",
+      "explanation": "The dog (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The dog are yellow.",
+      "answers": [
+        "The dog is yellow."
+      ],
+      "explanation": "The dog (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The pens are blue.",
+        "The cats are yellow.",
+        "The cat is blue.",
+        "The dogs is yellow."
+      ],
+      "answer": "The dogs is yellow.",
+      "explanation": "The dogs (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The dogs is yellow.",
+      "answers": [
+        "The dogs are yellow."
+      ],
+      "explanation": "The dogs (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The bag are red.",
+        "The pen is yellow.",
+        "The books are yellow.",
+        "The book is green."
+      ],
+      "answer": "The bag are red.",
+      "explanation": "The bag (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The bag are red.",
+      "answers": [
+        "The bag is red."
+      ],
+      "explanation": "The bag (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The bags is red.",
+        "This is a cake.",
+        "The cat is green.",
+        "The cats are green."
+      ],
+      "answer": "The bags is red.",
+      "explanation": "The bags (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The bags is red.",
+      "answers": [
+        "The bags are red."
+      ],
+      "explanation": "The bags (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This is a dog.",
+        "It is white.",
+        "The pen is red.",
+        "The bag are blue."
+      ],
+      "answer": "The bag are blue.",
+      "explanation": "The bag (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The bag are blue.",
+      "answers": [
+        "The bag is blue."
+      ],
+      "explanation": "The bag (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The bags is blue.",
+        "The pens are red.",
+        "This is an apple.",
+        "The bags are green."
+      ],
+      "answer": "The bags is blue.",
+      "explanation": "The bags (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The bags is blue.",
+      "answers": [
+        "The bags are blue."
+      ],
+      "explanation": "The bags (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The bag are green.",
+        "The bag is blue.",
+        "The dogs are blue.",
+        "This is a bag."
+      ],
+      "answer": "The bag are green.",
+      "explanation": "The bag (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The bag are green.",
+      "answers": [
+        "The bag is green."
+      ],
+      "explanation": "The bag (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "It is yellow.",
+        "The bag is red.",
+        "The books are yellow.",
+        "The bags is green."
+      ],
+      "answer": "The bags is green.",
+      "explanation": "The bags (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The bags is green.",
+      "answers": [
+        "The bags are green."
+      ],
+      "explanation": "The bags (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The cats are green.",
+        "The bag are yellow.",
+        "The bag is red.",
+        "The dogs are blue."
+      ],
+      "answer": "The bag are yellow.",
+      "explanation": "The bag (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The bag are yellow.",
+      "answers": [
+        "The bag is yellow."
+      ],
+      "explanation": "The bag (số ít) đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The dog is green.",
+        "This is a chair.",
+        "The bags is yellow.",
+        "It is red."
+      ],
+      "answer": "The bags is yellow.",
+      "explanation": "The bags (số nhiều) đi với are."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The bags is yellow.",
+      "answers": [
+        "The bags are yellow."
+      ],
+      "explanation": "The bags (số nhiều) đi với are."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The cats are red.",
+        "The bags are green.",
+        "This is a chair.",
+        "The chair are red."
+      ],
+      "answer": "The chair are red.",
+      "explanation": "The chair (số ít) đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The chair are red.",
+      "answers": [
+        "The chair is red."
+      ],
+      "explanation": "The chair (số ít) đi với is."
+    }
+  ],
+  "food-drink": [
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He wants bananas.",
+        "I likes apples.",
+        "Lan wants rice.",
+        "You like bananas."
+      ],
+      "answer": "I likes apples.",
+      "explanation": "I đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I likes apples.",
+      "answers": [
+        "I like apples."
+      ],
+      "explanation": "I đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He doesn't like bananas.",
+        "He don't like apples.",
+        "Lan doesn't like milk.",
+        "I like bananas."
+      ],
+      "answer": "He don't like apples.",
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He don't like apples.",
+      "answers": [
+        "He doesn't like apples."
+      ],
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "You like rice.",
+        "He want apples.",
+        "Lan doesn't like bananas.",
+        "She wants apples."
+      ],
+      "answer": "He want apples.",
+      "explanation": "He đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He want apples.",
+      "answers": [
+        "He wants apples."
+      ],
+      "explanation": "He đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Minh wants bananas.",
+        "They like bananas.",
+        "She doesn't like apples.",
+        "I likes bananas."
+      ],
+      "answer": "I likes bananas.",
+      "explanation": "I đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I likes bananas.",
+      "answers": [
+        "I like bananas."
+      ],
+      "explanation": "I đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He don't like bananas.",
+        "I like apples.",
+        "He doesn't like rice.",
+        "They like bananas."
+      ],
+      "answer": "He don't like bananas.",
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He don't like bananas.",
+      "answers": [
+        "He doesn't like bananas."
+      ],
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He wants fish.",
+        "He want bananas.",
+        "She doesn't like apples.",
+        "They like fish."
+      ],
+      "answer": "He want bananas.",
+      "explanation": "He đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He want bananas.",
+      "answers": [
+        "He wants bananas."
+      ],
+      "explanation": "He đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I like rice.",
+        "He wants milk.",
+        "They like apples.",
+        "I likes milk."
+      ],
+      "answer": "I likes milk.",
+      "explanation": "I đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I likes milk.",
+      "answers": [
+        "I like milk."
+      ],
+      "explanation": "I đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She wants bananas.",
+        "I like rice.",
+        "I like fish.",
+        "He don't like milk."
+      ],
+      "answer": "He don't like milk.",
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He don't like milk.",
+      "answers": [
+        "He doesn't like milk."
+      ],
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan wants bananas.",
+        "He want milk.",
+        "He wants fish.",
+        "He doesn't like milk."
+      ],
+      "answer": "He want milk.",
+      "explanation": "He đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He want milk.",
+      "answers": [
+        "He wants milk."
+      ],
+      "explanation": "He đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He wants rice.",
+        "She wants milk.",
+        "She wants fish.",
+        "I likes rice."
+      ],
+      "answer": "I likes rice.",
+      "explanation": "I đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I likes rice.",
+      "answers": [
+        "I like rice."
+      ],
+      "explanation": "I đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We like apples.",
+        "Lan doesn't like apples.",
+        "He doesn't like apples.",
+        "He don't like rice."
+      ],
+      "answer": "He don't like rice.",
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He don't like rice.",
+      "answers": [
+        "He doesn't like rice."
+      ],
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She wants rice.",
+        "He want rice.",
+        "Minh wants milk.",
+        "He wants milk."
+      ],
+      "answer": "He want rice.",
+      "explanation": "He đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He want rice.",
+      "answers": [
+        "He wants rice."
+      ],
+      "explanation": "He đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We like rice.",
+        "I likes fish.",
+        "Lan wants bananas.",
+        "He wants bananas."
+      ],
+      "answer": "I likes fish.",
+      "explanation": "I đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I likes fish.",
+      "answers": [
+        "I like fish."
+      ],
+      "explanation": "I đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He doesn't like apples.",
+        "She don't like apples.",
+        "Minh wants bananas.",
+        "He wants fish."
+      ],
+      "answer": "She don't like apples.",
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She don't like apples.",
+      "answers": [
+        "She doesn't like apples."
+      ],
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He want fish.",
+        "He doesn't like milk.",
+        "Lan wants rice.",
+        "Lan wants apples."
+      ],
+      "answer": "He want fish.",
+      "explanation": "He đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He want fish.",
+      "answers": [
+        "He wants fish."
+      ],
+      "explanation": "He đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "You likes apples.",
+        "I like bananas.",
+        "We like apples.",
+        "They like rice."
+      ],
+      "answer": "You likes apples.",
+      "explanation": "You đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "You likes apples.",
+      "answers": [
+        "You like apples."
+      ],
+      "explanation": "You đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We like rice.",
+        "He wants bananas.",
+        "You like rice.",
+        "She don't like bananas."
+      ],
+      "answer": "She don't like bananas.",
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She don't like bananas.",
+      "answers": [
+        "She doesn't like bananas."
+      ],
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She want apples.",
+        "We like rice.",
+        "She wants fish.",
+        "They like apples."
+      ],
+      "answer": "She want apples.",
+      "explanation": "She đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She want apples.",
+      "answers": [
+        "She wants apples."
+      ],
+      "explanation": "She đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She wants bananas.",
+        "Lan wants fish.",
+        "She doesn't like apples.",
+        "You likes bananas."
+      ],
+      "answer": "You likes bananas.",
+      "explanation": "You đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "You likes bananas.",
+      "answers": [
+        "You like bananas."
+      ],
+      "explanation": "You đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan wants rice.",
+        "You like bananas.",
+        "She wants bananas.",
+        "She don't like milk."
+      ],
+      "answer": "She don't like milk.",
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She don't like milk.",
+      "answers": [
+        "She doesn't like milk."
+      ],
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We like milk.",
+        "They like rice.",
+        "I like milk.",
+        "She want bananas."
+      ],
+      "answer": "She want bananas.",
+      "explanation": "She đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She want bananas.",
+      "answers": [
+        "She wants bananas."
+      ],
+      "explanation": "She đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We like rice.",
+        "He wants apples.",
+        "She wants apples.",
+        "You likes milk."
+      ],
+      "answer": "You likes milk.",
+      "explanation": "You đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "You likes milk.",
+      "answers": [
+        "You like milk."
+      ],
+      "explanation": "You đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "You like milk.",
+        "He doesn't like milk.",
+        "You like rice.",
+        "She don't like rice."
+      ],
+      "answer": "She don't like rice.",
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She don't like rice.",
+      "answers": [
+        "She doesn't like rice."
+      ],
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She wants rice.",
+        "She want milk.",
+        "They like bananas.",
+        "I like rice."
+      ],
+      "answer": "She want milk.",
+      "explanation": "She đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She want milk.",
+      "answers": [
+        "She wants milk."
+      ],
+      "explanation": "She đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "You like fish.",
+        "Minh doesn't like milk.",
+        "They like bananas.",
+        "You likes rice."
+      ],
+      "answer": "You likes rice.",
+      "explanation": "You đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "You likes rice.",
+      "answers": [
+        "You like rice."
+      ],
+      "explanation": "You đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I like fish.",
+        "She wants apples.",
+        "I like apples.",
+        "Lan don't like apples."
+      ],
+      "answer": "Lan don't like apples.",
+      "explanation": "Lan đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan don't like apples.",
+      "answers": [
+        "Lan doesn't like apples."
+      ],
+      "explanation": "Lan đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He wants fish.",
+        "She want rice.",
+        "She wants fish.",
+        "He wants milk."
+      ],
+      "answer": "She want rice.",
+      "explanation": "She đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She want rice.",
+      "answers": [
+        "She wants rice."
+      ],
+      "explanation": "She đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "You likes fish.",
+        "She wants apples.",
+        "She doesn't like bananas.",
+        "They like milk."
+      ],
+      "answer": "You likes fish.",
+      "explanation": "You đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "You likes fish.",
+      "answers": [
+        "You like fish."
+      ],
+      "explanation": "You đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We like apples.",
+        "She wants apples.",
+        "You like apples.",
+        "Lan don't like bananas."
+      ],
+      "answer": "Lan don't like bananas.",
+      "explanation": "Lan đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan don't like bananas.",
+      "answers": [
+        "Lan doesn't like bananas."
+      ],
+      "explanation": "Lan đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She want fish.",
+        "I like fish.",
+        "He wants bananas.",
+        "Minh wants rice."
+      ],
+      "answer": "She want fish.",
+      "explanation": "She đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She want fish.",
+      "answers": [
+        "She wants fish."
+      ],
+      "explanation": "She đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Minh doesn't like milk.",
+        "We like milk.",
+        "We likes apples.",
+        "They like milk."
+      ],
+      "answer": "We likes apples.",
+      "explanation": "We đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We likes apples.",
+      "answers": [
+        "We like apples."
+      ],
+      "explanation": "We đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan don't like milk.",
+        "You like fish.",
+        "They like bananas.",
+        "Lan doesn't like apples."
+      ],
+      "answer": "Lan don't like milk.",
+      "explanation": "Lan đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan don't like milk.",
+      "answers": [
+        "Lan doesn't like milk."
+      ],
+      "explanation": "Lan đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I like milk.",
+        "I like rice.",
+        "They like bananas.",
+        "Lan want apples."
+      ],
+      "answer": "Lan want apples.",
+      "explanation": "Lan đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan want apples.",
+      "answers": [
+        "Lan wants apples."
+      ],
+      "explanation": "Lan đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He doesn't like bananas.",
+        "We likes bananas.",
+        "Lan wants bananas.",
+        "They like apples."
+      ],
+      "answer": "We likes bananas.",
+      "explanation": "We đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We likes bananas.",
+      "answers": [
+        "We like bananas."
+      ],
+      "explanation": "We đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't like apples.",
+        "She doesn't like rice.",
+        "Lan don't like rice.",
+        "He wants milk."
+      ],
+      "answer": "Lan don't like rice.",
+      "explanation": "Lan đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan don't like rice.",
+      "answers": [
+        "Lan doesn't like rice."
+      ],
+      "explanation": "Lan đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We like bananas.",
+        "She wants fish.",
+        "Lan want bananas.",
+        "You like bananas."
+      ],
+      "answer": "Lan want bananas.",
+      "explanation": "Lan đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan want bananas.",
+      "answers": [
+        "Lan wants bananas."
+      ],
+      "explanation": "Lan đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan wants apples.",
+        "Lan wants milk.",
+        "We likes milk.",
+        "I like rice."
+      ],
+      "answer": "We likes milk.",
+      "explanation": "We đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We likes milk.",
+      "answers": [
+        "We like milk."
+      ],
+      "explanation": "We đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't like milk.",
+        "Lan wants fish.",
+        "Minh don't like apples.",
+        "She doesn't like rice."
+      ],
+      "answer": "Minh don't like apples.",
+      "explanation": "Minh đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Minh don't like apples.",
+      "answers": [
+        "Minh doesn't like apples."
+      ],
+      "explanation": "Minh đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan wants rice.",
+        "Lan doesn't like rice.",
+        "He wants bananas.",
+        "Lan want milk."
+      ],
+      "answer": "Lan want milk.",
+      "explanation": "Lan đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan want milk.",
+      "answers": [
+        "Lan wants milk."
+      ],
+      "explanation": "Lan đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Minh doesn't like rice.",
+        "Minh doesn't like apples.",
+        "They like fish.",
+        "We likes rice."
+      ],
+      "answer": "We likes rice.",
+      "explanation": "We đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We likes rice.",
+      "answers": [
+        "We like rice."
+      ],
+      "explanation": "We đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan wants bananas.",
+        "She doesn't like rice.",
+        "She doesn't like milk.",
+        "Minh don't like bananas."
+      ],
+      "answer": "Minh don't like bananas.",
+      "explanation": "Minh đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Minh don't like bananas.",
+      "answers": [
+        "Minh doesn't like bananas."
+      ],
+      "explanation": "Minh đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She wants apples.",
+        "Lan wants milk.",
+        "Lan want rice.",
+        "They like rice."
+      ],
+      "answer": "Lan want rice.",
+      "explanation": "Lan đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan want rice.",
+      "answers": [
+        "Lan wants rice."
+      ],
+      "explanation": "Lan đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "You like milk.",
+        "They like bananas.",
+        "He wants bananas.",
+        "We likes fish."
+      ],
+      "answer": "We likes fish.",
+      "explanation": "We đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We likes fish.",
+      "answers": [
+        "We like fish."
+      ],
+      "explanation": "We đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Minh doesn't like apples.",
+        "Minh don't like milk.",
+        "Minh wants bananas.",
+        "Lan wants apples."
+      ],
+      "answer": "Minh don't like milk.",
+      "explanation": "Minh đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Minh don't like milk.",
+      "answers": [
+        "Minh doesn't like milk."
+      ],
+      "explanation": "Minh đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "You like fish.",
+        "Lan want fish.",
+        "We like fish.",
+        "Minh doesn't like apples."
+      ],
+      "answer": "Lan want fish.",
+      "explanation": "Lan đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan want fish.",
+      "answers": [
+        "Lan wants fish."
+      ],
+      "explanation": "Lan đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She wants milk.",
+        "She wants fish.",
+        "You like fish.",
+        "They likes apples."
+      ],
+      "answer": "They likes apples.",
+      "explanation": "They đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They likes apples.",
+      "answers": [
+        "They like apples."
+      ],
+      "explanation": "They đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We like bananas.",
+        "Minh don't like rice.",
+        "You like milk.",
+        "Lan doesn't like milk."
+      ],
+      "answer": "Minh don't like rice.",
+      "explanation": "Minh đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Minh don't like rice.",
+      "answers": [
+        "Minh doesn't like rice."
+      ],
+      "explanation": "Minh đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We like apples.",
+        "Minh wants milk.",
+        "Minh want apples.",
+        "I like milk."
+      ],
+      "answer": "Minh want apples.",
+      "explanation": "Minh đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Minh want apples.",
+      "answers": [
+        "Minh wants apples."
+      ],
+      "explanation": "Minh đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan wants apples.",
+        "Lan wants fish.",
+        "Lan doesn't like rice.",
+        "They likes bananas."
+      ],
+      "answer": "They likes bananas.",
+      "explanation": "They đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They likes bananas.",
+      "answers": [
+        "They like bananas."
+      ],
+      "explanation": "They đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He doesn't likes apples.",
+        "She doesn't like apples.",
+        "He wants fish.",
+        "He wants apples."
+      ],
+      "answer": "He doesn't likes apples.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (like)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He doesn't likes apples.",
+      "answers": [
+        "He doesn't like apples."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (like)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Minh doesn't like rice.",
+        "You like bananas.",
+        "Minh want bananas.",
+        "You like milk."
+      ],
+      "answer": "Minh want bananas.",
+      "explanation": "Minh đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Minh want bananas.",
+      "answers": [
+        "Minh wants bananas."
+      ],
+      "explanation": "Minh đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He wants milk.",
+        "Lan doesn't like apples.",
+        "They likes milk.",
+        "Minh wants rice."
+      ],
+      "answer": "They likes milk.",
+      "explanation": "They đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They likes milk.",
+      "answers": [
+        "They like milk."
+      ],
+      "explanation": "They đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't like bananas.",
+        "He doesn't likes bananas.",
+        "They like milk.",
+        "She wants bananas."
+      ],
+      "answer": "He doesn't likes bananas.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (like)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He doesn't likes bananas.",
+      "answers": [
+        "He doesn't like bananas."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (like)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan wants fish.",
+        "Minh want milk.",
+        "She wants milk.",
+        "He wants fish."
+      ],
+      "answer": "Minh want milk.",
+      "explanation": "Minh đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Minh want milk.",
+      "answers": [
+        "Minh wants milk."
+      ],
+      "explanation": "Minh đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't like bananas.",
+        "He wants bananas.",
+        "They likes rice.",
+        "I like milk."
+      ],
+      "answer": "They likes rice.",
+      "explanation": "They đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They likes rice.",
+      "answers": [
+        "They like rice."
+      ],
+      "explanation": "They đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He doesn't likes milk.",
+        "You like fish.",
+        "You like apples.",
+        "Lan wants milk."
+      ],
+      "answer": "He doesn't likes milk.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (like)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He doesn't likes milk.",
+      "answers": [
+        "He doesn't like milk."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (like)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We like apples.",
+        "You like milk.",
+        "He doesn't like milk.",
+        "Minh want rice."
+      ],
+      "answer": "Minh want rice.",
+      "explanation": "Minh đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Minh want rice.",
+      "answers": [
+        "Minh wants rice."
+      ],
+      "explanation": "Minh đi với wants (thêm -s)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He doesn't like milk.",
+        "You like fish.",
+        "We like fish.",
+        "They likes fish."
+      ],
+      "answer": "They likes fish.",
+      "explanation": "They đi với like, không thêm -s."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They likes fish.",
+      "answers": [
+        "They like fish."
+      ],
+      "explanation": "They đi với like, không thêm -s."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She wants fish.",
+        "He wants rice.",
+        "He doesn't like bananas.",
+        "He doesn't likes rice."
+      ],
+      "answer": "He doesn't likes rice.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (like)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He doesn't likes rice.",
+      "answers": [
+        "He doesn't like rice."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (like)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I like rice.",
+        "Minh want fish.",
+        "I like apples.",
+        "You like fish."
+      ],
+      "answer": "Minh want fish.",
+      "explanation": "Minh đi với wants (thêm -s)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Minh want fish.",
+      "answers": [
+        "Minh wants fish."
+      ],
+      "explanation": "Minh đi với wants (thêm -s)."
+    }
+  ],
+  "to-be": [
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I is happy.",
+        "Lan isn't sad.",
+        "I am not tired.",
+        "I am busy."
+      ],
+      "answer": "I is happy.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is happy.",
+      "answers": [
+        "I am happy."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't busy.",
+        "Is She happy?",
+        "I is not happy.",
+        "Is He busy?"
+      ],
+      "answer": "I is not happy.",
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is not happy.",
+      "answers": [
+        "I am not happy."
+      ],
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He isn't busy.",
+        "Is I happy?",
+        "Is Minh happy?",
+        "I am sick."
+      ],
+      "answer": "Is I happy?",
+      "explanation": "Câu hỏi với I dùng Am I."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Is I happy?",
+      "answers": [
+        "Am I happy?"
+      ],
+      "explanation": "Câu hỏi với I dùng Am I."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Is Minh busy?",
+        "I am not happy.",
+        "I am not sad.",
+        "I is sad."
+      ],
+      "answer": "I is sad.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is sad.",
+      "answers": [
+        "I am sad."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I is not sad.",
+        "He is ready.",
+        "He isn't thirsty.",
+        "I am not happy."
+      ],
+      "answer": "I is not sad.",
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is not sad.",
+      "answers": [
+        "I am not sad."
+      ],
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Is She busy?",
+        "I am kind.",
+        "I is tired.",
+        "I am not happy."
+      ],
+      "answer": "I is tired.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is tired.",
+      "answers": [
+        "I am tired."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't thirsty.",
+        "Is Lan tired?",
+        "I am not busy.",
+        "I is not tired."
+      ],
+      "answer": "I is not tired.",
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is not tired.",
+      "answers": [
+        "I am not tired."
+      ],
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is hungry.",
+        "He isn't hungry.",
+        "She isn't tired.",
+        "I is busy."
+      ],
+      "answer": "I is busy.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is busy.",
+      "answers": [
+        "I am busy."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Is He tired?",
+        "He is thirsty.",
+        "I is not busy.",
+        "Is Lan sad?"
+      ],
+      "answer": "I is not busy.",
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is not busy.",
+      "answers": [
+        "I am not busy."
+      ],
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am tired.",
+        "He is busy.",
+        "She isn't busy.",
+        "I is hungry."
+      ],
+      "answer": "I is hungry.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is hungry.",
+      "answers": [
+        "I am hungry."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He isn't thirsty.",
+        "I is not hungry.",
+        "He isn't happy.",
+        "He is thirsty."
+      ],
+      "answer": "I is not hungry.",
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is not hungry.",
+      "answers": [
+        "I am not hungry."
+      ],
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am hungry.",
+        "He is ready.",
+        "He isn't happy.",
+        "Are He happy?"
+      ],
+      "answer": "Are He happy?",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are He happy?",
+      "answers": [
+        "Is He happy?"
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is sick.",
+        "I am sad.",
+        "I is thirsty.",
+        "He isn't busy."
+      ],
+      "answer": "I is thirsty.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is thirsty.",
+      "answers": [
+        "I am thirsty."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I is not thirsty.",
+        "Is He tired?",
+        "She isn't sad.",
+        "Is She happy?"
+      ],
+      "answer": "I is not thirsty.",
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is not thirsty.",
+      "answers": [
+        "I am not thirsty."
+      ],
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Is Minh tired?",
+        "I am thirsty.",
+        "Are He sad?",
+        "She isn't busy."
+      ],
+      "answer": "Are He sad?",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are He sad?",
+      "answers": [
+        "Is He sad?"
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't happy.",
+        "He isn't tired.",
+        "I is sick.",
+        "Is He happy?"
+      ],
+      "answer": "I is sick.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is sick.",
+      "answers": [
+        "I am sick."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He isn't sad.",
+        "He aren't happy.",
+        "Is He tired?",
+        "I am thirsty."
+      ],
+      "answer": "He aren't happy.",
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He aren't happy.",
+      "answers": [
+        "He isn't happy."
+      ],
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't thirsty.",
+        "He is tired.",
+        "Are He tired?",
+        "He isn't busy."
+      ],
+      "answer": "Are He tired?",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are He tired?",
+      "answers": [
+        "Is He tired?"
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He isn't thirsty.",
+        "I is ready.",
+        "He isn't sad.",
+        "I am happy."
+      ],
+      "answer": "I is ready.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is ready.",
+      "answers": [
+        "I am ready."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am hungry.",
+        "He is hungry.",
+        "I am kind.",
+        "He aren't sad."
+      ],
+      "answer": "He aren't sad.",
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He aren't sad.",
+      "answers": [
+        "He isn't sad."
+      ],
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Are He busy?",
+        "I am late.",
+        "She isn't busy.",
+        "Is Lan sad?"
+      ],
+      "answer": "Are He busy?",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are He busy?",
+      "answers": [
+        "Is He busy?"
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is ready.",
+        "I is late.",
+        "I am busy.",
+        "I am sick."
+      ],
+      "answer": "I is late.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is late.",
+      "answers": [
+        "I am late."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He aren't tired.",
+        "Lan isn't happy.",
+        "He is hungry.",
+        "He is tired."
+      ],
+      "answer": "He aren't tired.",
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He aren't tired.",
+      "answers": [
+        "He isn't tired."
+      ],
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am not busy.",
+        "He is sick.",
+        "Is Minh tired?",
+        "Are She happy?"
+      ],
+      "answer": "Are She happy?",
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are She happy?",
+      "answers": [
+        "Is She happy?"
+      ],
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I is early.",
+        "I am not tired.",
+        "Is Lan sad?",
+        "He isn't busy."
+      ],
+      "answer": "I is early.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is early.",
+      "answers": [
+        "I am early."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He isn't thirsty.",
+        "She isn't tired.",
+        "He aren't busy.",
+        "Is Minh happy?"
+      ],
+      "answer": "He aren't busy.",
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He aren't busy.",
+      "answers": [
+        "He isn't busy."
+      ],
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Are She sad?",
+        "He is happy.",
+        "Is She happy?",
+        "He isn't busy."
+      ],
+      "answer": "Are She sad?",
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are She sad?",
+      "answers": [
+        "Is She sad?"
+      ],
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am kind.",
+        "I is free.",
+        "Is Lan happy?",
+        "I am tired."
+      ],
+      "answer": "I is free.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is free.",
+      "answers": [
+        "I am free."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He aren't hungry.",
+        "I am not busy.",
+        "I am not hungry.",
+        "Is Lan tired?"
+      ],
+      "answer": "He aren't hungry.",
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He aren't hungry.",
+      "answers": [
+        "He isn't hungry."
+      ],
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He isn't busy.",
+        "Are She tired?",
+        "She isn't thirsty.",
+        "Is Minh sad?"
+      ],
+      "answer": "Are She tired?",
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are She tired?",
+      "answers": [
+        "Is She tired?"
+      ],
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't busy.",
+        "Is He sad?",
+        "I is kind.",
+        "He isn't sad."
+      ],
+      "answer": "I is kind.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is kind.",
+      "answers": [
+        "I am kind."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Is Lan happy?",
+        "He aren't thirsty.",
+        "He isn't sad.",
+        "Is He tired?"
+      ],
+      "answer": "He aren't thirsty.",
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He aren't thirsty.",
+      "answers": [
+        "He isn't thirsty."
+      ],
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am not hungry.",
+        "Are She busy?",
+        "He is hungry.",
+        "He is sick."
+      ],
+      "answer": "Are She busy?",
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are She busy?",
+      "answers": [
+        "Is She busy?"
+      ],
+      "explanation": "She đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am kind.",
+        "He isn't busy.",
+        "He are happy.",
+        "Lan isn't happy."
+      ],
+      "answer": "He are happy.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are happy.",
+      "answers": [
+        "He is happy."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She aren't happy.",
+        "Is She busy?",
+        "She isn't tired.",
+        "I am hungry."
+      ],
+      "answer": "She aren't happy.",
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She aren't happy.",
+      "answers": [
+        "She isn't happy."
+      ],
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is hungry.",
+        "Are Lan happy?",
+        "I am not hungry.",
+        "He is busy."
+      ],
+      "answer": "Are Lan happy?",
+      "explanation": "Lan đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are Lan happy?",
+      "answers": [
+        "Is Lan happy?"
+      ],
+      "explanation": "Lan đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't tired.",
+        "I am not sad.",
+        "Am I happy?",
+        "He are sad."
+      ],
+      "answer": "He are sad.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are sad.",
+      "answers": [
+        "He is sad."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't tired.",
+        "She aren't sad.",
+        "He isn't hungry.",
+        "He is tired."
+      ],
+      "answer": "She aren't sad.",
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She aren't sad.",
+      "answers": [
+        "She isn't sad."
+      ],
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't tired.",
+        "I am sad.",
+        "Are Lan sad?",
+        "He isn't tired."
+      ],
+      "answer": "Are Lan sad?",
+      "explanation": "Lan đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are Lan sad?",
+      "answers": [
+        "Is Lan sad?"
+      ],
+      "explanation": "Lan đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He isn't sad.",
+        "I am free.",
+        "Is He busy?",
+        "He are tired."
+      ],
+      "answer": "He are tired.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are tired.",
+      "answers": [
+        "He is tired."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Is She tired?",
+        "She aren't tired.",
+        "Is She busy?",
+        "Is Minh tired?"
+      ],
+      "answer": "She aren't tired.",
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She aren't tired.",
+      "answers": [
+        "She isn't tired."
+      ],
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Are Lan tired?",
+        "I am tired.",
+        "Is She happy?",
+        "He is tired."
+      ],
+      "answer": "Are Lan tired?",
+      "explanation": "Lan đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are Lan tired?",
+      "answers": [
+        "Is Lan tired?"
+      ],
+      "explanation": "Lan đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't sad.",
+        "He are busy.",
+        "I am tired.",
+        "Lan isn't sad."
+      ],
+      "answer": "He are busy.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are busy.",
+      "answers": [
+        "He is busy."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Am I happy?",
+        "I am not thirsty.",
+        "She aren't busy.",
+        "She isn't hungry."
+      ],
+      "answer": "She aren't busy.",
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She aren't busy.",
+      "answers": [
+        "She isn't busy."
+      ],
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He isn't busy.",
+        "Are Lan busy?",
+        "I am thirsty.",
+        "I am hungry."
+      ],
+      "answer": "Are Lan busy?",
+      "explanation": "Lan đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are Lan busy?",
+      "answers": [
+        "Is Lan busy?"
+      ],
+      "explanation": "Lan đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He are hungry.",
+        "I am not hungry.",
+        "Am I happy?",
+        "Is He happy?"
+      ],
+      "answer": "He are hungry.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are hungry.",
+      "answers": [
+        "He is hungry."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She aren't hungry.",
+        "I am sick.",
+        "I am late.",
+        "I am kind."
+      ],
+      "answer": "She aren't hungry.",
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She aren't hungry.",
+      "answers": [
+        "She isn't hungry."
+      ],
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't hungry.",
+        "Are Minh happy?",
+        "He isn't sad.",
+        "He is thirsty."
+      ],
+      "answer": "Are Minh happy?",
+      "explanation": "Minh đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are Minh happy?",
+      "answers": [
+        "Is Minh happy?"
+      ],
+      "explanation": "Minh đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am thirsty.",
+        "I am not happy.",
+        "He isn't sad.",
+        "He are thirsty."
+      ],
+      "answer": "He are thirsty.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are thirsty.",
+      "answers": [
+        "He is thirsty."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Is Lan busy?",
+        "I am sick.",
+        "She isn't busy.",
+        "She aren't thirsty."
+      ],
+      "answer": "She aren't thirsty.",
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She aren't thirsty.",
+      "answers": [
+        "She isn't thirsty."
+      ],
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am ready.",
+        "Is She sad?",
+        "She isn't hungry.",
+        "Are Minh sad?"
+      ],
+      "answer": "Are Minh sad?",
+      "explanation": "Minh đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are Minh sad?",
+      "answers": [
+        "Is Minh sad?"
+      ],
+      "explanation": "Minh đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He are sick.",
+        "I am not busy.",
+        "Is He tired?",
+        "Is Minh happy?"
+      ],
+      "answer": "He are sick.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are sick.",
+      "answers": [
+        "He is sick."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am not busy.",
+        "I am not happy.",
+        "Lan isn't sad.",
+        "Lan aren't happy."
+      ],
+      "answer": "Lan aren't happy.",
+      "explanation": "Lan đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan aren't happy.",
+      "answers": [
+        "Lan isn't happy."
+      ],
+      "explanation": "Lan đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is ready.",
+        "Are Minh tired?",
+        "Lan isn't happy.",
+        "Is He sad?"
+      ],
+      "answer": "Are Minh tired?",
+      "explanation": "Minh đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are Minh tired?",
+      "answers": [
+        "Is Minh tired?"
+      ],
+      "explanation": "Minh đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am free.",
+        "He are ready.",
+        "She isn't happy.",
+        "Is Minh happy?"
+      ],
+      "answer": "He are ready.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are ready.",
+      "answers": [
+        "He is ready."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't sad.",
+        "Is She busy?",
+        "Lan aren't sad.",
+        "He is thirsty."
+      ],
+      "answer": "Lan aren't sad.",
+      "explanation": "Lan đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan aren't sad.",
+      "answers": [
+        "Lan isn't sad."
+      ],
+      "explanation": "Lan đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Are Minh busy?",
+        "I am free.",
+        "Is She sad?",
+        "She isn't busy."
+      ],
+      "answer": "Are Minh busy?",
+      "explanation": "Minh đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Are Minh busy?",
+      "answers": [
+        "Is Minh busy?"
+      ],
+      "explanation": "Minh đi với is."
+    }
+  ],
+  "present-simple": [
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He go to school.",
+        "I help mother.",
+        "I play football.",
+        "They don't go to school."
+      ],
+      "answer": "He go to school.",
+      "explanation": "He đi với động từ thêm -s (goes)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He go to school.",
+      "answers": [
+        "He goes to school."
+      ],
+      "explanation": "He đi với động từ thêm -s (goes)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I eat breakfast.",
+        "I goes to school.",
+        "Does She watch TV?",
+        "Does She play football?"
+      ],
+      "answer": "I goes to school.",
+      "explanation": "I đi với động từ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I goes to school.",
+      "answers": [
+        "I go to school."
+      ],
+      "explanation": "I đi với động từ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He don't go to school.",
+        "Does He eat breakfast?",
+        "He doesn't help mother.",
+        "She doesn't play football."
+      ],
+      "answer": "He don't go to school.",
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He don't go to school.",
+      "answers": [
+        "He doesn't go to school."
+      ],
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He studies English.",
+        "I help mother.",
+        "He doesn't goes to school.",
+        "Does She watch TV?"
+      ],
+      "answer": "He doesn't goes to school.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He doesn't goes to school.",
+      "answers": [
+        "He doesn't go to school."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Does He watch TV?",
+        "We doesn't go to school.",
+        "He studies English.",
+        "I go to school."
+      ],
+      "answer": "We doesn't go to school.",
+      "explanation": "We đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We doesn't go to school.",
+      "answers": [
+        "We don't go to school."
+      ],
+      "explanation": "We đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Does He goes to school?",
+        "He doesn't watch TV.",
+        "He doesn't read a book.",
+        "He eats breakfast."
+      ],
+      "answer": "Does He goes to school?",
+      "explanation": "Sau Does, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Does He goes to school?",
+      "answers": [
+        "Does He go to school?"
+      ],
+      "explanation": "Sau Does, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He watch TV.",
+        "Does He read a book?",
+        "She doesn't watch TV.",
+        "They don't play football."
+      ],
+      "answer": "He watch TV.",
+      "explanation": "He đi với động từ thêm -s (watches)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He watch TV.",
+      "answers": [
+        "He watches TV."
+      ],
+      "explanation": "He đi với động từ thêm -s (watches)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Does He play football?",
+        "I watches TV.",
+        "We don't help mother.",
+        "Does He help mother?"
+      ],
+      "answer": "I watches TV.",
+      "explanation": "I đi với động từ nguyên thể (watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I watches TV.",
+      "answers": [
+        "I watch TV."
+      ],
+      "explanation": "I đi với động từ nguyên thể (watch)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I like apples.",
+        "We don't help mother.",
+        "He don't watch TV.",
+        "I go to school."
+      ],
+      "answer": "He don't watch TV.",
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He don't watch TV.",
+      "answers": [
+        "He doesn't watch TV."
+      ],
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He doesn't watches TV.",
+        "He doesn't eat breakfast.",
+        "I love music.",
+        "I play football."
+      ],
+      "answer": "He doesn't watches TV.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He doesn't watches TV.",
+      "answers": [
+        "He doesn't watch TV."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They don't read a book.",
+        "We doesn't watch TV.",
+        "He doesn't go to school.",
+        "He watches TV."
+      ],
+      "answer": "We doesn't watch TV.",
+      "explanation": "We đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We doesn't watch TV.",
+      "answers": [
+        "We don't watch TV."
+      ],
+      "explanation": "We đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Does He watches TV?",
+        "He doesn't watch TV.",
+        "Does He read a book?",
+        "He reads a book."
+      ],
+      "answer": "Does He watches TV?",
+      "explanation": "Sau Does, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Does He watches TV?",
+      "answers": [
+        "Does He watch TV?"
+      ],
+      "explanation": "Sau Does, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't play football.",
+        "We don't read a book.",
+        "He play football.",
+        "Does He watch TV?"
+      ],
+      "answer": "He play football.",
+      "explanation": "He đi với động từ thêm -s (plays)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He play football.",
+      "answers": [
+        "He plays football."
+      ],
+      "explanation": "He đi với động từ thêm -s (plays)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He watches TV.",
+        "I plays football.",
+        "He goes to school.",
+        "They don't go to school."
+      ],
+      "answer": "I plays football.",
+      "explanation": "I đi với động từ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I plays football.",
+      "answers": [
+        "I play football."
+      ],
+      "explanation": "I đi với động từ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He don't play football.",
+        "We don't eat breakfast.",
+        "He eats breakfast.",
+        "I love music."
+      ],
+      "answer": "He don't play football.",
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He don't play football.",
+      "answers": [
+        "He doesn't play football."
+      ],
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He cooks dinner.",
+        "Does He watch TV?",
+        "We don't help mother.",
+        "He doesn't plays football."
+      ],
+      "answer": "He doesn't plays football.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He doesn't plays football.",
+      "answers": [
+        "He doesn't play football."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't play football.",
+        "She doesn't go to school.",
+        "We doesn't play football.",
+        "I cook dinner."
+      ],
+      "answer": "We doesn't play football.",
+      "explanation": "We đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We doesn't play football.",
+      "answers": [
+        "We don't play football."
+      ],
+      "explanation": "We đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I like apples.",
+        "Does He plays football?",
+        "They don't watch TV.",
+        "He studies English."
+      ],
+      "answer": "Does He plays football?",
+      "explanation": "Sau Does, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Does He plays football?",
+      "answers": [
+        "Does He play football?"
+      ],
+      "explanation": "Sau Does, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He read a book.",
+        "Does He read a book?",
+        "He doesn't eat breakfast.",
+        "We don't eat breakfast."
+      ],
+      "answer": "He read a book.",
+      "explanation": "He đi với động từ thêm -s (reads)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He read a book.",
+      "answers": [
+        "He reads a book."
+      ],
+      "explanation": "He đi với động từ thêm -s (reads)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He likes apples.",
+        "Does She go to school?",
+        "We don't eat breakfast.",
+        "I reads a book."
+      ],
+      "answer": "I reads a book.",
+      "explanation": "I đi với động từ nguyên thể (read)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I reads a book.",
+      "answers": [
+        "I read a book."
+      ],
+      "explanation": "I đi với động từ nguyên thể (read)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Does He read a book?",
+        "She doesn't watch TV.",
+        "I like apples.",
+        "He don't read a book."
+      ],
+      "answer": "He don't read a book.",
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He don't read a book.",
+      "answers": [
+        "He doesn't read a book."
+      ],
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He watches TV.",
+        "He doesn't watch TV.",
+        "They don't watch TV.",
+        "He doesn't reads a book."
+      ],
+      "answer": "He doesn't reads a book.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (read)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He doesn't reads a book.",
+      "answers": [
+        "He doesn't read a book."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (read)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We doesn't read a book.",
+        "She doesn't play football.",
+        "He goes to school.",
+        "He likes apples."
+      ],
+      "answer": "We doesn't read a book.",
+      "explanation": "We đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We doesn't read a book.",
+      "answers": [
+        "We don't read a book."
+      ],
+      "explanation": "We đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He watches TV.",
+        "He doesn't read a book.",
+        "I like apples.",
+        "Does He reads a book?"
+      ],
+      "answer": "Does He reads a book?",
+      "explanation": "Sau Does, động từ giữ nguyên thể (read)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Does He reads a book?",
+      "answers": [
+        "Does He read a book?"
+      ],
+      "explanation": "Sau Does, động từ giữ nguyên thể (read)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They don't play football.",
+        "She doesn't go to school.",
+        "He eat breakfast.",
+        "Does He go to school?"
+      ],
+      "answer": "He eat breakfast.",
+      "explanation": "He đi với động từ thêm -s (eats)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He eat breakfast.",
+      "answers": [
+        "He eats breakfast."
+      ],
+      "explanation": "He đi với động từ thêm -s (eats)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Does She read a book?",
+        "Does He watch TV?",
+        "He likes apples.",
+        "I eats breakfast."
+      ],
+      "answer": "I eats breakfast.",
+      "explanation": "I đi với động từ nguyên thể (eat)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I eats breakfast.",
+      "answers": [
+        "I eat breakfast."
+      ],
+      "explanation": "I đi với động từ nguyên thể (eat)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I like apples.",
+        "He don't eat breakfast.",
+        "She doesn't watch TV.",
+        "She doesn't read a book."
+      ],
+      "answer": "He don't eat breakfast.",
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He don't eat breakfast.",
+      "answers": [
+        "He doesn't eat breakfast."
+      ],
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't go to school.",
+        "Does He watch TV?",
+        "He doesn't eats breakfast.",
+        "I like apples."
+      ],
+      "answer": "He doesn't eats breakfast.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He doesn't eats breakfast.",
+      "answers": [
+        "He doesn't eat breakfast."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She doesn't go to school.",
+        "We doesn't eat breakfast.",
+        "We don't watch TV.",
+        "I go to school."
+      ],
+      "answer": "We doesn't eat breakfast.",
+      "explanation": "We đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We doesn't eat breakfast.",
+      "answers": [
+        "We don't eat breakfast."
+      ],
+      "explanation": "We đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Does He eats breakfast?",
+        "They don't watch TV.",
+        "We don't read a book.",
+        "Does He watch TV?"
+      ],
+      "answer": "Does He eats breakfast?",
+      "explanation": "Sau Does, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Does He eats breakfast?",
+      "answers": [
+        "Does He eat breakfast?"
+      ],
+      "explanation": "Sau Does, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He help mother.",
+        "She doesn't watch TV.",
+        "He watches TV.",
+        "We don't read a book."
+      ],
+      "answer": "He help mother.",
+      "explanation": "He đi với động từ thêm -s (helps)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He help mother.",
+      "answers": [
+        "He helps mother."
+      ],
+      "explanation": "He đi với động từ thêm -s (helps)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He likes apples.",
+        "I helps mother.",
+        "He plays football.",
+        "She doesn't watch TV."
+      ],
+      "answer": "I helps mother.",
+      "explanation": "I đi với động từ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I helps mother.",
+      "answers": [
+        "I help mother."
+      ],
+      "explanation": "I đi với động từ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We don't read a book.",
+        "Does He read a book?",
+        "He don't help mother.",
+        "She doesn't read a book."
+      ],
+      "answer": "He don't help mother.",
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He don't help mother.",
+      "answers": [
+        "He doesn't help mother."
+      ],
+      "explanation": "He đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I watch TV.",
+        "We don't go to school.",
+        "He cooks dinner.",
+        "He doesn't helps mother."
+      ],
+      "answer": "He doesn't helps mother.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He doesn't helps mother.",
+      "answers": [
+        "He doesn't help mother."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We doesn't help mother.",
+        "We don't play football.",
+        "They don't play football.",
+        "I help mother."
+      ],
+      "answer": "We doesn't help mother.",
+      "explanation": "We đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "We doesn't help mother.",
+      "answers": [
+        "We don't help mother."
+      ],
+      "explanation": "We đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Does He helps mother?",
+        "Does He play football?",
+        "He doesn't read a book.",
+        "He likes apples."
+      ],
+      "answer": "Does He helps mother?",
+      "explanation": "Sau Does, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Does He helps mother?",
+      "answers": [
+        "Does He help mother?"
+      ],
+      "explanation": "Sau Does, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Does He watch TV?",
+        "He cook dinner.",
+        "We don't help mother.",
+        "He eats breakfast."
+      ],
+      "answer": "He cook dinner.",
+      "explanation": "He đi với động từ thêm -s (cooks)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He cook dinner.",
+      "answers": [
+        "He cooks dinner."
+      ],
+      "explanation": "He đi với động từ thêm -s (cooks)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He cooks dinner.",
+        "We don't read a book.",
+        "I cooks dinner.",
+        "Does He watch TV?"
+      ],
+      "answer": "I cooks dinner.",
+      "explanation": "I đi với động từ nguyên thể (cook)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I cooks dinner.",
+      "answers": [
+        "I cook dinner."
+      ],
+      "explanation": "I đi với động từ nguyên thể (cook)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He helps mother.",
+        "Does He eat breakfast?",
+        "He doesn't eat breakfast.",
+        "She don't go to school."
+      ],
+      "answer": "She don't go to school.",
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She don't go to school.",
+      "answers": [
+        "She doesn't go to school."
+      ],
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Does He watch TV?",
+        "They don't watch TV.",
+        "Does She play football?",
+        "She doesn't goes to school."
+      ],
+      "answer": "She doesn't goes to school.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She doesn't goes to school.",
+      "answers": [
+        "She doesn't go to school."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They doesn't go to school.",
+        "He doesn't watch TV.",
+        "She doesn't play football.",
+        "Does She watch TV?"
+      ],
+      "answer": "They doesn't go to school.",
+      "explanation": "They đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They doesn't go to school.",
+      "answers": [
+        "They don't go to school."
+      ],
+      "explanation": "They đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He doesn't play football.",
+        "I help mother.",
+        "He loves music.",
+        "Does She goes to school?"
+      ],
+      "answer": "Does She goes to school?",
+      "explanation": "Sau Does, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Does She goes to school?",
+      "answers": [
+        "Does She go to school?"
+      ],
+      "explanation": "Sau Does, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He watches TV.",
+        "He like apples.",
+        "I cook dinner.",
+        "I like apples."
+      ],
+      "answer": "He like apples.",
+      "explanation": "He đi với động từ thêm -s (likes)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He like apples.",
+      "answers": [
+        "He likes apples."
+      ],
+      "explanation": "He đi với động từ thêm -s (likes)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He goes to school.",
+        "I help mother.",
+        "I likes apples.",
+        "We don't help mother."
+      ],
+      "answer": "I likes apples.",
+      "explanation": "I đi với động từ nguyên thể (like)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I likes apples.",
+      "answers": [
+        "I like apples."
+      ],
+      "explanation": "I đi với động từ nguyên thể (like)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They don't play football.",
+        "She don't watch TV.",
+        "We don't go to school.",
+        "They don't read a book."
+      ],
+      "answer": "She don't watch TV.",
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She don't watch TV.",
+      "answers": [
+        "She doesn't watch TV."
+      ],
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He cooks dinner.",
+        "He doesn't go to school.",
+        "Does He eat breakfast?",
+        "She doesn't watches TV."
+      ],
+      "answer": "She doesn't watches TV.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She doesn't watches TV.",
+      "answers": [
+        "She doesn't watch TV."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I watch TV.",
+        "He loves music.",
+        "He reads a book.",
+        "They doesn't watch TV."
+      ],
+      "answer": "They doesn't watch TV.",
+      "explanation": "They đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They doesn't watch TV.",
+      "answers": [
+        "They don't watch TV."
+      ],
+      "explanation": "They đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I read a book.",
+        "Does She watches TV?",
+        "We don't play football.",
+        "We don't go to school."
+      ],
+      "answer": "Does She watches TV?",
+      "explanation": "Sau Does, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Does She watches TV?",
+      "answers": [
+        "Does She watch TV?"
+      ],
+      "explanation": "Sau Does, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "We don't play football.",
+        "I go to school.",
+        "He doesn't watch TV.",
+        "He love music."
+      ],
+      "answer": "He love music.",
+      "explanation": "He đi với động từ thêm -s (loves)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He love music.",
+      "answers": [
+        "He loves music."
+      ],
+      "explanation": "He đi với động từ thêm -s (loves)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I loves music.",
+        "He helps mother.",
+        "He doesn't read a book.",
+        "Does She watch TV?"
+      ],
+      "answer": "I loves music.",
+      "explanation": "I đi với động từ nguyên thể (love)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I loves music.",
+      "answers": [
+        "I love music."
+      ],
+      "explanation": "I đi với động từ nguyên thể (love)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She don't play football.",
+        "We don't play football.",
+        "She doesn't read a book.",
+        "They don't read a book."
+      ],
+      "answer": "She don't play football.",
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She don't play football.",
+      "answers": [
+        "She doesn't play football."
+      ],
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He doesn't go to school.",
+        "She doesn't plays football.",
+        "We don't help mother.",
+        "He plays football."
+      ],
+      "answer": "She doesn't plays football.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She doesn't plays football.",
+      "answers": [
+        "She doesn't play football."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "They don't watch TV.",
+        "He watches TV.",
+        "Does He watch TV?",
+        "They doesn't play football."
+      ],
+      "answer": "They doesn't play football.",
+      "explanation": "They đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They doesn't play football.",
+      "answers": [
+        "They don't play football."
+      ],
+      "explanation": "They đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Does He watch TV?",
+        "I watch TV.",
+        "He reads a book.",
+        "Does She plays football?"
+      ],
+      "answer": "Does She plays football?",
+      "explanation": "Sau Does, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Does She plays football?",
+      "answers": [
+        "Does She play football?"
+      ],
+      "explanation": "Sau Does, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I eat breakfast.",
+        "I study English.",
+        "He study English.",
+        "He eats breakfast."
+      ],
+      "answer": "He study English.",
+      "explanation": "He đi với động từ thêm -s (studies)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He study English.",
+      "answers": [
+        "He studies English."
+      ],
+      "explanation": "He đi với động từ thêm -s (studies)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He watches TV.",
+        "I studies English.",
+        "He loves music.",
+        "He goes to school."
+      ],
+      "answer": "I studies English.",
+      "explanation": "I đi với động từ nguyên thể (study)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I studies English.",
+      "answers": [
+        "I study English."
+      ],
+      "explanation": "I đi với động từ nguyên thể (study)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He cooks dinner.",
+        "I eat breakfast.",
+        "We don't watch TV.",
+        "She don't read a book."
+      ],
+      "answer": "She don't read a book.",
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She don't read a book.",
+      "answers": [
+        "She doesn't read a book."
+      ],
+      "explanation": "She đi với doesn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He loves music.",
+        "She doesn't reads a book.",
+        "Does She watch TV?",
+        "He watches TV."
+      ],
+      "answer": "She doesn't reads a book.",
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (read)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She doesn't reads a book.",
+      "answers": [
+        "She doesn't read a book."
+      ],
+      "explanation": "Sau doesn't, động từ giữ nguyên thể (read)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Does She play football?",
+        "I help mother.",
+        "They doesn't read a book.",
+        "I read a book."
+      ],
+      "answer": "They doesn't read a book.",
+      "explanation": "They đi với don't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "They doesn't read a book.",
+      "answers": [
+        "They don't read a book."
+      ],
+      "explanation": "They đi với don't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I help mother.",
+        "He watches TV.",
+        "He likes apples.",
+        "Does She reads a book?"
+      ],
+      "answer": "Does She reads a book?",
+      "explanation": "Sau Does, động từ giữ nguyên thể (read)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Does She reads a book?",
+      "answers": [
+        "Does She read a book?"
+      ],
+      "explanation": "Sau Does, động từ giữ nguyên thể (read)."
+    }
+  ],
+  "present-continuous": [
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I is playing football.",
+        "I am not reading a book.",
+        "Lan isn't reading a book.",
+        "I am swimming in the pool."
+      ],
+      "answer": "I is playing football.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is playing football.",
+      "answers": [
+        "I am playing football."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am play football.",
+        "Lan isn't playing football.",
+        "He is reading a book.",
+        "Lan isn't reading a book."
+      ],
+      "answer": "I am play football.",
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (playing, không phải play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I am play football.",
+      "answers": [
+        "I am playing football."
+      ],
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (playing, không phải play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am reading a book.",
+        "He is playing football.",
+        "I playing football.",
+        "He is reading a book."
+      ],
+      "answer": "I playing football.",
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I playing football.",
+      "answers": [
+        "I am playing football."
+      ],
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan isn't playing football.",
+        "He isn't eating breakfast.",
+        "I is not playing football.",
+        "She isn't singing a song."
+      ],
+      "answer": "I is not playing football.",
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is not playing football.",
+      "answers": [
+        "I am not playing football."
+      ],
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am not singing a song.",
+        "I is reading a book.",
+        "I am swimming in the pool.",
+        "I am cooking dinner."
+      ],
+      "answer": "I is reading a book.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is reading a book.",
+      "answers": [
+        "I am reading a book."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is swimming in the pool.",
+        "I am drawing a picture.",
+        "He isn't eating breakfast.",
+        "I am read a book."
+      ],
+      "answer": "I am read a book.",
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (reading, không phải read)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I am read a book.",
+      "answers": [
+        "I am reading a book."
+      ],
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (reading, không phải read)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He isn't eating breakfast.",
+        "I reading a book.",
+        "He is singing a song.",
+        "He isn't singing a song."
+      ],
+      "answer": "I reading a book.",
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I reading a book.",
+      "answers": [
+        "I am reading a book."
+      ],
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't eating breakfast.",
+        "I am cooking dinner.",
+        "I is not reading a book.",
+        "I am reading a book."
+      ],
+      "answer": "I is not reading a book.",
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is not reading a book.",
+      "answers": [
+        "I am not reading a book."
+      ],
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am not reading a book.",
+        "I is eating breakfast.",
+        "She isn't reading a book.",
+        "I am cooking dinner."
+      ],
+      "answer": "I is eating breakfast.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is eating breakfast.",
+      "answers": [
+        "I am eating breakfast."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am eat breakfast.",
+        "I am drawing a picture.",
+        "He isn't reading a book.",
+        "He isn't singing a song."
+      ],
+      "answer": "I am eat breakfast.",
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (eating, không phải eat)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I am eat breakfast.",
+      "answers": [
+        "I am eating breakfast."
+      ],
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (eating, không phải eat)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is eating breakfast.",
+        "Lan isn't eating breakfast.",
+        "I eating breakfast.",
+        "Lan isn't playing football."
+      ],
+      "answer": "I eating breakfast.",
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I eating breakfast.",
+      "answers": [
+        "I am eating breakfast."
+      ],
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I is not eating breakfast.",
+        "He is swimming in the pool.",
+        "I am drawing a picture.",
+        "I am not reading a book."
+      ],
+      "answer": "I is not eating breakfast.",
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is not eating breakfast.",
+      "answers": [
+        "I am not eating breakfast."
+      ],
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He isn't reading a book.",
+        "I is singing a song.",
+        "He is swimming in the pool.",
+        "I am reading a book."
+      ],
+      "answer": "I is singing a song.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is singing a song.",
+      "answers": [
+        "I am singing a song."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He isn't reading a book.",
+        "She isn't reading a book.",
+        "I am sing a song.",
+        "I am not playing football."
+      ],
+      "answer": "I am sing a song.",
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (singing, không phải sing)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I am sing a song.",
+      "answers": [
+        "I am singing a song."
+      ],
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (singing, không phải sing)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am swimming in the pool.",
+        "I am reading a book.",
+        "He is reading a book.",
+        "I singing a song."
+      ],
+      "answer": "I singing a song.",
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I singing a song.",
+      "answers": [
+        "I am singing a song."
+      ],
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He isn't reading a book.",
+        "She isn't singing a song.",
+        "I is not singing a song.",
+        "I am reading a book."
+      ],
+      "answer": "I is not singing a song.",
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is not singing a song.",
+      "answers": [
+        "I am not singing a song."
+      ],
+      "explanation": "I đi với am not."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I is swimming in the pool.",
+        "I am not playing football.",
+        "He isn't playing football.",
+        "I am eating breakfast."
+      ],
+      "answer": "I is swimming in the pool.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is swimming in the pool.",
+      "answers": [
+        "I am swimming in the pool."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't playing football.",
+        "I am reading a book.",
+        "Lan isn't reading a book.",
+        "I am swim in the pool."
+      ],
+      "answer": "I am swim in the pool.",
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (swimming, không phải swim)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I am swim in the pool.",
+      "answers": [
+        "I am swimming in the pool."
+      ],
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (swimming, không phải swim)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I swimming in the pool.",
+        "She isn't singing a song.",
+        "He is drawing a picture.",
+        "He is eating breakfast."
+      ],
+      "answer": "I swimming in the pool.",
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I swimming in the pool.",
+      "answers": [
+        "I am swimming in the pool."
+      ],
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He aren't playing football.",
+        "I am not playing football.",
+        "I am not singing a song.",
+        "I am eating breakfast."
+      ],
+      "answer": "He aren't playing football.",
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He aren't playing football.",
+      "answers": [
+        "He isn't playing football."
+      ],
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't singing a song.",
+        "He is singing a song.",
+        "I is drawing a picture.",
+        "She isn't playing football."
+      ],
+      "answer": "I is drawing a picture.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is drawing a picture.",
+      "answers": [
+        "I am drawing a picture."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am draw a picture.",
+        "I am reading a book.",
+        "She isn't reading a book.",
+        "He is eating breakfast."
+      ],
+      "answer": "I am draw a picture.",
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (drawing, không phải draw)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I am draw a picture.",
+      "answers": [
+        "I am drawing a picture."
+      ],
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (drawing, không phải draw)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is eating breakfast.",
+        "He is reading a book.",
+        "I drawing a picture.",
+        "I am singing a song."
+      ],
+      "answer": "I drawing a picture.",
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I drawing a picture.",
+      "answers": [
+        "I am drawing a picture."
+      ],
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't playing football.",
+        "He is playing football.",
+        "He aren't reading a book.",
+        "Lan isn't playing football."
+      ],
+      "answer": "He aren't reading a book.",
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He aren't reading a book.",
+      "answers": [
+        "He isn't reading a book."
+      ],
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He isn't playing football.",
+        "I is watching TV.",
+        "I am cooking dinner.",
+        "She isn't eating breakfast."
+      ],
+      "answer": "I is watching TV.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is watching TV.",
+      "answers": [
+        "I am watching TV."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He isn't playing football.",
+        "I am watch TV.",
+        "He is swimming in the pool.",
+        "I am not singing a song."
+      ],
+      "answer": "I am watch TV.",
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (watching, không phải watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I am watch TV.",
+      "answers": [
+        "I am watching TV."
+      ],
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (watching, không phải watch)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I watching TV.",
+        "He isn't singing a song.",
+        "He is eating breakfast.",
+        "He is singing a song."
+      ],
+      "answer": "I watching TV.",
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I watching TV.",
+      "answers": [
+        "I am watching TV."
+      ],
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He aren't eating breakfast.",
+        "I am reading a book.",
+        "I am swimming in the pool.",
+        "She isn't eating breakfast."
+      ],
+      "answer": "He aren't eating breakfast.",
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He aren't eating breakfast.",
+      "answers": [
+        "He isn't eating breakfast."
+      ],
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is reading a book.",
+        "I is cooking dinner.",
+        "I am not singing a song.",
+        "He is singing a song."
+      ],
+      "answer": "I is cooking dinner.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is cooking dinner.",
+      "answers": [
+        "I am cooking dinner."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is playing football.",
+        "I am cook dinner.",
+        "He isn't reading a book.",
+        "I am not reading a book."
+      ],
+      "answer": "I am cook dinner.",
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (cooking, không phải cook)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I am cook dinner.",
+      "answers": [
+        "I am cooking dinner."
+      ],
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (cooking, không phải cook)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is eating breakfast.",
+        "I cooking dinner.",
+        "I am playing football.",
+        "I am not eating breakfast."
+      ],
+      "answer": "I cooking dinner.",
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I cooking dinner.",
+      "answers": [
+        "I am cooking dinner."
+      ],
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He aren't singing a song.",
+        "He isn't eating breakfast.",
+        "He is reading a book.",
+        "He is swimming in the pool."
+      ],
+      "answer": "He aren't singing a song.",
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He aren't singing a song.",
+      "answers": [
+        "He isn't singing a song."
+      ],
+      "explanation": "He đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am watching TV.",
+        "He isn't singing a song.",
+        "I am not reading a book.",
+        "He are playing football."
+      ],
+      "answer": "He are playing football.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are playing football.",
+      "answers": [
+        "He is playing football."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am cooking dinner.",
+        "He is play football.",
+        "He is drawing a picture.",
+        "I am drawing a picture."
+      ],
+      "answer": "He is play football.",
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (playing, không phải play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He is play football.",
+      "answers": [
+        "He is playing football."
+      ],
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (playing, không phải play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am drawing a picture.",
+        "I am not playing football.",
+        "He playing football.",
+        "I am not eating breakfast."
+      ],
+      "answer": "He playing football.",
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He playing football.",
+      "answers": [
+        "He is playing football."
+      ],
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am not reading a book.",
+        "She aren't playing football.",
+        "I am not singing a song.",
+        "He is watching TV."
+      ],
+      "answer": "She aren't playing football.",
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She aren't playing football.",
+      "answers": [
+        "She isn't playing football."
+      ],
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan isn't eating breakfast.",
+        "I am reading a book.",
+        "She isn't reading a book.",
+        "He are reading a book."
+      ],
+      "answer": "He are reading a book.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are reading a book.",
+      "answers": [
+        "He is reading a book."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am not singing a song.",
+        "He is read a book.",
+        "He is swimming in the pool.",
+        "I am swimming in the pool."
+      ],
+      "answer": "He is read a book.",
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (reading, không phải read)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He is read a book.",
+      "answers": [
+        "He is reading a book."
+      ],
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (reading, không phải read)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan isn't reading a book.",
+        "I am reading a book.",
+        "He reading a book.",
+        "He isn't reading a book."
+      ],
+      "answer": "He reading a book.",
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He reading a book.",
+      "answers": [
+        "He is reading a book."
+      ],
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She aren't reading a book.",
+        "I am swimming in the pool.",
+        "I am eating breakfast.",
+        "He is reading a book."
+      ],
+      "answer": "She aren't reading a book.",
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She aren't reading a book.",
+      "answers": [
+        "She isn't reading a book."
+      ],
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am singing a song.",
+        "I am not reading a book.",
+        "He are eating breakfast.",
+        "She isn't eating breakfast."
+      ],
+      "answer": "He are eating breakfast.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are eating breakfast.",
+      "answers": [
+        "He is eating breakfast."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am cooking dinner.",
+        "He is watching TV.",
+        "I am playing football.",
+        "He is eat breakfast."
+      ],
+      "answer": "He is eat breakfast.",
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (eating, không phải eat)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He is eat breakfast.",
+      "answers": [
+        "He is eating breakfast."
+      ],
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (eating, không phải eat)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She isn't reading a book.",
+        "She isn't singing a song.",
+        "He is singing a song.",
+        "He eating breakfast."
+      ],
+      "answer": "He eating breakfast.",
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He eating breakfast.",
+      "answers": [
+        "He is eating breakfast."
+      ],
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She aren't eating breakfast.",
+        "He is singing a song.",
+        "He isn't playing football.",
+        "He is swimming in the pool."
+      ],
+      "answer": "She aren't eating breakfast.",
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She aren't eating breakfast.",
+      "answers": [
+        "She isn't eating breakfast."
+      ],
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is watching TV.",
+        "I am not eating breakfast.",
+        "He are singing a song.",
+        "He is reading a book."
+      ],
+      "answer": "He are singing a song.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are singing a song.",
+      "answers": [
+        "He is singing a song."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am singing a song.",
+        "Lan isn't eating breakfast.",
+        "Lan isn't reading a book.",
+        "He is sing a song."
+      ],
+      "answer": "He is sing a song.",
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (singing, không phải sing)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He is sing a song.",
+      "answers": [
+        "He is singing a song."
+      ],
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (singing, không phải sing)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am not singing a song.",
+        "He singing a song.",
+        "He is reading a book.",
+        "He is swimming in the pool."
+      ],
+      "answer": "He singing a song.",
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He singing a song.",
+      "answers": [
+        "He is singing a song."
+      ],
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He isn't playing football.",
+        "He is playing football.",
+        "She aren't singing a song.",
+        "I am not eating breakfast."
+      ],
+      "answer": "She aren't singing a song.",
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She aren't singing a song.",
+      "answers": [
+        "She isn't singing a song."
+      ],
+      "explanation": "She đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He are swimming in the pool.",
+        "Lan isn't eating breakfast.",
+        "She isn't reading a book.",
+        "Lan isn't reading a book."
+      ],
+      "answer": "He are swimming in the pool.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are swimming in the pool.",
+      "answers": [
+        "He is swimming in the pool."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am not reading a book.",
+        "I am singing a song.",
+        "He is swim in the pool.",
+        "She isn't singing a song."
+      ],
+      "answer": "He is swim in the pool.",
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (swimming, không phải swim)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He is swim in the pool.",
+      "answers": [
+        "He is swimming in the pool."
+      ],
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (swimming, không phải swim)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am watching TV.",
+        "I am singing a song.",
+        "Lan isn't playing football.",
+        "He swimming in the pool."
+      ],
+      "answer": "He swimming in the pool.",
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He swimming in the pool.",
+      "answers": [
+        "He is swimming in the pool."
+      ],
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am playing football.",
+        "He isn't eating breakfast.",
+        "Lan aren't playing football.",
+        "I am reading a book."
+      ],
+      "answer": "Lan aren't playing football.",
+      "explanation": "Lan đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan aren't playing football.",
+      "answers": [
+        "Lan isn't playing football."
+      ],
+      "explanation": "Lan đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He are drawing a picture.",
+        "He isn't playing football.",
+        "I am cooking dinner.",
+        "I am drawing a picture."
+      ],
+      "answer": "He are drawing a picture.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are drawing a picture.",
+      "answers": [
+        "He is drawing a picture."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is draw a picture.",
+        "I am not singing a song.",
+        "Lan isn't reading a book.",
+        "He is reading a book."
+      ],
+      "answer": "He is draw a picture.",
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (drawing, không phải draw)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He is draw a picture.",
+      "answers": [
+        "He is drawing a picture."
+      ],
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (drawing, không phải draw)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am not singing a song.",
+        "He drawing a picture.",
+        "He isn't playing football.",
+        "He is singing a song."
+      ],
+      "answer": "He drawing a picture.",
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He drawing a picture.",
+      "answers": [
+        "He is drawing a picture."
+      ],
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is drawing a picture.",
+        "He isn't singing a song.",
+        "I am cooking dinner.",
+        "Lan aren't reading a book."
+      ],
+      "answer": "Lan aren't reading a book.",
+      "explanation": "Lan đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan aren't reading a book.",
+      "answers": [
+        "Lan isn't reading a book."
+      ],
+      "explanation": "Lan đi với isn't."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is playing football.",
+        "He is drawing a picture.",
+        "I am drawing a picture.",
+        "He are watching TV."
+      ],
+      "answer": "He are watching TV.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are watching TV.",
+      "answers": [
+        "He is watching TV."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is watch TV.",
+        "She isn't eating breakfast.",
+        "He isn't playing football.",
+        "He is eating breakfast."
+      ],
+      "answer": "He is watch TV.",
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (watching, không phải watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He is watch TV.",
+      "answers": [
+        "He is watching TV."
+      ],
+      "explanation": "Hiện tại tiếp diễn: be + V-ing (watching, không phải watch)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am cooking dinner.",
+        "He watching TV.",
+        "He isn't eating breakfast.",
+        "He is playing football."
+      ],
+      "answer": "He watching TV.",
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He watching TV.",
+      "answers": [
+        "He is watching TV."
+      ],
+      "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am singing a song.",
+        "She isn't eating breakfast.",
+        "She isn't singing a song.",
+        "Lan aren't eating breakfast."
+      ],
+      "answer": "Lan aren't eating breakfast.",
+      "explanation": "Lan đi với isn't."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan aren't eating breakfast.",
+      "answers": [
+        "Lan isn't eating breakfast."
+      ],
+      "explanation": "Lan đi với isn't."
+    }
+  ],
+  "past-regular": [
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He called a friend last night.",
+        "She didn't cook dinner.",
+        "He didn't clean the room.",
+        "I play football yesterday."
+      ],
+      "answer": "I play football yesterday.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (played)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I play football yesterday.",
+      "answers": [
+        "I played football yesterday."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (played)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I didn't played football.",
+        "He cooked dinner yesterday.",
+        "He visited grandma yesterday.",
+        "He walked to school yesterday."
+      ],
+      "answer": "I didn't played football.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I didn't played football.",
+      "answers": [
+        "I didn't play football."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He walked to school yesterday.",
+        "I didn't play football.",
+        "Did I played football?",
+        "I studied English last week."
+      ],
+      "answer": "Did I played football?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did I played football?",
+      "answers": [
+        "Did I play football?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He watched TV last night.",
+        "Did Lan play football?",
+        "I watch TV last night.",
+        "He didn't cook dinner."
+      ],
+      "answer": "I watch TV last night.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (watched)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I watch TV last night.",
+      "answers": [
+        "I watched TV last night."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (watched)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I didn't watched TV.",
+        "She didn't clean the room.",
+        "Did I help mother?",
+        "I called a friend last night."
+      ],
+      "answer": "I didn't watched TV.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I didn't watched TV.",
+      "answers": [
+        "I didn't watch TV."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did She watch TV?",
+        "Did I watched TV?",
+        "Did I clean the room?",
+        "Did He wash hands?"
+      ],
+      "answer": "Did I watched TV?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did I watched TV?",
+      "answers": [
+        "Did I watch TV?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He washed hands last week.",
+        "I helped mother last night.",
+        "I clean the room last week.",
+        "Did He play football?"
+      ],
+      "answer": "I clean the room last week.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (cleaned)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I clean the room last week.",
+      "answers": [
+        "I cleaned the room last week."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (cleaned)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He visited grandma yesterday.",
+        "Did He cook dinner?",
+        "I didn't cleaned the room.",
+        "Lan didn't watch TV."
+      ],
+      "answer": "I didn't cleaned the room.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (clean)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I didn't cleaned the room.",
+      "answers": [
+        "I didn't clean the room."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (clean)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She didn't cook dinner.",
+        "Did I cleaned the room?",
+        "He called a friend last night.",
+        "He washed hands last week."
+      ],
+      "answer": "Did I cleaned the room?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (clean)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did I cleaned the room?",
+      "answers": [
+        "Did I clean the room?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (clean)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did He wash hands?",
+        "Did She play football?",
+        "He didn't play football.",
+        "I cook dinner yesterday."
+      ],
+      "answer": "I cook dinner yesterday.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (cooked)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I cook dinner yesterday.",
+      "answers": [
+        "I cooked dinner yesterday."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (cooked)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I studied English last week.",
+        "I didn't cooked dinner.",
+        "She didn't wash hands.",
+        "Did He play football?"
+      ],
+      "answer": "I didn't cooked dinner.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (cook)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I didn't cooked dinner.",
+      "answers": [
+        "I didn't cook dinner."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (cook)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I didn't wash hands.",
+        "Did I clean the room?",
+        "Did I cooked dinner?",
+        "I cooked dinner yesterday."
+      ],
+      "answer": "Did I cooked dinner?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (cook)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did I cooked dinner?",
+      "answers": [
+        "Did I cook dinner?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (cook)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I help mother last night.",
+        "Did She watch TV?",
+        "He played football yesterday.",
+        "She didn't wash hands."
+      ],
+      "answer": "I help mother last night.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (helped)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I help mother last night.",
+      "answers": [
+        "I helped mother last night."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (helped)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I didn't wash hands.",
+        "Lan didn't watch TV.",
+        "I didn't helped mother.",
+        "I cooked dinner yesterday."
+      ],
+      "answer": "I didn't helped mother.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I didn't helped mother.",
+      "answers": [
+        "I didn't help mother."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did I helped mother?",
+        "He cleaned the room last week.",
+        "Lan didn't watch TV.",
+        "Did I play football?"
+      ],
+      "answer": "Did I helped mother?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did I helped mother?",
+      "answers": [
+        "Did I help mother?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I helped mother last night.",
+        "Did She wash hands?",
+        "He walked to school yesterday.",
+        "I wash hands last week."
+      ],
+      "answer": "I wash hands last week.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (washed)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I wash hands last week.",
+      "answers": [
+        "I washed hands last week."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (washed)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I didn't washed hands.",
+        "He played football yesterday.",
+        "Did I watch TV?",
+        "Did She play football?"
+      ],
+      "answer": "I didn't washed hands.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (wash)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I didn't washed hands.",
+      "answers": [
+        "I didn't wash hands."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (wash)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did I help mother?",
+        "I didn't clean the room.",
+        "Did I washed hands?",
+        "Did He play football?"
+      ],
+      "answer": "Did I washed hands?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (wash)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did I washed hands?",
+      "answers": [
+        "Did I wash hands?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (wash)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did He clean the room?",
+        "Did She watch TV?",
+        "I visit grandma yesterday.",
+        "He walked to school yesterday."
+      ],
+      "answer": "I visit grandma yesterday.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (visited)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I visit grandma yesterday.",
+      "answers": [
+        "I visited grandma yesterday."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (visited)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He didn't played football.",
+        "Did She clean the room?",
+        "She didn't play football.",
+        "I didn't play football."
+      ],
+      "answer": "He didn't played football.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He didn't played football.",
+      "answers": [
+        "He didn't play football."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did He played football?",
+        "I washed hands last week.",
+        "Did I wash hands?",
+        "He visited grandma yesterday."
+      ],
+      "answer": "Did He played football?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did He played football?",
+      "answers": [
+        "Did He play football?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I call a friend last night.",
+        "I didn't wash hands.",
+        "Did She clean the room?",
+        "I played football yesterday."
+      ],
+      "answer": "I call a friend last night.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (called)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I call a friend last night.",
+      "answers": [
+        "I called a friend last night."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (called)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He didn't watched TV.",
+        "Did He clean the room?",
+        "He helped mother last night.",
+        "I didn't play football."
+      ],
+      "answer": "He didn't watched TV.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He didn't watched TV.",
+      "answers": [
+        "He didn't watch TV."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He didn't help mother.",
+        "Did Lan watch TV?",
+        "Did He watched TV?",
+        "Did He help mother?"
+      ],
+      "answer": "Did He watched TV?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did He watched TV?",
+      "answers": [
+        "Did He watch TV?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I study English last week.",
+        "He cooked dinner yesterday.",
+        "Did I cook dinner?",
+        "He didn't cook dinner."
+      ],
+      "answer": "I study English last week.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (studied)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I study English last week.",
+      "answers": [
+        "I studied English last week."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (studied)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She didn't cook dinner.",
+        "Did I clean the room?",
+        "He didn't cleaned the room.",
+        "Did She clean the room?"
+      ],
+      "answer": "He didn't cleaned the room.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (clean)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He didn't cleaned the room.",
+      "answers": [
+        "He didn't clean the room."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (clean)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did She cook dinner?",
+        "I didn't help mother.",
+        "Did He cleaned the room?",
+        "Did I watch TV?"
+      ],
+      "answer": "Did He cleaned the room?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (clean)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did He cleaned the room?",
+      "answers": [
+        "Did He clean the room?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (clean)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did She help mother?",
+        "I walk to school yesterday.",
+        "Did He cook dinner?",
+        "Lan didn't play football."
+      ],
+      "answer": "I walk to school yesterday.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (walked)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I walk to school yesterday.",
+      "answers": [
+        "I walked to school yesterday."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (walked)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I didn't play football.",
+        "She didn't play football.",
+        "I cleaned the room last week.",
+        "He didn't cooked dinner."
+      ],
+      "answer": "He didn't cooked dinner.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (cook)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He didn't cooked dinner.",
+      "answers": [
+        "He didn't cook dinner."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (cook)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He didn't wash hands.",
+        "Did He cooked dinner?",
+        "I didn't cook dinner.",
+        "He cooked dinner yesterday."
+      ],
+      "answer": "Did He cooked dinner?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (cook)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did He cooked dinner?",
+      "answers": [
+        "Did He cook dinner?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (cook)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He play football yesterday.",
+        "She didn't wash hands.",
+        "Did He play football?",
+        "Did He help mother?"
+      ],
+      "answer": "He play football yesterday.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (played)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He play football yesterday.",
+      "answers": [
+        "He played football yesterday."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (played)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I helped mother last night.",
+        "I cooked dinner yesterday.",
+        "He didn't helped mother.",
+        "Did I help mother?"
+      ],
+      "answer": "He didn't helped mother.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He didn't helped mother.",
+      "answers": [
+        "He didn't help mother."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She didn't clean the room.",
+        "Did He helped mother?",
+        "I didn't watch TV.",
+        "I studied English last week."
+      ],
+      "answer": "Did He helped mother?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did He helped mother?",
+      "answers": [
+        "Did He help mother?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He watch TV last night.",
+        "Did I play football?",
+        "He visited grandma yesterday.",
+        "Did She clean the room?"
+      ],
+      "answer": "He watch TV last night.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (watched)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He watch TV last night.",
+      "answers": [
+        "He watched TV last night."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (watched)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did He cook dinner?",
+        "He washed hands last week.",
+        "He didn't washed hands.",
+        "Did Lan play football?"
+      ],
+      "answer": "He didn't washed hands.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (wash)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He didn't washed hands.",
+      "answers": [
+        "He didn't wash hands."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (wash)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He walked to school yesterday.",
+        "I called a friend last night.",
+        "He studied English last week.",
+        "Did He washed hands?"
+      ],
+      "answer": "Did He washed hands?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (wash)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did He washed hands?",
+      "answers": [
+        "Did He wash hands?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (wash)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She didn't play football.",
+        "He clean the room last week.",
+        "I watched TV last night.",
+        "Did He watch TV?"
+      ],
+      "answer": "He clean the room last week.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (cleaned)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He clean the room last week.",
+      "answers": [
+        "He cleaned the room last week."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (cleaned)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did He cook dinner?",
+        "He cleaned the room last week.",
+        "She didn't played football.",
+        "I visited grandma yesterday."
+      ],
+      "answer": "She didn't played football.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She didn't played football.",
+      "answers": [
+        "She didn't play football."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I helped mother last night.",
+        "Did She played football?",
+        "She didn't watch TV.",
+        "Did She clean the room?"
+      ],
+      "answer": "Did She played football?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did She played football?",
+      "answers": [
+        "Did She play football?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He cook dinner yesterday.",
+        "I called a friend last night.",
+        "Did He play football?",
+        "I didn't help mother."
+      ],
+      "answer": "He cook dinner yesterday.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (cooked)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He cook dinner yesterday.",
+      "answers": [
+        "He cooked dinner yesterday."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (cooked)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He called a friend last night.",
+        "Did She help mother?",
+        "He cleaned the room last week.",
+        "She didn't watched TV."
+      ],
+      "answer": "She didn't watched TV.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She didn't watched TV.",
+      "answers": [
+        "She didn't watch TV."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did She watched TV?",
+        "He watched TV last night.",
+        "He called a friend last night.",
+        "He cleaned the room last week."
+      ],
+      "answer": "Did She watched TV?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did She watched TV?",
+      "answers": [
+        "Did She watch TV?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He help mother last night.",
+        "I didn't cook dinner.",
+        "I cleaned the room last week.",
+        "She didn't help mother."
+      ],
+      "answer": "He help mother last night.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (helped)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He help mother last night.",
+      "answers": [
+        "He helped mother last night."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (helped)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I visited grandma yesterday.",
+        "I helped mother last night.",
+        "Did He help mother?",
+        "She didn't cleaned the room."
+      ],
+      "answer": "She didn't cleaned the room.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (clean)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She didn't cleaned the room.",
+      "answers": [
+        "She didn't clean the room."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (clean)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He visited grandma yesterday.",
+        "He didn't cook dinner.",
+        "He washed hands last week.",
+        "Did She cleaned the room?"
+      ],
+      "answer": "Did She cleaned the room?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (clean)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did She cleaned the room?",
+      "answers": [
+        "Did She clean the room?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (clean)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He wash hands last week.",
+        "He helped mother last night.",
+        "Did I help mother?",
+        "I cooked dinner yesterday."
+      ],
+      "answer": "He wash hands last week.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (washed)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He wash hands last week.",
+      "answers": [
+        "He washed hands last week."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (washed)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He watched TV last night.",
+        "She didn't cooked dinner.",
+        "Did I cook dinner?",
+        "Did He help mother?"
+      ],
+      "answer": "She didn't cooked dinner.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (cook)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She didn't cooked dinner.",
+      "answers": [
+        "She didn't cook dinner."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (cook)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did I play football?",
+        "Lan didn't play football.",
+        "Did She cooked dinner?",
+        "I didn't help mother."
+      ],
+      "answer": "Did She cooked dinner?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (cook)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did She cooked dinner?",
+      "answers": [
+        "Did She cook dinner?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (cook)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He called a friend last night.",
+        "Did He wash hands?",
+        "Did She watch TV?",
+        "He visit grandma yesterday."
+      ],
+      "answer": "He visit grandma yesterday.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (visited)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He visit grandma yesterday.",
+      "answers": [
+        "He visited grandma yesterday."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (visited)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She didn't helped mother.",
+        "She didn't play football.",
+        "I didn't play football.",
+        "I helped mother last night."
+      ],
+      "answer": "She didn't helped mother.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She didn't helped mother.",
+      "answers": [
+        "She didn't help mother."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did He play football?",
+        "He cleaned the room last week.",
+        "He cooked dinner yesterday.",
+        "Did She helped mother?"
+      ],
+      "answer": "Did She helped mother?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did She helped mother?",
+      "answers": [
+        "Did She help mother?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He didn't help mother.",
+        "Did She play football?",
+        "He call a friend last night.",
+        "Did He help mother?"
+      ],
+      "answer": "He call a friend last night.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (called)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He call a friend last night.",
+      "answers": [
+        "He called a friend last night."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (called)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He played football yesterday.",
+        "Lan didn't watch TV.",
+        "I didn't help mother.",
+        "She didn't washed hands."
+      ],
+      "answer": "She didn't washed hands.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (wash)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She didn't washed hands.",
+      "answers": [
+        "She didn't wash hands."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (wash)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did She washed hands?",
+        "Did I cook dinner?",
+        "I didn't play football.",
+        "She didn't help mother."
+      ],
+      "answer": "Did She washed hands?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (wash)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did She washed hands?",
+      "answers": [
+        "Did She wash hands?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (wash)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did I cook dinner?",
+        "She didn't cook dinner.",
+        "He study English last week.",
+        "I played football yesterday."
+      ],
+      "answer": "He study English last week.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (studied)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He study English last week.",
+      "answers": [
+        "He studied English last week."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (studied)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I cleaned the room last week.",
+        "She didn't cook dinner.",
+        "Did I help mother?",
+        "Lan didn't played football."
+      ],
+      "answer": "Lan didn't played football.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan didn't played football.",
+      "answers": [
+        "Lan didn't play football."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did I help mother?",
+        "He didn't cook dinner.",
+        "Did She help mother?",
+        "Did Lan played football?"
+      ],
+      "answer": "Did Lan played football?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did Lan played football?",
+      "answers": [
+        "Did Lan play football?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I played football yesterday.",
+        "He walk to school yesterday.",
+        "Did He wash hands?",
+        "I watched TV last night."
+      ],
+      "answer": "He walk to school yesterday.",
+      "explanation": "Quá khứ đơn: động từ thêm -ed (walked)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He walk to school yesterday.",
+      "answers": [
+        "He walked to school yesterday."
+      ],
+      "explanation": "Quá khứ đơn: động từ thêm -ed (walked)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He cleaned the room last week.",
+        "I called a friend last night.",
+        "I helped mother last night.",
+        "Lan didn't watched TV."
+      ],
+      "answer": "Lan didn't watched TV.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan didn't watched TV.",
+      "answers": [
+        "Lan didn't watch TV."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did Lan watched TV?",
+        "He walked to school yesterday.",
+        "He cooked dinner yesterday.",
+        "I didn't play football."
+      ],
+      "answer": "Did Lan watched TV?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (watch)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did Lan watched TV?",
+      "answers": [
+        "Did Lan watch TV?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (watch)."
+    }
+  ],
+  "past-irregular": [
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She didn't go to school.",
+        "I found a ball yesterday.",
+        "He ate rice yesterday.",
+        "I goed to school yesterday."
+      ],
+      "answer": "I goed to school yesterday.",
+      "explanation": "Quá khứ của go là went, không phải goed."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I goed to school yesterday.",
+      "answers": [
+        "I went to school yesterday."
+      ],
+      "explanation": "Quá khứ của go là went, không phải goed."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I didn't went to school.",
+        "I went to school yesterday.",
+        "He made a cake yesterday.",
+        "I took a pen yesterday."
+      ],
+      "answer": "I didn't went to school.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I didn't went to school.",
+      "answers": [
+        "I didn't go to school."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She didn't go to school.",
+        "I saw a bird yesterday.",
+        "I took a pen yesterday.",
+        "Did I went to school?"
+      ],
+      "answer": "Did I went to school?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did I went to school?",
+      "answers": [
+        "Did I go to school?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I buyed a book yesterday.",
+        "I didn't eat rice.",
+        "Did He take a pen?",
+        "Did I eat rice?"
+      ],
+      "answer": "I buyed a book yesterday.",
+      "explanation": "Quá khứ của buy là bought, không phải buyed."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I buyed a book yesterday.",
+      "answers": [
+        "I bought a book yesterday."
+      ],
+      "explanation": "Quá khứ của buy là bought, không phải buyed."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He didn't eat rice.",
+        "Did I give me a pen?",
+        "I didn't bought a book.",
+        "He ate rice yesterday."
+      ],
+      "answer": "I didn't bought a book.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (buy)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I didn't bought a book.",
+      "answers": [
+        "I didn't buy a book."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (buy)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did I bought a book?",
+        "He didn't make a cake.",
+        "I went to school yesterday.",
+        "I drank milk yesterday."
+      ],
+      "answer": "Did I bought a book?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (buy)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did I bought a book?",
+      "answers": [
+        "Did I buy a book?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (buy)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I took a pen yesterday.",
+        "Did He see a bird?",
+        "He took a pen yesterday.",
+        "I eated rice yesterday."
+      ],
+      "answer": "I eated rice yesterday.",
+      "explanation": "Quá khứ của eat là ate, không phải eated."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I eated rice yesterday.",
+      "answers": [
+        "I ate rice yesterday."
+      ],
+      "explanation": "Quá khứ của eat là ate, không phải eated."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I drank milk yesterday.",
+        "Did I drink milk?",
+        "I didn't ate rice.",
+        "I ran fast yesterday."
+      ],
+      "answer": "I didn't ate rice.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I didn't ate rice.",
+      "answers": [
+        "I didn't eat rice."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did I make a cake?",
+        "I found a ball yesterday.",
+        "He didn't give me a pen.",
+        "Did I ate rice?"
+      ],
+      "answer": "Did I ate rice?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did I ate rice?",
+      "answers": [
+        "Did I eat rice?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did I eat rice?",
+        "I seed a bird yesterday.",
+        "I didn't give me a pen.",
+        "I didn't make a cake."
+      ],
+      "answer": "I seed a bird yesterday.",
+      "explanation": "Quá khứ của see là saw, không phải seed."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I seed a bird yesterday.",
+      "answers": [
+        "I saw a bird yesterday."
+      ],
+      "explanation": "Quá khứ của see là saw, không phải seed."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I didn't saw a bird.",
+        "Did He buy a book?",
+        "I didn't give me a pen.",
+        "He ate rice yesterday."
+      ],
+      "answer": "I didn't saw a bird.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (see)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I didn't saw a bird.",
+      "answers": [
+        "I didn't see a bird."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (see)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did He see a bird?",
+        "I didn't buy a book.",
+        "Did I saw a bird?",
+        "Did He give me a pen?"
+      ],
+      "answer": "Did I saw a bird?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (see)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did I saw a bird?",
+      "answers": [
+        "Did I see a bird?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (see)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He made a cake yesterday.",
+        "I drank milk yesterday.",
+        "I maked a cake yesterday.",
+        "She didn't eat rice."
+      ],
+      "answer": "I maked a cake yesterday.",
+      "explanation": "Quá khứ của make là made, không phải maked."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I maked a cake yesterday.",
+      "answers": [
+        "I made a cake yesterday."
+      ],
+      "explanation": "Quá khứ của make là made, không phải maked."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I didn't made a cake.",
+        "I didn't go to school.",
+        "I swam in the pool yesterday.",
+        "I sang a song yesterday."
+      ],
+      "answer": "I didn't made a cake.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (make)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I didn't made a cake.",
+      "answers": [
+        "I didn't make a cake."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (make)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did I made a cake?",
+        "Did He eat rice?",
+        "Did He drink milk?",
+        "I sang a song yesterday."
+      ],
+      "answer": "Did I made a cake?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (make)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did I made a cake?",
+      "answers": [
+        "Did I make a cake?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (make)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I taked a pen yesterday.",
+        "Did I take a pen?",
+        "She didn't see a bird.",
+        "Did She eat rice?"
+      ],
+      "answer": "I taked a pen yesterday.",
+      "explanation": "Quá khứ của take là took, không phải taked."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I taked a pen yesterday.",
+      "answers": [
+        "I took a pen yesterday."
+      ],
+      "explanation": "Quá khứ của take là took, không phải taked."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did She buy a book?",
+        "I didn't took a pen.",
+        "He saw a bird yesterday.",
+        "He didn't give me a pen."
+      ],
+      "answer": "I didn't took a pen.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (take)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I didn't took a pen.",
+      "answers": [
+        "I didn't take a pen."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (take)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did I took a pen?",
+        "I saw a bird yesterday.",
+        "Did I give me a pen?",
+        "She didn't buy a book."
+      ],
+      "answer": "Did I took a pen?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (take)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did I took a pen?",
+      "answers": [
+        "Did I take a pen?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (take)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did He make a cake?",
+        "I drinked milk yesterday.",
+        "I didn't see a bird.",
+        "Did He go to school?"
+      ],
+      "answer": "I drinked milk yesterday.",
+      "explanation": "Quá khứ của drink là drank, không phải drinked."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I drinked milk yesterday.",
+      "answers": [
+        "I drank milk yesterday."
+      ],
+      "explanation": "Quá khứ của drink là drank, không phải drinked."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I didn't drank milk.",
+        "I bought a book yesterday.",
+        "He made a cake yesterday.",
+        "I didn't eat rice."
+      ],
+      "answer": "I didn't drank milk.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (drink)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I didn't drank milk.",
+      "answers": [
+        "I didn't drink milk."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (drink)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did I drank milk?",
+        "Did He go to school?",
+        "Did I go to school?",
+        "Did She eat rice?"
+      ],
+      "answer": "Did I drank milk?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (drink)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did I drank milk?",
+      "answers": [
+        "Did I drink milk?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (drink)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I read a book yesterday.",
+        "I gived me a pen yesterday.",
+        "He ate rice yesterday.",
+        "She didn't buy a book."
+      ],
+      "answer": "I gived me a pen yesterday.",
+      "explanation": "Quá khứ của give là gave, không phải gived."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I gived me a pen yesterday.",
+      "answers": [
+        "I gave me a pen yesterday."
+      ],
+      "explanation": "Quá khứ của give là gave, không phải gived."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He bought a book yesterday.",
+        "I didn't gave me a pen.",
+        "He went to school yesterday.",
+        "He made a cake yesterday."
+      ],
+      "answer": "I didn't gave me a pen.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (give)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I didn't gave me a pen.",
+      "answers": [
+        "I didn't give me a pen."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (give)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I ate rice yesterday.",
+        "He took a pen yesterday.",
+        "Did I gave me a pen?",
+        "I didn't make a cake."
+      ],
+      "answer": "Did I gave me a pen?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (give)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did I gave me a pen?",
+      "answers": [
+        "Did I give me a pen?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (give)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did She eat rice?",
+        "He took a pen yesterday.",
+        "I finded a ball yesterday.",
+        "She didn't eat rice."
+      ],
+      "answer": "I finded a ball yesterday.",
+      "explanation": "Quá khứ của find là found, không phải finded."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I finded a ball yesterday.",
+      "answers": [
+        "I found a ball yesterday."
+      ],
+      "explanation": "Quá khứ của find là found, không phải finded."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did He eat rice?",
+        "I swam in the pool yesterday.",
+        "He didn't went to school.",
+        "Did He take a pen?"
+      ],
+      "answer": "He didn't went to school.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He didn't went to school.",
+      "answers": [
+        "He didn't go to school."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did She eat rice?",
+        "I gave me a pen yesterday.",
+        "I read a book yesterday.",
+        "Did He went to school?"
+      ],
+      "answer": "Did He went to school?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did He went to school?",
+      "answers": [
+        "Did He go to school?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He didn't drink milk.",
+        "He bought a book yesterday.",
+        "He didn't make a cake.",
+        "I singed a song yesterday."
+      ],
+      "answer": "I singed a song yesterday.",
+      "explanation": "Quá khứ của sing là sang, không phải singed."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I singed a song yesterday.",
+      "answers": [
+        "I sang a song yesterday."
+      ],
+      "explanation": "Quá khứ của sing là sang, không phải singed."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I didn't give me a pen.",
+        "He didn't bought a book.",
+        "He didn't go to school.",
+        "She didn't go to school."
+      ],
+      "answer": "He didn't bought a book.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (buy)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He didn't bought a book.",
+      "answers": [
+        "He didn't buy a book."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (buy)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did She eat rice?",
+        "Did He bought a book?",
+        "I didn't drink milk.",
+        "Did I take a pen?"
+      ],
+      "answer": "Did He bought a book?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (buy)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did He bought a book?",
+      "answers": [
+        "Did He buy a book?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (buy)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He didn't go to school.",
+        "I swimmed in the pool yesterday.",
+        "He didn't eat rice.",
+        "I wrote a letter yesterday."
+      ],
+      "answer": "I swimmed in the pool yesterday.",
+      "explanation": "Quá khứ của swim là swam, không phải swimmed."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I swimmed in the pool yesterday.",
+      "answers": [
+        "I swam in the pool yesterday."
+      ],
+      "explanation": "Quá khứ của swim là swam, không phải swimmed."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He went to school yesterday.",
+        "I didn't give me a pen.",
+        "I saw a bird yesterday.",
+        "He didn't ate rice."
+      ],
+      "answer": "He didn't ate rice.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He didn't ate rice.",
+      "answers": [
+        "He didn't eat rice."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I bought a book yesterday.",
+        "He didn't give me a pen.",
+        "Did I take a pen?",
+        "Did He ate rice?"
+      ],
+      "answer": "Did He ate rice?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did He ate rice?",
+      "answers": [
+        "Did He eat rice?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I runned fast yesterday.",
+        "Did He buy a book?",
+        "I didn't go to school.",
+        "He made a cake yesterday."
+      ],
+      "answer": "I runned fast yesterday.",
+      "explanation": "Quá khứ của run là ran, không phải runned."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I runned fast yesterday.",
+      "answers": [
+        "I ran fast yesterday."
+      ],
+      "explanation": "Quá khứ của run là ran, không phải runned."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did He give me a pen?",
+        "He didn't give me a pen.",
+        "I went to school yesterday.",
+        "He didn't saw a bird."
+      ],
+      "answer": "He didn't saw a bird.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (see)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He didn't saw a bird.",
+      "answers": [
+        "He didn't see a bird."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (see)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did He saw a bird?",
+        "Did She buy a book?",
+        "He bought a book yesterday.",
+        "Did He drink milk?"
+      ],
+      "answer": "Did He saw a bird?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (see)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did He saw a bird?",
+      "answers": [
+        "Did He see a bird?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (see)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I didn't drink milk.",
+        "She didn't eat rice.",
+        "I writed a letter yesterday.",
+        "I gave me a pen yesterday."
+      ],
+      "answer": "I writed a letter yesterday.",
+      "explanation": "Quá khứ của write là wrote, không phải writed."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I writed a letter yesterday.",
+      "answers": [
+        "I wrote a letter yesterday."
+      ],
+      "explanation": "Quá khứ của write là wrote, không phải writed."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did I give me a pen?",
+        "He ate rice yesterday.",
+        "He didn't made a cake.",
+        "Did He give me a pen?"
+      ],
+      "answer": "He didn't made a cake.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (make)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He didn't made a cake.",
+      "answers": [
+        "He didn't make a cake."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (make)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did He made a cake?",
+        "He bought a book yesterday.",
+        "I didn't go to school.",
+        "Did I eat rice?"
+      ],
+      "answer": "Did He made a cake?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (make)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did He made a cake?",
+      "answers": [
+        "Did He make a cake?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (make)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I readed a book yesterday.",
+        "I saw a bird yesterday.",
+        "Did I take a pen?",
+        "I found a ball yesterday."
+      ],
+      "answer": "I readed a book yesterday.",
+      "explanation": "Quá khứ của read là read, không phải readed."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I readed a book yesterday.",
+      "answers": [
+        "I read a book yesterday."
+      ],
+      "explanation": "Quá khứ của read là read, không phải readed."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I didn't go to school.",
+        "I wrote a letter yesterday.",
+        "He didn't make a cake.",
+        "He didn't took a pen."
+      ],
+      "answer": "He didn't took a pen.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (take)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He didn't took a pen.",
+      "answers": [
+        "He didn't take a pen."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (take)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I made a cake yesterday.",
+        "Did I take a pen?",
+        "I didn't drink milk.",
+        "Did He took a pen?"
+      ],
+      "answer": "Did He took a pen?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (take)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did He took a pen?",
+      "answers": [
+        "Did He take a pen?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (take)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He didn't buy a book.",
+        "He took a pen yesterday.",
+        "He goed to school yesterday.",
+        "I read a book yesterday."
+      ],
+      "answer": "He goed to school yesterday.",
+      "explanation": "Quá khứ của go là went, không phải goed."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He goed to school yesterday.",
+      "answers": [
+        "He went to school yesterday."
+      ],
+      "explanation": "Quá khứ của go là went, không phải goed."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I drank milk yesterday.",
+        "She didn't buy a book.",
+        "He didn't drank milk.",
+        "I went to school yesterday."
+      ],
+      "answer": "He didn't drank milk.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (drink)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He didn't drank milk.",
+      "answers": [
+        "He didn't drink milk."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (drink)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did He drank milk?",
+        "Did He see a bird?",
+        "He ate rice yesterday.",
+        "Did I give me a pen?"
+      ],
+      "answer": "Did He drank milk?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (drink)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did He drank milk?",
+      "answers": [
+        "Did He drink milk?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (drink)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did She eat rice?",
+        "Did I go to school?",
+        "Did He eat rice?",
+        "He buyed a book yesterday."
+      ],
+      "answer": "He buyed a book yesterday.",
+      "explanation": "Quá khứ của buy là bought, không phải buyed."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He buyed a book yesterday.",
+      "answers": [
+        "He bought a book yesterday."
+      ],
+      "explanation": "Quá khứ của buy là bought, không phải buyed."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He didn't gave me a pen.",
+        "He didn't make a cake.",
+        "He saw a bird yesterday.",
+        "I sang a song yesterday."
+      ],
+      "answer": "He didn't gave me a pen.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (give)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He didn't gave me a pen.",
+      "answers": [
+        "He didn't give me a pen."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (give)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I ran fast yesterday.",
+        "Did He gave me a pen?",
+        "I didn't take a pen.",
+        "He didn't take a pen."
+      ],
+      "answer": "Did He gave me a pen?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (give)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did He gave me a pen?",
+      "answers": [
+        "Did He give me a pen?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (give)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He saw a bird yesterday.",
+        "He eated rice yesterday.",
+        "He didn't buy a book.",
+        "I ran fast yesterday."
+      ],
+      "answer": "He eated rice yesterday.",
+      "explanation": "Quá khứ của eat là ate, không phải eated."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He eated rice yesterday.",
+      "answers": [
+        "He ate rice yesterday."
+      ],
+      "explanation": "Quá khứ của eat là ate, không phải eated."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She didn't went to school.",
+        "I ate rice yesterday.",
+        "I went to school yesterday.",
+        "I gave me a pen yesterday."
+      ],
+      "answer": "She didn't went to school.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She didn't went to school.",
+      "answers": [
+        "She didn't go to school."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did She went to school?",
+        "I drank milk yesterday.",
+        "Did He drink milk?",
+        "He went to school yesterday."
+      ],
+      "answer": "Did She went to school?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did She went to school?",
+      "answers": [
+        "Did She go to school?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did I give me a pen?",
+        "She didn't go to school.",
+        "I didn't give me a pen.",
+        "He seed a bird yesterday."
+      ],
+      "answer": "He seed a bird yesterday.",
+      "explanation": "Quá khứ của see là saw, không phải seed."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He seed a bird yesterday.",
+      "answers": [
+        "He saw a bird yesterday."
+      ],
+      "explanation": "Quá khứ của see là saw, không phải seed."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did He give me a pen?",
+        "I gave me a pen yesterday.",
+        "She didn't bought a book.",
+        "I didn't eat rice."
+      ],
+      "answer": "She didn't bought a book.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (buy)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She didn't bought a book.",
+      "answers": [
+        "She didn't buy a book."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (buy)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did She bought a book?",
+        "She didn't go to school.",
+        "Did She see a bird?",
+        "Did He make a cake?"
+      ],
+      "answer": "Did She bought a book?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (buy)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did She bought a book?",
+      "answers": [
+        "Did She buy a book?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (buy)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He ate rice yesterday.",
+        "He maked a cake yesterday.",
+        "He didn't take a pen.",
+        "Did She go to school?"
+      ],
+      "answer": "He maked a cake yesterday.",
+      "explanation": "Quá khứ của make là made, không phải maked."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He maked a cake yesterday.",
+      "answers": [
+        "He made a cake yesterday."
+      ],
+      "explanation": "Quá khứ của make là made, không phải maked."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She didn't ate rice.",
+        "I sang a song yesterday.",
+        "I swam in the pool yesterday.",
+        "He saw a bird yesterday."
+      ],
+      "answer": "She didn't ate rice.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She didn't ate rice.",
+      "answers": [
+        "She didn't eat rice."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I took a pen yesterday.",
+        "He saw a bird yesterday.",
+        "Did She ate rice?",
+        "I saw a bird yesterday."
+      ],
+      "answer": "Did She ate rice?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did She ate rice?",
+      "answers": [
+        "Did She eat rice?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (eat)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He taked a pen yesterday.",
+        "He didn't make a cake.",
+        "Did He go to school?",
+        "Did I make a cake?"
+      ],
+      "answer": "He taked a pen yesterday.",
+      "explanation": "Quá khứ của take là took, không phải taked."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He taked a pen yesterday.",
+      "answers": [
+        "He took a pen yesterday."
+      ],
+      "explanation": "Quá khứ của take là took, không phải taked."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He didn't make a cake.",
+        "She didn't saw a bird.",
+        "Did She eat rice?",
+        "Did She see a bird?"
+      ],
+      "answer": "She didn't saw a bird.",
+      "explanation": "Sau didn't, động từ giữ nguyên thể (see)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She didn't saw a bird.",
+      "answers": [
+        "She didn't see a bird."
+      ],
+      "explanation": "Sau didn't, động từ giữ nguyên thể (see)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Did He eat rice?",
+        "I found a ball yesterday.",
+        "Did She saw a bird?",
+        "I went to school yesterday."
+      ],
+      "answer": "Did She saw a bird?",
+      "explanation": "Sau Did, động từ giữ nguyên thể (see)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Did She saw a bird?",
+      "answers": [
+        "Did She see a bird?"
+      ],
+      "explanation": "Sau Did, động từ giữ nguyên thể (see)."
+    }
+  ],
+  "future": [
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He will play football.",
+        "He won't play football.",
+        "He is going to play football.",
+        "I will goes to school."
+      ],
+      "answer": "I will goes to school.",
+      "explanation": "Sau will, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I will goes to school.",
+      "answers": [
+        "I will go to school."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She will play football.",
+        "He will going to school.",
+        "Lan will visit grandma.",
+        "I will go to school."
+      ],
+      "answer": "He will going to school.",
+      "explanation": "Sau will, động từ giữ nguyên thể (go, không phải going)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He will going to school.",
+      "answers": [
+        "He will go to school."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (go, không phải going)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I is going to go to school.",
+        "She won't visit grandma.",
+        "I will cook dinner.",
+        "I will travel next week."
+      ],
+      "answer": "I is going to go to school.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is going to go to school.",
+      "answers": [
+        "I am going to go to school."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am going to goes to school.",
+        "Lan will help mother.",
+        "She will play football.",
+        "I will go to school."
+      ],
+      "answer": "I am going to goes to school.",
+      "explanation": "Sau be going to, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I am going to goes to school.",
+      "answers": [
+        "I am going to go to school."
+      ],
+      "explanation": "Sau be going to, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am going to play football.",
+        "He won't goes to school.",
+        "I will play football.",
+        "I will go to school."
+      ],
+      "answer": "He won't goes to school.",
+      "explanation": "Sau won't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He won't goes to school.",
+      "answers": [
+        "He won't go to school."
+      ],
+      "explanation": "Sau won't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am going to visit grandma.",
+        "He will go to school.",
+        "I will read a book tomorrow.",
+        "I will plays football."
+      ],
+      "answer": "I will plays football.",
+      "explanation": "Sau will, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I will plays football.",
+      "answers": [
+        "I will play football."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He will playing football.",
+        "I am going to read a book tomorrow.",
+        "She won't go to school.",
+        "She will help mother."
+      ],
+      "answer": "He will playing football.",
+      "explanation": "Sau will, động từ giữ nguyên thể (play, không phải playing)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He will playing football.",
+      "answers": [
+        "He will play football."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (play, không phải playing)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He won't visit grandma.",
+        "I is going to play football.",
+        "Lan will help mother.",
+        "Lan will go to school."
+      ],
+      "answer": "I is going to play football.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is going to play football.",
+      "answers": [
+        "I am going to play football."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am going to plays football.",
+        "She will go to school.",
+        "Lan won't help mother.",
+        "He is going to visit grandma."
+      ],
+      "answer": "I am going to plays football.",
+      "explanation": "Sau be going to, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I am going to plays football.",
+      "answers": [
+        "I am going to play football."
+      ],
+      "explanation": "Sau be going to, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She will go to school.",
+        "He won't help mother.",
+        "He won't plays football.",
+        "He is going to help mother."
+      ],
+      "answer": "He won't plays football.",
+      "explanation": "Sau won't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He won't plays football.",
+      "answers": [
+        "He won't play football."
+      ],
+      "explanation": "Sau won't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan will play football.",
+        "Lan won't play football.",
+        "I am going to play football.",
+        "I will helps mother."
+      ],
+      "answer": "I will helps mother.",
+      "explanation": "Sau will, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I will helps mother.",
+      "answers": [
+        "I will help mother."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He will helping mother.",
+        "She won't go to school.",
+        "He will go to school.",
+        "I will call you tonight."
+      ],
+      "answer": "He will helping mother.",
+      "explanation": "Sau will, động từ giữ nguyên thể (help, không phải helping)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He will helping mother.",
+      "answers": [
+        "He will help mother."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (help, không phải helping)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He won't go to school.",
+        "I is going to help mother.",
+        "Lan won't go to school.",
+        "She will go to school."
+      ],
+      "answer": "I is going to help mother.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is going to help mother.",
+      "answers": [
+        "I am going to help mother."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She is going to visit grandma.",
+        "She is going to help mother.",
+        "I am going to helps mother.",
+        "I will help mother."
+      ],
+      "answer": "I am going to helps mother.",
+      "explanation": "Sau be going to, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I am going to helps mother.",
+      "answers": [
+        "I am going to help mother."
+      ],
+      "explanation": "Sau be going to, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She won't go to school.",
+        "I am going to visit grandma.",
+        "He won't helps mother.",
+        "She won't play football."
+      ],
+      "answer": "He won't helps mother.",
+      "explanation": "Sau won't, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He won't helps mother.",
+      "answers": [
+        "He won't help mother."
+      ],
+      "explanation": "Sau won't, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I will visits grandma.",
+        "Lan won't help mother.",
+        "He is going to play football.",
+        "Lan won't go to school."
+      ],
+      "answer": "I will visits grandma.",
+      "explanation": "Sau will, động từ giữ nguyên thể (visit)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I will visits grandma.",
+      "answers": [
+        "I will visit grandma."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (visit)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He will visiting grandma.",
+        "She will help mother.",
+        "I will play football.",
+        "He won't visit grandma."
+      ],
+      "answer": "He will visiting grandma.",
+      "explanation": "Sau will, động từ giữ nguyên thể (visit, không phải visiting)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He will visiting grandma.",
+      "answers": [
+        "He will visit grandma."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (visit, không phải visiting)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She is going to help mother.",
+        "I is going to visit grandma.",
+        "He is going to visit grandma.",
+        "Lan won't go to school."
+      ],
+      "answer": "I is going to visit grandma.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is going to visit grandma.",
+      "answers": [
+        "I am going to visit grandma."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I will visit grandma.",
+        "I will cook dinner.",
+        "I am going to visits grandma.",
+        "I will call you tonight."
+      ],
+      "answer": "I am going to visits grandma.",
+      "explanation": "Sau be going to, động từ giữ nguyên thể (visit)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I am going to visits grandma.",
+      "answers": [
+        "I am going to visit grandma."
+      ],
+      "explanation": "Sau be going to, động từ giữ nguyên thể (visit)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He won't visits grandma.",
+        "I am going to cook dinner.",
+        "He will visit grandma.",
+        "I am going to travel next week."
+      ],
+      "answer": "He won't visits grandma.",
+      "explanation": "Sau won't, động từ giữ nguyên thể (visit)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He won't visits grandma.",
+      "answers": [
+        "He won't visit grandma."
+      ],
+      "explanation": "Sau won't, động từ giữ nguyên thể (visit)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I will go to school.",
+        "I will cooks dinner.",
+        "She is going to play football.",
+        "She won't play football."
+      ],
+      "answer": "I will cooks dinner.",
+      "explanation": "Sau will, động từ giữ nguyên thể (cook)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I will cooks dinner.",
+      "answers": [
+        "I will cook dinner."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (cook)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She will going to school.",
+        "She will visit grandma.",
+        "He is going to visit grandma.",
+        "I will cook dinner."
+      ],
+      "answer": "She will going to school.",
+      "explanation": "Sau will, động từ giữ nguyên thể (go, không phải going)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She will going to school.",
+      "answers": [
+        "She will go to school."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (go, không phải going)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She is going to go to school.",
+        "I will call you tonight.",
+        "I am going to read a book tomorrow.",
+        "I is going to cook dinner."
+      ],
+      "answer": "I is going to cook dinner.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is going to cook dinner.",
+      "answers": [
+        "I am going to cook dinner."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am going to play football.",
+        "He is going to goes to school.",
+        "He won't play football.",
+        "I will call you tonight."
+      ],
+      "answer": "He is going to goes to school.",
+      "explanation": "Sau be going to, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He is going to goes to school.",
+      "answers": [
+        "He is going to go to school."
+      ],
+      "explanation": "Sau be going to, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am going to cook dinner.",
+        "I am going to travel next week.",
+        "She won't goes to school.",
+        "I will play football."
+      ],
+      "answer": "She won't goes to school.",
+      "explanation": "Sau won't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She won't goes to school.",
+      "answers": [
+        "She won't go to school."
+      ],
+      "explanation": "Sau won't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan won't go to school.",
+        "I will travels next week.",
+        "He is going to visit grandma.",
+        "He won't go to school."
+      ],
+      "answer": "I will travels next week.",
+      "explanation": "Sau will, động từ giữ nguyên thể (travel)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I will travels next week.",
+      "answers": [
+        "I will travel next week."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (travel)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is going to play football.",
+        "She is going to play football.",
+        "She will playing football.",
+        "He will play football."
+      ],
+      "answer": "She will playing football.",
+      "explanation": "Sau will, động từ giữ nguyên thể (play, không phải playing)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She will playing football.",
+      "answers": [
+        "She will play football."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (play, không phải playing)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I will read a book tomorrow.",
+        "I is going to travel next week.",
+        "Lan will play football.",
+        "She won't help mother."
+      ],
+      "answer": "I is going to travel next week.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is going to travel next week.",
+      "answers": [
+        "I am going to travel next week."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She will play football.",
+        "I will call you tonight.",
+        "He is going to plays football.",
+        "I will help mother."
+      ],
+      "answer": "He is going to plays football.",
+      "explanation": "Sau be going to, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He is going to plays football.",
+      "answers": [
+        "He is going to play football."
+      ],
+      "explanation": "Sau be going to, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He won't help mother.",
+        "She won't plays football.",
+        "I am going to read a book tomorrow.",
+        "Lan will visit grandma."
+      ],
+      "answer": "She won't plays football.",
+      "explanation": "Sau won't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She won't plays football.",
+      "answers": [
+        "She won't play football."
+      ],
+      "explanation": "Sau won't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He will go to school.",
+        "He is going to visit grandma.",
+        "I will calls you tonight.",
+        "Lan will help mother."
+      ],
+      "answer": "I will calls you tonight.",
+      "explanation": "Sau will, động từ giữ nguyên thể (call)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I will calls you tonight.",
+      "answers": [
+        "I will call you tonight."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (call)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She will play football.",
+        "She is going to go to school.",
+        "Lan won't visit grandma.",
+        "She will helping mother."
+      ],
+      "answer": "She will helping mother.",
+      "explanation": "Sau will, động từ giữ nguyên thể (help, không phải helping)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She will helping mother.",
+      "answers": [
+        "She will help mother."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (help, không phải helping)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He is going to play football.",
+        "I will help mother.",
+        "I am going to go to school.",
+        "I is going to call you tonight."
+      ],
+      "answer": "I is going to call you tonight.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is going to call you tonight.",
+      "answers": [
+        "I am going to call you tonight."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am going to visit grandma.",
+        "He is going to helps mother.",
+        "She will go to school.",
+        "Lan will go to school."
+      ],
+      "answer": "He is going to helps mother.",
+      "explanation": "Sau be going to, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He is going to helps mother.",
+      "answers": [
+        "He is going to help mother."
+      ],
+      "explanation": "Sau be going to, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She won't helps mother.",
+        "She is going to go to school.",
+        "Lan won't help mother.",
+        "He will play football."
+      ],
+      "answer": "She won't helps mother.",
+      "explanation": "Sau won't, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She won't helps mother.",
+      "answers": [
+        "She won't help mother."
+      ],
+      "explanation": "Sau won't, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am going to cook dinner.",
+        "He won't visit grandma.",
+        "Lan will go to school.",
+        "I will reads a book tomorrow."
+      ],
+      "answer": "I will reads a book tomorrow.",
+      "explanation": "Sau will, động từ giữ nguyên thể (read)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I will reads a book tomorrow.",
+      "answers": [
+        "I will read a book tomorrow."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (read)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I will read a book tomorrow.",
+        "Lan will help mother.",
+        "She will visiting grandma.",
+        "I am going to travel next week."
+      ],
+      "answer": "She will visiting grandma.",
+      "explanation": "Sau will, động từ giữ nguyên thể (visit, không phải visiting)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She will visiting grandma.",
+      "answers": [
+        "She will visit grandma."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (visit, không phải visiting)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She is going to visit grandma.",
+        "I is going to read a book tomorrow.",
+        "He will play football.",
+        "I am going to play football."
+      ],
+      "answer": "I is going to read a book tomorrow.",
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "I is going to read a book tomorrow.",
+      "answers": [
+        "I am going to read a book tomorrow."
+      ],
+      "explanation": "I đi với am."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan won't help mother.",
+        "He won't help mother.",
+        "She will go to school.",
+        "He is going to visits grandma."
+      ],
+      "answer": "He is going to visits grandma.",
+      "explanation": "Sau be going to, động từ giữ nguyên thể (visit)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He is going to visits grandma.",
+      "answers": [
+        "He is going to visit grandma."
+      ],
+      "explanation": "Sau be going to, động từ giữ nguyên thể (visit)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan will help mother.",
+        "I will play football.",
+        "She won't visits grandma.",
+        "I will cook dinner."
+      ],
+      "answer": "She won't visits grandma.",
+      "explanation": "Sau won't, động từ giữ nguyên thể (visit)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She won't visits grandma.",
+      "answers": [
+        "She won't visit grandma."
+      ],
+      "explanation": "Sau won't, động từ giữ nguyên thể (visit)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He will goes to school.",
+        "I will help mother.",
+        "She is going to play football.",
+        "I will travel next week."
+      ],
+      "answer": "He will goes to school.",
+      "explanation": "Sau will, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He will goes to school.",
+      "answers": [
+        "He will go to school."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He won't go to school.",
+        "Lan will going to school.",
+        "I am going to read a book tomorrow.",
+        "She is going to go to school."
+      ],
+      "answer": "Lan will going to school.",
+      "explanation": "Sau will, động từ giữ nguyên thể (go, không phải going)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan will going to school.",
+      "answers": [
+        "Lan will go to school."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (go, không phải going)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He are going to go to school.",
+        "I am going to call you tonight.",
+        "Lan will play football.",
+        "I will call you tonight."
+      ],
+      "answer": "He are going to go to school.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are going to go to school.",
+      "answers": [
+        "He is going to go to school."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He will play football.",
+        "She is going to help mother.",
+        "She is going to goes to school.",
+        "Lan won't go to school."
+      ],
+      "answer": "She is going to goes to school.",
+      "explanation": "Sau be going to, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She is going to goes to school.",
+      "answers": [
+        "She is going to go to school."
+      ],
+      "explanation": "Sau be going to, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan will go to school.",
+        "Lan won't goes to school.",
+        "I will read a book tomorrow.",
+        "She will play football."
+      ],
+      "answer": "Lan won't goes to school.",
+      "explanation": "Sau won't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan won't goes to school.",
+      "answers": [
+        "Lan won't go to school."
+      ],
+      "explanation": "Sau won't, động từ giữ nguyên thể (go)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I will visit grandma.",
+        "She won't play football.",
+        "He will plays football.",
+        "I am going to go to school."
+      ],
+      "answer": "He will plays football.",
+      "explanation": "Sau will, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He will plays football.",
+      "answers": [
+        "He will play football."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I will read a book tomorrow.",
+        "He won't play football.",
+        "I am going to help mother.",
+        "Lan will playing football."
+      ],
+      "answer": "Lan will playing football.",
+      "explanation": "Sau will, động từ giữ nguyên thể (play, không phải playing)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan will playing football.",
+      "answers": [
+        "Lan will play football."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (play, không phải playing)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan will go to school.",
+        "He will visit grandma.",
+        "She is going to go to school.",
+        "He are going to play football."
+      ],
+      "answer": "He are going to play football.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are going to play football.",
+      "answers": [
+        "He is going to play football."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I will cook dinner.",
+        "I will help mother.",
+        "She is going to plays football.",
+        "He is going to go to school."
+      ],
+      "answer": "She is going to plays football.",
+      "explanation": "Sau be going to, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She is going to plays football.",
+      "answers": [
+        "She is going to play football."
+      ],
+      "explanation": "Sau be going to, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan won't plays football.",
+        "He is going to go to school.",
+        "I am going to go to school.",
+        "I am going to help mother."
+      ],
+      "answer": "Lan won't plays football.",
+      "explanation": "Sau won't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan won't plays football.",
+      "answers": [
+        "Lan won't play football."
+      ],
+      "explanation": "Sau won't, động từ giữ nguyên thể (play)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan will help mother.",
+        "Lan won't go to school.",
+        "He will play football.",
+        "He will helps mother."
+      ],
+      "answer": "He will helps mother.",
+      "explanation": "Sau will, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He will helps mother.",
+      "answers": [
+        "He will help mother."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "He won't visit grandma.",
+        "He will play football.",
+        "I am going to visit grandma.",
+        "Lan will helping mother."
+      ],
+      "answer": "Lan will helping mother.",
+      "explanation": "Sau will, động từ giữ nguyên thể (help, không phải helping)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan will helping mother.",
+      "answers": [
+        "Lan will help mother."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (help, không phải helping)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "I am going to play football.",
+        "She is going to go to school.",
+        "I will play football.",
+        "He are going to help mother."
+      ],
+      "answer": "He are going to help mother.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are going to help mother.",
+      "answers": [
+        "He is going to help mother."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan will visit grandma.",
+        "She won't help mother.",
+        "I will help mother.",
+        "She is going to helps mother."
+      ],
+      "answer": "She is going to helps mother.",
+      "explanation": "Sau be going to, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She is going to helps mother.",
+      "answers": [
+        "She is going to help mother."
+      ],
+      "explanation": "Sau be going to, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan will play football.",
+        "Lan won't helps mother.",
+        "I will call you tonight.",
+        "Lan will visit grandma."
+      ],
+      "answer": "Lan won't helps mother.",
+      "explanation": "Sau won't, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan won't helps mother.",
+      "answers": [
+        "Lan won't help mother."
+      ],
+      "explanation": "Sau won't, động từ giữ nguyên thể (help)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan will play football.",
+        "He will visits grandma.",
+        "I will play football.",
+        "I am going to travel next week."
+      ],
+      "answer": "He will visits grandma.",
+      "explanation": "Sau will, động từ giữ nguyên thể (visit)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He will visits grandma.",
+      "answers": [
+        "He will visit grandma."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (visit)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan will visiting grandma.",
+        "He will go to school.",
+        "I am going to read a book tomorrow.",
+        "He won't go to school."
+      ],
+      "answer": "Lan will visiting grandma.",
+      "explanation": "Sau will, động từ giữ nguyên thể (visit, không phải visiting)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan will visiting grandma.",
+      "answers": [
+        "Lan will visit grandma."
+      ],
+      "explanation": "Sau will, động từ giữ nguyên thể (visit, không phải visiting)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She is going to go to school.",
+        "He is going to help mother.",
+        "I will cook dinner.",
+        "He are going to visit grandma."
+      ],
+      "answer": "He are going to visit grandma.",
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "He are going to visit grandma.",
+      "answers": [
+        "He is going to visit grandma."
+      ],
+      "explanation": "He đi với is."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She won't go to school.",
+        "Lan won't help mother.",
+        "I will go to school.",
+        "She is going to visits grandma."
+      ],
+      "answer": "She is going to visits grandma.",
+      "explanation": "Sau be going to, động từ giữ nguyên thể (visit)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She is going to visits grandma.",
+      "answers": [
+        "She is going to visit grandma."
+      ],
+      "explanation": "Sau be going to, động từ giữ nguyên thể (visit)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan won't visits grandma.",
+        "He is going to play football.",
+        "She will help mother.",
+        "Lan will visit grandma."
+      ],
+      "answer": "Lan won't visits grandma.",
+      "explanation": "Sau won't, động từ giữ nguyên thể (visit)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan won't visits grandma.",
+      "answers": [
+        "Lan won't visit grandma."
+      ],
+      "explanation": "Sau won't, động từ giữ nguyên thể (visit)."
+    }
+  ]
+}
