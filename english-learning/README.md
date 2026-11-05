@@ -68,6 +68,12 @@ sang Nunito (sans tròn, thân thiện, có tiếng Việt) cho hợp app học 
 cài đặt cỡ chữ vẫn hoạt động như cũ qua biến `--font-scale`. Phần Dạng
 mẫu xếp ngang dạng lưới (`learn-vocab-grid`, tự xuống 1 cột trên màn
 hình hẹp) thay vì danh sách dọc, để 8 mục đỡ tốn chiều cao trang.
+Mục “Câu sai cần ôn lại”: mọi câu làm sai (bài lẻ hay ôn tập) đều
+được ghi lại và lưu bền (localStorage `english-learning-wrong-v1`),
+xem được từ thẻ trên trang chính và từ màn hình kết quả; bấm “Luyện
+lại” để làm lại đúng các câu đó, trả lời đúng thì câu tự xóa khỏi
+danh sách (kể cả khi làm đúng lại ở một bài thường); nút “Xóa hết”
+cần bấm 2 lần để xác nhận.
 
 ## Cài đặt — cỡ chữ
 

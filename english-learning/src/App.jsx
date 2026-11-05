@@ -18,6 +18,23 @@ import { conjugationGuides } from './data/conjugationGuides.js'
 import { irregularVerbs } from './data/irregular.js'
 
 const STORAGE_KEY = 'english-learning-progress-v1'
+const WRONG_KEY = 'english-learning-wrong-v1'
+const WRONG_BANK_MAX = 100
+// Mục "Câu sai cần ôn lại": mọi câu làm sai (bài lẻ hay ôn tập) đều được
+// ghi lại đây và lưu bền (localStorage). Khóa của 1 câu = tên bài + đề +
+// đáp án đúng, để cùng 1 câu dù làm sai ở đâu cũng chỉ ghi 1 lần, và khi
+// làm đúng lại ở bất kỳ bài nào thì câu đó tự xóa khỏi danh sách.
+function wrongKeyFor(lessonTitle, question, correctAnswer) {
+  return `${lessonTitle}||${question.prompt}||${correctAnswer}`
+}
+function loadWrongBank() {
+  try {
+    const data = JSON.parse(localStorage.getItem(WRONG_KEY))
+    return Array.isArray(data) ? data : []
+  } catch {
+    return []
+  }
+}
 const SETTINGS_KEY = 'english-learning-settings-v1'
 // Cỡ chữ trong Cài đặt: tỉ lệ nhân với cỡ mặc định của app (cỡ Vừa =
 // chữ thường 20px, tức theme 16px tăng 25% như trước). Đổi cỡ là đổi
@@ -400,6 +417,8 @@ function SectionLabel({ icon, children }) {
 
 export default function App() {
   const [progress, setProgress] = useState(loadProgress)
+  const [wrongBank, setWrongBank] = useState(loadWrongBank)
+  const [confirmClear, setConfirmClear] = useState(false)
   const [view, setView] = useState({ name: 'home' }) // home | lesson | quiz
   const [quiz, setQuiz] = useState(null)
   const [section, setSection] = useState('all') // all | basic | conjhub | lookup | settings
@@ -415,6 +434,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress))
   }, [progress])
+
+  useEffect(() => {
+    try { localStorage.setItem(WRONG_KEY, JSON.stringify(wrongBank)) } catch { /* không lưu được thì vẫn dùng trong phiên */ }
+  }, [wrongBank])
 
   // progress.best lưu theo % (bài cũ 10 câu thì điểm /100 trùng với % nên dữ liệu cũ vẫn dùng được)
   const completedCount = allLessons.filter((l) => (progress[l.id]?.best || 0) >= 70).length
@@ -449,6 +472,35 @@ export default function App() {
     setView({ name: 'quiz' })
   }
 
+  // Phiên ôn câu sai: lấy câu từ kho, trả lời đúng thì câu đó tự xóa
+  // khỏi kho khi nộp bài (xử lý trong nextQuestion, nhánh finished).
+  function startWrongQuiz() {
+    if (!wrongBank.length) return
+    const questions = prepareQuiz(wrongBank.map((e) => ({
+      ...e.question,
+      wrongKey: e.key,
+      wrongLessonTitle: e.lessonTitle,
+    })))
+    setQuiz({
+      title: 'Ôn lại câu sai',
+      lessonId: null,
+      review: true,
+      questions,
+      index: 0,
+      input: '',
+      checked: null,
+      score: 0,
+      log: [],
+      finished: false,
+    })
+    setView({ name: 'quiz' })
+  }
+
+  function openWrongBank() {
+    setConfirmClear(false)
+    setView({ name: 'wrong' })
+  }
+
   // Điều hướng mới (không còn menu trái): header + chip lọc.
   function goNav(target) {
     if (target === 'lessons') setSection('all')
@@ -457,6 +509,7 @@ export default function App() {
     setView({ name: 'home' })
   }
   function currentNav() {
+    if (view.name === 'wrong') return null
     if (view.name === 'lesson') return isConjLesson(view.lesson) ? 'conj' : 'lessons'
     if (view.name === 'quiz') {
       if (!quiz?.lessonId) return null
@@ -493,6 +546,26 @@ export default function App() {
       const maxScore = quiz.questions.length * POINTS_PER_QUESTION
       const finalPercent = Math.round((quiz.score / maxScore) * 100)
       setQuiz({ ...quiz, finished: true, percent: finalPercent })
+      // Ghi nhận câu sai: câu sai -> thêm/cập nhật vào kho; câu đúng ->
+      // xóa khỏi kho (dù trước đó ghi từ bài lẻ hay ôn tập). Phiên ôn câu
+      // sai dùng khóa đã lưu sẵn trên câu hỏi, các phiên khác tính khóa
+      // từ tên bài + đề + đáp án đúng.
+      setWrongBank((prev) => {
+        const touched = new Set()
+        const upserts = []
+        for (const entry of quiz.log) {
+          const q = entry.question
+          const label = quiz.review ? q.wrongLessonTitle : (q.lessonTitle || quiz.title)
+          const key = quiz.review ? q.wrongKey : wrongKeyFor(label, q, entry.correctAnswer)
+          touched.add(key)
+          if (!entry.correct) {
+            const { wrongKey, wrongLessonTitle, ...cleanQuestion } = q
+            upserts.push({ key, lessonTitle: label, question: cleanQuestion, userAnswer: entry.userAnswer, correctAnswer: entry.correctAnswer, at: Date.now() })
+          }
+        }
+        const kept = prev.filter((e) => !touched.has(e.key))
+        return [...upserts, ...kept].slice(0, WRONG_BANK_MAX)
+      })
       if (quiz.lessonId) {
         setProgress((prev) => {
           const old = prev[quiz.lessonId] || { best: 0, attempts: 0 }
@@ -551,10 +624,19 @@ export default function App() {
               ))}
             </VStack>
           )}
+          {quiz.review && (
+            <Text type="supporting">Các câu làm đúng đã tự xóa khỏi mục câu sai; câu nào vẫn sai thì còn lại trong đó để ôn tiếp.</Text>
+          )}
           <HStack gap={2} wrap="wrap">
             <Button variant="primary" label="Về trang chính" onClick={() => setView({ name: 'home' })} />
             {quiz.lessonId && (
               <Button label="Làm lại bài này" onClick={() => startQuiz(allLessons.find((l) => l.id === quiz.lessonId))} />
+            )}
+            {quiz.review && wrongBank.length > 0 && (
+              <Button label={`Luyện lại ${wrongBank.length} câu sai còn lại →`} onClick={startWrongQuiz} />
+            )}
+            {!quiz.review && wrong.length > 0 && (
+              <Button label="Mở mục Câu sai cần ôn lại →" onClick={openWrongBank} />
             )}
             <Button label="Bài tổng hợp phân loại" onClick={() => startQuiz(null, true)} />
           </HStack>
@@ -563,7 +645,9 @@ export default function App() {
     }
 
     const q = quiz.questions[quiz.index]
-    const quizLabel = !quiz.lessonId
+    const quizLabel = quiz.review
+      ? 'Ôn lại câu sai'
+      : !quiz.lessonId
       ? 'Ôn tập tổng hợp'
       : categoryLabel(allLessons.find((l) => l.id === quiz.lessonId) || { id: '' })
     return (
@@ -632,6 +716,50 @@ export default function App() {
         {!quiz.checked
           ? <Button variant="secondary" size="sm" label="Chấm câu này" isDisabled={!quiz.input.trim()} onClick={checkAnswer} />
           : <Button variant="primary" label={quiz.index + 1 >= quiz.questions.length ? 'Xem kết quả' : 'Câu tiếp theo →'} onClick={nextQuestion} />}
+      </Frame>
+    )
+  }
+
+  // ---- Trang "Câu sai cần ôn lại": nơi ghi nhận mọi câu làm sai ----
+  if (view.name === 'wrong') {
+    return (
+      <Frame navActive={currentNav()} onNav={goNav}>
+        <Button variant="ghost" label="← Về trang chính" onClick={() => setView({ name: 'home' })} />
+        <SectionLabel icon="📝">Câu sai cần ôn lại</SectionLabel>
+        <Heading level={2}>Câu sai cần ôn lại ({wrongBank.length})</Heading>
+        <Text type="supporting">Mọi câu làm sai trong các bài đều được ghi lại ở đây, kể cả khi đã thoát khỏi màn hình kết quả. Bấm “Luyện lại” và trả lời đúng thì câu đó tự xóa khỏi danh sách.</Text>
+        {wrongBank.length > 0 && (
+          <HStack gap={2} wrap="wrap">
+            <Button variant="primary" size="lg" label="Luyện lại các câu sai →" onClick={startWrongQuiz} />
+            <Button
+              variant={confirmClear ? 'destructive' : 'secondary'}
+              label={confirmClear ? 'Bấm lại để xác nhận xóa hết' : 'Xóa hết'}
+              onClick={() => {
+                if (confirmClear) { setWrongBank([]); setConfirmClear(false) }
+                else setConfirmClear(true)
+              }}
+            />
+          </HStack>
+        )}
+        {wrongBank.length === 0 ? (
+          <div className="learn-card">
+            <Text>Chưa có câu sai nào — tuyệt vời! 🎉</Text>
+          </div>
+        ) : (
+          <VStack gap={2}>
+            {wrongBank.map((e) => (
+              <div className="learn-card" key={e.key}>
+                <VStack gap={1}>
+                  <Text type="supporting">{e.lessonTitle}</Text>
+                  <Text weight="bold">{e.question.prompt}</Text>
+                  <Text>Bạn trả lời: {e.userAnswer}</Text>
+                  <Text>Đáp án đúng: {e.correctAnswer}</Text>
+                  {e.question.explanation && <Text type="supporting">{e.question.explanation}</Text>}
+                </VStack>
+              </div>
+            ))}
+          </VStack>
+        )}
       </Frame>
     )
   }
@@ -761,6 +889,15 @@ export default function App() {
               <Button variant="primary" size="lg" label="Bắt đầu ôn tập →" onClick={() => startQuiz(null, true)} />
             </VStack>
           </div>
+          {wrongBank.length > 0 && (
+            <div className="learn-card">
+              <VStack gap={2}>
+                <SectionLabel icon="📝">Câu sai cần ôn lại</SectionLabel>
+                <Text type="supporting">Đang có {wrongBank.length} câu làm sai chờ ôn. Luyện lại, trả lời đúng thì câu đó tự xóa khỏi danh sách.</Text>
+                <Button variant="primary" size="lg" label={`Xem ${wrongBank.length} câu sai →`} onClick={openWrongBank} />
+              </VStack>
+            </div>
+          )}
         </VStack>
       )}
     </Frame>
