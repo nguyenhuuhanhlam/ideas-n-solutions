@@ -454,10 +454,10 @@ export default function App() {
     let title
     if (practice) {
       const all = allLessons.flatMap((l) => l.questions.map((q) => ({ ...q, lessonTitle: l.title })))
-      questions = shuffle(all).slice(QUESTIONS_PER_SESSION)
+      questions = shuffle(all).slice(0, QUESTIONS_PER_SESSION)
       title = 'Ôn tập tổng hợp (25 câu ngẫu nhiên)'
     } else {
-      questions = shuffle(lesson.questions).slice(QUESTIONS_PER_SESSION)
+      questions = shuffle(lesson.questions).slice(0, QUESTIONS_PER_SESSION)
       title = lesson.title
     }
     setQuiz({
@@ -533,6 +533,15 @@ export default function App() {
 
   // ---- Màn hình làm bài ----
   if (view.name === 'quiz' && quiz) {
+    if (!quiz.questions.length) {
+      return (
+        <Page activeId={activeId} onNavigate={handleNavigate}>
+          <Heading level={2}>Bài này chưa có câu hỏi.</Heading>
+          <Text type="supporting">Hãy quay về trang chính và chọn bài khác.</Text>
+          <Button variant="primary" label="Về trang chính" onClick={() => setView({ name: 'home' })} />
+        </Page>
+      )
+    }
     if (quiz.finished) {
       const quizCat = categoryOfQuiz(quiz)
       const stars = starsFor(quiz.percent)
@@ -676,8 +685,10 @@ export default function App() {
   // ---- Trang chính: phân loại ở menu trái (shell-nav), không dùng tabs nữa ----
   const isConjSection = section.startsWith('conj:')
   const conjId = isConjSection ? section.slice(5) : 'to-be'
-  const shownLessons = section === 'basic' ? lessons : section === 'all' ? allLessons : []
-  const conjLesson = conjugationGroups.find((l) => l.id === conjId) || conjugationGroups[0]
+  const shownLessons = section === 'basic'
+    ? allLessons.filter((l) => !conjugationGroups.some((g) => g.id === l.id))
+    : section === 'all' ? allLessons : []
+  const conjLesson = allLessons.find((l) => l.id === conjId) || allLessons.find((l) => l.id === 'to-be')
   const conjBest = progress[conjLesson.id]?.best || 0
   return (
     <Page activeId={activeId} onNavigate={handleNavigate}>
