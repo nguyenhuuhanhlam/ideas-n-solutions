@@ -108,7 +108,7 @@ Chi tiết bài cơ bản có thêm hộp nhớ nhanh số ít/số nhiều tư�
 (kèm danh từ đổi hẳn dạng: child → children, person → people,
 man → men, foot → feet…).
 
-## Các bài (ngân hàng 1043 câu)
+## Các bài (ngân hàng 3029 câu)
 
 Ngân hàng câu hỏi sinh tự động bằng `tools/generate-questions.mjs`
 (chạy lại cho cùng một file, có kiểm tra: trắc nghiệm đủ 4 đáp án
