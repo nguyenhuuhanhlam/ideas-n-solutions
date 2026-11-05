@@ -197,3 +197,18 @@
   border-radius: 16px;
   padding: 14px 16px;
 }
+
+/* Sơ đồ hoạt động UML: nền xám nhạt để hộp trắng nổi lên trong thẻ trắng;
+   màn hình hẹp thì cuộn ngang thay vì bóp nhỏ chữ trong sơ đồ. */
+.learn-diagram {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 16px 8px;
+  overflow-x: auto;
+}
+
+.learn-diagram svg {
+  display: block;
+  min-width: 560px;
+}

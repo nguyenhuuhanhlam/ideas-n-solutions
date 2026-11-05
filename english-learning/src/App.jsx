@@ -224,56 +224,144 @@ function VocabList({ items, verbTint }) {
 // chìm trong một khối màu dài.
 // Sơ đồ luồng: hộp bước nối nhau bằng mũi tên đi xuống; gặp nút hỏi
 // thì rẽ sang 1 trong 2 nhánh rồi đi tiếp xuống dưới.
-function FlowDiagram({ flow }) {
-  let stepNo = 0
-  const nodes = []
-  flow.forEach((node, i) => {
-    if (i > 0) {
-      nodes.push(
-        <HStack key={`arrow-${i}`} justify="center">
-          <Text size="xl">↓</Text>
-        </HStack>,
-      )
-    }
-    if (node.decision) {
-      nodes.push(
-        <VStack key={`node-${i}`} gap={2}>
-          <HStack gap={2} align="center">
-            <Badge variant="teal" label="?" />
-            <Text weight="bold" size="lg">{node.decision}</Text>
-          </HStack>
-          <HStack gap={2} wrap="wrap">
-            {node.branches.map((b, j) => (
-              <Card key={j}>
-                <VStack gap={1}>
-                  <Badge variant={j === 0 ? 'teal' : 'neutral'} label={b.tag} />
-                  <Text weight="bold" size="lg">{b.result}</Text>
-                  {b.note && <Text type="supporting">{b.note}</Text>}
-                </VStack>
-              </Card>
-            ))}
-          </HStack>
-        </VStack>,
-      )
-    } else {
-      stepNo += 1
-      nodes.push(
-        <Card key={`node-${i}`}>
-          <HStack gap={2} align="center">
-            <Badge variant="teal" label={`Bước ${stepNo}`} />
-            <VStack gap={1}>
-              <Text weight="bold" size="lg">{node.label}</Text>
-              {node.sub && <Text type="supporting">{node.sub}</Text>}
-            </VStack>
-          </HStack>
-        </Card>,
-      )
-    }
-  })
-  return <VStack gap={2}>{nodes}</VStack>
+// Sơ đồ hoạt động UML (tĩnh) cho "Các bước làm": vẽ bằng SVG thay vì
+// danh sách thẻ, để thấy rõ luồng đi — bắt đầu ●, hộp bo tròn = bước,
+// hình thoi = câu hỏi rẽ nhánh, 2 nhánh chập lại ở hình thoi hợp lưu
+// rồi mới đi tiếp, kết thúc ◎. Nội dung lấy đúng từ dữ liệu flow
+// (bước / câu hỏi / nhánh), chỉ đổi cách vẽ. Chữ trong SVG tự ngắt
+// dòng theo độ rộng hộp và nhân với tỉ lệ cỡ chữ đang chọn (scale) để
+// không tràn hộp khi user chỉnh cỡ chữ lớn.
+const DIAG_NAVY = '#16233a'
+const DIAG_MUTED = '#475569'
+const DIAG_TEAL = '#0f766e'
+const DIAG_TEAL_BG = '#e6f4f1'
+
+function diagWrap(text, maxChars) {
+  if (!text) return []
+  const words = String(text).split(/\s+/)
+  const lines = []
+  let cur = ''
+  for (const w of words) {
+    if (!cur) cur = w
+    else if (cur.length + 1 + w.length <= maxChars) cur += ` ${w}`
+    else { lines.push(cur); cur = w }
+  }
+  if (cur) lines.push(cur)
+  return lines
 }
 
-function ConjugationGuide({ guide }) {
+function ActivityDiagram({ flow, scale }) {
+  const s = scale || 1
+  const CX = 380
+  const BX = [150, 610]
+  const gap = 30 * s
+  let k = 0
+  const els = []
+  const line = (x1, y1, x2, y2) => {
+    els.push(<line key={k++} x1={x1} y1={y1} x2={x2} y2={y2} stroke={DIAG_NAVY} strokeWidth={2 * s} markerEnd="url(#uml-arrow)" />)
+  }
+  const path = (d) => {
+    els.push(<path key={k++} d={d} fill="none" stroke={DIAG_NAVY} strokeWidth={2 * s} markerEnd="url(#uml-arrow)" />)
+  }
+  // Vẽ 1 khối chữ nhiều dòng từ top; baseline dòng i = top + i * lh + lh - 5s.
+  const textLines = (x, top, lines, lh, size, weight, fill) => {
+    const out = []
+    lines.forEach((ln, i) => {
+      out.push(<text key={k++} x={x} y={top + i * lh + lh - 5 * s} textAnchor="middle" fontSize={size} fontWeight={weight} fill={fill}>{ln}</text>)
+    })
+    return out
+  }
+
+  let stepNo = 0
+  els.push(<circle key={k++} cx={CX} cy={13 * s} r={13 * s} fill={DIAG_NAVY} />)
+  let y = 26 * s
+
+  flow.forEach((node) => {
+    const top = y + gap
+    line(CX, y, CX, top)
+    if (node.decision) {
+      const qLines = diagWrap(node.decision, Math.max(8, Math.floor(240 / (10 * s))))
+      const qH = qLines.length * 25 * s
+      const dH = Math.max(96 * s, qH + 44 * s)
+      const midY = top + dH / 2
+      els.push(<polygon key={k++} points={`${CX},${top} ${CX + 160},${midY} ${CX},${top + dH} ${CX - 160},${midY}`} fill="#ffffff" stroke={DIAG_NAVY} strokeWidth={2 * s} />)
+      els.push(...textLines(CX, top + (dH - qH) / 2, qLines, 25 * s, 19 * s, 800, DIAG_NAVY))
+      // 2 nhánh: tính chiều cao hộp nhánh trước để vẽ 2 hộp bằng nhau
+      const branches = node.branches.map((b) => {
+        const rLines = diagWrap(b.result, Math.max(6, Math.floor(228 / (11.5 * s))))
+        const nLines = b.note ? diagWrap(b.note, Math.max(8, Math.floor(228 / (7 * s)))) : []
+        return { ...b, rLines, nLines, h: 16 * s + rLines.length * 27 * s + nLines.length * 19 * s + 16 * s }
+      })
+      const bH = Math.max(...branches.map((b) => b.h))
+      // Nhãn điều kiện (guard) nằm trên đoạn dọc; hộp nhánh bắt đầu sau nhãn
+      const pillTops = branches.map((b) => {
+        const tLines = diagWrap(b.tag, Math.max(8, Math.floor(240 / (7.2 * s))))
+        const w = Math.min(250, Math.max(...tLines.map((t) => t.length)) * 7.2 * s + 28)
+        return { tLines, w, h: tLines.length * 19 * s + 12 * s }
+      })
+      const bTop = midY + 12 * s + Math.max(...pillTops.map((p) => p.h)) + 12 * s
+      branches.forEach((b, j) => {
+        const bx = BX[j]
+        const vx = j === 0 ? CX - 160 : CX + 160
+        path(`M${vx},${midY} H${bx} V${bTop}`)
+        const p = pillTops[j]
+        els.push(<rect key={k++} x={bx - p.w / 2} y={midY + 12 * s} width={p.w} height={p.h} rx={p.h / 2} fill={DIAG_TEAL_BG} stroke={DIAG_TEAL} strokeWidth={1.5 * s} />)
+        els.push(...textLines(bx, midY + 12 * s + (p.h - p.tLines.length * 19 * s) / 2, p.tLines, 19 * s, 13.5 * s, 700, DIAG_TEAL))
+        els.push(<rect key={k++} x={bx - 130} y={bTop} width={260} height={bH} rx={18} fill="#ffffff" stroke={DIAG_NAVY} strokeWidth={2 * s} />)
+        const contentH = b.rLines.length * 27 * s + b.nLines.length * 19 * s
+        let ty = bTop + (bH - contentH) / 2
+        els.push(...textLines(bx, ty, b.rLines, 27 * s, 22 * s, 800, DIAG_NAVY))
+        ty += b.rLines.length * 27 * s
+        els.push(...textLines(bx, ty, b.nLines, 19 * s, 14 * s, 400, DIAG_MUTED))
+      })
+      // Hợp lưu: 2 đoạn dọc xuống rồi chập vào hình thoi nhỏ
+      const mY = bTop + bH + 44 * s
+      branches.forEach((b, j) => {
+        const bx = BX[j]
+        const vx = j === 0 ? CX - 18 * s : CX + 18 * s
+        path(`M${bx},${bTop + bH} V${mY} H${vx}`)
+      })
+      els.push(<polygon key={k++} points={`${CX},${mY - 18 * s} ${CX + 18 * s},${mY} ${CX},${mY + 18 * s} ${CX - 18 * s},${mY}`} fill="#ffffff" stroke={DIAG_NAVY} strokeWidth={2 * s} />)
+      y = mY + 18 * s
+    } else {
+      stepNo += 1
+      const labelLines = diagWrap(node.label, Math.max(8, Math.floor(312 / (10.5 * s))))
+      const subLines = node.sub ? diagWrap(node.sub, Math.max(8, Math.floor(312 / (7.3 * s)))) : []
+      const h = 16 * s + 15 * s + labelLines.length * 25 * s + subLines.length * 20 * s + 16 * s
+      els.push(<rect key={k++} x={200} y={top} width={360} height={h} rx={18} fill="#ffffff" stroke={DIAG_NAVY} strokeWidth={2 * s} />)
+      els.push(<circle key={k++} cx={200} cy={top} r={15 * s} fill={DIAG_NAVY} />)
+      els.push(<text key={k++} x={200} y={top + 5 * s} textAnchor="middle" fontSize={14 * s} fontWeight={800} fill="#ffffff">{stepNo}</text>)
+      els.push(<text key={k++} x={CX} y={top + 16 * s + 6 * s} textAnchor="middle" fontSize={11 * s} fontWeight={800} letterSpacing={2} fill={DIAG_TEAL}>BƯỚC {stepNo}</text>)
+      let ty = top + 16 * s + 15 * s
+      els.push(...textLines(CX, ty, labelLines, 25 * s, 20 * s, 800, DIAG_NAVY))
+      ty += labelLines.length * 25 * s
+      els.push(...textLines(CX, ty, subLines, 20 * s, 14.5 * s, 400, DIAG_MUTED))
+      y = top + h
+    }
+  })
+
+  const endTop = y + gap
+  line(CX, y, CX, endTop)
+  const endCy = endTop + 17 * s
+  els.push(<circle key={k++} cx={CX} cy={endCy} r={17 * s} fill="none" stroke={DIAG_NAVY} strokeWidth={2.5 * s} />)
+  els.push(<circle key={k++} cx={CX} cy={endCy} r={8 * s} fill={DIAG_NAVY} />)
+  const totalH = endCy + 17 * s
+
+  return (
+    <div className="learn-diagram">
+      <svg viewBox={`0 0 760 ${totalH}`} width="100%" role="img" aria-label="Sơ đồ các bước làm">
+        <defs>
+          <marker id="uml-arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L7,3 L0,6 Z" fill={DIAG_NAVY} />
+          </marker>
+        </defs>
+        {els}
+      </svg>
+    </div>
+  )
+}
+
+function ConjugationGuide({ guide, scale }) {
   if (!guide) return null
   return (
     <VStack gap={6}>
@@ -290,8 +378,8 @@ function ConjugationGuide({ guide }) {
       </VStack>
       <VStack gap={2}>
         <Heading level={4} weight="bold">🪜 Các bước làm — đi theo sơ đồ này</Heading>
-        <Text type="supporting">Đi từ trên xuống dưới; gặp nút hỏi thì rẽ sang nhánh đúng rồi đi tiếp.</Text>
-        <FlowDiagram flow={guide.flow} />
+        <Text type="supporting">Đi từ trên xuống dưới; gặp hình thoi thì rẽ sang nhánh đúng, hai nhánh chập lại rồi đi tiếp.</Text>
+        <ActivityDiagram flow={guide.flow} scale={scale} />
       </VStack>
       <VStack gap={2}>
         <Heading level={4} weight="bold">💡 Mẹo nhớ</Heading>
@@ -796,7 +884,7 @@ export default function App() {
               <SectionLabel icon="📚">Dạng mẫu · {lesson.vocab.length} mục</SectionLabel>
               <VocabList items={lesson.vocab} verbTint={isConj} />
             </VStack>
-            {guide ? <ConjugationGuide guide={guide} /> : <SingularPluralBox />}
+            {guide ? <ConjugationGuide guide={guide} scale={fontSizeOpt.scale} /> : <SingularPluralBox />}
             <Button variant="primary" size="lg" label="Bắt đầu làm 25 câu →" onClick={() => startQuiz(lesson)} />
           </VStack>
         </div>

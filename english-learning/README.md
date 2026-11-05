@@ -74,6 +74,14 @@ xem được từ thẻ trên trang chính và từ màn hình kết quả; bấ
 lại” để làm lại đúng các câu đó, trả lời đúng thì câu tự xóa khỏi
 danh sách (kể cả khi làm đúng lại ở một bài thường); nút “Xóa hết”
 cần bấm 2 lần để xác nhận.
+Phần “Các bước làm” ở 6 nhóm chia động từ vẽ bằng sơ đồ hoạt động
+UML tĩnh (`ActivityDiagram` trong App.jsx, SVG tự tính bố cục):
+bắt đầu ●, hộp bo tròn = bước (có số bước ở góc), hình thoi = câu
+hỏi rẽ nhánh với nhãn điều kiện, 2 nhánh chập lại ở hình thoi hợp
+lưu rồi mới đi tiếp, kết thúc ◎; chữ tự ngắt dòng theo độ rộng hộp
+và nhân với tỉ lệ cỡ chữ đang chọn nên không tràn hộp khi chỉnh cỡ
+chữ lớn; màn hình hẹp thì sơ đồ cuộn ngang thay vì bóp nhỏ chữ.
+Nội dung sơ đồ lấy đúng từ dữ liệu `flow` hiện có, không viết lại.
 
 ## Cài đặt — cỡ chữ
 
