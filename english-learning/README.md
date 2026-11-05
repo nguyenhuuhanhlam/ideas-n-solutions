@@ -55,6 +55,15 @@ qua localStorage, không cần tài khoản. Điểm cũ của 2 bài chia độ
 trước khi gộp thành tabs được chuyển sang nhóm mới tương ứng
 (to-be, present-simple).
 
+## Cài đặt — cỡ chữ
+
+Menu trái có mục Cài đặt → Cỡ chữ, 4 mức: Nhỏ (chữ thường 16px),
+Vừa (20px, mặc định), Lớn (25px), Rất lớn (30px). Chọn cỡ nào toàn
+app đổi ngay (kỹ thuật: biến `--font-scale` trên documentElement,
+các `--font-size-*` trong `src/app-fonts.css` nhân với biến này) và
+lưu bền ở localStorage (`english-learning-settings-v1`) nên mở lại
+vẫn giữ cỡ đã chọn.
+
 ## Hướng dẫn chia động từ (ở chi tiết nhóm)
 
 Mỗi nhóm chia động từ có thêm mục hướng dẫn chi tiết

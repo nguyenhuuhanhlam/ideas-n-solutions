@@ -21,6 +21,16 @@ import { conjugationGuides } from './data/conjugationGuides.js'
 import { irregularVerbs } from './data/irregular.js'
 
 const STORAGE_KEY = 'english-learning-progress-v1'
+const SETTINGS_KEY = 'english-learning-settings-v1'
+// Cỡ chữ trong Cài đặt: tỉ lệ nhân với cỡ mặc định của app (cỡ Vừa =
+// chữ thường 20px, tức theme 16px tăng 25% như trước). Đổi cỡ là đổi
+// biến --font-scale trên documentElement nên toàn app đổi ngay.
+const FONT_SIZE_OPTIONS = [
+  { id: 'small', label: 'Nhỏ', scale: 0.8, px: 16 },
+  { id: 'medium', label: 'Vừa', scale: 1, px: 20 },
+  { id: 'large', label: 'Lớn', scale: 1.25, px: 25 },
+  { id: 'xlarge', label: 'Rất lớn', scale: 1.5, px: 30 },
+]
 // Ngân hàng câu hỏi (tools/generate-questions.mjs sinh ra, 1043 câu):
 // mỗi bài lấy ngẫu nhiên 25 câu mỗi phiên thay vì làm hết cả ngân hàng.
 const QUESTIONS_PER_SESSION = 25
@@ -372,6 +382,20 @@ function Shell({ activeId, onNavigate, children }) {
         })),
       },
       {
+        id: 'group-settings',
+        label: <Text maxLines={1}>Cài đặt</Text>,
+        isExpanded: true,
+        children: [
+          {
+            id: 'settings',
+            label: <Text maxLines={1}>Cỡ chữ</Text>,
+            startContent: <Text>⚙️</Text>,
+            isSelected: 'settings' === activeId,
+            onClick: () => onNavigate('settings'),
+          },
+        ],
+      },
+      {
         id: 'group-lookup',
         label: <Text maxLines={1}>Tra cứu</Text>,
         isExpanded: true,
@@ -435,7 +459,15 @@ export default function App() {
   const [progress, setProgress] = useState(loadProgress)
   const [view, setView] = useState({ name: 'home' }) // home | lesson | quiz
   const [quiz, setQuiz] = useState(null)
-  const [section, setSection] = useState('all') // all | basic | lookup | conj:<id> | practice
+  const [section, setSection] = useState('all') // all | basic | lookup | conj:<id> | practice | settings
+  const [fontSize, setFontSize] = useState(() => {
+    try { return localStorage.getItem(SETTINGS_KEY) || 'medium' } catch { return 'medium' }
+  })
+  const fontSizeOpt = FONT_SIZE_OPTIONS.find((o) => o.id === fontSize) || FONT_SIZE_OPTIONS[1]
+  useEffect(() => {
+    document.documentElement.style.setProperty('--font-scale', String(fontSizeOpt.scale))
+    try { localStorage.setItem(SETTINGS_KEY, fontSize) } catch { /* không lưu được thì vẫn dùng cỡ đã chọn trong phiên */ }
+  }, [fontSize, fontSizeOpt.scale])
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress))
@@ -702,6 +734,32 @@ export default function App() {
         </HStack>
       </Card>
       <Button variant="primary" size="lg" label="🔀 Ôn tập tổng hợp — 25 câu ngẫu nhiên" onClick={() => startQuiz(null, true)} />
+
+      {section === 'settings' && (
+        <VStack gap={2}>
+          <Badge variant="neutral" label="Cài đặt" />
+          <Heading level={4} weight="bold">⚙️ Cài đặt — Cỡ chữ</Heading>
+          <Text type="supporting">Chọn một cỡ, toàn bộ app (menu, bài học, bài tập) đổi ngay lập tức và lần sau mở lại vẫn giữ cỡ đó.</Text>
+          <HStack gap={2} wrap="wrap">
+            {FONT_SIZE_OPTIONS.map((opt) => (
+              <Button
+                key={opt.id}
+                variant={fontSize === opt.id ? 'primary' : 'secondary'}
+                label={opt.label}
+                onClick={() => setFontSize(opt.id)}
+              />
+            ))}
+          </HStack>
+          <Text type="supporting">Cỡ hiện tại: {fontSizeOpt.label} — chữ thường khoảng {fontSizeOpt.px}px.</Text>
+          <Card>
+            <VStack gap={1}>
+              <Text weight="bold" size="lg">Chữ xem trước: She plays football every day.</Text>
+              <Text>Chữ xem trước: Lan and Minh are happy today.</Text>
+              <Text type="supporting">Đoạn này đổi theo cỡ bạn chọn ở trên.</Text>
+            </VStack>
+          </Card>
+        </VStack>
+      )}
 
       {section === 'lookup' && (
         <VStack gap={2}>
