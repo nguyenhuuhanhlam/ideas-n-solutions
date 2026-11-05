@@ -3,6 +3,7 @@ import { Banner } from '@astryxdesign/core/Banner'
 import { Button } from '@astryxdesign/core/Button'
 import { Card } from '@astryxdesign/core/Card'
 import { ClickableCard } from '@astryxdesign/core/ClickableCard'
+import { BookOpen, Compass, Flag, Hash, LayoutGrid, Lightbulb, List, NotebookPen, Pencil, Search, Settings, Shuffle, TriangleAlert, Workflow } from 'lucide-react'
 import { Heading } from '@astryxdesign/core/Heading'
 import { HStack } from '@astryxdesign/core/HStack'
 import { ProgressBar } from '@astryxdesign/core/ProgressBar'
@@ -405,7 +406,7 @@ function ConjugationGuide({ guide, scale }) {
   return (
     <VStack gap={6}>
       <VStack gap={2}>
-        <SectionLabel icon="🧭">Sơ đồ chia động từ</SectionLabel>
+        <SectionLabel icon={<Compass />}>Sơ đồ chia động từ</SectionLabel>
         <Table
           data={guide.table.rows}
           idKey={guide.table.idKey}
@@ -416,12 +417,12 @@ function ConjugationGuide({ guide, scale }) {
         />
       </VStack>
       <VStack gap={2}>
-        <SectionLabel icon="🪜">Các bước làm — đi theo sơ đồ này</SectionLabel>
+        <SectionLabel icon={<Workflow />}>Các bước làm — đi theo sơ đồ này</SectionLabel>
         <Text type="supporting">Đi từ trên xuống dưới; gặp hình thoi thì rẽ sang nhánh đúng, hai nhánh chập lại rồi đi tiếp.</Text>
         <ActivityDiagram flow={guide.flow} scale={scale} />
       </VStack>
       <VStack gap={2}>
-        <SectionLabel icon="💡">Mẹo nhớ</SectionLabel>
+        <SectionLabel icon={<Lightbulb />}>Mẹo nhớ</SectionLabel>
         <VStack gap={1}>
           {guide.tips.map((tip, i) => (
             <Text key={i}>💡 {tip}</Text>
@@ -429,7 +430,7 @@ function ConjugationGuide({ guide, scale }) {
         </VStack>
       </VStack>
       <VStack gap={2}>
-        <SectionLabel icon="⚠️">Số ít / Số nhiều — ví dụ đặc biệt</SectionLabel>
+        <SectionLabel icon={<TriangleAlert />}>Số ít / Số nhiều — ví dụ đặc biệt</SectionLabel>
         <VStack gap={2}>
           {guide.specials.map((sp, i) => (
             <VStack key={i} gap={1}>
@@ -448,7 +449,7 @@ function ConjugationGuide({ guide, scale }) {
 function SingularPluralBox() {
   return (
     <VStack gap={2}>
-      <SectionLabel icon="🔢">Số ít / Số nhiều — nhớ nhanh</SectionLabel>
+      <SectionLabel icon={<Hash />}>Số ít / Số nhiều — nhớ nhanh</SectionLabel>
       <Table
         data={[
           { kind: '1 người/vật', subjects: 'he, she, it, Lan, the dog', verb: '+ -s / is (She plays, Lan is kind)' },
@@ -728,7 +729,7 @@ export default function App() {
       return (
         <Frame navActive={currentNav()} onNav={goNav} narrow>
           <Button variant="ghost" label="← Về trang chính" onClick={() => setView({ name: 'home' })} />
-          <SectionLabel icon="🏁">Kết quả</SectionLabel>
+          <SectionLabel icon={<Flag />}>Kết quả</SectionLabel>
           <Heading level={2}>Kết quả: {quiz.score} / {quiz.questions.length * POINTS_PER_QUESTION} điểm ({quiz.percent}%)</Heading>
           <Banner
             status={passed ? 'success' : 'error'}
@@ -780,7 +781,7 @@ export default function App() {
     return (
       <Frame navActive={currentNav()} onNav={goNav} narrow>
         <Button variant="ghost" label="← Thoát bài (không lưu điểm)" onClick={() => setView({ name: 'home' })} />
-        <SectionLabel icon="✏️">{quizLabel}</SectionLabel>
+        <SectionLabel icon={<Pencil />}>{quizLabel}</SectionLabel>
         <Heading level={2}>{quiz.title}</Heading>
         <ProgressBar
           label="Tiến độ bài làm"
@@ -852,7 +853,7 @@ export default function App() {
     return (
       <Frame navActive={currentNav()} onNav={goNav}>
         <Button variant="ghost" label="← Về trang chính" onClick={() => setView({ name: 'home' })} />
-        <SectionLabel icon="📝">Câu sai cần ôn lại</SectionLabel>
+        <SectionLabel icon={<NotebookPen />}>Câu sai cần ôn lại</SectionLabel>
         <Heading level={2}>Câu sai cần ôn lại ({wrongBank.length})</Heading>
         <Text type="supporting">Mọi câu làm sai trong các bài đều được ghi lại ở đây, kể cả khi đã thoát khỏi màn hình kết quả. Bấm “Luyện lại” và trả lời đúng thì câu đó tự xóa khỏi danh sách.</Text>
         {wrongBank.length > 0 && (
@@ -916,11 +917,11 @@ export default function App() {
         <div className="learn-card">
           <VStack gap={6}>
             <VStack gap={2}>
-              <SectionLabel icon="📖">{lesson.grammarTitle}</SectionLabel>
+              <SectionLabel icon={<BookOpen />}>{lesson.grammarTitle}</SectionLabel>
               <GrammarExamples grammar={lesson.grammar} />
             </VStack>
             <VStack gap={2}>
-              <SectionLabel icon="📚">Dạng mẫu</SectionLabel>
+              <SectionLabel icon={<LayoutGrid />}>Dạng mẫu</SectionLabel>
               <VocabList items={lesson.vocab} verbTint={isConj} />
             </VStack>
             {guide ? <ConjugationGuide guide={guide} scale={fontSizeOpt.scale} /> : <SingularPluralBox />}
@@ -957,7 +958,7 @@ export default function App() {
       {section === 'settings' && (
         <div className="learn-card">
           <VStack gap={2}>
-            <SectionLabel icon="⚙️">Cài đặt — Cỡ chữ</SectionLabel>
+            <SectionLabel icon={<Settings />}>Cài đặt — Cỡ chữ</SectionLabel>
             <Text type="supporting">Chọn một cỡ, toàn bộ app đổi ngay lập tức và lần sau mở lại vẫn giữ cỡ đó.</Text>
             <HStack gap={2} wrap="wrap">
               {FONT_SIZE_OPTIONS.map((opt) => (
@@ -981,7 +982,7 @@ export default function App() {
       {section === 'lookup' && (
         <div className="learn-card">
           <VStack gap={2}>
-            <SectionLabel icon="📖">Tra cứu động từ bất quy tắc</SectionLabel>
+            <SectionLabel icon={<Search />}>Tra cứu động từ bất quy tắc</SectionLabel>
             <Text type="supporting">Bảng này dùng cho nhóm Quá khứ bất quy tắc trong Chia động từ. Gõ tiếng Anh hoặc tiếng Việt để lọc, ví dụ “go”, “went” hoặc “mua”.</Text>
             <IrregularLookup />
           </VStack>
@@ -990,7 +991,7 @@ export default function App() {
 
       {(section === 'basic' || section === 'conjhub') && (
         <VStack gap={3}>
-          <SectionLabel icon="📚">{listTitle}</SectionLabel>
+          <SectionLabel icon={<List />}>{listTitle}</SectionLabel>
           <Text type="supporting">Mỗi lần làm bài lấy ngẫu nhiên 25 câu, mỗi câu 1 điểm.</Text>
           {shownLessons.map((lesson) => {
             const best = progress[lesson.id]?.best || 0
@@ -1010,7 +1011,7 @@ export default function App() {
           })}
           <div className="learn-card">
             <VStack gap={2}>
-              <SectionLabel icon="🔀">Ôn tập tổng hợp</SectionLabel>
+              <SectionLabel icon={<Shuffle />}>Ôn tập tổng hợp</SectionLabel>
               <Text type="supporting">25 câu ngẫu nhiên từ tất cả các bài, mỗi câu 1 điểm.</Text>
               <Button variant="primary" size="lg" label="Bắt đầu ôn tập →" onClick={() => startQuiz(null, true)} />
             </VStack>
@@ -1018,7 +1019,7 @@ export default function App() {
           {wrongBank.length > 0 && (
             <div className="learn-card">
               <VStack gap={2}>
-                <SectionLabel icon="📝">Câu sai cần ôn lại</SectionLabel>
+                <SectionLabel icon={<NotebookPen />}>Câu sai cần ôn lại</SectionLabel>
                 <Text type="supporting">Đang có {wrongBank.length} câu làm sai chờ ôn. Luyện lại, trả lời đúng thì câu đó tự xóa khỏi danh sách.</Text>
                 <Button variant="primary" size="lg" label={`Xem ${wrongBank.length} câu sai →`} onClick={openWrongBank} />
               </VStack>

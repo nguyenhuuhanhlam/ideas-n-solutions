@@ -149,6 +149,14 @@
   gap: 8px;
 }
 
+/* Icon Lucide (nét mảnh, stroke = currentColor nên ăn màu teal của nhãn);
+   cỡ theo em để icon to theo khi user chỉnh cỡ chữ. */
+.learn-section-label svg {
+  width: 1.25em;
+  height: 1.25em;
+  flex: none;
+}
+
 .learn-example {
   font-style: italic;
   border-left: 4px solid #0e9a8b;
