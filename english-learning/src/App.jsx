@@ -82,12 +82,37 @@ function loadProgress() {
   }
 }
 
+// Dạng rút gọn và dạng đầy đủ được chấm như nhau (i'm = i am,
+// don't = do not, ...), kể cả khi user gõ không dấu nháy (im, dont)
+// hoặc dùng dấu nháy cong ’ của bàn phím điện thoại.
+const CONTRACTIONS = {
+  "i'm": 'i am', im: 'i am',
+  "you're": 'you are', "he's": 'he is', "she's": 'she is', "it's": 'it is',
+  "we're": 'we are', "they're": 'they are',
+  "isn't": 'is not', isnt: 'is not',
+  "aren't": 'are not', arent: 'are not',
+  "wasn't": 'was not', wasnt: 'was not',
+  "weren't": 'were not', werent: 'were not',
+  "don't": 'do not', dont: 'do not',
+  "doesn't": 'does not', doesnt: 'does not',
+  "didn't": 'did not', didnt: 'did not',
+  "won't": 'will not', wont: 'will not',
+  "can't": 'cannot', cant: 'cannot',
+  "i'll": 'i will', ill: 'i will',
+  "you'll": 'you will', "he'll": 'he will', "she'll": 'she will',
+  "it'll": 'it will', "we'll": 'we will', "they'll": 'they will',
+  "that's": 'that is', "what's": 'what is',
+}
+
 function normalize(text) {
   return String(text || '')
     .toLowerCase()
     .trim()
+    .replace(/[\u2019\u2018]/g, "'")
     .replace(/[.!?]+$/g, '')
-    .replace(/\s+/g, ' ')
+    .split(/\s+/)
+    .map((w) => CONTRACTIONS[w] || w)
+    .join(' ')
 }
 
 function shuffle(arr) {
