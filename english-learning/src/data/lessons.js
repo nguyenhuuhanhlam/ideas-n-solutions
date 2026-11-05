@@ -190,7 +190,7 @@ export const lessons = [
 export const conjugationGroups = [
   {
     id: 'to-be',
-    title: 'Nhóm 1: Động từ to be — hiện tại và quá khứ',
+    title: 'Động từ to be — hiện tại và quá khứ',
     topic: 'To be',
     description: 'Chia am/is/are ở hiện tại, was/were ở quá khứ; phủ định và câu hỏi. Nhóm này không chia -s/-ed, chỉ đổi chính dạng của be.',
     grammarTitle: 'Bảng chia to be',
@@ -225,7 +225,7 @@ export const conjugationGroups = [
   },
   {
     id: 'present-simple',
-    title: 'Nhóm 2: Động từ thường — hiện tại đơn',
+    title: 'Động từ thường — hiện tại đơn',
     topic: 'Present Simple',
     description: 'Thói quen, sự thật hiển nhiên. Chia -s/-es/-ies theo chủ ngữ, do/does cho phủ định và câu hỏi.',
     grammarTitle: 'Quy tắc chia hiện tại đơn',
@@ -260,7 +260,7 @@ export const conjugationGroups = [
   },
   {
     id: 'present-continuous',
-    title: 'Nhóm 3: Hiện tại tiếp diễn — be + V-ing',
+    title: 'Hiện tại tiếp diễn — be + V-ing',
     topic: 'Present Continuous',
     description: 'Hành động đang diễn ra ngay lúc nói. Công thức be (am/is/are) + động từ thêm -ing, chú ý cách viết -ing.',
     grammarTitle: 'Quy tắc viết V-ing',
@@ -295,7 +295,7 @@ export const conjugationGroups = [
   },
   {
     id: 'past-regular',
-    title: 'Nhóm 4: Quá khứ đơn — động từ có quy tắc (-ed)',
+    title: 'Quá khứ đơn — động từ có quy tắc (-ed)',
     topic: 'Past Simple (regular)',
     description: 'Hành động đã xong trong quá khứ. Động từ có quy tắc chỉ cần thêm -ed theo 4 cách viết, phủ định và câu hỏi dùng did.',
     grammarTitle: 'Quy tắc thêm -ed',
@@ -330,7 +330,7 @@ export const conjugationGroups = [
   },
   {
     id: 'past-irregular',
-    title: 'Nhóm 5: Quá khứ đơn — động từ bất quy tắc',
+    title: 'Quá khứ đơn — động từ bất quy tắc',
     topic: 'Past Simple (irregular)',
     description: 'Không có quy tắc thêm -ed, phải học thuộc bảng dạng quá khứ (V2). Bẫy lớn nhất: sau didn\'t/Did vẫn dùng dạng gốc (V1).',
     grammarTitle: 'Cách học động từ bất quy tắc',
@@ -365,7 +365,7 @@ export const conjugationGroups = [
   },
   {
     id: 'future',
-    title: 'Nhóm 6: Tương lai đơn — will và be going to',
+    title: 'Tương lai đơn — will và be going to',
     topic: 'Future Simple',
     description: 'Nói về việc sẽ xảy ra. Will + V cho quyết định tức thì và dự đoán; be going to + V cho kế hoạch đã định trước.',
     grammarTitle: 'Phân biệt will và be going to',

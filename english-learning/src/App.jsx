@@ -30,7 +30,21 @@ function wrongKeyFor(lessonTitle, question, correctAnswer) {
 function loadWrongBank() {
   try {
     const data = JSON.parse(localStorage.getItem(WRONG_KEY))
-    return Array.isArray(data) ? data : []
+    if (!Array.isArray(data)) return []
+    // Di dời: trước đây tên bài chia động từ có tiền tố "Nhóm N: " (đã bỏ
+    // cho đỡ rối) nên đổi cả tên hiển thị lẫn khóa của các câu sai đã lưu
+    // từ trước, tránh 1 câu bị ghi trùng 2 lần dưới 2 khóa khác nhau.
+    const seen = new Set()
+    const out = []
+    for (const e of data) {
+      if (!e.question || !e.correctAnswer) continue
+      const lessonTitle = (e.lessonTitle || '').replace(/^Nhóm \d+: /, '')
+      const key = wrongKeyFor(lessonTitle, e.question, e.correctAnswer)
+      if (seen.has(key)) continue
+      seen.add(key)
+      out.push({ ...e, lessonTitle, key })
+    }
+    return out
   } catch {
     return []
   }
