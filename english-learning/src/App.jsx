@@ -177,22 +177,24 @@ function GrammarExamples({ grammar }) {
 
 function VocabList({ items, verbTint }) {
   return (
-    <VStack gap={3}>
+    <div className="learn-vocab-grid">
       {items.map((v, i) => (
-        <VStack key={v.en} gap={1}>
-          <HStack gap={2} wrap="wrap">
-            {verbTint
-              ? (<><Text weight="bold">{i + 1}.</Text><Badge variant="teal" label={v.en} /></>)
-              : (<Text weight="bold" size="lg">{i + 1}. {v.en}</Text>)}
-            <Text type="supporting">— {v.vi}</Text>
-          </HStack>
-          <HStack gap={2} wrap="wrap">
-            <Text type="supporting">💬 Ví dụ:</Text>
-            <Text weight="bold">{v.example}</Text>
-          </HStack>
-        </VStack>
+        <div key={v.en} className="learn-vocab-item">
+          <VStack gap={1}>
+            <HStack gap={2} wrap="wrap">
+              {verbTint
+                ? (<><Text weight="bold">{i + 1}.</Text><Badge variant="teal" label={v.en} /></>)
+                : (<Text weight="bold" size="lg">{i + 1}. {v.en}</Text>)}
+              <Text type="supporting">— {v.vi}</Text>
+            </HStack>
+            <HStack gap={2} wrap="wrap">
+              <Text type="supporting">💬 Ví dụ:</Text>
+              <Text weight="bold">{v.example}</Text>
+            </HStack>
+          </VStack>
+        </div>
       ))}
-    </VStack>
+    </div>
   )
 }
 

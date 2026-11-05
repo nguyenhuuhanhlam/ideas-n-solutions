@@ -65,7 +65,9 @@ hero tên bài → cách dùng (ví dụ in nghiêng, vạch teal) → dạng m�
 hướng dẫn chia (nhóm chia) hoặc hộp số ít/số nhiều (bài cơ bản) → nút
 làm bài; màn hình quiz thu hẹp ở giữa. Font chuyển từ Cascadia Mono
 sang Nunito (sans tròn, thân thiện, có tiếng Việt) cho hợp app học tập;
-cài đặt cỡ chữ vẫn hoạt động như cũ qua biến `--font-scale`.
+cài đặt cỡ chữ vẫn hoạt động như cũ qua biến `--font-scale`. Phần Dạng
+mẫu xếp ngang dạng lưới (`learn-vocab-grid`, tự xuống 1 cột trên màn
+hình hẹp) thay vì danh sách dọc, để 8 mục đỡ tốn chiều cao trang.
 
 ## Cài đặt — cỡ chữ
 
