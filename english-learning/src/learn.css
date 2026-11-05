@@ -4,10 +4,18 @@
    đúng, đỏ = sai). Chữ dùng token --font-size-* của theme nên vẫn đổi
    theo cài đặt cỡ chữ. */
 
+:root {
+  color-scheme: light;
+}
+
 .learn-page {
   background: #eef3f7;
   min-height: 100vh;
   font-family: 'Nunito', ui-rounded, system-ui, sans-serif;
+  /* Khóa app ở light mode (xem ghi chú trong app-fonts.css): nền tự vẽ
+     của app luôn sáng, nên không được để chữ của Astryx chuyển trắng
+     theo dark mode của máy. */
+  color-scheme: light;
 }
 
 .learn-header {

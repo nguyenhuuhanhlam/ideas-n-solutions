@@ -13,6 +13,15 @@
    thắng các định nghĩa trong @layer astryx-theme của theme. */
 @scope ([data-astryx-theme]) {
   :scope {
+    /* QUAN TRỌNG — đừng bỏ dòng này: theme Astryx dùng light-dark() ở
+       ~107 chỗ và khai báo color-scheme: light dark, tức chữ sẽ chuyển
+       trắng khi máy/trình duyệt ở dark mode. Nhưng nền của app (trang,
+       thẻ trắng, panel ví dụ, ô dạng mẫu) là màu sáng CỐ ĐỊNH, không
+       đổi theo dark mode — nên chữ trắng sẽ chìm hẳn trên nền sáng,
+       đúng lỗi đã gặp sau bản thiết kế lại (bản cũ không bị vì mọi nền
+       đều là nền của Astryx, đổi màu cùng với chữ). Khóa light ở đây để
+       mọi token của theme luôn lấy nhánh sáng, khớp với nền sáng cố định. */
+    color-scheme: light;
     --font-family-body: 'Nunito', ui-rounded, system-ui, sans-serif;
     --font-family-heading: 'Nunito', ui-rounded, system-ui, sans-serif;
     --font-family-code: 'Nunito', ui-rounded, system-ui, sans-serif;
