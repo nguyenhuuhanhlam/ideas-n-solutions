@@ -1,7 +1,11 @@
-# SurveyJS Demo — React + Vite
+# SurveyJS Demo — React + Vite (chỉ dùng phần miễn phí)
 
-Demo SurveyJS trong React + Vite: kéo-thả tạo form bằng Survey Creator,
-điền thử bằng Survey, xem JSON định nghĩa form.
+Demo SurveyJS Form Library trong React + Vite: soạn form bằng JSON,
+điền thử bằng Survey, xem kết quả nộp dưới dạng JSON.
+
+Chỉ dùng `survey-core` + `survey-react-ui` (giấy phép MIT, miễn phí).
+KHÔNG dùng Survey Creator (thương mại, cần licence developer) nên không
+còn banner licence.
 
 ## Chạy local
 
@@ -41,3 +45,4 @@ App nằm trong repo ideas-n-solutions, theo đúng mẫu các app khác:
 
 Form đang sửa được lưu vào `localStorage` (`surveyjs-demo-json-v1`),
 tải lại trang vẫn còn. Nút Copy JSON / Tải form.json để lấy JSON mang đi dùng.
+Nút "Thêm câu hỏi" chèn nhanh một câu hỏi mẫu vào cuối trang 1.

@@ -13,7 +13,7 @@ button { font: inherit; cursor: pointer; }
 .toolbar button.primary { background: #2563eb; color: #fff; border-color: #2563eb; }
 .hint { font-size: 13px; color: #555; }
 pre { background: #111827; color: #e5e7eb; padding: 14px; border-radius: 10px; overflow: auto; font-size: 12.5px; line-height: 1.5; }
-.creator-wrap { height: 640px; }
-.creator-wrap .svc-creator { height: 100%; }
 .result { margin-top: 16px; }
 .success { background: #ecfdf5; border: 1px solid #a7f3d0; padding: 12px 14px; border-radius: 10px; }
+.error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 12px 14px; border-radius: 10px; margin: 0 0 12px; }
+textarea.editor { width: 100%; min-height: 480px; font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 13px; line-height: 1.55; padding: 12px; border: 1px solid #d0d0d0; border-radius: 10px; resize: vertical; background: #fafafa; }
