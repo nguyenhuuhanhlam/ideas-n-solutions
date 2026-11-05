@@ -209,13 +209,13 @@ function GrammarExamples({ grammar }) {
 function VocabList({ items, verbTint }) {
   return (
     <div className="learn-vocab-grid">
-      {items.map((v, i) => (
+      {items.map((v) => (
         <div key={v.en} className="learn-vocab-item">
           <VStack gap={1}>
             <HStack gap={2} wrap="wrap">
               {verbTint
-                ? (<><Text weight="bold">{i + 1}.</Text><Badge variant="teal" label={v.en} /></>)
-                : (<Text weight="bold" size="lg">{i + 1}. {v.en}</Text>)}
+                ? (<Badge variant="teal" label={v.en} />)
+                : (<Text weight="bold" size="lg">{v.en}</Text>)}
               <Text type="supporting">— {v.vi}</Text>
             </HStack>
             <HStack gap={2} wrap="wrap">
@@ -895,7 +895,7 @@ export default function App() {
               <GrammarExamples grammar={lesson.grammar} />
             </VStack>
             <VStack gap={2}>
-              <SectionLabel icon="📚">Dạng mẫu · {lesson.vocab.length} mục</SectionLabel>
+              <SectionLabel icon="📚">Dạng mẫu</SectionLabel>
               <VocabList items={lesson.vocab} verbTint={isConj} />
             </VStack>
             {guide ? <ConjugationGuide guide={guide} scale={fontSizeOpt.scale} /> : <SingularPluralBox />}
