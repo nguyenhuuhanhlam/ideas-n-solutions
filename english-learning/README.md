@@ -55,6 +55,18 @@ qua localStorage, không cần tài khoản. Điểm cũ của 2 bài chia độ
 trước khi gộp thành tabs được chuyển sang nhóm mới tương ứng
 (to-be, present-simple).
 
+## Giao diện (thiết kế lại 2026-11-05, theo phong cách interactiveenglish.app)
+
+Không còn khung shell-nav kiểu admin: header trắng + hero xanh navy +
+một cột nội dung ở giữa trên nền xanh xám nhạt, thẻ trắng bo tròn lớn.
+Điều hướng bằng nút chữ trên header (Bài học / Chia động từ / Tra cứu /
+Cài đặt) và chip lọc trên trang chính. Trang bài học chảy từ trên xuống:
+hero tên bài → cách dùng (ví dụ in nghiêng, vạch teal) → dạng mẫu →
+hướng dẫn chia (nhóm chia) hoặc hộp số ít/số nhiều (bài cơ bản) → nút
+làm bài; màn hình quiz thu hẹp ở giữa. Font chuyển từ Cascadia Mono
+sang Nunito (sans tròn, thân thiện, có tiếng Việt) cho hợp app học tập;
+cài đặt cỡ chữ vẫn hoạt động như cũ qua biến `--font-scale`.
+
 ## Cài đặt — cỡ chữ
 
 Menu trái có mục Cài đặt → Cỡ chữ, 4 mức: Nhỏ (chữ thường 16px),

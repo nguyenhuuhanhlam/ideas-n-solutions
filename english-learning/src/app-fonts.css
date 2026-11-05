@@ -1,22 +1,24 @@
-/* Theme tương tự NSDT App: toàn bộ app dùng font Cascadia Mono.
-   Bundle qua @fontsource để chạy offline, không phụ thuộc Google Fonts
-   lúc runtime. Kỹ thuật y hệt NSDT (frontend/src/app-fonts.css). */
+/* Font theo phong cách app học tập (kiểu trang interactiveenglish.app):
+   sans tròn, thân thiện, dễ đọc cho trẻ em — Nunito qua @fontsource,
+   có subset tiếng Việt, chạy offline không phụ thuộc Google Fonts.
+   (Trước đây app dùng Cascadia Mono kiểu NSDT; bản thiết kế lại
+   2026-11-05 chuyển sang Nunito cho hợp app học tập.) */
 
-@import '@fontsource/cascadia-mono/400.css';
-@import '@fontsource/cascadia-mono/500.css';
-@import '@fontsource/cascadia-mono/600.css';
-@import '@fontsource/cascadia-mono/700.css';
+@import '@fontsource/nunito/400.css';
+@import '@fontsource/nunito/700.css';
+@import '@fontsource/nunito/800.css';
+@import '@fontsource/nunito/900.css';
 
-/* Ghi đè 3 biến font của theme Astryx. Rule này không nằm trong @layer nên
+/* Ghi đè font của theme Astryx. Rule này không nằm trong @layer nên
    thắng các định nghĩa trong @layer astryx-theme của theme. */
 @scope ([data-astryx-theme]) {
   :scope {
-    --font-family-body: 'Cascadia Mono', ui-monospace, 'SF Mono', Consolas, monospace;
-    --font-family-heading: 'Cascadia Mono', ui-monospace, 'SF Mono', Consolas, monospace;
-    --font-family-code: 'Cascadia Mono', ui-monospace, 'SF Mono', Consolas, monospace;
-    /* App dành cho trẻ em: chữ to hơn mặc định của theme khoảng 25%.
+    --font-family-body: 'Nunito', ui-rounded, system-ui, sans-serif;
+    --font-family-heading: 'Nunito', ui-rounded, system-ui, sans-serif;
+    --font-family-code: 'Nunito', ui-rounded, system-ui, sans-serif;
+    /* Chữ to hơn mặc định của theme khoảng 25%.
        Body mặc định của theme là 1rem (16px) -> 1.25rem (20px); các cỡ
-       khác tăng theo cùng tỉ lệ để heading, nút, bảng, menu đều to lên.
+       khác tăng theo cùng tỉ lệ để heading, nút, bảng đều to lên.
        Mỗi cỡ nhân thêm với --font-scale (mặc định 1): phần Cài đặt đổi
        biến này trên documentElement để toàn app đổi cỡ ngay lập tức. */
     --font-size-base: calc(1.25rem * var(--font-scale, 1));
