@@ -105,6 +105,15 @@ webhook mặc định và file `forms/index.json` đều tự đổi theo, khôn
 sửa từng form. `src/config.js` cũng chứa `APP_BASE_URL` (địa chỉ app trên
 Pages) và `N8N_WEBHOOK_PATH` (đường dẫn webhook trong n8n).
 
+## Giao diện form (compact)
+
+Form điền dùng theme compact của SurveyJS Form Library: bố cục không khung
+(`isPanelless: true`, bỏ thẻ bao quanh từng câu hỏi), đơn vị khoảng cách
+`--sjs-base-unit: 6px` (mặc định 8px) và cỡ chữ `--sjs-font-size: 14px`
+(mặc định 16px). Theme nằm ở `COMPACT_THEME` trong `src/App.jsx`, áp lúc
+tạo `Model` — chỉ thu gọn hiển thị, không đổi JSON hay logic form. Muốn
+form thoáng hơn thì tăng 2 biến này hoặc bỏ `isPanelless`.
+
 ## Build (kiểm chứng trước khi push)
 
 ```bash

@@ -150,10 +150,24 @@ export default function App() {
     setSettingsMsg('Đã khôi phục mặc định trong code.')
   }
 
-  // Model điền form, tạo lại mỗi khi đổi form.
+// Theme compact cho form điền: bố cục không khung (panelless, bỏ thẻ bao
+// quanh từng câu hỏi) + đơn vị khoảng cách 6px (mặc định 8px) + cỡ chữ
+// 14px (mặc định 16px). Chỉ thu gọn hiển thị, không đổi JSON hay logic form.
+const COMPACT_THEME = {
+  themeName: 'default',
+  colorPalette: 'light',
+  isPanelless: true,
+  cssVariables: {
+    '--sjs-base-unit': '6px',
+    '--sjs-font-size': '14px',
+  },
+}
+
+// Model điền form, tạo lại mỗi khi đổi form.
   const model = useMemo(() => {
     if (!selected) return null
     const m = new Model(selected.json)
+    m.applyTheme(COMPACT_THEME)
     m.onComplete.add((sender) => {
       setResult(sender.data)
       setSendStatus('')
