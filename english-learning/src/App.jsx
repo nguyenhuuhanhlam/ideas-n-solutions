@@ -1056,15 +1056,17 @@ export default function App() {
               <Button variant="primary" size="lg" label="Bắt đầu ôn tập →" onClick={() => startQuiz(null, true)} />
             </VStack>
           </div>
-          {wrongBank.length > 0 && (
-            <div className="learn-card">
-              <VStack gap={2}>
-                <SectionLabel icon={<NotebookPen />}>Câu sai cần ôn lại</SectionLabel>
-                <Text type="supporting">Đang có {wrongBank.length} câu làm sai chờ ôn. Luyện lại, trả lời đúng thì câu đó tự xóa khỏi danh sách.</Text>
-                <Button variant="primary" size="lg" label={`Xem ${wrongBank.length} câu sai →`} onClick={openWrongBank} />
-              </VStack>
-            </div>
-          )}
+          <div className="learn-card">
+            <VStack gap={2}>
+              <SectionLabel icon={<NotebookPen />}>Câu sai cần ôn lại</SectionLabel>
+              <Text type="supporting">
+                {wrongBank.length > 0
+                  ? `Đang có ${wrongBank.length} câu làm sai chờ ôn. Luyện lại, trả lời đúng thì câu đó tự xóa khỏi danh sách.`
+                  : 'Chưa có câu sai nào — bé làm đúng hết thì mục này trống. Câu nào làm sai sẽ tự ghi lại đây để phụ huynh xem lại và sửa cho bé.'}
+              </Text>
+              <Button variant="primary" size="lg" label={wrongBank.length > 0 ? `Xem ${wrongBank.length} câu sai →` : 'Mở mục Câu sai →'} onClick={openWrongBank} />
+            </VStack>
+          </div>
         </VStack>
       )}
     </Frame>
