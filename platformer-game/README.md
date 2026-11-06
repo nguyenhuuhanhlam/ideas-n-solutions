@@ -46,6 +46,16 @@ vật lý của nhân vật và cảnh trí xung quanh, chưa làm hệ thống 
   dày đúng tỷ lệ khối đất gốc: cỏ 19px + thân đất 48px = 67px, đáy
   là hàng đáy gồ ghề của khối gốc (không còn đường thẳng sắc như
   bản mỏng 35px trước đây); thân va chạm từ mặt đứng y xuống y+62.
+- Kẻ thù: 3 slime (`src/entities/Enemy.ts`), vị trí xuất hiện ngẫu
+  nhiên trên mặt đất, cách xa nhân vật ít nhất 400px. Slime đi tuần
+  chậm (60px/s), thấy nhân vật trong 250px thì đuổi theo (110px/s),
+  di chuyển bằng cách nhảy cóc. Trúng 1 đòn chém là chết (nổ hạt
+  tím), hồi sinh sau 10s ở vị trí ngẫu nhiên khác, cũng cách xa
+  nhân vật lúc đó ít nhất 400px. Slime hiện vẽ bằng code (texture
+  `enemy-slime` sinh từ Graphics) vì chưa có sprite địch thật — khi
+  user gửi sprite, thay texture ở `Enemy.ts` là xong, logic giữ
+  nguyên. Địch chạm vào người chơi chưa gây sát thương (chưa có hệ
+  thống HP), làm cùng bước RPG sau.
 - Phím: A/D hoặc ←/→ di chuyển, giữ Shift/X chạy, Z/Space/↑ nhảy,
   J chém, P tạm dừng, R chơi lại. Mobile: tay NES (D-pad ◀ ▶ ▲,
   nút dẹt Chạy/Dừng, nút tròn đỏ B = Nhảy, A = Chém).
@@ -61,12 +71,16 @@ vật lý của nhân vật và cảnh trí xung quanh, chưa làm hệ thống 
   thị 30x64 nhưng khai báo cho Phaser bằng pixel gốc 15x32 (offset
   49.5, 48) vì setSize/setOffset của Phaser tính theo pixel gốc rồi
   tự nhân scale — đưa số hiển thị vào sẽ làm body lệch khỏi sprite,
-  nhân vật nổi trên mặt đất (lỗi đã gặp ngày 2026-11-04). Animation điều khiển
+  nhân vật nổi trên mặt đất (lỗi đã gặp ngày 2026-11-04). Mỗi lần
+  chém tăng `attackId` để 1 đòn chỉ giết mỗi địch 1 lần. Animation điều khiển
   thủ công theo đúng nhịp frame bản vanilla (idle 0.12s, walk 0.09s,
   run 0.07s, chém 0.06s, nhảy/rơi theo thời gian bay).
 - `src/scenes/GameScene.ts` — 1 scene duy nhất hiện tại: load asset,
   cắt texture từ tileset, vẽ cảnh trí, mặt đất, platform, camera,
-  phím tắt. Scene HUD, menu, địch sẽ tách sau.
+  phím tắt, sinh địch + kiểm tra chém trúng địch + hồi sinh địch.
+  Scene HUD, menu sẽ tách sau.
+- `src/entities/Enemy.ts` — kẻ thù: đi tuần/truy đuổi/nhảy cóc, chết
+  và hồi sinh; xem `src/config.ts` (ENEMY_*) để chỉnh số.
 
 ## Asset: tách riêng, đặt tên rõ
 

@@ -1,5 +1,15 @@
 import Phaser from "phaser";
-import { GROUND_Y, PLATFORMS, VIEW_H, VIEW_W, WORLD_W } from "../config";
+import {
+  ENEMY_COUNT,
+  ENEMY_MIN_SPAWN_DIST,
+  ENEMY_RESPAWN_MS,
+  GROUND_Y,
+  PLATFORMS,
+  VIEW_H,
+  VIEW_W,
+  WORLD_W,
+} from "../config";
+import { Enemy } from "../entities/Enemy";
 import { touchInput, type InputState } from "../input";
 import { Player } from "../entities/Player";
 
@@ -16,6 +26,8 @@ const SHEETS: Array<{ key: string; file: string }> = [
 export class GameScene extends Phaser.Scene {
   private player!: Player;
   private solids: Phaser.GameObjects.GameObject[] = [];
+  private enemies: Enemy[] = [];
+  private deathEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
   private paused = false;
   private prevJump = false;
@@ -121,8 +133,42 @@ export class GameScene extends Phaser.Scene {
       this.solids.push(body);
     }
 
+    // Slime tạm vẽ bằng code (chưa có sprite địch thật): thân tím, mắt trắng.
+    const g = this.make.graphics({ x: 0, y: 0 }, false);
+    g.fillStyle(0x7c3aed, 1);
+    g.fillEllipse(16, 18, 30, 20);
+    g.fillStyle(0x5b21b6, 1);
+    g.fillEllipse(16, 24, 28, 8);
+    g.fillStyle(0xffffff, 1);
+    g.fillCircle(11, 14, 4);
+    g.fillCircle(21, 14, 4);
+    g.fillStyle(0x1f2937, 1);
+    g.fillCircle(12, 14, 2);
+    g.fillCircle(22, 14, 2);
+    g.generateTexture("enemy-slime", 32, 28);
+    g.destroy();
+    const dot = this.make.graphics({ x: 0, y: 0 }, false);
+    dot.fillStyle(0xffffff, 1);
+    dot.fillCircle(4, 4, 4);
+    dot.generateTexture("dot", 8, 8);
+    dot.destroy();
+    this.deathEmitter = this.add.particles(0, 0, "dot", {
+      speed: 120,
+      lifespan: 400,
+      scale: 1.5,
+      tint: 0xa78bfa,
+      emitting: false,
+    });
+
     this.player = new Player(this, 120, GROUND_Y);
     this.physics.add.collider(this.player, this.solids);
+
+    // Vài kẻ thù, vị trí ngẫu nhiên, cách xa nhân vật lúc mới vào.
+    for (let i = 0; i < ENEMY_COUNT; i++) {
+      const enemy = new Enemy(this, this.randomFarX(), GROUND_Y);
+      this.physics.add.collider(enemy, this.solids);
+      this.enemies.push(enemy);
+    }
 
     this.physics.world.setBounds(0, 0, WORLD_W, VIEW_H);
     this.cameras.main.setBounds(0, 0, WORLD_W, VIEW_H);
@@ -146,6 +192,28 @@ export class GameScene extends Phaser.Scene {
       };
     }
     document.getElementById("pauseBtn")?.addEventListener("click", () => this.togglePause());
+  }
+
+  // Vị trí ngẫu nhiên trên mặt đất, cách nhân vật ít nhất
+  // ENEMY_MIN_SPAWN_DIST và cách các địch khác ít nhất 150px.
+  private randomFarX(): number {
+    const others = this.enemies.filter((e) => e.alive).map((e) => e.x);
+    for (let i = 0; i < 20; i++) {
+      const x = 80 + Math.random() * (WORLD_W - 160);
+      if (Math.abs(x - this.player.x) < ENEMY_MIN_SPAWN_DIST) continue;
+      if (others.some((ox) => Math.abs(x - ox) < 150)) continue;
+      return x;
+    }
+    return this.player.x < WORLD_W / 2 ? WORLD_W - 120 : 120;
+  }
+
+  private killEnemy(enemy: Enemy): void {
+    enemy.die();
+    this.deathEmitter.explode(10, enemy.x, enemy.y - 20);
+    // Hồi sinh sau 10s ở vị trí ngẫu nhiên, cách xa vị trí nhân vật lúc đó.
+    this.time.delayedCall(ENEMY_RESPAWN_MS, () => {
+      enemy.respawn(this.randomFarX(), GROUND_Y);
+    });
   }
 
   private togglePause(): void {
@@ -179,5 +247,19 @@ export class GameScene extends Phaser.Scene {
     this.prevJump = jumpHeld;
     this.prevAttack = attackHeld;
     this.player.update(input, dt);
+    for (const enemy of this.enemies) enemy.update(dt, this.player.x);
+    if (this.player.attacking) {
+      const box = this.player.attackBox();
+      const boxRect = new Phaser.Geom.Rectangle(box.x, box.y, box.w, box.h);
+      for (const enemy of this.enemies) {
+        if (!enemy.alive || enemy.lastAttackId === this.player.attackId) continue;
+        const b = enemy.body as Phaser.Physics.Arcade.Body;
+        const enemyRect = new Phaser.Geom.Rectangle(b.x, b.y, b.width, b.height);
+        if (Phaser.Geom.Intersects.RectangleToRectangle(boxRect, enemyRect)) {
+          enemy.lastAttackId = this.player.attackId;
+          this.killEnemy(enemy);
+        }
+      }
+    }
   }
 }

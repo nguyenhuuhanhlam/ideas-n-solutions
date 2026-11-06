@@ -49,3 +49,14 @@ export const PLATFORMS: PlatformDef[] = [
   { x: 1000, y: 308, w: 96 },
   { x: 1250, y: 388, w: 160 },
 ];
+
+// Kẻ thù (bước đầu): slime tạm vẽ bằng code, chưa có sprite thật.
+// Chết khi trúng 1 đòn chém, hồi sinh sau 10s ở vị trí ngẫu nhiên cách xa
+// nhân vật tối thiểu ENEMY_MIN_SPAWN_DIST.
+export const ENEMY_COUNT = 3;
+export const ENEMY_MIN_SPAWN_DIST = 400;
+export const ENEMY_RESPAWN_MS = 10000;
+export const ENEMY_PATROL_SPEED = 60;
+export const ENEMY_CHASE_SPEED = 110;
+export const ENEMY_CHASE_RANGE = 250;
+export const ENEMY_HOP_VELOCITY = -260;

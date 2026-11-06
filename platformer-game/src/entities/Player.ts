@@ -35,6 +35,7 @@ const SHEET_FRAMES: Record<string, { key: string; frames: number; time: number }
 export class Player extends Phaser.Physics.Arcade.Sprite {
   face: 1 | -1 = 1;
   attacking = false;
+  attackId = 0;
   private attackT = 0;
   private animT = 0;
   private airT = 0;
@@ -74,6 +75,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private startAttack(): void {
     if (this.attacking) return;
     this.attacking = true;
+    this.attackId++;
     this.attackT = 0;
     if (this.grounded) this.setVelocityX(0); // chém trên không thì giữ đà bay
   }
