@@ -314,7 +314,7 @@ const COMPACT_THEME = {
 
   return (
     <div className="app">
-      <h1>Danh sách form</h1>
+      <h1>Form Hub</h1>
       <div className="toolbar">
         <button onClick={openSettings}>⚙️ Cài đặt n8n</button>
         {settings ? (

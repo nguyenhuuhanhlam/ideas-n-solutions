@@ -1,4 +1,4 @@
-# SurveyJS Demo — Danh sách form + API (chỉ dùng phần miễn phí)
+# Form Hub — Danh sách form + API (chỉ dùng phần miễn phí)
 
 App liệt kê các form có sẵn, cho điền form, và công bố API/URL để ứng
 dụng khác dùng. Chỉ dùng `survey-core` + `survey-react-ui` (giấy phép MIT,

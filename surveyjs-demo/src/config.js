@@ -1,4 +1,4 @@
-// Cấu hình tập trung cho surveyjs-demo.
+// Cấu hình tập trung cho Form Hub.
 //
 // Muốn đổi máy chạy n8n thì CHỈ sửa N8N_BASE_URL ở đây rồi build lại +
 // push — mọi link điền form, webhook mặc định trong samples.js, nút copy
