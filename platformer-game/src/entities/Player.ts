@@ -12,6 +12,10 @@ import {
   HITBOX_OFF_Y,
   HITBOX_W,
   JUMP_VELOCITY,
+  KNOCKBACK_X,
+  KNOCKBACK_Y,
+  PLAYER_INVULN_MS,
+  PLAYER_MAX_HP,
   RUN_SPEED,
   SPRITE_CX,
   SPRITE_SCALE,
@@ -36,6 +40,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   face: 1 | -1 = 1;
   attacking = false;
   attackId = 0;
+  hp = PLAYER_MAX_HP;
+  dead = false;
+  private invulnUntil = 0;
   private attackT = 0;
   private animT = 0;
   private airT = 0;
@@ -70,6 +77,25 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     return this.face > 0
       ? { x: body.right, y: body.y + 4, w: ATTACK_BOX_W, h: ATTACK_BOX_H }
       : { x: body.x - ATTACK_BOX_W, y: body.y + 4, w: ATTACK_BOX_W, h: ATTACK_BOX_H };
+  }
+
+  // Địch chạm: mất 1 tim, bất tử tạm, hất văng khỏi địch. Trả về false
+  // nếu đang bất tử tạm hoặc đã chết (không mất máu tiếp).
+  takeDamage(fromX: number): boolean {
+    if (this.dead || this.scene.time.now < this.invulnUntil) return false;
+    this.hp--;
+    this.invulnUntil = this.scene.time.now + PLAYER_INVULN_MS;
+    const dir = this.x >= fromX ? 1 : -1;
+    this.setVelocity(dir * KNOCKBACK_X, KNOCKBACK_Y);
+    this.setTint(0xff6666);
+    this.scene.time.delayedCall(200, () => this.clearTint());
+    if (this.hp <= 0) {
+      this.dead = true;
+      this.attacking = false;
+      this.setVelocity(0, 0);
+      this.setTint(0x888888);
+    }
+    return true;
   }
 
   private startAttack(): void {
@@ -119,6 +145,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   update(input: InputState, dt: number): void {
+    if (this.dead) return;
     const body = this.body as Phaser.Physics.Arcade.Body;
     if (this.attacking) {
       this.attackT += dt;

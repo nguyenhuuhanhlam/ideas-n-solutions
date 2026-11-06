@@ -53,10 +53,17 @@ export const PLATFORMS: PlatformDef[] = [
 // Kẻ thù (bước đầu): slime tạm vẽ bằng code, chưa có sprite thật.
 // Chết khi trúng 1 đòn chém, hồi sinh sau 10s ở vị trí ngẫu nhiên cách xa
 // nhân vật tối thiểu ENEMY_MIN_SPAWN_DIST.
-export const ENEMY_COUNT = 3;
+export const ENEMY_COUNT = 6;
 export const ENEMY_MIN_SPAWN_DIST = 400;
 export const ENEMY_RESPAWN_MS = 10000;
 export const ENEMY_PATROL_SPEED = 60;
 export const ENEMY_CHASE_SPEED = 110;
 export const ENEMY_CHASE_RANGE = 250;
 export const ENEMY_HOP_VELOCITY = -260;
+
+// Máu nhân vật: 5 trái tim, địch chạm mất 1 tim. Sau khi mất máu được
+// bất tử tạm 1.5s (không mất tiếp) và bị hất văng khỏi địch.
+export const PLAYER_MAX_HP = 5;
+export const PLAYER_INVULN_MS = 1500;
+export const KNOCKBACK_X = 300;
+export const KNOCKBACK_Y = -180;

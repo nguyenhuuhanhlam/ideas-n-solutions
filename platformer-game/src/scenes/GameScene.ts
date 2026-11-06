@@ -32,6 +32,7 @@ export class GameScene extends Phaser.Scene {
   private paused = false;
   private prevJump = false;
   private prevAttack = false;
+  private uiBound = false;
 
   constructor() {
     super("game");
@@ -83,6 +84,19 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Scene restart dùng lại cùng instance nên phải reset tay các trạng thái
+    // và ẩn các overlay DOM (DOM không tự reset theo scene).
+    this.paused = false;
+    this.prevJump = false;
+    this.prevAttack = false;
+    document.getElementById("pauseOverlay")?.classList.add("hidden");
+    document.getElementById("gameOverOverlay")?.classList.add("hidden");
+    if (!this.uiBound) {
+      this.uiBound = true;
+      document.getElementById("retryBtn")?.addEventListener("click", () => this.scene.restart());
+      document.getElementById("pauseBtn")?.addEventListener("click", () => this.togglePause());
+    }
+
     // Texture cắt từ tileset (đo từ file gốc, xem README mục Tileset).
     this.makeTileTexture("ground-top", 192, 13, 64, 19);
     this.makeDirtBodyTexture();
@@ -162,6 +176,7 @@ export class GameScene extends Phaser.Scene {
 
     this.player = new Player(this, 120, GROUND_Y);
     this.physics.add.collider(this.player, this.solids);
+    this.renderHearts();
 
     // Vài kẻ thù, vị trí ngẫu nhiên, cách xa nhân vật lúc mới vào.
     for (let i = 0; i < ENEMY_COUNT; i++) {
@@ -191,7 +206,6 @@ export class GameScene extends Phaser.Scene {
         restart: keyboard.addKey("R"),
       };
     }
-    document.getElementById("pauseBtn")?.addEventListener("click", () => this.togglePause());
   }
 
   // Vị trí ngẫu nhiên trên mặt đất, cách nhân vật ít nhất
@@ -214,6 +228,20 @@ export class GameScene extends Phaser.Scene {
     this.time.delayedCall(ENEMY_RESPAWN_MS, () => {
       enemy.respawn(this.randomFarX(), GROUND_Y);
     });
+  }
+
+  private renderHearts(): void {
+    const el = document.getElementById("hearts");
+    if (!el) return;
+    let html = "";
+    for (let i = 0; i < 5; i++) {
+      html += `<span class="heart ${i < this.player.hp ? "full" : "empty"}">♥</span>`;
+    }
+    el.innerHTML = html;
+  }
+
+  private gameOver(): void {
+    document.getElementById("gameOverOverlay")?.classList.remove("hidden");
   }
 
   private togglePause(): void {
@@ -248,6 +276,25 @@ export class GameScene extends Phaser.Scene {
     this.prevAttack = attackHeld;
     this.player.update(input, dt);
     for (const enemy of this.enemies) enemy.update(dt, this.player.x);
+    // Địch chạm người chơi: mất 1 tim (takeDamage tự chặn lúc bất tử tạm).
+    // Kiểm tra chém ở dưới chạy trước nên đòn chém giết địch cùng khung hình
+    // sẽ cứu được 1 tim.
+    if (!this.player.dead) {
+      const pb = this.player.body as Phaser.Physics.Arcade.Body;
+      const playerRect = new Phaser.Geom.Rectangle(pb.x, pb.y, pb.width, pb.height);
+      for (const enemy of this.enemies) {
+        if (!enemy.alive) continue;
+        const eb = enemy.body as Phaser.Physics.Arcade.Body;
+        const enemyRect = new Phaser.Geom.Rectangle(eb.x, eb.y, eb.width, eb.height);
+        if (Phaser.Geom.Intersects.RectangleToRectangle(playerRect, enemyRect)) {
+          if (this.player.takeDamage(enemy.x)) {
+            this.renderHearts();
+            if (this.player.hp <= 0) this.gameOver();
+          }
+          break;
+        }
+      }
+    }
     if (this.player.attacking) {
       const box = this.player.attackBox();
       const boxRect = new Phaser.Geom.Rectangle(box.x, box.y, box.w, box.h);

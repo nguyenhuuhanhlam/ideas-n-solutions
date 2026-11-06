@@ -46,7 +46,7 @@ vật lý của nhân vật và cảnh trí xung quanh, chưa làm hệ thống 
   dày đúng tỷ lệ khối đất gốc: cỏ 19px + thân đất 48px = 67px, đáy
   là hàng đáy gồ ghề của khối gốc (không còn đường thẳng sắc như
   bản mỏng 35px trước đây); thân va chạm từ mặt đứng y xuống y+62.
-- Kẻ thù: 3 slime (`src/entities/Enemy.ts`), vị trí xuất hiện ngẫu
+- Kẻ thù: 6 slime (`src/entities/Enemy.ts`), vị trí xuất hiện ngẫu
   nhiên trên mặt đất, cách xa nhân vật ít nhất 400px. Slime đi tuần
   chậm (60px/s), thấy nhân vật trong 250px thì đuổi theo (110px/s),
   di chuyển bằng cách nhảy cóc. Trúng 1 đòn chém là chết (nổ hạt
@@ -54,8 +54,12 @@ vật lý của nhân vật và cảnh trí xung quanh, chưa làm hệ thống 
   nhân vật lúc đó ít nhất 400px. Slime hiện vẽ bằng code (texture
   `enemy-slime` sinh từ Graphics) vì chưa có sprite địch thật — khi
   user gửi sprite, thay texture ở `Enemy.ts` là xong, logic giữ
-  nguyên. Địch chạm vào người chơi chưa gây sát thương (chưa có hệ
-  thống HP), làm cùng bước RPG sau.
+  nguyên.
+- Máu: nhân vật có 5 trái tim (thanh tim trên khung game), địch chạm
+  mất 1 tim, sau đó bất tử tạm 1.5s (không mất tiếp) và bị hất văng
+  khỏi địch. Hết 5 tim thì hiện màn "Hết máu!" và bấm Chơi lại (hoặc
+  phím R) để chơi lại từ đầu (máu và địch reset). Số liệu ở
+  `src/config.ts` (PLAYER_MAX_HP, PLAYER_INVULN_MS, ENEMY_COUNT).
 - Phím: A/D hoặc ←/→ di chuyển, giữ Shift/X chạy, Z/Space/↑ nhảy,
   J chém, P tạm dừng, R chơi lại. Mobile: tay NES (D-pad ◀ ▶ ▲,
   nút dẹt Chạy/Dừng, nút tròn đỏ B = Nhảy, A = Chém).
