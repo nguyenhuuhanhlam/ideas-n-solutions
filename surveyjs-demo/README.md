@@ -77,6 +77,25 @@ webhook: `?webhook=` trên link trước, rồi `webhookUrl` trong `samples.js`,
 cả hai đều không có thì form chỉ hiện kết quả như trước. Form không có
 `fillUrl` thì link điền tự sinh như thường.
 
+## Cài đặt n8n trong app
+
+Trên trang chính có nút **⚙️ Cài đặt n8n**. Mở ra sửa được 2 thứ:
+
+- **Địa chỉ máy chạy n8n** (phải bắt đầu bằng `https://`)
+- **Đường dẫn webhook trong n8n** (mặc định `/webhook/survey-submit`)
+
+Bấm **Lưu cài đặt** thì app lưu vào localStorage của trình duyệt
+(`surveyjs-demo-settings-v1`). Từ lúc đó link điền, mã nhúng và kết quả
+gửi đi đều dùng địa chỉ mới, không cần sửa code hay push lại. Bấm
+**Khôi phục mặc định** thì xóa cài đặt đã lưu, quay về mặc định trong
+`src/config.js`.
+
+Thứ tự ưu tiên webhook khi điền xong: `?webhook=` trên link trước, rồi
+cài đặt đã lưu, rồi `webhookUrl` trong `src/samples.js`. Lưu ý: cài đặt
+chỉ có tác dụng trên trình duyệt đã lưu; người khác mở link vẫn dùng
+mặc định trong code, và file `forms/index.json` (sinh lúc build) cũng
+vậy. Muốn đổi mặc định cho mọi người thì sửa `src/config.js`.
+
 ## Đổi máy chạy n8n
 
 Địa chỉ máy n8n chỉ nằm ở **một chỗ duy nhất**: `src/config.js`, dòng

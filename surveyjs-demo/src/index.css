@@ -15,6 +15,10 @@ button { font: inherit; cursor: pointer; }
 pre { background: #111827; color: #e5e7eb; padding: 14px; border-radius: 10px; overflow: auto; font-size: 12.5px; line-height: 1.5; }
 .result { margin-top: 16px; }
 .success { background: #ecfdf5; border: 1px solid #a7f3d0; padding: 12px 14px; border-radius: 10px; }
+.error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 12px 14px; border-radius: 10px; margin: 0 0 12px; }
+.settings-form .field { margin: 12px 0; }
+.settings-form label { display: block; font-weight: 600; margin-bottom: 6px; }
+.settings-form input { width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid #d0d0d0; border-radius: 10px; font-size: 14px; font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
 .app--embed { max-width: 900px; }
 .form-grid { display: grid; gap: 14px; margin-top: 14px; }
 .form-card h2 { font-size: 17px; margin: 0 0 6px; }

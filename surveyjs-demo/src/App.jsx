@@ -3,7 +3,8 @@ import { Model } from 'survey-core'
 import { Survey } from 'survey-react-ui'
 import 'survey-core/survey-core.css'
 import { SAMPLES, SAMPLE_KEYS } from './samples.js'
-import { APP_BASE_URL } from './config.js'
+import { APP_BASE_URL, N8N_BASE_URL, N8N_WEBHOOK_PATH, N8N_WEBHOOK_URL } from './config.js'
+import { loadSettings, saveSettings, clearSettings, webhookFromSettings } from './settings.js'
 
 // Chỉ dùng SurveyJS Form Library (survey-core + survey-react-ui, giấy phép MIT).
 // KHÔNG dùng Survey Creator (thương mại, cần licence).
@@ -19,15 +20,19 @@ function appBase() {
   return window.location.origin + window.location.pathname.replace(/\/$/, '')
 }
 
-function urlsFor(id) {
+// settings: cài đặt n8n đã lưu trên trình duyệt (null khi chưa lưu).
+// Khi có cài đặt đã lưu, webhook trong đó ghi đè webhook mặc định của form
+// và link điền được sinh lại từ cài đặt đó; khi chưa lưu thì dùng link dán
+// sẵn (fillUrl) hoặc tự sinh như trước.
+function urlsFor(id, settings) {
   const base = appBase()
   const form = SAMPLES[id]
-  const hook = form.webhookUrl
+  const hook = settings ? webhookFromSettings(settings) : form.webhookUrl
   const suffix = hook ? `&webhook=${encodeURIComponent(hook)}` : ''
   return {
-    // Link điền dán sẵn trong samples.js (fillUrl) được ưu tiên dùng nguyên
-    // văn; không có thì tự sinh từ ?form= + webhook mặc định (nếu có).
-    fillUrl: form.fillUrl || `${base}?form=${id}${suffix}`,
+    // Link điền dán sẵn trong samples.js (fillUrl) chỉ dùng khi chưa có
+    // cài đặt đã lưu; không có thì tự sinh từ ?form= + webhook (nếu có).
+    fillUrl: settings ? `${base}?form=${id}${suffix}` : (form.fillUrl || `${base}?form=${id}${suffix}`),
     jsonUrl: `${base}/forms/${id}.json`,
     embedUrl: `${base}?form=${id}&embed=1${suffix}`,
     iframe: `<iframe src="${base}?form=${id}&embed=1${suffix}" width="100%" height="700" frameborder="0"></iframe>`,
@@ -69,6 +74,12 @@ export default function App() {
   const [result, setResult] = useState(null)
   const [fillKey, setFillKey] = useState(0)
   const [sendStatus, setSendStatus] = useState('')
+  const [settings, setSettings] = useState(loadSettings)
+  const [showSettings, setShowSettings] = useState(false)
+  const [draftBase, setDraftBase] = useState('')
+  const [draftPath, setDraftPath] = useState('')
+  const [settingsMsg, setSettingsMsg] = useState('')
+  const [settingsError, setSettingsError] = useState('')
   const embed = isEmbed()
 
   const selected = selectedId ? SAMPLES[selectedId] : null
@@ -103,6 +114,42 @@ export default function App() {
     } catch { /* ignore */ }
   }
 
+  const openSettings = () => {
+    const s = loadSettings()
+    setDraftBase(s ? s.n8nBaseUrl : N8N_BASE_URL)
+    setDraftPath(s ? s.n8nWebhookPath : N8N_WEBHOOK_PATH)
+    setSettingsMsg('')
+    setSettingsError('')
+    setShowSettings(true)
+  }
+
+  const saveSettingsForm = () => {
+    const base = draftBase.trim().replace(/\/+$/, '')
+    const path = draftPath.trim() || N8N_WEBHOOK_PATH
+    if (!/^https:\/\/.+/.test(base)) {
+      setSettingsError('Địa chỉ máy n8n phải bắt đầu bằng https://')
+      setSettingsMsg('')
+      return
+    }
+    const next = {
+      n8nBaseUrl: base,
+      n8nWebhookPath: path.startsWith('/') ? path : '/' + path,
+    }
+    saveSettings(next)
+    setSettings(next)
+    setSettingsError('')
+    setSettingsMsg('Đã lưu cài đặt. Link điền và webhook từ giờ dùng địa chỉ mới.')
+  }
+
+  const resetSettings = () => {
+    clearSettings()
+    setSettings(null)
+    setDraftBase(N8N_BASE_URL)
+    setDraftPath(N8N_WEBHOOK_PATH)
+    setSettingsError('')
+    setSettingsMsg('Đã khôi phục mặc định trong code.')
+  }
+
   // Model điền form, tạo lại mỗi khi đổi form.
   const model = useMemo(() => {
     if (!selected) return null
@@ -110,10 +157,11 @@ export default function App() {
     m.onComplete.add((sender) => {
       setResult(sender.data)
       setSendStatus('')
-      // Gửi kết quả về webhook n8n (nếu có): ưu tiên ?webhook= trên link,
-      // không có thì dùng webhookUrl mặc định của form trong samples.js.
+      // Gửi kết quả về webhook n8n (nếu có). Thứ tự ưu tiên: ?webhook= trên
+      // link, rồi cài đặt n8n đã lưu trên trình duyệt, rồi webhookUrl mặc
+      // định của form trong samples.js.
       // Không có webhook nào thì form chỉ hiện kết quả như trước.
-      const target = webhookUrlFromLink() || selected.webhookUrl || ''
+      const target = webhookUrlFromLink() || (settings ? webhookFromSettings(settings) : selected.webhookUrl) || ''
       if (target) {
         fetch(target, {
           method: 'POST',
@@ -162,8 +210,59 @@ export default function App() {
     )
   }
 
+  // Màn hình Cài đặt n8n.
+  if (showSettings) {
+    const previewBase = draftBase.trim().replace(/\/+$/, '')
+    const previewPath = draftPath.trim() || N8N_WEBHOOK_PATH
+    const preview = previewBase
+      ? previewBase + (previewPath.startsWith('/') ? previewPath : '/' + previewPath)
+      : ''
+    return (
+      <div className="app">
+        <button onClick={() => setShowSettings(false)}>← Danh sách form</button>
+        <h1>Cài đặt n8n</h1>
+        <p className="sub">
+          Địa chỉ máy chạy n8n. Lưu xong thì link điền, mã nhúng và kết quả
+          gửi đi đều dùng địa chỉ mới, không cần sửa code hay push lại.
+        </p>
+        <div className="card settings-form">
+          <div className="field">
+            <label>Địa chỉ máy chạy n8n</label>
+            <input
+              value={draftBase}
+              onChange={(e) => setDraftBase(e.target.value)}
+              placeholder={N8N_BASE_URL}
+            />
+            <p className="hint">Ví dụ: https://ten-may.tailnet.ts.net — không có dấu / ở cuối.</p>
+          </div>
+          <div className="field">
+            <label>Đường dẫn webhook trong n8n</label>
+            <input
+              value={draftPath}
+              onChange={(e) => setDraftPath(e.target.value)}
+              placeholder={N8N_WEBHOOK_PATH}
+            />
+          </div>
+          <p className="hint">Webhook đầy đủ: {preview ? <code>{preview}</code> : '—'}</p>
+          {settingsError && <p className="error">{settingsError}</p>}
+          {settingsMsg && <p className="hint">{settingsMsg}</p>}
+          <div className="toolbar">
+            <button className="primary" onClick={saveSettingsForm}>Lưu cài đặt</button>
+            <button onClick={resetSettings}>Khôi phục mặc định</button>
+          </div>
+          <p className="hint">
+            Cài đặt chỉ lưu trên trình duyệt này. Người khác mở link vẫn dùng
+            mặc định trong code (<code>{N8N_WEBHOOK_URL}</code>); muốn đổi mặc
+            định cho mọi người thì sửa <code>src/config.js</code>. Link nào đã
+            có sẵn ?webhook= thì giữ nguyên, không bị cài đặt ghi đè.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   if (selected) {
-    const u = urlsFor(selectedId)
+    const u = urlsFor(selectedId, settings)
     return (
       <div className="app">
         <button onClick={backToList}>← Danh sách form</button>
@@ -202,6 +301,14 @@ export default function App() {
   return (
     <div className="app">
       <h1>Danh sách form</h1>
+      <div className="toolbar">
+        <button onClick={openSettings}>⚙️ Cài đặt n8n</button>
+        {settings ? (
+          <span className="hint">Đang dùng cài đặt đã lưu — webhook: <code>{webhookFromSettings(settings)}</code></span>
+        ) : (
+          <span className="hint">Webhook mặc định: <code>{N8N_WEBHOOK_URL}</code></span>
+        )}
+      </div>
       <p className="sub">
         Các form có sẵn, soạn sẵn bởi Muse. Chọn một form để điền, hoặc lấy link/API
         của form để dùng trong ứng dụng khác. Chỉ dùng SurveyJS Form Library miễn phí (MIT).
@@ -225,7 +332,7 @@ export default function App() {
       <div className="form-grid">
         {SAMPLE_KEYS.map((id) => {
           const form = SAMPLES[id]
-          const u = urlsFor(id)
+          const u = urlsFor(id, settings)
           const open = showJsonId === id
           return (
             <div className="card form-card" key={id}>
