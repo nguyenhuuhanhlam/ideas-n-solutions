@@ -6,6 +6,8 @@ export interface InputState {
   run: boolean;
   jump: boolean;
   attack: boolean;
+  up: boolean;
+  down: boolean;
 }
 
 export const touchInput: InputState = {
@@ -14,6 +16,8 @@ export const touchInput: InputState = {
   run: false,
   jump: false,
   attack: false,
+  up: false,
+  down: false,
 };
 
 export function bindTouchButton(el: HTMLElement, key: keyof InputState): void {

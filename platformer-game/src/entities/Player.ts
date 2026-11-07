@@ -42,6 +42,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   attackId = 0;
   hp = PLAYER_MAX_HP;
   dead = false;
+  climbing = false;
   private invulnUntil = 0;
   private attackT = 0;
   private animT = 0;
@@ -83,6 +84,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   // nếu đang bất tử tạm hoặc đã chết (không mất máu tiếp).
   takeDamage(fromX: number): boolean {
     if (this.dead || this.scene.time.now < this.invulnUntil) return false;
+    // Bị đánh khi đang leo thang thì buông thang, rơi xuống như thường.
+    if (this.climbing) {
+      this.climbing = false;
+      (this.body as Phaser.Physics.Arcade.Body).allowGravity = true;
+    }
     this.hp--;
     this.invulnUntil = this.scene.time.now + PLAYER_INVULN_MS;
     const dir = this.x >= fromX ? 1 : -1;
@@ -145,7 +151,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   update(input: InputState, dt: number): void {
-    if (this.dead) return;
+    // Đang leo thang thì GameScene điều khiển vận tốc trực tiếp, không chạy
+    // logic di chuyển/nhảy/chém ở đây.
+    if (this.dead || this.climbing) return;
     const body = this.body as Phaser.Physics.Arcade.Body;
     if (this.attacking) {
       this.attackT += dt;

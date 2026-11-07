@@ -32,20 +32,32 @@ vật lý của nhân vật và cảnh trí xung quanh, chưa làm hệ thống 
 - Chém combo 7 frame (0.06s/frame, tổng 0.42s), chém được cả khi nhảy;
   chém dưới đất khóa di chuyển, chém trên không giữ đà bay và vẫn
   lái được hướng. Vùng chém đã tính sẵn trong `Player.attackBox()`
-  để bước địch dùng ngay, hiện chưa có mục tiêu.
-- Camera bám theo nhân vật (lerp 0.1), kẹp trong thế giới 4800x540,
-  mặt đất tại y=468 (hạ 1 block 48px so với y=420 ban đầu theo phản hồi
-  ngày 2026-11-04, platform hạ theo để vẫn nhảy lên được).
+  để bước địch dùng ngay; trúng 1 đòn là slime chết.
+- Camera bám theo nhân vật (lerp 0.1), kẹp trong thế giới 4800x540.
 - Cảnh trí: nền xa nhất là ảnh núi `far-mountains.png` (384x216)
   vẽ full màn hình, cố định theo màn hình (scrollFactor 0) — ảnh đã
   có đủ trời, mây, núi, nền đất phẳng nên không vẽ thêm trời
   gradient, núi tam giác hay mặt trời bằng code nữa; cây gần
   parallax 0.6, mặt đất + platform nổi bằng Tileset.
-- Platform nổi mẫu (đặc, đứng được trên mặt): (700, 388, 128),
-  (1000, 308, 96), (1250, 388, 160) — xem `src/config.ts`. Platform
-  dày đúng tỷ lệ khối đất gốc: cỏ 19px + thân đất 48px = 67px, đáy
-  là hàng đáy gồ ghề của khối gốc (không còn đường thẳng sắc như
-  bản mỏng 35px trước đây); thân va chạm từ mặt đứng y xuống y+62.
+- Map làm lại theo mockup của user (2026-11-07): mặt đất chia 4 đoạn
+  cao thấp — 0–1000 ở y=428, 1000–2000 ở y=468, 2000–3000 ở y=428,
+  3000–4800 ở y=468 (bậc 40px, nhảy lên được); 15 platform nổi nhiều
+  tầng (xem `src/config.ts`, bậc/tầng kề nhau chênh tối đa 80px trong
+  tầm nhảy 96px). Platform dày đúng tỷ lệ khối đất gốc: cỏ 19px +
+  thân đất 48px = 67px, đáy là hàng đáy gồ ghề của khối gốc; thân va
+  chạm từ mặt đứng y xuống y+62.
+- Thang leo (3 cái, ở x=600, 1500, 4380): đứng cạnh thang bấm ↑/↓ để
+  leo lên/xuống, ←/→ trườn ngang (đi khỏi thang thì buông), bấm
+  Z/Space/B để nhảy khỏi thang. Platform ngay trên đầu mỗi thang là
+  platform một chiều (nhảy/leo xuyên từ dưới lên, đứng từ trên vẫn
+  đứng được) — 3 platform này có `oneWay: true` trong config, các
+  platform còn lại vẫn đặc (chạm đáy sẽ chặn lại).
+- Trang trí theo mockup (vẽ bằng code hoặc cắt từ tileset): nhà đá ở
+  x=3980 (tường đá có đốm, mái ngói hình thang + ống khói, cửa vòm gỗ,
+  cửa sổ sáng) — chỉ trang trí, không va chạm; cửa hang tối trên mặt
+  cắt đất đoạn đầu; khối đầu lâu (3 chỗ); dây leo rủ dưới 3 platform;
+  gai trên mặt đất (2 chỗ, x=1300 và 3350) — chạm gai mất 1 tim như
+  địch chạm.
 - Kẻ thù: 6 slime (`src/entities/Enemy.ts`), vị trí xuất hiện ngẫu
   nhiên trên mặt đất, cách xa nhân vật ít nhất 400px. Slime đi tuần
   chậm (60px/s), thấy nhân vật trong 250px thì đuổi theo (110px/s),
@@ -61,8 +73,9 @@ vật lý của nhân vật và cảnh trí xung quanh, chưa làm hệ thống 
   phím R) để chơi lại từ đầu (máu và địch reset). Số liệu ở
   `src/config.ts` (PLAYER_MAX_HP, PLAYER_INVULN_MS, ENEMY_COUNT).
 - Phím: A/D hoặc ←/→ di chuyển, giữ Shift/X chạy, Z/Space/↑ nhảy,
-  J chém, P tạm dừng, R chơi lại. Mobile: tay NES (D-pad ◀ ▶ ▲,
-  nút dẹt Chạy/Dừng, nút tròn đỏ B = Nhảy, A = Chém).
+  ↑/↓ leo thang khi đứng cạnh thang, J chém, P tạm dừng, R chơi lại.
+  Mobile: tay NES (D-pad ◀ ▶ ▲ ▼, nút dẹt Chạy/Dừng, nút tròn đỏ
+  B = Nhảy, A = Chém).
 
 ## Cấu trúc code
 
