@@ -62,7 +62,13 @@ vật lý của nhân vật và cảnh trí xung quanh, chưa làm hệ thống 
   bằng phím F9, hoặc mở game với `?debug=1` để bật sẵn; lớp đỏ nằm
   trên ảnh map, dưới nhân vật/địch nên vẫn thấy rõ người đứng trên
   vùng nào. Chỉ gắn sự kiện F9 một lần (scene restart chạy lại
-  create() nên gắn thêm sẽ nhân đôi).
+  create() nên gắn thêm sẽ nhân đôi). Sau khi user chụp lớp đỏ
+  (22:52): sửa 4 chỗ đo sai — bỏ cột tối ở mép phải nhà đá (bóng tối
+  bị đo nhầm thành đất, thành cột vô hình cho nhân vật đứng), bỏ thân
+  cột đá (chỉ giữ đỉnh để đứng, thân là trang trí để đi qua được),
+  mở ống thang xuyên qua gờ trái (cột 5-6) và gờ trên hố (cột 37-38)
+  vì gờ đặc chặn ngang thang, đáy thang trái kéo xuống 448 để đứng
+  dưới hố vẫn bám được thang.
 - Kẻ thù: 6 slime (`src/entities/Enemy.ts`), vị trí xuất hiện ngẫu
   nhiên trên mặt đất, cách xa nhân vật ít nhất 400px. Slime đi tuần
   chậm (60px/s), thấy nhân vật trong 250px thì đuổi theo (110px/s),

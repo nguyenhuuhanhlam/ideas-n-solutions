@@ -88,6 +88,24 @@ for ry in range(9, 12):
 # không chạm trần khi đi dưới hang (khoảng trống 64px -> 96px).
 for rx in range(5, 36):
     solid[6][rx] = False
+# Nhà đá chỉ là trang trí: bỏ cột tối ở mép phải nhà (cột 63, hàng 9-11)
+# — bóng tối bị đo nhầm thành đất, thành cột vô hình cho nhân vật đứng.
+for ry in range(9, 12):
+    solid[ry][63] = False
+# Cột đá (cột 75-78): chỉ đỉnh (hàng 8) là đặc để đứng; thân cột là
+# trang trí để nhân vật đi qua được (thành tường đặc sẽ chặn kín đường).
+for ry in range(9, 12):
+    for rx in range(75, 79):
+        solid[ry][rx] = False
+# Thang trái: mở ống thang xuyên qua gờ (cột 5-6, hàng 9-13) để leo
+# xuống hố thang; thang giữa: mở ống thang xuyên qua gờ trên hố
+# (cột 37-38, hàng 9-11). Không mở thì gờ đặc chặn ngang thang.
+for ry in range(9, 14):
+    for rx in range(5, 7):
+        solid[ry][rx] = False
+for ry in range(9, 12):
+    for rx in range(37, 39):
+        solid[ry][rx] = False
 
 # Mặt đất theo cột: từ hàng đáy đi lên tới khi gặp ô không đặc.
 ground = []
@@ -134,7 +152,7 @@ while cx < cols:
 # Thang + gai (tọa độ ảnh -> game x2), đo tay từ vị trí trong mockup.
 # Đầu thang vươn 40px trên mặt đứng để đứng trên gờ bấm Down là bám được.
 ladders = [
-    {'x': 92 * S, 'top': 124 * S, 'bottom': 200 * S},   # thang trái: gờ giữa -> cỏ thấp
+    {'x': 92 * S, 'top': 124 * S, 'bottom': 224 * S},   # thang trái: gờ giữa -> đáy hố thang
     {'x': 610 * S, 'top': 124 * S, 'bottom': 240 * S},  # thang giữa: cỏ trên -> đáy hố
     {'x': 1352 * S, 'top': 4 * S, 'bottom': 160 * S},   # tháp thang phải: platform cao
 ]
