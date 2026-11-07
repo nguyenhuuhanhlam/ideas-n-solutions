@@ -43,6 +43,9 @@ export class GameScene extends Phaser.Scene {
   private prevUp = false;
   private prevAttack = false;
   private uiBound = false;
+  private debugOverlay!: Phaser.GameObjects.Graphics;
+  private debugOn = false;
+  private debugBound = false;
   private climbZone: Phaser.Geom.Rectangle | null = null;
   private climbCooldownUntil = 0;
 
@@ -97,6 +100,15 @@ export class GameScene extends Phaser.Scene {
       this.solids.push(body);
     }
 
+    // Lớp kiểm tra va chạm: tô đỏ 50% mọi vùng đất đặc (SOLID_RECTS) để
+    // so với hình mockup — chỗ nào đỏ mà mắt thấy trống là vật vô hình,
+    // chỗ nào đất mà không đỏ là đi trên không. Vẽ trên ảnh map, dưới
+    // nhân vật/địch để vẫn thấy rõ người đứng trên vùng nào.
+    this.debugOverlay = this.add.graphics();
+    this.debugOverlay.setDepth(1);
+    this.drawDebugOverlay();
+    this.debugOverlay.setVisible(this.debugOn);
+
     // Thang leo (hình thang đã có trong mockup, đây chỉ là vùng leo):
     // đầu thang vươn lên 40px trên mặt đứng để đứng trên gờ bấm Down là
     // bám được thang; đáy thang trùng mặt đất/hố để bước ra được.
@@ -135,8 +147,10 @@ export class GameScene extends Phaser.Scene {
       tint: 0xa78bfa,
       emitting: false,
     });
+    this.deathEmitter.setDepth(2);
 
     this.player = new Player(this, 120, this.groundYAt(120));
+    this.player.setDepth(2);
     this.physics.add.collider(this.player, this.solids);
     this.renderHearts();
 
@@ -144,6 +158,7 @@ export class GameScene extends Phaser.Scene {
     for (let i = 0; i < ENEMY_COUNT; i++) {
       const x = this.randomFarX();
       const enemy = new Enemy(this, x, this.groundYAt(x));
+      enemy.setDepth(2);
       this.physics.add.collider(enemy, this.solids);
       this.enemies.push(enemy);
     }
@@ -170,6 +185,27 @@ export class GameScene extends Phaser.Scene {
         pause: keyboard.addKey("P"),
         restart: keyboard.addKey("R"),
       };
+      // Bật/tắt lớp kiểm tra va chạm: phím F9, hoặc mở game với
+      // ?debug=1 để bật sẵn. Chỉ gắn 1 lần (scene restart chạy lại
+      // create() nên gắn thêm sẽ nhân đôi sự kiện).
+      if (!this.debugBound) {
+        this.debugBound = true;
+        this.debugOn = new URLSearchParams(window.location.search).get("debug") === "1";
+        this.debugOverlay.setVisible(this.debugOn);
+        keyboard.on("keydown-F9", () => {
+          this.debugOn = !this.debugOn;
+          this.debugOverlay.setVisible(this.debugOn);
+        });
+      }
+    }
+  }
+
+  // Vẽ lại lớp kiểm tra va chạm: đỏ 50% trên mọi vùng đất đặc.
+  private drawDebugOverlay(): void {
+    this.debugOverlay.clear();
+    this.debugOverlay.fillStyle(0xff0000, 0.5);
+    for (const rect of SOLID_RECTS) {
+      this.debugOverlay.fillRect(rect.x, rect.y, rect.w, rect.h);
     }
   }
 

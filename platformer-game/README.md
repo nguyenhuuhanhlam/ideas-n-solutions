@@ -56,6 +56,13 @@ vật lý của nhân vật và cảnh trí xung quanh, chưa làm hệ thống 
 - Gai (5 cụm, đo từ mockup): gờ trái dưới khối 2x2, đáy hố, cạnh
   khối đầu lâu giữa, chân cột đá, mép phải — chạm gai mất 1 tim như
   địch chạm.
+- Lớp kiểm tra va chạm (từ 2026-11-07): tô đỏ 50% mọi vùng đất đặc
+  (SOLID_RECTS) để so với hình mockup — chỗ nào đỏ mà mắt thấy trống
+  là vật vô hình, chỗ nào đất mà không đỏ là đi trên không. Bật/tắt
+  bằng phím F9, hoặc mở game với `?debug=1` để bật sẵn; lớp đỏ nằm
+  trên ảnh map, dưới nhân vật/địch nên vẫn thấy rõ người đứng trên
+  vùng nào. Chỉ gắn sự kiện F9 một lần (scene restart chạy lại
+  create() nên gắn thêm sẽ nhân đôi).
 - Kẻ thù: 6 slime (`src/entities/Enemy.ts`), vị trí xuất hiện ngẫu
   nhiên trên mặt đất, cách xa nhân vật ít nhất 400px. Slime đi tuần
   chậm (60px/s), thấy nhân vật trong 250px thì đuổi theo (110px/s),
