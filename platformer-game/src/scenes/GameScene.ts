@@ -5,17 +5,17 @@ import {
   ENEMY_COUNT,
   ENEMY_MIN_SPAWN_DIST,
   ENEMY_RESPAWN_MS,
-  GROUND_SEGMENTS,
-  GROUND_Y,
-  HOUSE_X,
-  HOUSE_Y,
-  LADDERS,
-  PLATFORMS,
-  SPIKES,
   VIEW_H,
   VIEW_W,
-  WORLD_W,
 } from "../config";
+import {
+  GROUND_Y_AT,
+  LADDER_ZONES,
+  MAP_H,
+  MAP_W,
+  SOLID_RECTS,
+  SPIKE_RECTS,
+} from "../map";
 import { Enemy } from "../entities/Enemy";
 import { touchInput, type InputState } from "../input";
 import { Player } from "../entities/Player";
@@ -33,7 +33,6 @@ const SHEETS: Array<{ key: string; file: string }> = [
 export class GameScene extends Phaser.Scene {
   private player!: Player;
   private solids: Phaser.GameObjects.GameObject[] = [];
-  private oneWayBodies: Phaser.GameObjects.GameObject[] = [];
   private ladderZones: Phaser.Geom.Rectangle[] = [];
   private spikeRects: Phaser.Geom.Rectangle[] = [];
   private enemies: Enemy[] = [];
@@ -58,42 +57,8 @@ export class GameScene extends Phaser.Scene {
         frameHeight: 128,
       });
     }
-    this.load.image("terrain", "assets/tilesets/terrain-tileset.png");
-    this.load.image("far-mountains", "assets/backgrounds/far-mountains.png");
-  }
-
-  private makeTileTexture(key: string, sx: number, sy: number, w: number, h: number): void {
-    const source = this.textures.get("terrain").getSourceImage() as HTMLImageElement;
-    const tex = this.textures.createCanvas(key, w, h);
-    if (!tex) return;
-    const ctx = tex.getContext();
-    ctx.drawImage(source, sx, sy, w, h, 0, 0, w, h);
-    tex.refresh();
-  }
-
-  // Thân đất: khối đất lớn 64x48 (112,32) + cùng khối lật gương sang phải,
-  // thành texture 128x48 nên chu kỳ lặp là 128px thay vì 16px như ô đất cũ.
-  // Xen giữa là 2 mảng đất tối ("khoảng đen") để mặt đất không phẳng lì.
-  private makeDirtBodyTexture(): void {
-    const source = this.textures.get("terrain").getSourceImage() as HTMLImageElement;
-    const tex = this.textures.createCanvas("dirt-body", 128, 48);
-    if (!tex) return;
-    const ctx = tex.getContext();
-    ctx.drawImage(source, 112, 32, 64, 48, 0, 0, 64, 48);
-    ctx.save();
-    ctx.translate(128, 0);
-    ctx.scale(-1, 1);
-    ctx.drawImage(source, 112, 32, 64, 48, 0, 0, 64, 48);
-    ctx.restore();
-    ctx.fillStyle = "#0d131b";
-    ctx.fillRect(88, 14, 16, 20);
-    ctx.fillStyle = "#14232a";
-    ctx.fillRect(92, 18, 8, 12);
-    ctx.fillRect(24, 30, 10, 10);
-    ctx.fillStyle = "#284232";
-    ctx.fillRect(90, 16, 4, 4);
-    ctx.fillRect(26, 32, 4, 4);
-    tex.refresh();
+    // Map là chính mockup của user (3072x540, xem src/map.ts).
+    this.load.image("mockup-map", "assets/backgrounds/mockup-map.png");
   }
 
   create(): void {
@@ -104,7 +69,6 @@ export class GameScene extends Phaser.Scene {
     this.prevUp = false;
     this.prevAttack = false;
     this.solids = [];
-    this.oneWayBodies = [];
     this.ladderZones = [];
     this.spikeRects = [];
     this.enemies = [];
@@ -118,134 +82,31 @@ export class GameScene extends Phaser.Scene {
       document.getElementById("pauseBtn")?.addEventListener("click", () => this.togglePause());
     }
 
-    // Texture cắt từ tileset (đo từ file gốc, xem README mục Tileset).
-    this.makeTileTexture("ground-top", 192, 13, 64, 19);
-    this.makeDirtBodyTexture();
-    this.makeTileTexture("plat-top", 16, 13, 16, 19);
-    this.makeTileTexture("skull-block", 80, 96, 32, 32);
-    this.makeTileTexture("spike", 16, 82, 16, 14);
+    // Toàn bộ hình ảnh map (trời, núi, cây, đất, nhà, thang, gai, rương)
+    // nằm trong ảnh mockup — không vẽ thêm gì bằng code nữa.
+    this.add.image(0, 0, "mockup-map").setOrigin(0, 0);
 
-    // Nền xa nhất: ảnh núi 384x216 đúng tỷ lệ 16:9 với khung 960x540 nên
-    // vẽ full màn hình, cố định theo màn hình (scrollFactor 0). Ảnh đã có
-    // đủ trời, mây, núi, nền đất phẳng nên không vẽ thêm trời gradient,
-    // núi tam giác hay mặt trời bằng code nữa.
-    const far = this.add.image(0, 0, "far-mountains");
-    far.setOrigin(0, 0);
-    far.setDisplaySize(VIEW_W, VIEW_H);
-    far.setScrollFactor(0);
-
-    // Cây gần (parallax 0.6), chân cây theo mặt đất đoạn đó.
-    for (const x of [160, 960, 1760, 2560, 3360, 4600]) {
-      const base = this.groundYAt(x);
-      const t = this.add.graphics();
-      t.setScrollFactor(0.6);
-      t.fillStyle(0x6b4a2f, 1);
-      t.fillRect(x + 16, base - 84, 12, 84);
-      t.fillStyle(0x2f7d4f, 1);
-      t.fillCircle(x + 22, base - 104, 40);
-      t.fillCircle(x - 4, base - 80, 26);
-      t.fillCircle(x + 48, base - 80, 26);
-    }
-
-    // Mặt đất theo mockup: 4 đoạn cao thấp, mỗi đoạn cỏ + thân đất + thân
-    // va chạm riêng. Đoạn cao 428, đoạn thấp 468, bậc 40px nhảy lên được.
-    for (const seg of GROUND_SEGMENTS) {
-      this.add.tileSprite(seg.x, seg.y - 5, seg.w, 19, "ground-top").setOrigin(0, 0);
-      this.add.tileSprite(seg.x, seg.y + 14, seg.w, VIEW_H - (seg.y + 14), "dirt-body").setOrigin(0, 0);
-      const groundBody = this.add.rectangle(seg.x + seg.w / 2, seg.y + 60, seg.w, 120);
-      groundBody.setFillStyle(0xffffff, 0);
-      this.physics.add.existing(groundBody, true);
-      this.solids.push(groundBody);
-    }
-
-    // Cửa hang tối trên mặt cắt đất của đoạn đầu (như mockup): chỉ trang trí.
-    const cave = this.add.graphics();
-    cave.fillStyle(0x0d131b, 1);
-    cave.fillRect(250, 448, 90, 30);
-    cave.fillEllipse(295, 448, 90, 26);
-
-    // Nhà đá ở đoạn cuối (vẽ bằng code, chỉ trang trí, không va chạm):
-    // tường đá có đốm, mái ngói hình thang + ống khói, cửa vòm gỗ, cửa sổ sáng.
-    const h = this.add.graphics();
-    h.fillStyle(0x8a7f74, 1);
-    h.fillRect(HOUSE_X, HOUSE_Y - 110, 150, 110);
-    h.fillStyle(0x6e6459, 1);
-    h.fillRect(HOUSE_X + 12, HOUSE_Y - 96, 18, 10);
-    h.fillRect(HOUSE_X + 60, HOUSE_Y - 70, 22, 12);
-    h.fillRect(HOUSE_X + 110, HOUSE_Y - 92, 16, 10);
-    h.fillRect(HOUSE_X + 30, HOUSE_Y - 40, 20, 10);
-    h.fillStyle(0x9d938a, 1);
-    h.fillRect(HOUSE_X + 40, HOUSE_Y - 100, 14, 8);
-    h.fillRect(HOUSE_X + 90, HOUSE_Y - 50, 18, 8);
-    h.fillStyle(0x7a6f63, 1);
-    h.fillRect(HOUSE_X + 118, HOUSE_Y - 196, 18, 30);
-    h.fillStyle(0x5d4030, 1);
-    h.fillPoints([
-      new Phaser.Geom.Point(HOUSE_X - 15, HOUSE_Y - 110),
-      new Phaser.Geom.Point(HOUSE_X + 165, HOUSE_Y - 110),
-      new Phaser.Geom.Point(HOUSE_X + 135, HOUSE_Y - 168),
-      new Phaser.Geom.Point(HOUSE_X + 15, HOUSE_Y - 168),
-    ]);
-    h.fillStyle(0x3e2a1e, 1);
-    h.fillRect(HOUSE_X - 15, HOUSE_Y - 112, 180, 4);
-    h.fillStyle(0x6b4a2f, 1);
-    h.fillRect(HOUSE_X + 60, HOUSE_Y - 68, 30, 68);
-    h.fillCircle(HOUSE_X + 75, HOUSE_Y - 68, 15);
-    h.fillStyle(0xffd97a, 1);
-    h.fillCircle(HOUSE_X + 82, HOUSE_Y - 34, 2);
-    h.fillRect(HOUSE_X + 18, HOUSE_Y - 88, 16, 16);
-    h.lineStyle(1, 0x4a3220, 1);
-    h.lineBetween(HOUSE_X + 26, HOUSE_Y - 88, HOUSE_X + 26, HOUSE_Y - 72);
-    h.lineBetween(HOUSE_X + 18, HOUSE_Y - 80, HOUSE_X + 34, HOUSE_Y - 80);
-
-    // Platform nổi nhiều tầng như mockup + thân va chạm của chúng. Platform
-    // dày đúng tỷ lệ khối đất gốc trong tileset: cỏ 19px + thân đất 48px =
-    // 67px, đáy là hàng đáy gồ ghề của khối gốc; thân va chạm kéo từ mặt
-    // đứng y xuống y+62. Platform một chiều (dưới đầu thang) tách riêng để
-    // leo xuyên từ dưới lên được, còn lại đặc như trước.
-    for (const plat of PLATFORMS) {
-      this.add.tileSprite(plat.x, plat.y - 5, plat.w, 19, "plat-top").setOrigin(0, 0);
-      this.add.tileSprite(plat.x, plat.y + 14, plat.w, 48, "dirt-body").setOrigin(0, 0);
-      const body = this.add.rectangle(plat.x + plat.w / 2, plat.y + 31, plat.w, 62);
+    // Mọi vùng đặc (đất, gờ trên hố, trần hang, khối nổi) đo từ mockup,
+    // đã gộp ngang thành các rect. Bậc giữa 2 vùng kề là tường đứng —
+    // đi xuống tự do, đi lên phải nhảy (bậc cao nhất 96px, đúng tầm nhảy
+    // tối đa nên vẫn lên được).
+    for (const rect of SOLID_RECTS) {
+      const body = this.add.rectangle(rect.x + rect.w / 2, rect.y + rect.h / 2, rect.w, rect.h);
       body.setFillStyle(0xffffff, 0);
       this.physics.add.existing(body, true);
-      if (plat.oneWay) this.oneWayBodies.push(body);
-      else this.solids.push(body);
+      this.solids.push(body);
     }
 
-    // Dây leo rủ xuống từ vài platform (trang trí).
-    const vine = this.add.graphics();
-    vine.lineStyle(2, 0x3f8f4f, 1);
-    for (const [vx, vy] of [[1470, 370], [2520, 370], [4320, 370]] as const) {
-      vine.lineBetween(vx, vy, vx + 3, vy + 14);
-      vine.lineBetween(vx + 3, vy + 14, vx - 2, vy + 26);
-      vine.lineBetween(vx + 14, vy, vx + 11, vy + 12);
-      vine.lineBetween(vx + 11, vy + 12, vx + 16, vy + 22);
-    }
-
-    // Thang leo: 2 thanh dọc + bậc ngang, vùng leo rộng 28px quanh tâm thang.
-    for (const lad of LADDERS) {
-      const g = this.add.graphics();
-      g.fillStyle(0x6b4a2f, 1);
-      g.fillRect(lad.x - 10, lad.top, 4, lad.bottom - lad.top);
-      g.fillRect(lad.x + 6, lad.top, 4, lad.bottom - lad.top);
-      for (let y = lad.top + 8; y < lad.bottom - 4; y += 16) {
-        g.fillRect(lad.x - 10, y, 20, 3);
-      }
+    // Thang leo (hình thang đã có trong mockup, đây chỉ là vùng leo):
+    // đầu thang vươn lên 40px trên mặt đứng để đứng trên gờ bấm Down là
+    // bám được thang; đáy thang trùng mặt đất/hố để bước ra được.
+    for (const lad of LADDER_ZONES) {
       this.ladderZones.push(new Phaser.Geom.Rectangle(lad.x - 14, lad.top, 28, lad.bottom - lad.top));
     }
 
-    // Khối đầu lâu trang trí (cắt từ tileset) trên platform và mặt đất.
-    this.add.image(840, 348, "skull-block").setOrigin(0, 1);
-    this.add.image(1900, 468, "skull-block").setOrigin(0, 1);
-    this.add.image(3900, 468, "skull-block").setOrigin(0, 1);
-
-    // Gai trên mặt đất (cắt từ tileset): chạm mất 1 tim như địch chạm.
-    for (const sp of SPIKES) {
-      for (let x = sp.x; x < sp.x + sp.w; x += 16) {
-        this.add.image(x, sp.y, "spike").setOrigin(0, 1);
-      }
-      this.spikeRects.push(new Phaser.Geom.Rectangle(sp.x, sp.y - 14, sp.w, 14));
+    // Gai (hình gai đã có trong mockup, đây chỉ là vùng gây sát thương).
+    for (const sp of SPIKE_RECTS) {
+      this.spikeRects.push(new Phaser.Geom.Rectangle(sp.x, sp.y, sp.w, sp.h));
     }
 
     // Slime tạm vẽ bằng code (chưa có sprite địch thật): thân tím, mắt trắng.
@@ -277,20 +138,6 @@ export class GameScene extends Phaser.Scene {
 
     this.player = new Player(this, 120, this.groundYAt(120));
     this.physics.add.collider(this.player, this.solids);
-    // Platform một chiều: chỉ va chạm khi nhân vật đang rơi xuống và chân
-    // đã ở trên mặt platform (dung sai 16px), nên nhảy/leo xuyên từ dưới
-    // lên được mà đứng từ trên vẫn đứng được.
-    this.physics.add.collider(
-      this.player,
-      this.oneWayBodies,
-      undefined,
-      (a, b) => {
-        const pb = (a as unknown as { body: Phaser.Physics.Arcade.Body }).body;
-        const sb = (b as unknown as { body: Phaser.Physics.Arcade.Body }).body;
-        return pb.velocity.y >= 0 && pb.bottom <= sb.top + 16;
-      },
-      this,
-    );
     this.renderHearts();
 
     // Vài kẻ thù, vị trí ngẫu nhiên, cách xa nhân vật lúc mới vào.
@@ -301,8 +148,8 @@ export class GameScene extends Phaser.Scene {
       this.enemies.push(enemy);
     }
 
-    this.physics.world.setBounds(0, 0, WORLD_W, VIEW_H);
-    this.cameras.main.setBounds(0, 0, WORLD_W, VIEW_H);
+    this.physics.world.setBounds(0, 0, MAP_W, MAP_H);
+    this.cameras.main.setBounds(0, 0, MAP_W, MAP_H);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
 
     const keyboard = this.input.keyboard;
@@ -326,12 +173,10 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  // Mặt đất tại x (đoạn nào chứa x thì lấy mặt đoạn đó, không thì 468).
+  // Mặt đất tại x: cột 32px nào chứa x thì lấy mặt đứng cột đó.
   private groundYAt(x: number): number {
-    for (const seg of GROUND_SEGMENTS) {
-      if (x >= seg.x && x < seg.x + seg.w) return seg.y;
-    }
-    return GROUND_Y;
+    const col = Phaser.Math.Clamp(Math.floor(x / 32), 0, GROUND_Y_AT.length - 1);
+    return GROUND_Y_AT[col];
   }
 
   // Thang chứa điểm (tâm hitbox) hay không.
@@ -386,12 +231,12 @@ export class GameScene extends Phaser.Scene {
   private randomFarX(): number {
     const others = this.enemies.filter((e) => e.alive).map((e) => e.x);
     for (let i = 0; i < 20; i++) {
-      const x = 80 + Math.random() * (WORLD_W - 160);
+      const x = 80 + Math.random() * (MAP_W - 160);
       if (Math.abs(x - this.player.x) < ENEMY_MIN_SPAWN_DIST) continue;
       if (others.some((ox) => Math.abs(x - ox) < 150)) continue;
       return x;
     }
-    return this.player.x < WORLD_W / 2 ? WORLD_W - 120 : 120;
+    return this.player.x < MAP_W / 2 ? MAP_W - 120 : 120;
   }
 
   private killEnemy(enemy: Enemy): void {

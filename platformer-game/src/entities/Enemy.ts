@@ -21,14 +21,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   constructor(scene: Phaser.Scene, feetX: number, feetY: number) {
     super(scene, feetX, feetY, "enemy-slime");
-    // Gốc vẽ ở đáy giữa, position của sprite là (tâm, chân) như Player.
+    // Slime nhỏ lại theo yêu cầu user (2026-11-07): scale 1.5 thay vì 2.
     this.setOrigin(0.5, 1);
-    this.setScale(2);
+    this.setScale(1.5);
     scene.add.existing(this);
     scene.physics.add.existing(this);
     const body = this.body as Phaser.Physics.Arcade.Body;
     // Body tính bằng pixel gốc của texture 32x28 (xem config hitbox Player
-    // để biết vì sao không dùng số hiển thị): hiển thị 48x36.
+    // để biết vì sao không dùng số hiển thị): hiển thị 36x27.
     body.setSize(24, 18);
     body.setOffset(4, 10);
     body.setCollideWorldBounds(true);

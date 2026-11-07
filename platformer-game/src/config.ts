@@ -5,8 +5,10 @@
 // dưới đây đều scale gấp đôi bản vanilla để giữ nguyên cảm giác.
 export const VIEW_W = 960;
 export const VIEW_H = 540;
-export const WORLD_W = 4800;
-export const GROUND_Y = 468;
+// Thế giới = đúng kích thước mockup x2 (3072x540), xem src/map.ts.
+// Map cũ (4 đoạn đất + 15 platform + nhà vẽ code) đã thay bằng map đo
+// trực tiếp từ mockup của user (2026-11-07): ảnh nền là chính mockup,
+// va chạm (đất/platform/thang/gai) đo từ màu từng ô 16px.
 
 // Nhân vật: frame 128x128, tâm ngang x=57, đường chân y=80 (đo từ file gốc,
 // sau khử viền đen nhân vật đứng còn 30x36 nhưng tâm và đường chân không đổi).
@@ -35,80 +37,8 @@ export const ATTACK_FRAMES = 7;
 export const ATTACK_BOX_W = 70;
 export const ATTACK_BOX_H = 50;
 
-// Map làm lại theo mockup của user (2026-11-07): mặt đất không còn phẳng
-// 1 đường mà chia 4 đoạn cao thấp (bậc 40px, nhảy lên được), platform nổi
-// rải nhiều tầng như các cụm khối xanh trong mockup, 3 thang leo nối đất
-// với platform cao, nhà đá ở đoạn cuối, gai trên mặt đất gây mất máu.
-// Độ cao nhảy tối đa 96px nên mọi bậc/tầng kề nhau chênh tối đa 80px.
-export interface GroundSegment {
-  x: number;
-  w: number;
-  y: number; // mặt đứng của đoạn
-}
-export const GROUND_SEGMENTS: GroundSegment[] = [
-  { x: 0, w: 1000, y: 428 },
-  { x: 1000, w: 1000, y: 468 },
-  { x: 2000, w: 1000, y: 428 },
-  { x: 3000, w: 1800, y: 468 },
-];
-
-export interface PlatformDef {
-  x: number;
-  y: number;
-  w: number;
-  // oneWay: platform một chiều — nhảy xuyên từ dưới lên, đứng được từ trên.
-  // Chỉ 3 platform dưới đầu thang là một chiều để leo xuyên qua nó lên mặt;
-  // các platform còn lại vẫn đặc như trước (chạm đáy sẽ chặn lại).
-  oneWay?: boolean;
-}
-export const PLATFORMS: PlatformDef[] = [
-  { x: 320, y: 348, w: 96 },
-  { x: 560, y: 308, w: 96, oneWay: true },
-  { x: 800, y: 348, w: 96 },
-  { x: 1150, y: 388, w: 128 },
-  { x: 1330, y: 348, w: 64 },
-  { x: 1450, y: 308, w: 96, oneWay: true },
-  { x: 1750, y: 388, w: 64 },
-  { x: 2150, y: 348, w: 160 },
-  { x: 2500, y: 308, w: 96 },
-  { x: 2800, y: 348, w: 96 },
-  { x: 3150, y: 388, w: 128 },
-  { x: 3350, y: 348, w: 64 },
-  { x: 3500, y: 308, w: 64 },
-  { x: 3750, y: 388, w: 96 },
-  { x: 4300, y: 308, w: 128, oneWay: true },
-];
-
-// Thang leo: x là tâm thang, top/bottom là 2 đầu (y = mặt chân).
-// Đầu thang trùng mặt platform một chiều ngay trên nó để leo lên tới nơi
-// là đứng được lên platform đó.
-export interface LadderDef {
-  x: number;
-  top: number;
-  bottom: number;
-}
-export const LADDERS: LadderDef[] = [
-  { x: 600, top: 308, bottom: 428 },
-  { x: 1500, top: 308, bottom: 468 },
-  { x: 4380, top: 308, bottom: 468 },
-];
 export const CLIMB_SPEED = 130;
 export const CLIMB_X_SPEED = 120;
-
-// Gai trên mặt đất: chạm mất 1 tim như địch chạm (dùng chung takeDamage).
-export interface SpikeDef {
-  x: number;
-  y: number; // mặt đất đặt gai
-  w: number;
-}
-export const SPIKES: SpikeDef[] = [
-  { x: 1300, y: 468, w: 32 },
-  { x: 3350, y: 468, w: 32 },
-];
-
-// Nhà đá (vẽ bằng code, chỉ trang trí, không va chạm): mép trái x, mặt đất y.
-export const HOUSE_X = 3980;
-export const HOUSE_Y = 468;
 
 // Kẻ thù (bước đầu): slime tạm vẽ bằng code, chưa có sprite thật.
 // Chết khi trúng 1 đòn chém, hồi sinh sau 10s ở vị trí ngẫu nhiên cách xa

@@ -33,40 +33,38 @@ vật lý của nhân vật và cảnh trí xung quanh, chưa làm hệ thống 
   chém dưới đất khóa di chuyển, chém trên không giữ đà bay và vẫn
   lái được hướng. Vùng chém đã tính sẵn trong `Player.attackBox()`
   để bước địch dùng ngay; trúng 1 đòn là slime chết.
-- Camera bám theo nhân vật (lerp 0.1), kẹp trong thế giới 4800x540.
-- Cảnh trí: nền xa nhất là ảnh núi `far-mountains.png` (384x216)
-  vẽ full màn hình, cố định theo màn hình (scrollFactor 0) — ảnh đã
-  có đủ trời, mây, núi, nền đất phẳng nên không vẽ thêm trời
-  gradient, núi tam giác hay mặt trời bằng code nữa; cây gần
-  parallax 0.6, mặt đất + platform nổi bằng Tileset.
-- Map làm lại theo mockup của user (2026-11-07): mặt đất chia 4 đoạn
-  cao thấp — 0–1000 ở y=428, 1000–2000 ở y=468, 2000–3000 ở y=428,
-  3000–4800 ở y=468 (bậc 40px, nhảy lên được); 15 platform nổi nhiều
-  tầng (xem `src/config.ts`, bậc/tầng kề nhau chênh tối đa 80px trong
-  tầm nhảy 96px). Platform dày đúng tỷ lệ khối đất gốc: cỏ 19px +
-  thân đất 48px = 67px, đáy là hàng đáy gồ ghề của khối gốc; thân va
-  chạm từ mặt đứng y xuống y+62.
-- Thang leo (3 cái, ở x=600, 1500, 4380): đứng cạnh thang bấm ↑/↓ để
-  leo lên/xuống, ←/→ trườn ngang (đi khỏi thang thì buông), bấm
-  Z/Space/B để nhảy khỏi thang. Platform ngay trên đầu mỗi thang là
-  platform một chiều (nhảy/leo xuyên từ dưới lên, đứng từ trên vẫn
-  đứng được) — 3 platform này có `oneWay: true` trong config, các
-  platform còn lại vẫn đặc (chạm đáy sẽ chặn lại).
-- Trang trí theo mockup (vẽ bằng code hoặc cắt từ tileset): nhà đá ở
-  x=3980 (tường đá có đốm, mái ngói hình thang + ống khói, cửa vòm gỗ,
-  cửa sổ sáng) — chỉ trang trí, không va chạm; cửa hang tối trên mặt
-  cắt đất đoạn đầu; khối đầu lâu (3 chỗ); dây leo rủ dưới 3 platform;
-  gai trên mặt đất (2 chỗ, x=1300 và 3350) — chạm gai mất 1 tim như
+- Camera bám theo nhân vật (lerp 0.1), kẹp trong thế giới 3072x540.
+- Map đúng y mockup của user (2026-11-07): ảnh nền là chính mockup
+  (1536x256, vẽ x2 = 3072x540, `assets/backgrounds/mockup-map.png`) —
+  trời, núi, cây, đất, nhà đá, thang, gai, rương, khối đầu lâu đều là
+  pixel của mockup, không vẽ thêm gì bằng code nữa. Va chạm đo trực
+  tiếp từ màu từng ô 16px của mockup (`src/map.ts`, sinh bằng
+  `tools/analyze-mockup.py`): 66 rect đặc đã gộp (đất, gờ trên hố,
+  trần hang, khối xanh nổi), mặt đất theo từng cột 32px (gờ trái
+  y=288, đất thấp y=384, hố giữa sâu tới y=480), bậc lên cao nhất
+  96px đúng tầm nhảy tối đa. Nhà đá và cây chỉ là hình trong mockup,
+  không va chạm; trần hang bỏ 1 hàng đáy để đầu nhân vật (74px) không
+  chạm trần khi đi dưới hang.
+- Thang leo (3 cái, tâm x=184, 1220, 2704): đứng cạnh thang bấm ↑/↓
+  để leo lên/xuống, ←/→ trườn ngang (đi khỏi thang thì buông), bấm
+  Z/Space/B để nhảy khỏi thang. Đầu thang vươn 40px trên mặt đứng để
+  đứng trên gờ bấm Down là bám được; thang trái nối gờ giữa xuống cỏ
+  thấp, thang giữa nối cỏ trên xuống đáy hố (ra khỏi hố chỉ có đường
+  thang — 2 vách hố cao 128–160px, nhảy không lên được), tháp thang
+  phải nối platform cao lên đỉnh màn hình. Không còn platform một
+  chiều — mọi khối đều đặc, thang nối thẳng lên mặt đất/thềm.
+- Gai (5 cụm, đo từ mockup): gờ trái dưới khối 2x2, đáy hố, cạnh
+  khối đầu lâu giữa, chân cột đá, mép phải — chạm gai mất 1 tim như
   địch chạm.
 - Kẻ thù: 6 slime (`src/entities/Enemy.ts`), vị trí xuất hiện ngẫu
   nhiên trên mặt đất, cách xa nhân vật ít nhất 400px. Slime đi tuần
   chậm (60px/s), thấy nhân vật trong 250px thì đuổi theo (110px/s),
   di chuyển bằng cách nhảy cóc. Trúng 1 đòn chém là chết (nổ hạt
   tím), hồi sinh sau 10s ở vị trí ngẫu nhiên khác, cũng cách xa
-  nhân vật lúc đó ít nhất 400px. Slime hiện vẽ bằng code (texture
-  `enemy-slime` sinh từ Graphics) vì chưa có sprite địch thật — khi
-  user gửi sprite, thay texture ở `Enemy.ts` là xong, logic giữ
-  nguyên.
+  nhân vật lúc đó ít nhất 400px. Slime vẽ bằng code (texture
+  `enemy-slime` sinh từ Graphics), nhỏ lại từ 2026-11-07 (scale 1.5,
+  hiển thị 48x42, body 36x27) — khi user gửi sprite địch thật, thay
+  texture ở `Enemy.ts` là xong, logic giữ nguyên.
 - Máu: nhân vật có 5 trái tim (thanh tim trên khung game), địch chạm
   mất 1 tim, sau đó bất tử tạm 1.5s (không mất tiếp) và bị hất văng
   khỏi địch. Hết 5 tim thì hiện màn "Hết máu!" và bấm Chơi lại (hoặc
@@ -81,8 +79,11 @@ vật lý của nhân vật và cảnh trí xung quanh, chưa làm hệ thống 
 
 - `src/main.ts` — cấu hình Phaser (960x540, FIT, pixelArt, roundPixels)
   và gắn nút cảm ứng NES vào input.
-- `src/config.ts` — mọi hằng số gameplay (khung hình, thế giới, tốc
-  độ, nhảy, hitbox, platform) để chỉnh số không cần đụng logic.
+- `src/config.ts` — mọi hằng số gameplay (khung hình, tốc độ, nhảy,
+  hitbox, thang, máu, địch) để chỉnh số không cần đụng logic; số liệu
+  map (đất, khối, thang, gai) nằm riêng ở `src/map.ts`.
+- `src/map.ts` — map đo từ mockup (mặt đất theo cột, 66 rect đặc,
+  3 thang, 5 cụm gai), sinh bằng `tools/analyze-mockup.py`.
 - `src/input.ts` — trạng thái nút chung cho bàn phím + cảm ứng.
 - `src/entities/Player.ts` — nhân vật: physics Arcade, hitbox hiển
   thị 30x64 nhưng khai báo cho Phaser bằng pixel gốc 15x32 (offset
@@ -93,8 +94,8 @@ vật lý của nhân vật và cảnh trí xung quanh, chưa làm hệ thống 
   thủ công theo đúng nhịp frame bản vanilla (idle 0.12s, walk 0.09s,
   run 0.07s, chém 0.06s, nhảy/rơi theo thời gian bay).
 - `src/scenes/GameScene.ts` — 1 scene duy nhất hiện tại: load asset,
-  cắt texture từ tileset, vẽ cảnh trí, mặt đất, platform, camera,
-  phím tắt, sinh địch + kiểm tra chém trúng địch + hồi sinh địch.
+  vẽ ảnh mockup làm map, dựng va chạm từ `src/map.ts`, camera, phím
+  tắt, sinh địch + kiểm tra chém trúng địch + hồi sinh địch.
   Scene HUD, menu sẽ tách sau.
 - `src/entities/Enemy.ts` — kẻ thù: đi tuần/truy đuổi/nhảy cóc, chết
   và hồi sinh; xem `src/config.ts` (ENEMY_*) để chỉnh số.
