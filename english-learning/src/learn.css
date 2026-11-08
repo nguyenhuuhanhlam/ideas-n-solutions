@@ -203,6 +203,44 @@
   color: #94a3b8;
 }
 
+/* Thẻ Thành tích ở cuối trang chính: nền gradient pastel ấm + hình trang
+   trí nền nhẹ (sao vàng góc trên phải, vòng tròn teal góc dưới trái).
+   Nội dung nằm trên lớp trang trí để chữ vẫn đọc rõ. */
+.learn-achievement {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(115deg, #fff7ed 0%, #fefce8 48%, #ecfdf5 100%);
+  border-color: #fde68a;
+}
+.learn-achievement::before {
+  content: "";
+  position: absolute;
+  top: -24px;
+  right: -16px;
+  width: 220px;
+  height: 180px;
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='180' viewBox='0 0 220 180'><g fill='none'><path d='M180 20l4 10 10 4-10 4-4 10-4-10-10-4 10-4z' fill='%23fbbf24' fill-opacity='0.35'/><path d='M140 70l3 8 8 3-8 3-3 8-3-8-8-3 8-3z' fill='%23fbbf24' fill-opacity='0.3'/><circle cx='200' cy='90' r='5' fill='%23f59e0b' fill-opacity='0.25'/><circle cx='160' cy='120' r='3.5' fill='%23f59e0b' fill-opacity='0.3'/><circle cx='205' cy='140' r='3' fill='%23f59e0b' fill-opacity='0.25'/><path d='M120 30h14M127 23v14' stroke='%23f59e0b' stroke-opacity='0.4' stroke-width='2' stroke-linecap='round'/></g></svg>");
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+}
+.learn-achievement::after {
+  content: "";
+  position: absolute;
+  bottom: -36px;
+  left: -24px;
+  width: 200px;
+  height: 160px;
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='160' viewBox='0 0 200 160'><g fill='none'><circle cx='40' cy='120' r='26' fill='%230e9a8b' fill-opacity='0.10'/><circle cx='80' cy='140' r='14' fill='%230e9a8b' fill-opacity='0.12'/><path d='M30 60l3 8 8 3-8 3-3 8-3-8-8-3 8-3z' fill='%230e9a8b' fill-opacity='0.25'/><circle cx='120' cy='90' r='4' fill='%230e9a8b' fill-opacity='0.3'/><path d='M150 120h12M156 114v12' stroke='%230e9a8b' stroke-opacity='0.35' stroke-width='2' stroke-linecap='round'/></g></svg>");
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+}
+.learn-achievement > * {
+  position: relative;
+  z-index: 1;
+}
+
 .learn-example {
   font-style: italic;
   border-left: 4px solid #0e9a8b;

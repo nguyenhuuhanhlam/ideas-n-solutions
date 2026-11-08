@@ -1191,20 +1191,6 @@ export default function App() {
 
       {(section === 'basic' || section === 'conjhub') && (
         <VStack gap={3}>
-          <div className="learn-card">
-            <VStack gap={2}>
-              <SectionLabel icon={<Flame />}>Thành tích</SectionLabel>
-              <Text>
-                {stats.streak > 0 ? `Chuỗi ngày: ${stats.streak} ngày liên tiếp` : 'Chưa có chuỗi ngày — làm bài hôm nay để bắt đầu!'}
-                {' · '}Hôm nay: {todayEntries.length} bài · {todayPoints} điểm
-              </Text>
-              <Text type="supporting">
-                {earnedIds.length} / {BADGES.length} huy hiệu đã mở khóa
-                {nextBadge ? ` · Huy hiệu tiếp theo: ${nextBadge.name} — ${nextBadge.desc}` : ' · Đã mở hết huy hiệu!'}
-              </Text>
-              <Button variant="secondary" label="Xem lịch sử & huy hiệu →" onClick={() => setSection('history')} />
-            </VStack>
-          </div>
           <SectionLabel icon={<List />}>{listTitle}</SectionLabel>
           <Text type="supporting">Mỗi lần làm bài lấy ngẫu nhiên 25 câu, mỗi câu 1 điểm.</Text>
           {shownLessons.map((lesson) => {
@@ -1239,6 +1225,20 @@ export default function App() {
                   : 'Chưa có câu sai nào — bé làm đúng hết thì mục này trống. Câu nào làm sai sẽ tự ghi lại đây để phụ huynh xem lại và sửa cho bé.'}
               </Text>
               <Button variant="primary" size="lg" label={wrongBank.length > 0 ? `Xem ${wrongBank.length} câu sai →` : 'Mở mục Câu sai →'} onClick={openWrongBank} />
+            </VStack>
+          </div>
+          <div className="learn-card learn-achievement">
+            <VStack gap={2}>
+              <SectionLabel icon={<Flame />}>Thành tích</SectionLabel>
+              <Text>
+                {stats.streak > 0 ? `Chuỗi ngày: ${stats.streak} ngày liên tiếp` : 'Chưa có chuỗi ngày — làm bài hôm nay để bắt đầu!'}
+                {' · '}Hôm nay: {todayEntries.length} bài · {todayPoints} điểm
+              </Text>
+              <Text type="supporting">
+                {earnedIds.length} / {BADGES.length} huy hiệu đã mở khóa
+                {nextBadge ? ` · Huy hiệu tiếp theo: ${nextBadge.name} — ${nextBadge.desc}` : ' · Đã mở hết huy hiệu!'}
+              </Text>
+              <Button variant="secondary" label="Xem lịch sử & huy hiệu →" onClick={() => setSection('history')} />
             </VStack>
           </div>
         </VStack>
