@@ -555,7 +555,7 @@ function Frame({ navActive, onNav, hero, narrow, children }) {
     <div className="learn-page">
       <header className="learn-header">
         <div className="learn-header-inner">
-          <button type="button" className="learn-logo" onClick={() => onNav('lessons')}>🇬🇧 TuTi Learn English</button>
+          <button type="button" className="learn-logo" onClick={() => onNav('lessons')}><span className="learn-logo-tag">GB</span> TuTi Learn English</button>
           <nav className="learn-nav" aria-label="Điều hướng chính">
             {NAV_ITEMS.map((item) => (
               <button
