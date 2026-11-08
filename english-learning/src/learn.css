@@ -157,6 +157,37 @@
   flex: none;
 }
 
+/* Huy hiệu: lưới thẻ nhỏ, đã mở thì nền teal nhạt + icon teal,
+   chưa mở thì xám nhạt mờ. */
+.learn-badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+}
+.learn-badge {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 10px 12px;
+  background: #f0fdfa;
+}
+.learn-badge.locked {
+  background: #f8fafc;
+  opacity: 0.55;
+}
+.learn-badge svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  color: #0f766e;
+  margin-top: 2px;
+}
+.learn-badge.locked svg {
+  color: #94a3b8;
+}
+
 .learn-example {
   font-style: italic;
   border-left: 4px solid #0e9a8b;

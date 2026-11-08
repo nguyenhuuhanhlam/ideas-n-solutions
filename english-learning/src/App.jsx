@@ -3,7 +3,7 @@ import { Banner } from '@astryxdesign/core/Banner'
 import { Button } from '@astryxdesign/core/Button'
 import { Card } from '@astryxdesign/core/Card'
 import { ClickableCard } from '@astryxdesign/core/ClickableCard'
-import { BookOpen, Compass, Flag, Hash, LayoutGrid, Lightbulb, List, NotebookPen, Pencil, Search, Settings, Shuffle, TriangleAlert, Workflow } from 'lucide-react'
+import { Award, BookOpen, Compass, Crown, Flag, Flame, FlameKindling, Footprints, Hash, History, LayoutGrid, Lightbulb, List, NotebookPen, Pencil, Search, Settings, Shuffle, Sparkles, Star, TriangleAlert, Trophy, Workflow } from 'lucide-react'
 import { Heading } from '@astryxdesign/core/Heading'
 import { HStack } from '@astryxdesign/core/HStack'
 import { ProgressBar } from '@astryxdesign/core/ProgressBar'
@@ -30,6 +30,66 @@ function wrongKeyFor(lessonTitle, question, correctAnswer) {
 }
 // pickWrong cham va hien thi nhu trac nghiem (bam chon 1 dap an).
 const isChoiceLike = (q) => q.type === 'choice' || q.type === 'pickWrong'
+
+const HISTORY_KEY = 'english-learning-history-v1'
+const HISTORY_MAX = 500
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+function loadHistory() {
+  try {
+    const data = JSON.parse(localStorage.getItem(HISTORY_KEY))
+    if (!Array.isArray(data)) return []
+    return data.filter((e) => e && typeof e.date === 'string' && typeof e.at === 'number' && e.title).slice(0, HISTORY_MAX)
+  } catch { return [] }
+}
+// Chuỗi ngày liên tiếp: đếm ngược từ hôm nay; nếu hôm nay chưa làm bài
+// thì tính từ hôm qua (vẫn còn trong ngày để giữ chuỗi).
+function computeStreak(entries) {
+  const days = new Set(entries.map((e) => e.date))
+  let streak = 0
+  const d = new Date()
+  if (!days.has(dateKey(d))) d.setDate(d.getDate() - 1)
+  while (days.has(dateKey(d))) { streak++; d.setDate(d.getDate() - 1) }
+  return streak
+}
+// Huy hiệu: tính từ lịch sử làm bài (không lưu riêng, tự mở khóa khi đủ
+// điều kiện). stats: { sessions, correct, streak, perfect }.
+const BADGES = [
+  { id: 'first', name: 'Bước đầu tiên', desc: 'Hoàn thành bài tập đầu tiên', icon: Footprints, check: (s) => s.sessions >= 1 },
+  { id: 'streak3', name: '3 ngày liên tiếp', desc: 'Làm bài 3 ngày liền', icon: Flame, check: (s) => s.streak >= 3 },
+  { id: 'streak7', name: '7 ngày liên tiếp', desc: 'Làm bài 7 ngày liền', icon: FlameKindling, check: (s) => s.streak >= 7 },
+  { id: 'sessions10', name: '10 bài hoàn thành', desc: 'Hoàn thành 10 bài tập', icon: Award, check: (s) => s.sessions >= 10 },
+  { id: 'correct50', name: '50 câu đúng', desc: 'Trả lời đúng 50 câu', icon: Star, check: (s) => s.correct >= 50 },
+  { id: 'correct100', name: '100 câu đúng', desc: 'Trả lời đúng 100 câu', icon: Trophy, check: (s) => s.correct >= 100 },
+  { id: 'perfect', name: 'Bài hoàn hảo', desc: 'Đạt 100% một bài', icon: Sparkles, check: (s) => s.perfect },
+  { id: 'streak30', name: '30 ngày liên tiếp', desc: 'Làm bài 30 ngày liền', icon: Crown, check: (s) => s.streak >= 30 },
+]
+function historyStats(entries) {
+  return {
+    sessions: entries.length,
+    correct: entries.reduce((sum, e) => sum + (e.score || 0), 0),
+    streak: computeStreak(entries),
+    perfect: entries.some((e) => e.percent === 100),
+  }
+}
+function earnedBadgeIds(entries) {
+  const st = historyStats(entries)
+  return BADGES.filter((b) => b.check(st)).map((b) => b.id)
+}
+function groupByDay(entries) {
+  const map = new Map()
+  for (const e of entries) {
+    if (!map.has(e.date)) map.set(e.date, [])
+    map.get(e.date).push(e)
+  }
+  return [...map.entries()].sort((a, b) => (a[0] < b[0] ? 1 : -1))
+}
+const WEEKDAYS = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy']
+function formatDay(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  return `${WEEKDAYS[new Date(y, m - 1, d).getDay()]}, ${String(d).padStart(2, '0')}-${String(m).padStart(2, '0')}-${y}`
+}
 function loadWrongBank() {
   try {
     const data = JSON.parse(localStorage.getItem(WRONG_KEY))
@@ -486,6 +546,7 @@ const NAV_ITEMS = [
   { id: 'lessons', label: 'Bài học', accent: '#12294d' },
   { id: 'conj', label: 'Chia động từ', accent: '#0e9a8b' },
   { id: 'lookup', label: 'Tra cứu', accent: '#1f9d66' },
+  { id: 'history', label: 'Lịch sử', accent: '#f59e0b' },
   { id: 'settings', label: 'Cài đặt', accent: '#8b5cf6' },
 ]
 
@@ -550,10 +611,12 @@ function SectionLabel({ icon, children }) {
 export default function App() {
   const [progress, setProgress] = useState(loadProgress)
   const [wrongBank, setWrongBank] = useState(loadWrongBank)
+  const [history, setHistory] = useState(loadHistory)
   const [confirmClear, setConfirmClear] = useState(false)
+  const [confirmClearHistory, setConfirmClearHistory] = useState(false)
   const [view, setView] = useState({ name: 'home' }) // home | lesson | quiz
   const [quiz, setQuiz] = useState(null)
-  const [section, setSection] = useState('basic') // basic | conjhub | lookup | settings (không còn mục 'tất cả' để danh sách khỏi quá dài khi thêm bài mới)
+  const [section, setSection] = useState('basic') // basic | conjhub | lookup | history | settings (không còn mục 'tất cả' để danh sách khỏi quá dài khi thêm bài mới)
   const [fontSize, setFontSize] = useState(() => {
     try { return localStorage.getItem(SETTINGS_KEY) || 'medium' } catch { return 'medium' }
   })
@@ -570,6 +633,10 @@ export default function App() {
   useEffect(() => {
     try { localStorage.setItem(WRONG_KEY, JSON.stringify(wrongBank)) } catch { /* không lưu được thì vẫn dùng trong phiên */ }
   }, [wrongBank])
+
+  useEffect(() => {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)) } catch { /* không lưu được thì vẫn dùng trong phiên */ }
+  }, [history])
 
   // progress.best lưu theo % (bài cũ 10 câu thì điểm /100 trùng với % nên dữ liệu cũ vẫn dùng được)
   const completedCount = allLessons.filter((l) => (progress[l.id]?.best || 0) >= 70).length
@@ -676,6 +743,7 @@ export default function App() {
     if (section === 'basic') return 'lessons'
     if (section === 'conjhub') return 'conj'
     if (section === 'lookup') return 'lookup'
+    if (section === 'history') return 'history'
     if (section === 'settings') return 'settings'
     return null
   }
@@ -702,7 +770,21 @@ export default function App() {
     if (quiz.index + 1 >= quiz.questions.length) {
       const maxScore = quiz.questions.length * POINTS_PER_QUESTION
       const finalPercent = Math.round((quiz.score / maxScore) * 100)
-      setQuiz({ ...quiz, finished: true, percent: finalPercent })
+      // Ghi nhận phiên làm bài vào lịch sử ngày (mọi dạng phiên: bài
+      // thường, ôn tập, nâng cao, ôn câu sai) để tính chuỗi ngày + huy hiệu.
+      const historyEntry = {
+        date: dateKey(new Date()),
+        at: Date.now(),
+        title: quiz.title,
+        kind: quiz.review ? 'review' : quiz.advanced ? 'advanced' : !quiz.lessonId ? 'practice' : 'lesson',
+        score: quiz.score,
+        total: quiz.questions.length,
+        percent: finalPercent,
+      }
+      const earnedBefore = earnedBadgeIds(history)
+      const freshBadges = earnedBadgeIds([...history, historyEntry]).filter((id) => !earnedBefore.includes(id))
+      setHistory((prev) => [historyEntry, ...prev].slice(0, HISTORY_MAX))
+      setQuiz({ ...quiz, finished: true, percent: finalPercent, freshBadges })
       // Ghi nhận câu sai: câu sai -> thêm/cập nhật vào kho; câu đúng ->
       // xóa khỏi kho (dù trước đó ghi từ bài lẻ hay ôn tập). Phiên ôn câu
       // sai dùng khóa đã lưu sẵn trên câu hỏi, các phiên khác tính khóa
@@ -766,6 +848,14 @@ export default function App() {
             description={`Số sao: ${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}`}
             collapsible={false}
           />
+          {quiz.freshBadges?.length > 0 && (
+            <Banner
+              status="success"
+              title={`Huy hiệu mới: ${quiz.freshBadges.map((id) => BADGES.find((b) => b.id === id)?.name).join(', ')}`}
+              description="Bé vừa mở khóa huy hiệu mới — xem tất cả ở mục Lịch sử."
+              collapsible={false}
+            />
+          )}
           {wrong.length > 0 && (
             <VStack gap={2}>
               <Heading level={4} weight="bold">Câu làm sai — xem lại</Heading>
@@ -973,6 +1063,12 @@ export default function App() {
   }
 
   // ---- Trang chính: hero + chip lọc + thẻ bài ----
+  const stats = historyStats(history)
+  const earnedIds = earnedBadgeIds(history)
+  const nextBadge = BADGES.find((b) => !earnedIds.includes(b.id))
+  const todayEntries = history.filter((e) => e.date === dateKey(new Date()))
+  const todayPoints = todayEntries.reduce((sum, e) => sum + (e.score || 0), 0)
+  const groupedDays = groupByDay(history)
   const basicLessons = allLessons.filter((l) => !isConjLesson(l))
   const conjLessons = allLessons.filter((l) => isConjLesson(l))
   const shownLessons = section === 'basic' ? basicLessons : conjLessons
@@ -1029,8 +1125,86 @@ export default function App() {
         </div>
       )}
 
+      {section === 'history' && (
+        <VStack gap={3}>
+          <div className="learn-card">
+            <VStack gap={2}>
+              <SectionLabel icon={<Flame />}>Chuỗi ngày liên tiếp</SectionLabel>
+              <Text weight="bold" size="lg">
+                {stats.streak > 0 ? `${stats.streak} ngày liên tiếp` : 'Chưa có chuỗi ngày'}
+              </Text>
+              <Text type="supporting">
+                Hôm nay đã làm {todayEntries.length} bài · {todayPoints} điểm · Tổng cộng {stats.sessions} bài · {stats.correct} câu đúng.
+                Làm bài mỗi ngày để giữ chuỗi — nghỉ 1 ngày là chuỗi về 0.
+              </Text>
+            </VStack>
+          </div>
+          <div className="learn-card">
+            <VStack gap={2}>
+              <SectionLabel icon={<Trophy />}>Huy hiệu ({earnedIds.length} / {BADGES.length})</SectionLabel>
+              <div className="learn-badge-grid">
+                {BADGES.map((b) => {
+                  const earned = earnedIds.includes(b.id)
+                  const Icon = b.icon
+                  return (
+                    <div key={b.id} className={`learn-badge${earned ? '' : ' locked'}`}>
+                      <Icon />
+                      <div>
+                        <Text weight="bold">{b.name}</Text>
+                        <Text type="supporting">{b.desc}</Text>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </VStack>
+          </div>
+          <div className="learn-card">
+            <VStack gap={2}>
+              <SectionLabel icon={<History />}>Lịch sử làm bài</SectionLabel>
+              {history.length === 0 ? (
+                <Text type="supporting">Chưa có bài nào được ghi lại — hoàn thành 1 bài tập là lịch sử bắt đầu.</Text>
+              ) : (
+                <>
+                  {groupedDays.slice(0, 30).map(([day, items]) => (
+                    <VStack key={day} gap={1}>
+                      <Text weight="bold">{formatDay(day)}</Text>
+                      {items.map((e, i) => (
+                        <Text key={i} type="supporting">{e.title} — {e.score}/{e.total} điểm ({e.percent}%)</Text>
+                      ))}
+                    </VStack>
+                  ))}
+                  <Button
+                    variant={confirmClearHistory ? 'destructive' : 'secondary'}
+                    label={confirmClearHistory ? 'Bấm lại để xác nhận xóa hết' : 'Xóa lịch sử'}
+                    onClick={() => {
+                      if (confirmClearHistory) { setHistory([]); setConfirmClearHistory(false) }
+                      else setConfirmClearHistory(true)
+                    }}
+                  />
+                </>
+              )}
+            </VStack>
+          </div>
+        </VStack>
+      )}
+
       {(section === 'basic' || section === 'conjhub') && (
         <VStack gap={3}>
+          <div className="learn-card">
+            <VStack gap={2}>
+              <SectionLabel icon={<Flame />}>Thành tích</SectionLabel>
+              <Text>
+                {stats.streak > 0 ? `Chuỗi ngày: ${stats.streak} ngày liên tiếp` : 'Chưa có chuỗi ngày — làm bài hôm nay để bắt đầu!'}
+                {' · '}Hôm nay: {todayEntries.length} bài · {todayPoints} điểm
+              </Text>
+              <Text type="supporting">
+                {earnedIds.length} / {BADGES.length} huy hiệu đã mở khóa
+                {nextBadge ? ` · Huy hiệu tiếp theo: ${nextBadge.name} — ${nextBadge.desc}` : ' · Đã mở hết huy hiệu!'}
+              </Text>
+              <Button variant="secondary" label="Xem lịch sử & huy hiệu →" onClick={() => setSection('history')} />
+            </VStack>
+          </div>
           <SectionLabel icon={<List />}>{listTitle}</SectionLabel>
           <Text type="supporting">Mỗi lần làm bài lấy ngẫu nhiên 25 câu, mỗi câu 1 điểm.</Text>
           {shownLessons.map((lesson) => {
