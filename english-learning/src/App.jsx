@@ -3,7 +3,7 @@ import { Banner } from '@astryxdesign/core/Banner'
 import { Button } from '@astryxdesign/core/Button'
 import { Card } from '@astryxdesign/core/Card'
 import { ClickableCard } from '@astryxdesign/core/ClickableCard'
-import { Award, BookOpen, Compass, Crown, Flag, Flame, FlameKindling, Footprints, Hash, History, LayoutGrid, Lightbulb, List, NotebookPen, Pencil, Search, Settings, Shuffle, Sparkles, Star, TriangleAlert, Trophy, Workflow } from 'lucide-react'
+import { Award, BookOpen, Cloud, Compass, Crown, Flag, Flame, FlameKindling, Footprints, Hash, History, LayoutGrid, Lightbulb, List, NotebookPen, Pencil, Search, Settings, Shuffle, Sparkles, Star, TriangleAlert, Trophy, Workflow } from 'lucide-react'
 import { Heading } from '@astryxdesign/core/Heading'
 import { HStack } from '@astryxdesign/core/HStack'
 import { ProgressBar } from '@astryxdesign/core/ProgressBar'
@@ -11,16 +11,16 @@ import { Table } from '@astryxdesign/core/Table'
 import { Text } from '@astryxdesign/core/Text'
 import { TextInput } from '@astryxdesign/core/TextInput'
 import { VStack } from '@astryxdesign/core/VStack'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './learn.css'
 import { lessons, conjugationGroups, POINTS_PER_QUESTION } from './data/lessons.js'
 import { questionBanks, errorBanks } from './data/questions.js'
 import { conjugationGuides } from './data/conjugationGuides.js'
 import { irregularVerbs } from './data/irregular.js'
+import { HISTORY_MAX, WRONG_BANK_MAX, mergeHistory, mergeProgress, mergeWrongBank } from './lib/sync.js'
 
 const STORAGE_KEY = 'english-learning-progress-v1'
 const WRONG_KEY = 'english-learning-wrong-v1'
-const WRONG_BANK_MAX = 100
 // Mục "Câu sai cần ôn lại": mọi câu làm sai (bài lẻ hay ôn tập) đều được
 // ghi lại đây và lưu bền (localStorage). Khóa của 1 câu = tên bài + đề +
 // đáp án đúng, để cùng 1 câu dù làm sai ở đâu cũng chỉ ghi 1 lần, và khi
@@ -32,7 +32,6 @@ function wrongKeyFor(lessonTitle, question, correctAnswer) {
 const isChoiceLike = (q) => q.type === 'choice' || q.type === 'pickWrong'
 
 const HISTORY_KEY = 'english-learning-history-v1'
-const HISTORY_MAX = 500
 function dateKey(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
@@ -638,6 +637,102 @@ export default function App() {
     try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)) } catch { /* không lưu được thì vẫn dùng trong phiên */ }
   }, [history])
 
+  // ---- Đồng bộ đám mây (Firebase, project dev-lab-vm của app Ahri) ----
+  // localStorage vẫn là bộ nhớ chính trên máy (dùng được khi mất mạng);
+  // khi đăng nhập Google, dữ liệu gộp 2 chiều với Firestore để xem được
+  // trên máy khác. Chỉ cho đẩy lên sau khi đã gộp xong lúc đăng nhập
+  // (syncReady) để bản local chưa gộp không ghi đè mất dữ liệu trên mây.
+  const [syncUser, setSyncUser] = useState(null)
+  const [syncStatus, setSyncStatus] = useState('off') // off | loading | synced | error | unavailable
+  const [syncMessage, setSyncMessage] = useState('')
+  const [lastSyncAt, setLastSyncAt] = useState(null)
+  const dataRef = useRef(null)
+  dataRef.current = { history, progress, wrongBank }
+  const syncReadyRef = useRef(false)
+  const firebaseModRef = useRef(null)
+  async function loadFirebase() {
+    if (!firebaseModRef.current) firebaseModRef.current = await import('./lib/firebase.js')
+    return firebaseModRef.current
+  }
+  useEffect(() => {
+    let unsub = null
+    let cancelled = false
+    loadFirebase().then((m) => {
+      if (cancelled) return
+      try {
+        unsub = m.listenAuth(async (user) => {
+          if (cancelled) return
+          setSyncUser(user)
+          syncReadyRef.current = false
+          if (!user) { setSyncStatus('off'); setSyncMessage(''); return }
+          setSyncStatus('loading')
+          try {
+            const cloud = await m.fetchCloud(user.uid)
+            if (cancelled) return
+            if (cloud) {
+              setHistory((prev) => mergeHistory(prev, cloud.history))
+              setWrongBank((prev) => mergeWrongBank(prev, cloud.wrongBank))
+              setProgress((prev) => mergeProgress(prev, cloud.progress))
+            } else {
+              // Chưa có gì trên mây: đẩy dữ liệu hiện tại của máy lên.
+              await m.pushCloud(user.uid, dataRef.current)
+            }
+            syncReadyRef.current = true
+            setSyncStatus('synced')
+            setLastSyncAt(Date.now())
+            setSyncMessage('')
+          } catch (e) {
+            setSyncStatus('error')
+            setSyncMessage(m.syncErrorText(e))
+          }
+        })
+      } catch { setSyncStatus('unavailable') }
+    }).catch(() => { if (!cancelled) setSyncStatus('unavailable') })
+    return () => { cancelled = true; if (unsub) unsub() }
+  }, [])
+  // Đẩy dữ liệu lên mây mỗi khi có thay đổi (chờ 1.2s để gộp nhiều thay
+  // đổi liên tiếp thành 1 lần ghi). Không chạy trước khi gộp xong.
+  useEffect(() => {
+    if (!syncUser || !syncReadyRef.current) return undefined
+    const t = setTimeout(async () => {
+      try {
+        const m = await loadFirebase()
+        await m.pushCloud(syncUser.uid, dataRef.current)
+        setLastSyncAt(Date.now())
+        setSyncStatus('synced')
+        setSyncMessage('')
+      } catch (e) {
+        setSyncStatus('error')
+        loadFirebase().then((m) => setSyncMessage(m.syncErrorText(e))).catch(() => setSyncMessage('Đồng bộ chưa được — dữ liệu vẫn lưu trên máy.'))
+      }
+    }, 1200)
+    return () => clearTimeout(t)
+  }, [history, progress, wrongBank, syncUser])
+
+  async function handleSignIn() {
+    setSyncStatus('loading')
+    setSyncMessage('')
+    try {
+      const m = await loadFirebase()
+      await m.signInWithGoogle()
+      // onAuthStateChanged chạy tiếp: tải mây + gộp dữ liệu.
+    } catch (e) {
+      setSyncStatus('error')
+      const m = firebaseModRef.current
+      setSyncMessage(m ? m.syncErrorText(e) : 'Không mở được đăng nhập — kiểm tra mạng rồi thử lại.')
+    }
+  }
+  async function handleSignOut() {
+    try {
+      const m = await loadFirebase()
+      await m.signOutUser()
+    } catch { /* đăng xuất lỗi thì vẫn về trạng thái chưa đăng nhập */ }
+    setSyncUser(null)
+    setSyncStatus('off')
+    setSyncMessage('')
+    syncReadyRef.current = false
+  }
+
   // progress.best lưu theo % (bài cũ 10 câu thì điểm /100 trùng với % nên dữ liệu cũ vẫn dùng được)
   const completedCount = allLessons.filter((l) => (progress[l.id]?.best || 0) >= 70).length
   const totalQuestions = allLessons.reduce((sum, l) => sum + l.questions.length, 0)
@@ -1092,6 +1187,7 @@ export default function App() {
       </HStack>
 
       {section === 'settings' && (
+        <VStack gap={3}>
         <div className="learn-card">
           <VStack gap={2}>
             <SectionLabel icon={<Settings />}>Cài đặt — Cỡ chữ</SectionLabel>
@@ -1113,6 +1209,25 @@ export default function App() {
             </div>
           </VStack>
         </div>
+        <div className="learn-card">
+          <VStack gap={2}>
+            <SectionLabel icon={<Cloud />}>Đồng bộ đám mây</SectionLabel>
+            <Text type="supporting">Đăng nhập cùng 1 tài khoản Google trên các máy để xem lịch sử làm bài, tiến độ và câu sai ở máy nào cũng được. Khi mất mạng, dữ liệu vẫn lưu trên máy và đồng bộ lại sau.</Text>
+            {syncUser ? (
+              <>
+                <Text>Đã đăng nhập: {syncUser.email || syncUser.displayName || 'Google'}</Text>
+                <Text type="supporting">
+                  {syncStatus === 'loading' ? 'Đang đồng bộ…' : syncStatus === 'error' ? 'Đồng bộ đang lỗi — dữ liệu vẫn lưu trên máy.' : lastSyncAt ? `Đã đồng bộ lúc ${new Date(lastSyncAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}` : 'Đã đăng nhập.'}
+                </Text>
+                <Button variant="secondary" label="Đăng xuất" onClick={handleSignOut} />
+              </>
+            ) : (
+              <Button variant="primary" label="Đăng nhập bằng Google →" onClick={handleSignIn} />
+            )}
+            {syncMessage && <Text type="supporting">{syncMessage}</Text>}
+          </VStack>
+        </div>
+        </VStack>
       )}
 
       {section === 'lookup' && (
@@ -1162,6 +1277,9 @@ export default function App() {
           <div className="learn-card">
             <VStack gap={2}>
               <SectionLabel icon={<History />}>Lịch sử làm bài</SectionLabel>
+              <Text type="supporting">
+                {syncUser ? `Đang đồng bộ với tài khoản ${syncUser.email || 'Google'} — làm bài ở máy nào cũng thấy ở đây.` : 'Lịch sử này hiện chỉ lưu trên trình duyệt máy này — đăng nhập Google ở mục Cài đặt để xem được trên máy khác.'}
+              </Text>
               {history.length === 0 ? (
                 <Text type="supporting">Chưa có bài nào được ghi lại — hoàn thành 1 bài tập là lịch sử bắt đầu.</Text>
               ) : (
