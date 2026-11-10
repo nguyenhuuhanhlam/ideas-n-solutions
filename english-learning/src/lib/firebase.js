@@ -1,13 +1,14 @@
 // Firebase cho TuTi: dùng lại project dev-lab-vm của app Ahri (user chốt
-// 2026-11-09). Chỉ dùng Auth (Google) + Firestore; dữ liệu TuTi nằm riêng
-// trong collection `tuti_sync`, 1 doc / 1 tài khoản (id = uid).
+// 2026-11-09). Chỉ dùng Auth (Google) + Firestore; dữ liệu TuTi nằm trong
+// 1 tài liệu dùng chung `tuti_sync/shared` — mọi tài khoản đã đăng nhập
+// đều đọc/ghi cùng 1 lịch sử chung (user chốt 2026-11-10).
 // File này được import động (import()) nên Firebase chỉ tải khi cần đồng bộ,
 // không làm nặng bundle lúc mở app.
 import { initializeApp, getApps } from 'firebase/app'
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth'
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'
 import { firebaseConfig } from './firebase-config.js'
-import { SYNC_COLLECTION, packSync, unpackSync } from './sync.js'
+import { SYNC_COLLECTION, SHARED_DOC_ID, packSync, unpackSync } from './sync.js'
 
 let app = null
 let auth = null
@@ -42,17 +43,17 @@ export async function signOutUser() {
   await signOut(a)
 }
 
-// Đọc tài liệu đồng bộ của tài khoản; null nếu chưa có gì trên mây.
-export async function fetchCloud(uid) {
+// Đọc tài liệu đồng bộ chung; null nếu chưa có gì trên mây.
+export async function fetchCloud() {
   const { db: d } = initFirebase()
-  const snap = await getDoc(doc(d, SYNC_COLLECTION, uid))
+  const snap = await getDoc(doc(d, SYNC_COLLECTION, SHARED_DOC_ID))
   return snap.exists() ? unpackSync(snap.data()) : null
 }
 
-// Ghi đè toàn bộ tài liệu đồng bộ bằng dữ liệu hiện tại của máy.
-export async function pushCloud(uid, data) {
+// Ghi đè toàn bộ tài liệu đồng bộ chung bằng dữ liệu hiện tại của máy.
+export async function pushCloud(data) {
   const { db: d } = initFirebase()
-  await setDoc(doc(d, SYNC_COLLECTION, uid), packSync(data))
+  await setDoc(doc(d, SYNC_COLLECTION, SHARED_DOC_ID), packSync(data))
 }
 
 // Dịch mã lỗi Firebase/Auth/Firestore sang tiếng Việt dễ hiểu.

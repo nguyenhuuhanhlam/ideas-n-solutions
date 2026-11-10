@@ -639,8 +639,9 @@ export default function App() {
 
   // ---- Đồng bộ đám mây (Firebase, project dev-lab-vm của app Ahri) ----
   // localStorage vẫn là bộ nhớ chính trên máy (dùng được khi mất mạng);
-  // khi đăng nhập Google, dữ liệu gộp 2 chiều với Firestore để xem được
-  // trên máy khác. Chỉ cho đẩy lên sau khi đã gộp xong lúc đăng nhập
+  // khi đăng nhập Google (tài khoản nào cũng được), dữ liệu gộp 2 chiều
+  // với tài liệu chung trên Firestore để mọi tài khoản đều thấy cùng 1
+  // lịch sử. Chỉ cho đẩy lên sau khi đã gộp xong lúc đăng nhập
   // (syncReady) để bản local chưa gộp không ghi đè mất dữ liệu trên mây.
   const [syncUser, setSyncUser] = useState(null)
   const [syncStatus, setSyncStatus] = useState('off') // off | loading | synced | error | unavailable
@@ -667,7 +668,7 @@ export default function App() {
           if (!user) { setSyncStatus('off'); setSyncMessage(''); return }
           setSyncStatus('loading')
           try {
-            const cloud = await m.fetchCloud(user.uid)
+            const cloud = await m.fetchCloud()
             if (cancelled) return
             if (cloud) {
               setHistory((prev) => mergeHistory(prev, cloud.history))
@@ -675,7 +676,7 @@ export default function App() {
               setProgress((prev) => mergeProgress(prev, cloud.progress))
             } else {
               // Chưa có gì trên mây: đẩy dữ liệu hiện tại của máy lên.
-              await m.pushCloud(user.uid, dataRef.current)
+              await m.pushCloud(dataRef.current)
             }
             syncReadyRef.current = true
             setSyncStatus('synced')
@@ -697,7 +698,7 @@ export default function App() {
     const t = setTimeout(async () => {
       try {
         const m = await loadFirebase()
-        await m.pushCloud(syncUser.uid, dataRef.current)
+        await m.pushCloud(dataRef.current)
         setLastSyncAt(Date.now())
         setSyncStatus('synced')
         setSyncMessage('')
@@ -1212,7 +1213,7 @@ export default function App() {
         <div className="learn-card">
           <VStack gap={2}>
             <SectionLabel icon={<Cloud />}>Đồng bộ đám mây</SectionLabel>
-            <Text type="supporting">Đăng nhập cùng 1 tài khoản Google trên các máy để xem lịch sử làm bài, tiến độ và câu sai ở máy nào cũng được. Khi mất mạng, dữ liệu vẫn lưu trên máy và đồng bộ lại sau.</Text>
+            <Text type="supporting">Lịch sử làm bài, tiến độ và câu sai được lưu chung — đăng nhập bằng tài khoản Google nào cũng thấy cùng một lịch sử, làm bài ở máy nào cũng ghi vào đó. Khi mất mạng, dữ liệu vẫn lưu trên máy và đồng bộ lại sau.</Text>
             {syncUser ? (
               <>
                 <Text>Đã đăng nhập: {syncUser.email || syncUser.displayName || 'Google'}</Text>
@@ -1278,7 +1279,7 @@ export default function App() {
             <VStack gap={2}>
               <SectionLabel icon={<History />}>Lịch sử làm bài</SectionLabel>
               <Text type="supporting">
-                {syncUser ? `Đang đồng bộ với tài khoản ${syncUser.email || 'Google'} — làm bài ở máy nào cũng thấy ở đây.` : 'Lịch sử này hiện chỉ lưu trên trình duyệt máy này — đăng nhập Google ở mục Cài đặt để xem được trên máy khác.'}
+                {syncUser ? `Đang đồng bộ lịch sử chung với tài khoản ${syncUser.email || 'Google'} — làm bài ở máy nào cũng ghi vào đây.` : 'Lịch sử chung lưu trên mây — đăng nhập Google ở mục Cài đặt (tài khoản nào cũng được) để xem và đồng bộ.'}
               </Text>
               {history.length === 0 ? (
                 <Text type="supporting">Chưa có bài nào được ghi lại — hoàn thành 1 bài tập là lịch sử bắt đầu.</Text>

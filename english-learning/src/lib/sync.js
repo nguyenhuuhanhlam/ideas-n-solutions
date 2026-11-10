@@ -5,6 +5,9 @@
 // - Tiến độ từng bài: lấy mức tốt nhất (best cao nhất, attempts nhiều nhất).
 
 export const SYNC_COLLECTION = 'tuti_sync'
+// Tài liệu dùng chung cho MỌI tài khoản đã đăng nhập: mọi người cùng xem
+// và cùng ghi 1 lịch sử chung (user chốt 2026-11-10).
+export const SHARED_DOC_ID = 'shared'
 export const SYNC_VERSION = 1
 export const HISTORY_MAX = 500
 export const WRONG_BANK_MAX = 100
