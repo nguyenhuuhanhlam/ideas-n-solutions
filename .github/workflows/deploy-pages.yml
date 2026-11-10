@@ -52,12 +52,13 @@ jobs:
         working-directory: surveyjs-demo
       # Ghép các app + trang chủ ở root thành một site duy nhất
       - run: |
-          mkdir -p _site/timeline-projects _site/team-assistant-sim _site/platformer-game _site/english-learning _site/surveyjs-demo
+          mkdir -p _site/timeline-projects _site/team-assistant-sim _site/platformer-game _site/english-learning _site/surveyjs-demo _site/tam-ly-hoc-ung-dung
           cp -r timeline-projects/dist/* _site/timeline-projects/
           cp -r team-assistant-sim/dist/* _site/team-assistant-sim/
           cp -r platformer-game/dist/* _site/platformer-game/
           cp -r english-learning/dist/* _site/english-learning/
           cp -r surveyjs-demo/dist/* _site/surveyjs-demo/
+          cp -r tam-ly-hoc-ung-dung/* _site/tam-ly-hoc-ung-dung/
           cp index.html _site/index.html
       - uses: actions/configure-pages@v5
         with:

@@ -13,6 +13,7 @@ thư mục mới và một thẻ vào trang chủ ở `index.html`.
 | Platformer Game — prototype màn 1 kiểu NES, Canvas 2D + JS thuần, 1 file HTML tĩnh (không cần build) | `platformer-game/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/platformer-game/ |
 | TuTi Learn English — học tiếng Anh cơ bản qua bài tập có chấm điểm, phân loại bằng tabs (6 bài cơ bản + tab Chia động từ 6 nhóm × 15 câu + tab Tra cứu 47 động từ bất quy tắc, ôn tập tổng hợp) | `english-learning/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/english-learning/ |
 | Form Hub — danh sách form có sẵn + API cho ứng dụng khác (link điền, JSON form, nhúng iframe); chỉ dùng Form Library miễn phí (MIT) | `surveyjs-demo/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/surveyjs-demo/ |
+| Tâm lý học ứng dụng — trang cá nhân, bản tương đương cấu trúc buithanhphap.vn với dữ liệu giả lập, HTML tĩnh 1 file (không cần build) | `tam-ly-hoc-ung-dung/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/tam-ly-hoc-ung-dung/ |
 
 ## App desktop (không deploy lên Pages)
 
@@ -40,4 +41,5 @@ từng app với base là subpath Pages của nó, rồi ghép với trang chủ
 
 Ngoại lệ: `platformer-game/` là app HTML tĩnh 1 file, không cần build —
 workflow chỉ copy `platformer-game/index.html` vào site, không có bước
-`npm ci` / `npm run build` cho nó.
+`npm ci` / `npm run build` cho nó. `tam-ly-hoc-ung-dung/` cũng là app
+HTML tĩnh 1 file, workflow chỉ copy thư mục này vào site.
