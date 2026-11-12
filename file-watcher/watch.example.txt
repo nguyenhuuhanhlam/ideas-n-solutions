@@ -1,0 +1,12 @@
+# Danh sách thư mục cho file-watcher --config watch.txt
+# 1 dòng = 1 thư mục. Dòng trống và dòng bắt đầu bằng # được bỏ qua.
+# Đường dẫn tương đối được hiểu tương đối theo thư mục chứa file này.
+# Copy file này thành watch.txt rồi sửa lại cho máy của bạn.
+
+# Ví dụ trên Windows:
+# D:\code\project
+# C:\Users\ten\Documents\ghi-chu
+
+# Ví dụ trên Linux/macOS:
+# /home/ten/code/project
+# /home/ten/ghi-chu

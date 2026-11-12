@@ -1,0 +1,30 @@
+[package]
+name = "file-watcher"
+version = "0.1.0"
+edition = "2021"
+description = "Lightweight file watcher: logs changes in one or more folders using OS-native notifications (no polling)"
+license = "MIT"
+
+[lib]
+name = "file_watcher"
+path = "src/lib.rs"
+
+[[bin]]
+name = "file-watcher"
+path = "src/main.rs"
+
+[dependencies]
+# OS-native notifications: ReadDirectoryChangesW (Windows), inotify
+# (Linux), FSEvents (macOS). No polling, idle CPU ~ 0.
+notify = "8"
+# Local timestamps only (no other use).
+chrono = "0.4"
+
+[profile.release]
+# Nhẹ + nhanh: tối ưu tốc độ, link-time optimization toàn bộ,
+# 1 codegen unit, strip symbol, không unwind khi panic.
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"

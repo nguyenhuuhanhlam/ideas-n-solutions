@@ -67,6 +67,11 @@
         <p>Tool tray thường trú trên Windows, viết bằng Rust, chỉ xử lý text thuần: mỗi lần copy, các module chạy tự động và ghi đè clipboard — phát hiện và chuẩn hoá link http/https, loại bỏ tham số fbclid nhưng giữ tất cả tham số còn lại. Không lưu clipboard xuống đĩa, tắt máy là hết; chỉnh module và tham số trong cửa sổ Settings Win32.</p>
         <span class="open" style="color: #8b95a9;">Ứng dụng Windows desktop — không có bản demo web</span>
       </div>
+      <div class="card card--static" style="margin-top: 14px;">
+        <h2>File Watcher</h2>
+        <p>CLI viết bằng Rust, lắng nghe thay đổi file trong 1 hoặc nhiều thư mục: tạo, sửa, xóa, đổi tên đều ghi 1 dòng log có giờ. Dùng API thông báo của hệ điều hành nên không polling, lúc rảnh gần như không tốn CPU; debounce gộp các event dồn dập của 1 lần lưu file, lọc theo đuôi file, ghi thêm ra file log, chạy lệnh tùy chọn mỗi khi có thay đổi, hoặc in JSON để pipe sang tool khác.</p>
+        <span class="open" style="color: #8b95a9;">Ứng dụng dòng lệnh — không có bản demo web</span>
+      </div>
       <p class="note">Các ý tưởng và giải pháp khác sẽ xuất hiện tại đây khi được thêm vào repo.</p>
     </main>
   </body>
