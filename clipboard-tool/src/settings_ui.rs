@@ -19,9 +19,9 @@
 //! the front.
 //!
 //! Layout: a Win32 tab control (`SysTabControl32`) splits the window
-//! into General, Link Detector, Facebook and Translator tabs, so each
-//! module's settings live on its own page instead of one long stacked
-//! form. Save / Cancel / Status and the File: line stay visible on
+//! into General, Link Detector, Facebook, Translator and Query
+//! Stripper tabs, so each module's settings live on its own page
+//! instead of one long stacked form. Save / Cancel / Status and the File: line stay visible on
 //! every tab; switching tabs only shows/hides that tab's controls
 //! (hidden controls still exist, so Save reads all tabs). The tab
 //! control needs `InitCommonControlsEx(ICC_TAB_CLASSES)` before the
@@ -32,12 +32,19 @@
 //! `HWND` itself is not `Send` and a static must be. All access happens
 //! on the Win32 thread, so rebuilding the HWND from its address there
 //! is safe.
+//!
+//! Modern look: the Common Controls v6 visual styles come from the
+//! manifest embedded by build.rs (see `clipboard-tool.manifest`),
+//! and every control gets the Segoe UI 9pt font via `WM_SETFONT`
+//! (see `create_ui_font`). No runtime library is involved: `windows`
+//! was already a dependency and `embed-resource` is build-time only.
 
 use crate::config::AppConfig;
 use std::path::PathBuf;
 use std::sync::{Mutex, OnceLock};
 use windows::core::{w, PCWSTR, PWSTR};
 use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
+use windows::Win32::Graphics::Gdi::{CreateFontW, DeleteObject, HGDIOBJ, HFONT};
 use windows::Win32::UI::Controls::{
     InitCommonControlsEx, INITCOMMONCONTROLSEX, ICC_TAB_CLASSES, TCITEMW, TCIF_TEXT,
 };
@@ -45,8 +52,9 @@ use windows::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DefWindowProcW, DestroyWindow, GetWindowTextW, RegisterClassW,
     SendMessageW, SetForegroundWindow, SetWindowTextW, ShowWindow,
     BM_GETCHECK, BM_SETCHECK, BN_CLICKED, HMENU, SW_HIDE, SW_SHOW, WINDOW_EX_STYLE,
-    WINDOW_STYLE, WM_CLOSE, WM_COMMAND, WM_CREATE, WM_DESTROY, WM_NOTIFY, WNDCLASSW,
-    WS_BORDER, WS_CHILD, WS_OVERLAPPEDWINDOW, WS_TABSTOP, WS_VISIBLE, WS_VSCROLL,
+    WINDOW_STYLE, WM_CLOSE, WM_COMMAND, WM_CREATE, WM_DESTROY, WM_NOTIFY, WM_SETFONT,
+    WNDCLASSW, WS_BORDER, WS_CHILD, WS_OVERLAPPEDWINDOW, WS_TABSTOP, WS_VISIBLE,
+    WS_VSCROLL,
 };
 
 // Control ids.
@@ -71,6 +79,8 @@ const IDC_STATUS: usize = 2042;
 const IDC_TRANSLATOR: usize = 2050;
 const IDC_TR_MAX_WORDS: usize = 2051;
 const IDC_TR_MAX_LEN: usize = 2052;
+const IDC_QS_ENABLED: usize = 2060;
+const IDC_QS_HOSTS: usize = 2061;
 // The tab control itself, plus static labels that must be shown/hidden
 // with their tab (unlike the File: line above the tabs, which is global).
 const IDC_TABS: usize = 2000;
@@ -82,6 +92,8 @@ const LBL_FB_STRIP: usize = 2104;
 const LBL_TR_WORDS: usize = 2105;
 const LBL_TR_LEN: usize = 2106;
 const LBL_TR_INFO: usize = 2107;
+const LBL_QS_HOSTS: usize = 2108;
+const LBL_QS_INFO: usize = 2109;
 
 // Tab control messages / notifications (TCM_FIRST = 0x1300).
 const TCM_GETCURSEL: u32 = 0x130B;
@@ -89,8 +101,9 @@ const TCM_INSERTITEMW: u32 = 0x133E;
 const TCN_SELCHANGE: i32 = -551;
 
 // (control id, tab index): 0 General, 1 Link Detector, 2 Facebook,
-// 3 Translator. Save / Cancel / Status / File: / the tab control
-// itself are deliberately absent: they stay visible on every tab.
+// 3 Translator, 4 Query Stripper. Save / Cancel / Status / File: /
+// the tab control itself are deliberately absent: they stay visible
+// on every tab.
 const TAB_CONTROLS: &[(usize, usize)] = &[
     (IDC_AUTO_RUN, 0),
     (IDC_OVERWRITE, 0),
@@ -118,6 +131,10 @@ const TAB_CONTROLS: &[(usize, usize)] = &[
     (LBL_TR_LEN, 3),
     (IDC_TR_MAX_LEN, 3),
     (LBL_TR_INFO, 3),
+    (IDC_QS_ENABLED, 4),
+    (LBL_QS_HOSTS, 4),
+    (IDC_QS_HOSTS, 4),
+    (LBL_QS_INFO, 4),
 ];
 
 // Win32 message numbers not exported as constants in windows 0.58.
@@ -163,6 +180,10 @@ struct SettingsState {
     main_hwnd_addr: isize,
     settings_hwnd_addr: isize,
     ctrl: std::collections::HashMap<usize, isize>,
+    // Segoe UI font handle (HFONT as address, 0 = none). Created in
+    // create_controls, deleted in WM_DESTROY; it must outlive every
+    // control that uses it.
+    font_addr: isize,
 }
 
 static STATE: OnceLock<Mutex<SettingsState>> = OnceLock::new();
@@ -177,6 +198,7 @@ fn state() -> &'static Mutex<SettingsState> {
             main_hwnd_addr: 0,
             settings_hwnd_addr: 0,
             ctrl: std::collections::HashMap::new(),
+            font_addr: 0,
         })
     })
 }
@@ -197,7 +219,7 @@ fn create_control(
     id: usize,
 ) -> Option<HWND> {
     let text_w = wide(text);
-    unsafe {
+    let hwnd = unsafe {
         CreateWindowExW(
             WINDOW_EX_STYLE(0),
             class,
@@ -213,6 +235,54 @@ fn create_control(
             None,
         )
         .ok()
+    };
+    // Every control gets the Segoe UI font (created in create_controls
+    // before the first control). Without it, Win32 falls back to the
+    // old default GUI font, which is what makes a dialog look dated.
+    if let Some(h) = hwnd {
+        apply_font(h);
+    }
+    hwnd
+}
+
+/// The standard Windows UI font: Segoe UI 9pt. Height is negative so
+/// it means the character height (not the cell height): -12 = 9pt at
+/// 96 DPI. Returns a null HFONT on failure; callers treat that as
+/// "no font", and controls simply keep their default font.
+fn create_ui_font() -> HFONT {
+    unsafe {
+        CreateFontW(
+            -12, // 9pt at 96 DPI
+            0,   // default width
+            0,   // no escapement
+            0,   // no orientation
+            400, // FW_NORMAL
+            0,   // not italic
+            0,   // not underlined
+            0,   // not struck out
+            0,   // DEFAULT_CHARSET
+            0,   // OUT_DEFAULT_PRECIS
+            0,   // CLIP_DEFAULT_PRECIS
+            0,   // DEFAULT_QUALITY
+            0,   // DEFAULT_PITCH | FF_DONTCARE
+            w!("Segoe UI"),
+        )
+    }
+}
+
+/// Send WM_SETFONT to one control, using the font stored in state.
+/// A no-op until create_controls has created the font.
+fn apply_font(hwnd: HWND) {
+    let font_addr = state().lock().map(|s| s.font_addr).unwrap_or(0);
+    if font_addr != 0 {
+        unsafe {
+            let _ = SendMessageW(
+                hwnd,
+                WM_SETFONT,
+                WPARAM(font_addr as usize),
+                LPARAM(1), // redraw
+            );
+        }
     }
 }
 
@@ -276,7 +346,7 @@ fn create_tab_control(parent: HWND) -> Option<HWND> {
     // WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS.
     let style = WINDOW_STYLE(WS_CHILD.0 | WS_VISIBLE.0 | 0x04000000);
     let tabs = create_control(parent, w!("SysTabControl32"), "", style, 12, 40, 576, 470, IDC_TABS)?;
-    for (i, title) in ["General", "Link Detector", "Facebook", "Translator"]
+    for (i, title) in ["General", "Link Detector", "Facebook", "Translator", "Query Stripper"]
         .iter()
         .enumerate()
     {
@@ -326,6 +396,16 @@ fn create_controls(parent: HWND) {
         let s = state().lock().unwrap();
         (s.config.clone(), s.path.clone())
     };
+    // Create the UI font before the first control, so create_control
+    // can apply it to every control as it is created. (A previous
+    // font, if any, was deleted in WM_DESTROY when the old window
+    // closed, so this never leaks.)
+    let font = create_ui_font();
+    if !font.0.is_null() {
+        if let Ok(mut s) = state().lock() {
+            s.font_addr = font.0 as isize;
+        }
+    }
     let mut ctrls: std::collections::HashMap<usize, isize> =
         std::collections::HashMap::new();
     let mut put = |id: usize, hwnd: Option<HWND>| {
@@ -797,6 +877,82 @@ fn create_controls(parent: HWND) {
             LBL_TR_INFO,
         ),
     );
+
+    // Query stripper section.
+    let qs = config.modules.iter().find(|m| m.id == "query_stripper");
+    let (qs_enabled, hosts) = match qs {
+        Some(m) => {
+            let hosts: Vec<String> = m
+                .params
+                .get("hosts")
+                .and_then(|v| v.as_array())
+                .map(|arr| {
+                    arr.iter()
+                        .filter_map(|v| v.as_str().map(|s| s.to_string()))
+                        .collect()
+                })
+                .unwrap_or_else(|| vec!["shopee.vn".to_string()]);
+            (m.enabled, hosts.join(", "))
+        }
+        None => (true, "shopee.vn".to_string()),
+    };
+    let c = create_control(
+        parent,
+        w!("BUTTON"),
+        "Enable this module",
+        style_button_checkbox(),
+        16,
+        80,
+        200,
+        22,
+        IDC_QS_ENABLED,
+    );
+    put(IDC_QS_ENABLED, c);
+    if let Some(h) = c {
+        set_check(h, qs_enabled);
+    }
+    put(
+        LBL_QS_HOSTS,
+        create_control(
+            parent,
+            w!("STATIC"),
+            "Hosts (comma-separated):",
+            style_static(),
+            16,
+            108,
+            200,
+            20,
+            LBL_QS_HOSTS,
+        ),
+    );
+    put(
+        IDC_QS_HOSTS,
+        create_control(
+            parent,
+            w!("EDIT"),
+            &hosts,
+            style_edit(),
+            16,
+            132,
+            360,
+            22,
+            IDC_QS_HOSTS,
+        ),
+    );
+    put(
+        LBL_QS_INFO,
+        create_control(
+            parent,
+            w!("STATIC"),
+            "For these hosts, everything after the ? is removed, including the ? itself. Other hosts are left untouched.",
+            style_static(),
+            16,
+            164,
+            540,
+            40,
+            LBL_QS_INFO,
+        ),
+    );
     put(
         IDC_STATUS,
         create_control(
@@ -971,6 +1127,17 @@ fn do_save(hwnd: HWND) {
         set_status("Error: Strip list is empty. Disable the module instead of leaving it empty.");
         return;
     }
+    let qs_hosts: Vec<String> = ctrl(IDC_QS_HOSTS)
+        .map(get_text)
+        .unwrap_or_default()
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+    if qs_hosts.is_empty() {
+        set_status("Error: Query stripper hosts list is empty. Disable the module instead of leaving it empty.");
+        return;
+    }
 
     // Do NOT call listbox_order() while holding the state lock: it locks
     // the same mutex itself and would deadlock the Win32 thread on Save.
@@ -1031,6 +1198,10 @@ fn do_save(hwnd: HWND) {
                     "case_insensitive",
                     serde_json::json!(ctrl(IDC_FB_CASE).map(get_check).unwrap_or(true)),
                 );
+            }
+            "query_stripper" => {
+                m.enabled = ctrl(IDC_QS_ENABLED).map(get_check).unwrap_or(m.enabled);
+                set_param(&mut m.params, "hosts", serde_json::json!(qs_hosts));
             }
             _ => {}
         }
@@ -1122,6 +1293,14 @@ unsafe extern "system" fn settings_wnd_proc(
             if let Ok(mut s) = state().lock() {
                 s.settings_hwnd_addr = 0;
                 s.ctrl.clear();
+                // Delete the UI font now that every control using it
+                // is gone (child windows are destroyed with the parent).
+                if s.font_addr != 0 {
+                    unsafe {
+                        let _ = DeleteObject(HGDIOBJ(s.font_addr as *mut std::ffi::c_void));
+                    }
+                    s.font_addr = 0;
+                }
             }
             LRESULT(0)
         }

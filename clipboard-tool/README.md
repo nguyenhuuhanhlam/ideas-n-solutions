@@ -19,7 +19,7 @@ Windows tray clipboard tool, in Rust. Plain text only, for now.
 - Modules must be pure, fast and local. No network in the
   auto-overwrite pipeline.
 
-## Pipeline (module 1 and 2)
+## Pipeline (modules 1, 2 and 3)
 
 1. `link_detector`: if the whole trimmed text is a single web address,
    normalise it. `http` / `https` only. Scheme-less `www.example.com`
@@ -30,9 +30,16 @@ Windows tray clipboard tool, in Rust. Plain text only, for now.
    remove the exact `fbclid` query parameter and keep every other
    parameter, in order, with its original encoding, plus the fragment.
    If there is no `fbclid`, the text passes through unchanged.
+3. `query_stripper`: if the URL's host is on the configured list
+   (default: `shopee.vn`), remove the entire query string, including
+   the `?` itself. Other hosts are left untouched, so links that need
+   their query (e.g. YouTube `watch?v=...`) are not broken.
 
 Example: `www.example.com/bai-viet?a=1&fbclid=XYZ&b=2`
 becomes `https://www.example.com/bai-viet?a=1&b=2`.
+
+Example: `https://shopee.vn/product/110272203/27608833519?sp_atk=abc`
+becomes `https://shopee.vn/product/110272203/27608833519`.
 
 ## Translator (skeleton, notifier only)
 
@@ -107,6 +114,18 @@ new Rust module still needs a rebuild; changing settings does not.
 
 Autostart and single-instance (named mutex) are not implemented yet.
 
+The dialog's flat, modern look comes from the Common Controls v6
+visual styles enabled by the manifest embedded at build time
+(`build.rs` + `clipboard-tool.rc` + `clipboard-tool.manifest`, via
+the build-time-only `embed-resource` crate) plus the Segoe UI 9pt
+font applied to every control. No runtime library is involved and
+the exe stays a single file. The manifest is embedded only when
+building on Windows with a resource compiler (`rc.exe` from the
+Windows SDK); without one the build still succeeds and the dialog
+falls back to classic controls. DPI awareness is deliberately not
+declared in the manifest: the layout uses fixed pixel coordinates,
+and declaring it would shrink the dialog on high-DPI displays.
+
 ## Develop / test on Linux
 
 The tray and clipboard listener are `cfg(windows)` only, so a Linux
@@ -127,8 +146,11 @@ echo 'www.example.com/?fbclid=XYZ' | cargo run
 - `src/modules/mod.rs` — the `TextModule` trait and registry
 - `src/modules/link_detector.rs` — module 1
 - `src/modules/fbclid_stripper.rs` — module 2
+- `src/modules/query_stripper.rs` — module 3
 - `src/modules/translator.rs` — translator notifier (dictionary data
   lives separately in `assets/dictionary.tsv`)
 - `src/win.rs` — Windows-only hidden window, tray, clipboard listener
 - `src/settings_ui.rs` — Windows-only native Win32 settings window
 - `src/main.rs` — entry point, config loading
+- `build.rs`, `clipboard-tool.rc`, `clipboard-tool.manifest` —
+  embed the Common Controls v6 manifest (build-time only)

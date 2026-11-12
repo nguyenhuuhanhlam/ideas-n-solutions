@@ -77,30 +77,48 @@ impl Default for TranslatorConfig {
     }
 }
 
-fn default_modules() -> Vec<ModuleConfig> {
-    vec![
-        ModuleConfig {
-            id: "link_detector".to_string(),
-            enabled: true,
-            order: 1,
-            params: serde_json::json!({
+/// Default config entry for one built-in module id. `None` for
+/// unknown ids (e.g. from a newer version's settings file).
+pub fn default_module_config(id: &str) -> Option<ModuleConfig> {
+    let (order, params) = match id {
+        "link_detector" => (
+            1,
+            serde_json::json!({
                 "allow_missing_scheme": true,
                 "default_scheme": "https",
                 "allow_localhost": true,
                 "allow_ip": true,
                 "max_len": 2048,
             }),
-        },
-        ModuleConfig {
-            id: "fbclid_stripper".to_string(),
-            enabled: true,
-            order: 2,
-            params: serde_json::json!({
+        ),
+        "fbclid_stripper" => (
+            2,
+            serde_json::json!({
                 "strip": ["fbclid"],
                 "case_insensitive": true,
             }),
-        },
-    ]
+        ),
+        "query_stripper" => (
+            3,
+            serde_json::json!({
+                "hosts": ["shopee.vn"],
+            }),
+        ),
+        _ => return None,
+    };
+    Some(ModuleConfig {
+        id: id.to_string(),
+        enabled: true,
+        order,
+        params,
+    })
+}
+
+fn default_modules() -> Vec<ModuleConfig> {
+    ["link_detector", "fbclid_stripper", "query_stripper"]
+        .iter()
+        .filter_map(|id| default_module_config(id))
+        .collect()
 }
 
 impl Default for AppConfig {
@@ -122,9 +140,71 @@ impl AppConfig {
     /// can report it instead of running with surprise settings.
     pub fn load_or_default(path: &std::path::Path) -> Result<Self, String> {
         match std::fs::read_to_string(path) {
-            Ok(text) => serde_json::from_str(&text).map_err(|e| e.to_string()),
+            Ok(text) => {
+                let mut config: Self =
+                    serde_json::from_str(&text).map_err(|e| e.to_string())?;
+                config.ensure_known_modules();
+                Ok(config)
+            }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(Self::default()),
             Err(e) => Err(e.to_string()),
         }
+    }
+
+    /// Add config entries for built-in modules missing from this config
+    /// (e.g. a `config.json` written before the module existed), so an
+    /// upgrade never silently leaves a new module off. Entries already
+    /// present are left untouched, including a user-disabled module.
+    /// New entries go after the current highest order.
+    pub fn ensure_known_modules(&mut self) {
+        let mut next_order = self.modules.iter().map(|m| m.order).max().unwrap_or(0) + 1;
+        for module in crate::modules::all_modules() {
+            let id = module.id();
+            if self.modules.iter().any(|m| m.id == id) {
+                continue;
+            }
+            if let Some(mut entry) = default_module_config(id) {
+                entry.order = next_order;
+                next_order += 1;
+                self.modules.push(entry);
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn old_config_without_query_stripper_gets_it_on_ensure() {
+        let text = r#"{"auto_run":true,"max_chars":1000000,"modules":[
+            {"enabled":true,"id":"link_detector","order":1,"params":{}},
+            {"enabled":true,"id":"fbclid_stripper","order":2,"params":{}}
+        ],"overwrite_clipboard":true}"#;
+        let mut config: AppConfig = serde_json::from_str(text).unwrap();
+        assert_eq!(config.modules.len(), 2);
+        config.ensure_known_modules();
+        assert_eq!(config.modules.len(), 3);
+        let qs = config
+            .modules
+            .iter()
+            .find(|m| m.id == "query_stripper")
+            .expect("query_stripper entry");
+        assert!(qs.enabled);
+        assert_eq!(qs.order, 3);
+        assert_eq!(qs.params["hosts"][0], "shopee.vn");
+        // Idempotent: a second call adds nothing.
+        config.ensure_known_modules();
+        assert_eq!(config.modules.len(), 3);
+    }
+
+    #[test]
+    fn ensure_does_not_touch_existing_entries() {
+        let mut config = AppConfig::default();
+        config.modules[1].enabled = false;
+        config.ensure_known_modules();
+        assert_eq!(config.modules.len(), 3);
+        assert!(!config.modules[1].enabled);
     }
 }

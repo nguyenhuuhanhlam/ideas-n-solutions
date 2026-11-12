@@ -89,6 +89,28 @@ mod tests {
     }
 
     #[test]
+    fn shopee_link_loses_query_in_pipeline() {
+        let config = AppConfig::default();
+        let r = run_pipeline(
+            "https://shopee.vn/product/110272203/27608833519?sp_atk=abc&xptdk=xyz",
+            &config,
+        );
+        assert!(r.changed, "expected a change, got {:?}", r);
+        assert_eq!(
+            r.output,
+            "https://shopee.vn/product/110272203/27608833519"
+        );
+        assert_eq!(r.applied, vec!["query_stripper"]);
+        // Missing scheme + query: detector normalises, stripper cleans.
+        let r = run_pipeline(
+            "www.shopee.vn/product/1/2?a=1",
+            &config,
+        );
+        assert_eq!(r.output, "https://www.shopee.vn/product/1/2");
+        assert_eq!(r.applied, vec!["link_detector", "query_stripper"]);
+    }
+
+    #[test]
     fn plain_text_passes_through_unchanged() {
         let config = AppConfig::default();
         let r = run_pipeline("hello world, not a link", &config);

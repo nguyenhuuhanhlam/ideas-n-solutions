@@ -2,6 +2,7 @@ use serde_json::Value;
 
 pub mod fbclid_stripper;
 pub mod link_detector;
+pub mod query_stripper;
 /// Translator: a *notifier*, not a `TextModule`. It lives here for
 /// organisation, but it is deliberately absent from `all_modules()`:
 /// it must never transform text or write the clipboard, only return
@@ -10,6 +11,7 @@ pub mod translator;
 
 pub use fbclid_stripper::FbclidStripper;
 pub use link_detector::LinkDetector;
+pub use query_stripper::QueryStripper;
 
 /// The single contract every module implements.
 ///
@@ -25,13 +27,16 @@ pub trait TextModule: Send + Sync {
     fn process(&self, input: &str, params: &Value) -> Result<String, String>;
 }
 
-/// All built-in modules. Adding a new module = a new file + one line here.
+/// All built-in modules. Adding a new module = a new file + one line
+/// here + a default entry in `config::default_module_config`, so
+/// existing `config.json` files pick the new module up on load.
 /// Modules never import each other; shared detection helpers live in the
 /// module that owns them and are reused by callers, not by coupling.
 pub fn all_modules() -> Vec<Box<dyn TextModule>> {
     vec![
         Box::new(LinkDetector),
         Box::new(FbclidStripper),
+        Box::new(QueryStripper),
     ]
 }
 
