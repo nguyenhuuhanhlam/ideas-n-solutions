@@ -19,6 +19,7 @@
     --blue: #2563eb;
     --red: #dc2626;
     --purple: #9333ea;
+    --fade-from: rgba(255, 255, 255, 0); /* nền trong suốt, đầu vệt mờ báo cuộn */
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -32,6 +33,7 @@
       --blue: #60a5fa;
       --red: #f87171;
       --purple: #c084fc;
+      --fade-from: rgba(11, 11, 12, 0);
     }
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,27 +50,27 @@
   /* Khung chính: grid sidebar | 1fr, topbar 44px, không gap, chỉ line.
      Chiều rộng sidebar nằm trong biến --side-w (JS đổi khi kéo tay nắm
      hoặc bấm thu gọn); vị trí các vùng đặt rõ để khi thu gọn (ẩn brand
-     + side) topbar/main không bị xếp lại. */
+     + sidewrap) topbar/main không bị xếp lại. */
   .app {
     position: relative;
     display: grid;
-    grid-template-columns: var(--side-w, 220px) 1fr;
+    grid-template-columns: var(--side-w, 320px) 1fr;
     grid-template-rows: 44px 1fr;
     height: 100vh;
     border: 1px solid var(--line);
   }
-  .brand, .topbar, .side, .main { min-width: 0; }
+  .brand, .topbar, .sidewrap, .main { min-width: 0; }
   .brand { grid-column: 1; grid-row: 1; }
   .topbar { grid-column: 2; grid-row: 1; }
-  .side { grid-column: 1; grid-row: 2; }
+  .sidewrap { grid-column: 1; grid-row: 2; }
   .main { grid-column: 2; grid-row: 2; }
   .app.collapsed { grid-template-columns: 0 1fr; }
-  .app.collapsed .brand, .app.collapsed .side, .app.collapsed #sideResizer { display: none; }
+  .app.collapsed .brand, .app.collapsed .sidewrap, .app.collapsed #sideResizer { display: none; }
   /* Tay kéo đổi chiều rộng sidebar: dải 6px ôm đúng đường line giữa
      2 cột, bình thường vô hình, rê chuột/kéo thì hiện vạch accent. */
   #sideResizer {
     position: absolute; top: 0; bottom: 0;
-    left: var(--side-w, 220px);
+    left: var(--side-w, 320px);
     width: 6px; margin-left: -3px;
     cursor: col-resize; z-index: 5;
   }
@@ -90,7 +92,21 @@
   .dot.on { background: var(--green); }
   #counts { margin-left: auto; font-size: 13px; }
 
-  .side { border-right: 1px solid var(--line); overflow-y: auto; }
+  /* Cuộn không thanh trượt: thanh cuộn ẩn hẳn ở sidebar và log; khi
+     còn nội dung phía trên/dưới thì mép đó hiện vệt mờ nhạt (JS bật/
+     tắt .show theo vị trí cuộn). Vệt mờ nằm trong khung bọc (.sidewrap
+     / .logwrap) để không bị cuốn theo nội dung khi cuộn. */
+  .side, #log { scrollbar-width: none; }
+  .side::-webkit-scrollbar, #log::-webkit-scrollbar { display: none; }
+  .fade {
+    position: absolute; left: 0; right: 0; height: 28px;
+    pointer-events: none; opacity: 0; transition: opacity .25s ease; z-index: 4;
+  }
+  .fade.show { opacity: 1; }
+  .fade-top { top: 0; background: linear-gradient(to bottom, var(--bg), var(--fade-from)); }
+  .fade-bottom { bottom: 0; background: linear-gradient(to top, var(--bg), var(--fade-from)); }
+  .sidewrap { position: relative; border-right: 1px solid var(--line); min-height: 0; }
+  .side { height: 100%; overflow-y: auto; }
   .side h6 {
     font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
     color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--line);
@@ -177,6 +193,7 @@
   .tabbtn.active { color: var(--fg); box-shadow: inset 0 -2px 0 var(--accent); }
   .tabbtn .tabcount { opacity: .75; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
 
+  .logwrap { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
   #log { flex: 1; overflow-y: auto; padding: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
   .row { display: flex; gap: 10px; padding: 5px 14px; white-space: pre-wrap; word-break: break-all; border-bottom: 1px solid var(--line); }
   .row:last-child { border-bottom: 0; }
@@ -243,12 +260,14 @@
     .app { grid-template-columns: 1fr; grid-template-rows: 44px 44px auto 1fr; height: auto; min-height: 100vh; }
     .brand { grid-column: 1; grid-row: 1; border-right: 0; }
     .topbar { grid-column: 1; grid-row: 2; }
-    .side { grid-column: 1; grid-row: 3; border-right: 0; border-bottom: 1px solid var(--line); overflow: visible; }
+    .sidewrap { grid-column: 1; grid-row: 3; border-right: 0; border-bottom: 1px solid var(--line); }
+    .side { overflow: visible; }
     .main { grid-column: 1; grid-row: 4; }
     .app.collapsed { grid-template-columns: 1fr; grid-template-rows: 44px 1fr; }
     .app.collapsed .topbar { grid-row: 1; }
     .app.collapsed .main { grid-row: 2; }
     #sideResizer { display: none; }
+    .fade { display: none; }
     .main { overflow: visible; }
     #log { overflow: visible; }
     .stats { grid-template-columns: repeat(2, 1fr); }
@@ -267,6 +286,7 @@
     <div id="counts" class="mono muted"></div>
   </div>
 
+  <div class="sidewrap">
   <nav class="side">
     <h6>Thư mục theo dõi (<span id="dirCount">0</span>)</h6>
     <ul id="dirList"></ul>
@@ -302,6 +322,9 @@
       <p style="margin-top:8px">Giao diện này chỉ chạy trên máy này (127.0.0.1). Mọi thay đổi lưu ngay vào file cấu hình nên khởi động lại vẫn giữ nguyên.</p>
     </div>
   </nav>
+    <div class="fade fade-top" id="sideFadeTop"></div>
+    <div class="fade fade-bottom" id="sideFadeBottom"></div>
+  </div>
 
   <main class="main">
     <section class="stats">
@@ -326,9 +349,13 @@
       <button class="tabbtn" data-tab="pinned">Đã ghim <span class="tabcount" id="countPinned"></span></button>
       <button class="tabbtn" data-tab="deleted">Đã xóa <span class="tabcount" id="countDeleted"></span></button>
     </div>
-    <div id="log"><p class="empty">Chưa có thay đổi nào. Sửa, tạo hoặc xóa file trong thư mục đang theo dõi để thấy log ở đây.</p></div>
+    <div class="logwrap">
+      <div id="log"><p class="empty">Chưa có thay đổi nào. Sửa, tạo hoặc xóa file trong thư mục đang theo dõi để thấy log ở đây.</p></div>
+      <div class="fade fade-top" id="logFadeTop"></div>
+      <div class="fade fade-bottom" id="logFadeBottom"></div>
+    </div>
   </main>
-  <div id="sideResizer" tabindex="0" role="separator" aria-orientation="vertical" aria-label="Đổi chiều rộng sidebar" title="Kéo để đổi chiều rộng sidebar (bấm đúp để về 220px)"></div>
+  <div id="sideResizer" tabindex="0" role="separator" aria-orientation="vertical" aria-label="Đổi chiều rộng sidebar" title="Kéo để đổi chiều rộng sidebar (bấm đúp để về 320px)"></div>
 </div>
 <div id="toast"></div>
 <script>
@@ -361,11 +388,12 @@
   var toastTimer = null;
 
   // Sidebar co dãn + thu gọn: chiều rộng và trạng thái lưu
-  // localStorage để mở lại vẫn giữ. Kéo tay nắm ở đường line giữa 2
-  // cột (160–480px, tối đa nửa màn hình); bấm đúp tay nắm để về
-  // 220px; phím mũi tên trái/phải khi tay nắm đang focus thì nới/
-  // thu 10px (giữ Shift: 50px).
-  var SIDE_DEFAULT_W = 220;
+  // localStorage để mở lại vẫn giữ. Mặc định 320px để nội dung vừa
+  // 1 trang, không phải cuộn. Kéo tay nắm ở đường line giữa 2 cột
+  // (160–480px, tối đa nửa màn hình); bấm đúp tay nắm để về 320px;
+  // phím mũi tên trái/phải khi tay nắm đang focus thì nới/thu 10px
+  // (giữ Shift: 50px).
+  var SIDE_DEFAULT_W = 320;
   var SIDE_MIN_W = 160;
   var SIDE_MAX_W = 480;
   var appEl = document.querySelector(".app");
@@ -382,7 +410,9 @@
   var sideW = SIDE_DEFAULT_W;
   var sideCollapsed = false;
   (function loadSideState() {
-    var w = parseInt(storeGet("file-watcher-side-w"), 10);
+    // Khóa ...-w2: mặc định đổi từ 220px lên 320px ở 0.8.0, dùng khóa
+    // mới để máy đã lưu 220px trước đây cũng nhận mặc định mới.
+    var w = parseInt(storeGet("file-watcher-side-w2"), 10);
     if (!isNaN(w)) sideW = w;
     sideCollapsed = storeGet("file-watcher-side-collapsed") === "1";
   })();
@@ -402,7 +432,7 @@
     resizerEl.setAttribute("aria-valuenow", String(sideW));
   }
   function saveSideState() {
-    storeSet("file-watcher-side-w", String(sideW));
+    storeSet("file-watcher-side-w2", String(sideW));
     storeSet("file-watcher-side-collapsed", sideCollapsed ? "1" : "0");
   }
 
@@ -448,8 +478,33 @@
     // Cửa sổ thu nhỏ: kẹp lại chiều rộng sidebar cho vừa.
     var clamped = clampSideW(sideW);
     if (clamped !== sideW) { sideW = clamped; applySide(); saveSideState(); }
+    updateFades();
   });
   applySide();
+
+  // Vệt mờ báo cuộn (thay thanh trượt đã ẩn): vệt trên hiện khi đã
+  // cuộn xuống (còn nội dung phía trên), vệt dưới hiện khi còn nội
+  // dung phía dưới; không cuộn được thì cả 2 đều ẩn. Cập nhật khi
+  // cuộn, khi nội dung đổi (render/fillConfig) và khi đổi cỡ cửa sổ.
+  var sideEl = document.querySelector(".side");
+  var sideFadeTopEl = document.getElementById("sideFadeTop");
+  var sideFadeBottomEl = document.getElementById("sideFadeBottom");
+  var logFadeTopEl = document.getElementById("logFadeTop");
+  var logFadeBottomEl = document.getElementById("logFadeBottom");
+
+  function updateFadeFor(scroller, topEl, bottomEl) {
+    var canScroll = scroller.scrollHeight > scroller.clientHeight + 1;
+    var atTop = scroller.scrollTop <= 0;
+    var atBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1;
+    topEl.classList.toggle("show", canScroll && !atTop);
+    bottomEl.classList.toggle("show", canScroll && !atBottom);
+  }
+  function updateFades() {
+    updateFadeFor(sideEl, sideFadeTopEl, sideFadeBottomEl);
+    updateFadeFor(logEl, logFadeTopEl, logFadeBottomEl);
+  }
+  sideEl.addEventListener("scroll", updateFades);
+  logEl.addEventListener("scroll", updateFades);
 
   // Nhóm: event mới vào nhóm đang mở của file đó nếu cách event cuối
   // trong nhóm <= 5 phút, nếu không mở nhóm mới. Nhóm từ 3 event trở
@@ -797,6 +852,7 @@
     }
     if (document.getElementById("autoscroll").checked) logEl.scrollTop = logEl.scrollHeight;
     countsEl.textContent = entries.length + " dòng · " + lastSeq + " event (từ khi chạy)";
+    updateFades();
   }
 
   function addEntry(e) {

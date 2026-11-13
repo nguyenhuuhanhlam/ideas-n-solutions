@@ -16,7 +16,7 @@
 //!   lưu vào file cấu hình).
 //! - `POST /api/config` — đổi cài đặt (áp dụng ngay, lưu vào file).
 //! - `POST /api/pins` — ghim/bỏ ghim 1 file (lưu vào file cấu hình
-//!   dạng dòng `@pin ...`; không đổi watcher).
+//!   lưu vào file cấu hình JSON; không đổi watcher).
 //!
 //! Mọi thay đổi từ giao diện đều: áp dụng live trước, lưu file sau;
 //! lưu lỗi thì rollback thay đổi live và trả lỗi cho giao diện.

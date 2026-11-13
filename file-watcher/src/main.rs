@@ -60,14 +60,14 @@ fn real_main() -> i32 {
     }
 
     // File cấu hình: --config nếu có; với --serve mà không có --config
-    // thì mặc định dùng watch.txt ở thư mục hiện tại (nếu có).
+    // thì mặc định dùng watch.json ở thư mục hiện tại (nếu có).
     let config_path: Option<PathBuf> = match &args.config {
         Some(c) => Some(PathBuf::from(c)),
-        None if args.serve => Some(PathBuf::from("watch.txt")),
+        None if args.serve => Some(PathBuf::from("watch.json")),
         None => None,
     };
 
-    // Đọc file cấu hình (thư mục + cài đặt @...). File --config chỉ
+    // Đọc file cấu hình (thư mục + cài đặt). File --config chỉ
     // định rõ mà không đọc được thì báo lỗi và dừng — trừ khi đang
     // --serve: lúc đó coi như bắt đầu rỗng, giao diện web sẽ tạo file
     // khi user thêm thư mục đầu tiên.
@@ -82,7 +82,7 @@ fn real_main() -> i32 {
             }
             Err(msg) => {
                 if args.serve && args.config.is_none() {
-                    // watch.txt mặc định chưa có: bắt đầu rỗng.
+                    // watch.json mặc định chưa có: bắt đầu rỗng.
                 } else if args.serve && !config.exists() {
                     // File --config chưa tồn tại: bắt đầu rỗng, sẽ
                     // tạo khi lưu từ giao diện web.

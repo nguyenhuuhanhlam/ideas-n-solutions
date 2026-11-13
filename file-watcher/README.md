@@ -62,8 +62,8 @@ file-watcher D:\code\project
 # Nhiều thư mục, chỉ file .rs/.md, bỏ qua target và node_modules
 file-watcher C:\a D:\b --ext rs,md --ignore target,node_modules
 
-# Đọc danh sách thư mục từ file (xem watch.example.txt)
-file-watcher --config watch.txt
+# Đọc cấu hình từ file JSON (xem watch.example.json)
+file-watcher --config watch.json
 
 # Ghi thêm vào file log + chạy lệnh mỗi khi có thay đổi
 file-watcher . --log events.log --exec "echo {event} {path}"
@@ -72,7 +72,7 @@ file-watcher . --log events.log --exec "echo {event} {path}"
 file-watcher . --json > events.jsonl
 
 # Giao diện web: cấu hình thư mục + xem log realtime
-file-watcher --config watch.txt --serve
+file-watcher --config watch.json --serve
 file-watcher --serve --port 9000
 ```
 
@@ -83,8 +83,8 @@ luôn sạch — pipe sang file hay tool khác chỉ nhận event.
 
 | Tùy chọn | Mặc định | Nghĩa |
 | --- | --- | --- |
-| `--config <file>` | — | Đọc danh sách thư mục từ file text: 1 dòng = 1 thư mục, dòng trống và dòng bắt đầu bằng `#` được bỏ qua. Đường dẫn tương đối hiểu theo thư mục chứa file. Gộp chung với thư mục gõ trên CLI, trùng nhau tự loại. File còn có thể chứa dòng cài đặt `@exts` / `@ignore` / `@debounce` / `@recursive` (xem "File cấu hình"). |
-| `--serve` | tắt | Bật giao diện web local trên http://127.0.0.1:8787 (xem "Giao diện web"). Khi bật mà không có `--config`, app dùng file `watch.txt` ở thư mục hiện tại (nếu có) và lưu thay đổi vào đó. Cho phép khởi động với 0 thư mục rồi thêm sau trên giao diện. |
+| `--config <file>` | — | Đọc cấu hình từ file JSON (xem "File cấu hình"). Đường dẫn tương đối hiểu theo thư mục chứa file. Gộp chung với thư mục gõ trên CLI, trùng nhau tự loại. File text cũ (1 dòng = 1 thư mục, dòng `@...` là cài đặt) vẫn đọc bình thường. |
+| `--serve` | tắt | Bật giao diện web local trên http://127.0.0.1:8787 (xem "Giao diện web"). Khi bật mà không có `--config`, app dùng file `watch.json` ở thư mục hiện tại (nếu có) và lưu thay đổi vào đó. Cho phép khởi động với 0 thư mục rồi thêm sau trên giao diện. |
 | `--port <n>` | 8787 | Cổng giao diện web (1–65535; chỉ có nghĩa với `--serve`). Cổng bị chiếm thì app báo lỗi và thoát ngay (exit 2). |
 | `--no-recursive` | đệ quy | Chỉ theo dõi tầng trên cùng của mỗi thư mục. |
 | `--debounce-ms <n>` | 200 | Gộp các event dồn dập trong n mili-giây thành 1 dòng (xem "Quy tắc gộp"). `0` = in ngay từng event, không gộp. |
@@ -103,7 +103,7 @@ Thư mục không tồn tại, không phải thư mục, hoặc file log không 
 ## Giao diện web (`--serve`)
 
 ```sh
-file-watcher --config watch.txt --serve
+file-watcher --config watch.json --serve
 ```
 
 Mở trình duyệt vào http://127.0.0.1:8787 (hoặc cổng đã chọn với
@@ -140,7 +140,7 @@ không truy cập được từ máy khác trong mạng.
   lại để bỏ ghim), hoặc gõ đường dẫn trong tab Đã ghim. Ghim là
   đường dẫn cố định, không chạy theo đổi tên. File ngoài vùng theo
   dõi vẫn ghim được, hiện trạng thái "ngoài vùng theo dõi". Ghim
-  lưu vào file cấu hình dạng dòng `@pin ...` nên khởi động lại vẫn
+  lưu vào file cấu hình JSON (mục `"pins"`) nên khởi động lại vẫn
   còn; dữ liệu ghim đã để sẵn chỗ cho lệnh xử lý riêng theo file
   (sẽ làm sau).
 - **Phong cách hairline grid:** nền sáng (tối theo hệ thống qua
@@ -148,14 +148,19 @@ không truy cập được từ máy khác trong mạng.
   không card nổi, không shadow, không bo góc. Dải stat 4 ô đếm
   event theo loại (tạo/sửa/xóa/đổi tên) trong 1000 dòng gần nhất,
   kèm giờ event mới nhất của từng loại.
-- **Sidebar co dãn + thu gọn:** kéo tay nắm ở đường line giữa
+- **Sidebar co dãn + thu gọn:** mặc định rộng 320px để nội dung
+  vừa 1 trang, không phải cuộn. Kéo tay nắm ở đường line giữa
   sidebar và nội dung để đổi chiều rộng (160–480px, tối đa nửa màn
-  hình; bấm đúp tay nắm để về 220px; phím mũi tên khi tay nắm đang
+  hình; bấm đúp tay nắm để về 320px; phím mũi tên khi tay nắm đang
   focus). Nút ‹ ở đầu topbar thu gọn hẳn sidebar, bấm › để mở lại.
   Chiều rộng và trạng thái thu gọn lưu trong trình duyệt nên mở
   lại vẫn giữ.
+- **Cuộn không thanh trượt:** sidebar và log đều ẩn thanh cuộn;
+  khi còn nội dung phía trên/dưới thì mép tương ứng hiện vệt mờ
+  nhạt, mờ dần khi cuộn tới cuối. Cuộn bằng chuột/bàn phím như
+  bình thường.
 - **Khởi động rỗng:** `--serve` không cần thư mục nào — mở giao diện
-  rồi thêm thư mục sau cũng được; file `watch.txt` được tạo khi lưu
+  rồi thêm thư mục sau cũng được; file `watch.json` được tạo khi lưu
   thay đổi đầu tiên.
 
 API dùng nội bộ (không cần nhớ để xài giao diện):
@@ -172,26 +177,30 @@ API dùng nội bộ (không cần nhớ để xài giao diện):
 
 ## File cấu hình
 
-Ngoài danh sách thư mục, file cấu hình còn chứa được cài đặt —
-1 dòng `@tên giá-trị` (xem `watch.example.txt`):
+File cấu hình là JSON (xem `watch.example.json`):
 
-```text
-@recursive true
-@debounce 200
-@exts rs,md
-@ignore target,node_modules
-@pin D:\code\project\quan-trong.txt
-D:\code\project
-C:\Users\ten\Documents\ghi-chu
+```json
+{
+  "dirs": ["D:\\code\\project", "C:\\Users\\ten\\Documents\\ghi-chu"],
+  "recursive": true,
+  "debounce_ms": 200,
+  "exts": ["rs", "md"],
+  "ignores": ["target", "node_modules"],
+  "pins": [{ "path": "D:\\code\\project\\quan-trong.txt", "command": null }]
+}
 ```
 
-Dòng `@pin <đường-dẫn-file>` ghim 1 file để theo dõi riêng trong
-giao diện web (tab Đã ghim). Đường dẫn tương đối hiểu theo thư mục
-chứa file cấu hình, giống thư mục. Ghim trùng nhau tự loại bỏ.
-
-- File cũ chỉ có thư mục (không có dòng `@`) vẫn đọc bình thường.
-- Dòng `@` không rõ hoặc giá trị sai thì app báo lỗi rõ dòng nào
+- Mọi trường đều không bắt buộc (thiếu thì dùng mặc định: đệ quy
+  bật, debounce 200ms, không lọc đuôi, không bỏ qua, không ghim).
+- `"pins"` ghim file để theo dõi riêng trong giao diện web (tab Đã
+  ghim). `"command"` để dành cho lệnh xử lý riêng theo file (chưa
+  dùng — luôn `null`). Ghim trùng nhau tự loại bỏ.
+- Khóa lạ, sai kiểu hoặc JSON sai cú pháp thì app báo lỗi rõ ràng
   và dừng, không chạy với cài đặt đoán mò.
+- File cũ dạng text (1 dòng = 1 thư mục, dòng `@exts`/`@ignore`/
+  `@debounce`/`@recursive`/`@pin` là cài đặt) vẫn đọc bình thường.
+  Khi lưu từ giao diện web, file được ghi lại dạng JSON.
+- Đường dẫn tương đối hiểu theo thư mục chứa file cấu hình.
 - **Thứ tự ưu tiên:** flag CLI thắng file cấu hình — nhưng chỉ khi
   user gõ rõ flag đó (`--ext`, `--ignore`, `--debounce-ms`,
   `--no-recursive`). Không gõ thì cài đặt trong file được giữ.
