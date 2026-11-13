@@ -139,6 +139,8 @@ không truy cập được từ máy khác trong mạng.
   **Đã ghim** (event của file đã ghim), **Đã xóa** (toàn bộ lịch sử
   của file đã bị xóa, kể cả tạo/sửa trước khi xóa). File bị xóa rồi
   tạo lại: lịch sử cũ ở lại tab Đã xóa, event mới quay về Tất cả.
+  Tab Đã xóa không hiện nút ghim (file đã xóa thì ghim không có tác
+  dụng; muốn bỏ ghim file đã xóa thì làm ở tab Đã ghim).
 - **Ghim file:** bấm 📌 ở dòng log hoặc nhóm để ghim file đó (bấm
   lại để bỏ ghim), hoặc gõ đường dẫn trong tab Đã ghim. Ghim là
   đường dẫn cố định, không chạy theo đổi tên. File ngoài vùng theo

@@ -814,6 +814,10 @@
   }
 
   function pinBtnHtml(path) {
+    // Tab Đã xóa: file đã xóa thì ghim không có tác dụng nên không
+    // hiện nút ghim (dòng thường lẫn tiêu đề nhóm). Muốn bỏ ghim
+    // file đã xóa thì làm ở tab Đã ghim.
+    if (activeTab === "deleted") return "";
     var on = isPinned(path);
     return '<button class="pinbtn' + (on ? " on" : "") + '" data-pin="' + esc(path) + '" title="' + (on ? "Bỏ ghim file này" : "Ghim file này") + '">📌</button>';
   }
