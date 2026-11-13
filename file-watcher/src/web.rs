@@ -195,21 +195,21 @@ impl Shared {
         // Windows — nếu không thư mục lưu vào watch.json và hiện
         // ở sidebar đều mang tiền tố thừa đó.
         let canon = strip_verbatim_prefix(&Path::new(dir).canonicalize().map_err(|_| {
-            format!("thư mục không tồn tại hoặc không đọc được: {dir}")
+            format!("folder does not exist or is not readable: {dir}")
         })?);
         if !canon.is_dir() {
-            return Err(format!("không phải thư mục: {dir}"));
+            return Err(format!("not a folder: {dir}"));
         }
         let mut st = lock(&self.0);
         if st.roots.contains(&canon) {
             return Err(format!(
-                "thư mục đã được theo dõi: {}",
+                "folder is already being watched: {}",
                 canon.display()
             ));
         }
         let mode = mode_of(st.recursive);
         if let Err(e) = st.watcher.watch(&canon, mode) {
-            return Err(format!("không theo dõi được {}: {e}", canon.display()));
+            return Err(format!("cannot watch {}: {e}", canon.display()));
         }
         st.roots.push(canon);
         if let Err(e) = Self::save_locked(&st) {
@@ -226,12 +226,12 @@ impl Shared {
         let canon = strip_verbatim_prefix(
             &Path::new(dir)
                 .canonicalize()
-                .map_err(|_| format!("thư mục không tồn tại: {dir}"))?,
+                .map_err(|_| format!("folder does not exist: {dir}"))?,
         );
         let mut st = lock(&self.0);
         let Some(pos) = st.roots.iter().position(|r| r == &canon) else {
             return Err(format!(
-                "thư mục không nằm trong danh sách theo dõi: {}",
+                "folder is not in the watch list: {}",
                 canon.display()
             ));
         };
@@ -316,8 +316,8 @@ impl Shared {
                     let _ = st.watcher.watch(&root, old_mode);
                 }
                 return Err(format!(
-                    "không đổi được chế độ đệ quy ({}): {}",
-                    if new_recursive { "đệ quy" } else { "không đệ quy" },
+                    "cannot change recursive mode ({}): {}",
+                    if new_recursive { "recursive" } else { "non-recursive" },
                     failed.join("; ")
                 ));
             }
@@ -366,7 +366,7 @@ fn mode_of(recursive: bool) -> RecursiveMode {
 fn normalize_pin_path(path: &str) -> Result<PathBuf, String> {
     let p = Path::new(path);
     if !p.is_absolute() {
-        return Err(format!("đường dẫn ghim phải tuyệt đối: {path}"));
+        return Err(format!("pinned path must be absolute: {path}"));
     }
     if let Ok(canon) = p.canonicalize() {
         return Ok(strip_verbatim_prefix(&canon));
@@ -550,7 +550,7 @@ fn handle_connection(mut stream: TcpStream, shared: &Shared) {
             let result = match form.get("action").map(|s| s.as_str()) {
                 Some("add") => shared.add_dir(&dir),
                 Some("remove") => shared.remove_dir(&dir),
-                _ => Err("action phải là add hoặc remove".to_string()),
+                _ => Err("action must be add or remove".to_string()),
             };
             match result {
                 Ok(()) => json_ok(&mut stream),
@@ -563,7 +563,7 @@ fn handle_connection(mut stream: TcpStream, shared: &Shared) {
             let result = match form.get("action").map(|s| s.as_str()) {
                 Some("add") => shared.add_pin(&path),
                 Some("remove") => shared.remove_pin(&path),
-                _ => Err("action phải là add hoặc remove".to_string()),
+                _ => Err("action must be add or remove".to_string()),
             };
             match result {
                 Ok(()) => json_ok(&mut stream),
@@ -576,7 +576,7 @@ fn handle_connection(mut stream: TcpStream, shared: &Shared) {
                 Some("true") => Some(true),
                 Some("false") => Some(false),
                 Some(other) => {
-                    json_err(&mut stream, &format!("recursive phải là true hoặc false, nhận được: {other}"));
+                    json_err(&mut stream, &format!("recursive must be true or false, got: {other}"));
                     return;
                 }
                 None => None,
@@ -585,7 +585,7 @@ fn handle_connection(mut stream: TcpStream, shared: &Shared) {
                 Some(v) => match v.parse::<u64>() {
                     Ok(n) => Some(n),
                     Err(_) => {
-                        json_err(&mut stream, &format!("debounce_ms phải là số nguyên >= 0, nhận được: {v}"));
+                        json_err(&mut stream, &format!("debounce_ms must be an integer >= 0, got: {v}"));
                         return;
                     }
                 },
@@ -598,7 +598,7 @@ fn handle_connection(mut stream: TcpStream, shared: &Shared) {
                 Err(e) => json_err(&mut stream, &e),
             }
         }
-        _ => respond(&mut stream, 404, "text/plain; charset=utf-8", "không tìm thấy".as_bytes()),
+        _ => respond(&mut stream, 404, "text/plain; charset=utf-8", "not found".as_bytes()),
     }
 }
 

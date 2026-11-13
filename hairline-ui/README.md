@@ -7,7 +7,7 @@
 > component, hành vi — để sau này tách ra thành thư viện dùng chung
 > mà không phải đoán lại từ đầu.
 >
-> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.4.
+> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.5.
 
 ## Nguồn gốc
 
@@ -166,7 +166,7 @@ vuông đặc chính là dấu nhận diện.
 
 - **Tiêu đề mục (`h6`):** uppercase 11px muted, padding
   `10px 14px`, ngăn dưới bằng line. Kèm số đếm trong ngoặc
-  (vd: `Thư mục theo dõi (3)`).
+  (vd: `Watched folders (3)`).
 - **Khối (`sideblock`):** padding `12px 14px`, ngăn dưới bằng
   line, khối cuối không line.
 - **Danh sách thư mục:** mỗi dòng mono 12.5px, padding
@@ -189,8 +189,8 @@ vuông đặc chính là dấu nhận diện.
 
 4 ô đều nhau (grid `repeat(4, 1fr)`), ngăn bằng `border-right`
 (ô cuối không viền). Mỗi ô: nhãn muted + số lớn 22px semibold
-+ dòng phụ mono 12px muted (vd: giờ mới nhất). Tooltip giải
-thích phạm vi số đếm (vd: "trong 1000 dòng gần nhất").
++ dòng phụ mono 12px muted (vd: "latest 20:42:00"). Tooltip giải
+thích phạm vi số đếm (vd: "Counts within the latest 1000 log lines").
 
 ### Toolbar
 
@@ -235,10 +235,10 @@ trong tab: mono 12px, opacity .75.
 
 ### Quản lý ghim (pin manage)
 
-Khối trên cùng của tab Đã ghim: `h6` + số lượng; danh sách
+Khối trên cùng của tab Pinned: `h6` + số lượng; danh sách
 ghim mỗi dòng có badge + tên file + **trạng thái đẩy sát phải**
-(muted, không xuống dòng: `ngoài vùng theo dõi` / `chưa có
-event` / `đã xóa` / `LOẠI giờ · N event`) + nút `×` đỏ bỏ ghim.
+(muted, không xuống dòng: `outside watched folders` / `no events
+yet` / `deleted` / `KIND time · N events`) + nút `×` đỏ bỏ ghim.
 (Từ 0.9.4 bỏ ô nhập đường dẫn + nút Ghim bên dưới vì gây rối
 UX — ghim chỉ bằng nút 📌 ở dòng log.)
 
@@ -248,9 +248,9 @@ Cố định giữa dưới màn hình (`bottom: 18px`, `translateX(-50%)`),
 nền `--bg`, viền 1px `--line`, radius 0, padding `9px 16px`,
 `z-index: 10`, `pointer-events: none`. Hiện/ẩn bằng opacity +
 `translateY` (transition .2s). Chỉ dùng cho xác nhận ngắn
-(vd: "Đã copy đường dẫn").
+(vd: "File pinned.").
 
-### Màu nền (tint) — từ File Watcher 0.9.0
+### Background color (tint) — từ File Watcher 0.9.0
 
 Các vùng xung quanh (brand, topbar, sidebar, dải stat, toolbar,
 tabs) có thể nhuộm 1 trong 6 màu cơ bản (xám, xanh dương, xanh
@@ -382,6 +382,7 @@ chưa làm):
 | 0.9.2 | 2026-11-13 | Tab Đã xóa không hiện nút ghim (dòng thường lẫn tiêu đề nhóm): file đã xóa thì ghim không có tác dụng; bỏ ghim file đã xóa vẫn làm được ở tab Đã ghim. |
 | 0.9.3 | 2026-11-13 | Line trong vùng nhuộm tự đổi màu theo tint: giữ sắc, lệch độ sáng cố định 14 điểm (đậm hơn ở theme sáng, sáng hơn ở theme tối); log và viền ngoài app giữ line gốc. |
 | 0.9.4 | 2026-11-13 | Tab Đã ghim bỏ ô nhập đường dẫn ghim tay (gây rối UX): chỉ còn danh sách file đã ghim + nút × bỏ ghim; ghim chỉ bằng nút 📌 ở dòng log. |
+| 0.9.5 | 2026-11-13 | Toàn bộ app chuyển sang tiếng Anh (UI web + CLI): nhãn, tab, hint, toast, help text, thông báo lỗi, banner; kích thước đổi sang dấu chấm thập phân (`1.5 KB`, `net +1.0 KB`). Comment trong code và tài liệu vẫn tiếng Việt. |
 
 ## Tham chiếu
 

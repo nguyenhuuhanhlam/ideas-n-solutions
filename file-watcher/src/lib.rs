@@ -561,7 +561,7 @@ impl SizeTracker {
 }
 
 /// Định dạng byte cho người đọc, đơn vị 1024, 1 chữ số thập phân
-/// với dấu phẩy (kiểu Việt Nam): `512 B`, `15,1 KB`, `2,0 MB`.
+/// với dấu chấm: `512 B`, `15.1 KB`, `2.0 MB`.
 pub fn format_bytes(n: u64) -> String {
     const KB: f64 = 1024.0;
     const MB: f64 = 1024.0 * 1024.0;
@@ -570,15 +570,15 @@ pub fn format_bytes(n: u64) -> String {
     if n < KB {
         format!("{} B", n as u64)
     } else if n < MB {
-        format!("{:.1} KB", n / KB).replace('.', ",")
+        format!("{:.1} KB", n / KB)
     } else if n < GB {
-        format!("{:.1} MB", n / MB).replace('.', ",")
+        format!("{:.1} MB", n / MB)
     } else {
-        format!("{:.1} GB", n / GB).replace('.', ",")
+        format!("{:.1} GB", n / GB)
     }
 }
 
-/// Định dạng delta có dấu: `+2,8 KB`, `-512 B`, `±0 B`.
+/// Định dạng delta có dấu: `+2.8 KB`, `-512 B`, `±0 B`.
 fn format_delta(d: i64) -> String {
     if d == 0 {
         return "±0 B".to_string();
@@ -588,7 +588,7 @@ fn format_delta(d: i64) -> String {
 }
 
 /// Phần kích thước trong dòng log dạng đọc được:
-/// `15,1 KB (+2,8 KB)`, `15,1 KB` (chưa biết delta), `—` (không rõ).
+/// `15.1 KB (+2.8 KB)`, `15.1 KB` (chưa biết delta), `—` (không rõ).
 fn size_part(summary: &Summary) -> String {
     match summary.size {
         None => "—".to_string(),
@@ -712,10 +712,10 @@ pub fn detect_identity() -> Identity {
     }
 }
 
-/// Dạng đọc được: `2026-11-12 22:55:01  MODIFIED  lam@may1  15,1 KB (+2,8 KB)  D:\code\main.rs`
-/// Rename đủ 2 đầu: `...  RENAMED   lam@may1  15,1 KB  cũ -> mới`.
-/// Chỉ biết 1 đầu: `...  RENAMED   lam@may1  12,3 KB  cũ -> ?` (đổi tên đi)
-/// hoặc `...  RENAMED   lam@may1  12,3 KB  ? -> mới` (đổi tên từ ngoài vào).
+/// Dạng đọc được: `2026-11-12 22:55:01  MODIFIED  lam@may1  15.1 KB (+2.8 KB)  D:\code\main.rs`
+/// Rename đủ 2 đầu: `...  RENAMED   lam@may1  15.1 KB  cũ -> mới`.
+/// Chỉ biết 1 đầu: `...  RENAMED   lam@may1  12.3 KB  cũ -> ?` (đổi tên đi)
+/// hoặc `...  RENAMED   lam@may1  12.3 KB  ? -> mới` (đổi tên từ ngoài vào).
 /// Không rõ size (thư mục, file mất mà chưa từng thấy): cột size là `—`.
 pub fn format_human(summary: &Summary, identity: &Identity) -> String {
     let who = identity.label();
@@ -845,38 +845,38 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub fn usage() -> String {
     format!(
-        "file-watcher {VERSION} — lắng nghe thay đổi file trong 1 hoặc nhiều thư mục (nhẹ, nhanh, không polling)\n\
+        "file-watcher {VERSION} — watch for file changes in one or more folders (light, fast, no polling)\n\
         \n\
-        Dùng:\n\
-        \x20 file-watcher <thư-mục...> [tùy-chọn]\n\
-        \x20 file-watcher --config watch.json [tùy-chọn]\n\
+        Usage:\n\
+        \x20 file-watcher <folder...> [options]\n\
+        \x20 file-watcher --config watch.json [options]\n\
         \n\
-        Tùy chọn:\n\
-        \x20 --config <file>       đọc cấu hình từ file JSON (xem watch.example.json; file text cũ vẫn đọc được)\n\
-        \x20 --no-recursive        chỉ theo dõi tầng trên cùng (mặc định: đệ quy)\n\
-        \x20 --debounce-ms <n>     gộp các event dồn dập trong n mili-giây (mặc định 200; 0 = in ngay)\n\
-        \x20 --ext <a,b,c>         chỉ hiện file có đuôi này (vd: rs,md,txt)\n\
-        \x20 --ignore <a,b>        bỏ qua đường dẫn chứa chuỗi này (vd: .tmp,~$,node_modules)\n\
-        \x20 --log <file>          ghi thêm mọi dòng event vào file (append)\n\
-        \x20 --json                in mỗi event 1 dòng JSON thay vì dạng đọc được\n\
-        \x20 --exec \"<lệnh>\"       chạy lệnh mỗi khi có event ({{path}} {{event}} {{time}} {{from}} {{user}} {{pc}} {{size}} {{delta}})\n\
-        \x20 --pc-id <id>          ghi đè PC ID trong log (mặc định: hostname của máy)\n\
-        \x20 --serve              bật giao diện web local để cấu hình thư mục + xem log realtime\n\
-        \x20 --port <n>           cổng giao diện web (mặc định 8787; chỉ có nghĩa với --serve)\n\
-        \x20 -h, --help            hiện hướng dẫn này\n\
-        \x20 -V, --version         hiện phiên bản\n\
+        Options:\n\
+        \x20 --config <file>       read config from a JSON file (see watch.example.json; legacy text files still work)\n\
+        \x20 --no-recursive        watch only the top level (default: recursive)\n\
+        \x20 --debounce-ms <n>     merge bursts of events within n milliseconds (default 200; 0 = print immediately)\n\
+        \x20 --ext <a,b,c>         only show files with these extensions (e.g. rs,md,txt)\n\
+        \x20 --ignore <a,b>        ignore paths containing these strings (e.g. .tmp,~$,node_modules)\n\
+        \x20 --log <file>          also append every event line to a file\n\
+        \x20 --json                print each event as one JSON line instead of human-readable form\n\
+        \x20 --exec \"<command>\"    run a command on every event ({{path}} {{event}} {{time}} {{from}} {{user}} {{pc}} {{size}} {{delta}})\n\
+        \x20 --pc-id <id>          override the PC ID in the log (default: machine hostname)\n\
+        \x20 --serve               start the local web UI to configure folders + view the live log\n\
+        \x20 --port <n>            web UI port (default 8787; only meaningful with --serve)\n\
+        \x20 -h, --help            show this help\n\
+        \x20 -V, --version         show the version\n\
         \n\
-        Ví dụ:\n\
+        Examples:\n\
         \x20 file-watcher D:\\code\\project\n\
         \x20 file-watcher C:\\a D:\\b --ext rs,md --ignore target,node_modules\n\
         \x20 file-watcher . --log events.log --exec \"echo {{event}} {{path}}\"\n\
         \x20 file-watcher --config watch.json --serve\n\
         \x20 file-watcher --serve --port 9000\n\
         \n\
-        Giao diện web chỉ nghe trên 127.0.0.1 (máy này), mở trình duyệt\n\
-        vào http://127.0.0.1:8787 (hoặc cổng đã chọn). Khi bật --serve mà\n\
-        không có --config, app dùng file watch.json ở thư mục hiện tại\n\
-        (nếu có) và lưu thay đổi từ giao diện vào đó.\n"
+        The web UI only listens on 127.0.0.1 (this machine); open a browser\n\
+        at http://127.0.0.1:8787 (or the chosen port). With --serve and no\n\
+        --config, the app uses watch.json in the current folder (if any)\n\
+        and saves UI changes to it.\n"
     )
 }
 
@@ -924,7 +924,7 @@ where
             }
             match iter.next() {
                 Some(v) => Ok(v.as_ref().to_string()),
-                None => Err(format!("thiếu giá trị cho {flag}")),
+                None => Err(format!("missing value for {flag}")),
             }
         };
         match flag.as_str() {
@@ -944,9 +944,9 @@ where
                 let v = take_value(&mut iter)?;
                 let port = v
                     .parse::<u32>()
-                    .map_err(|_| format!("--port phải là số nguyên 1-65535, nhận được: {v}"))?;
+                    .map_err(|_| format!("--port must be an integer 1-65535, got: {v}"))?;
                 if !(1..=65535).contains(&port) {
-                    return Err(format!("--port phải là số nguyên 1-65535, nhận được: {v}"));
+                    return Err(format!("--port must be an integer 1-65535, got: {v}"));
                 }
                 args.port = port as u16;
                 args.port_set = true;
@@ -955,7 +955,7 @@ where
                 let v = take_value(&mut iter)?;
                 args.debounce_ms = v
                     .parse::<u64>()
-                    .map_err(|_| format!("--debounce-ms phải là số nguyên >= 0, nhận được: {v}"))?;
+                    .map_err(|_| format!("--debounce-ms must be an integer >= 0, got: {v}"))?;
                 args.debounce_set = true;
             }
             "--ext" => {
@@ -968,14 +968,14 @@ where
             }
             _ => {
                 if flag.starts_with('-') {
-                    return Err(format!("tham số không rõ: {flag}"));
+                    return Err(format!("unknown argument: {flag}"));
                 }
                 args.dirs.push(flag);
             }
         }
     }
     if args.port_set && !args.serve {
-        return Err("--port chỉ có nghĩa khi dùng kèm --serve".to_string());
+        return Err("--port only makes sense with --serve".to_string());
     }
     Ok(args)
 }
@@ -1055,7 +1055,7 @@ impl<'a> JsonParser<'a> {
     }
 
     fn err(&self, msg: &str) -> String {
-        format!("lỗi JSON tại vị trí {}: {msg}", self.pos)
+        format!("JSON error at position {}: {msg}", self.pos)
     }
 
     fn peek(&self) -> Option<u8> {
@@ -1073,14 +1073,14 @@ impl<'a> JsonParser<'a> {
         let v = self.parse_value(0)?;
         self.skip_ws();
         if self.pos != self.src.len() {
-            return Err(self.err("còn ký tự thừa sau giá trị JSON"));
+            return Err(self.err("trailing characters after JSON value"));
         }
         Ok(v)
     }
 
     fn parse_value(&mut self, depth: usize) -> Result<JsonValue, String> {
         if depth > 64 {
-            return Err(self.err("JSON lồng nhau quá sâu (quá 64 cấp)"));
+            return Err(self.err("JSON nested too deep (over 64 levels)"));
         }
         self.skip_ws();
         match self.peek() {
@@ -1091,8 +1091,8 @@ impl<'a> JsonParser<'a> {
             Some(b'f') => self.parse_literal("false", JsonValue::Bool(false)),
             Some(b'n') => self.parse_literal("null", JsonValue::Null),
             Some(b'-') | Some(b'0'..=b'9') => self.parse_number(),
-            Some(_) => Err(self.err("ký tự không hợp lệ, chờ giá trị JSON")),
-            None => Err(self.err("hết file giữa chừng, chờ giá trị JSON")),
+            Some(_) => Err(self.err("invalid character, expected a JSON value")),
+            None => Err(self.err("unexpected end of file, expected a JSON value")),
         }
     }
 
@@ -1101,7 +1101,7 @@ impl<'a> JsonParser<'a> {
             self.pos += lit.len();
             Ok(value)
         } else {
-            Err(self.err("giá trị true/false/null viết sai"))
+            Err(self.err("misspelled true/false/null"))
         }
     }
 
@@ -1116,15 +1116,15 @@ impl<'a> JsonParser<'a> {
         loop {
             self.skip_ws();
             if self.peek() != Some(b'"') {
-                return Err(self.err("chờ tên khóa (chuỗi trong ngoặc kép)"));
+                return Err(self.err("expected a key name (quoted string)"));
             }
             let key = self.parse_string()?;
             if entries.iter().any(|(k, _)| k == &key) {
-                return Err(format!("lỗi JSON: khóa trùng lặp \"{key}\""));
+                return Err(format!("JSON error: duplicate key \"{key}\""));
             }
             self.skip_ws();
             if self.peek() != Some(b':') {
-                return Err(self.err("chờ dấu ':' sau tên khóa"));
+                return Err(self.err("expected ':' after key name"));
             }
             self.pos += 1;
             let value = self.parse_value(depth + 1)?;
@@ -1138,7 +1138,7 @@ impl<'a> JsonParser<'a> {
                     self.pos += 1;
                     return Ok(JsonValue::Object(entries));
                 }
-                _ => return Err(self.err("chờ ',' hoặc '}' trong object")),
+                _ => return Err(self.err("expected ',' or '}' in object")),
             }
         }
     }
@@ -1163,7 +1163,7 @@ impl<'a> JsonParser<'a> {
                     self.pos += 1;
                     return Ok(JsonValue::Array(items));
                 }
-                _ => return Err(self.err("chờ ',' hoặc ']' trong array")),
+                _ => return Err(self.err("expected ',' or ']' in array")),
             }
         }
     }
@@ -1174,7 +1174,7 @@ impl<'a> JsonParser<'a> {
         let mut out = String::new();
         loop {
             let Some(b) = self.peek() else {
-                return Err(self.err("chuỗi chưa đóng ngoặc kép đã hết file"));
+                return Err(self.err("unterminated string at end of file"));
             };
             match b {
                 b'"' => {
@@ -1183,7 +1183,7 @@ impl<'a> JsonParser<'a> {
                 }
                 b'\\' => {
                     self.pos += 1;
-                    let esc = self.peek().ok_or_else(|| self.err("dấu \\ ở cuối file"))?;
+                    let esc = self.peek().ok_or_else(|| self.err("backslash at end of file"))?;
                     self.pos += 1;
                     match esc {
                         b'"' => out.push('"'),
@@ -1207,22 +1207,22 @@ impl<'a> JsonParser<'a> {
                                         let c = 0x10000 + ((cp - 0xD800) << 10) + (lo - 0xDC00);
                                         out.push(char::from_u32(c).unwrap_or('\u{FFFD}'));
                                     } else {
-                                        return Err(self.err("cặp surrogate \\u không hợp lệ"));
+                                        return Err(self.err("invalid \\u surrogate pair"));
                                     }
                                 } else {
-                                    return Err(self.err("surrogate cao \\u thiếu nửa sau"));
+                                    return Err(self.err("high \\u surrogate missing its second half"));
                                 }
                             } else if (0xDC00..0xE000).contains(&cp) {
-                                return Err(self.err("surrogate thấp \\u đứng một mình"));
+                                return Err(self.err("lone low \\u surrogate"));
                             } else {
                                 out.push(char::from_u32(cp).unwrap_or('\u{FFFD}'));
                             }
                         }
-                        _ => return Err(self.err("ký tự escape không hợp lệ sau dấu \\")),
+                        _ => return Err(self.err("invalid escape character after backslash")),
                     }
                 }
                 0x00..=0x1F => {
-                    return Err(self.err("ký tự điều khiển trong chuỗi phải viết dạng \\uXXXX"));
+                    return Err(self.err("control characters in strings must use \\uXXXX"));
                 }
                 _ => {
                     // Ký tự UTF-8 thường: lấy cả char (không cắt giữa
@@ -1240,9 +1240,9 @@ impl<'a> JsonParser<'a> {
                     let chunk = self
                         .src
                         .get(self.pos..self.pos + len)
-                        .ok_or_else(|| self.err("chuỗi UTF-8 bị cắt giữa chừng"))?;
+                        .ok_or_else(|| self.err("UTF-8 string cut off mid-sequence"))?;
                     let s = std::str::from_utf8(chunk)
-                        .map_err(|_| self.err("chuỗi không phải UTF-8 hợp lệ"))?;
+                        .map_err(|_| self.err("string is not valid UTF-8"))?;
                     out.push(s.chars().next().unwrap());
                     self.pos += len;
                 }
@@ -1252,7 +1252,7 @@ impl<'a> JsonParser<'a> {
 
     fn parse_hex4(&mut self) -> Result<u32, String> {
         if self.pos + 4 > self.src.len() {
-            return Err(self.err("escape \\u thiếu 4 chữ số hex"));
+            return Err(self.err("\\u escape needs 4 hex digits"));
         }
         let mut v: u32 = 0;
         for _ in 0..4 {
@@ -1261,7 +1261,7 @@ impl<'a> JsonParser<'a> {
                 b'0'..=b'9' => (b - b'0') as u32,
                 b'a'..=b'f' => (b - b'a' + 10) as u32,
                 b'A'..=b'F' => (b - b'A' + 10) as u32,
-                _ => return Err(self.err("escape \\u chứa ký tự không phải hex")),
+                _ => return Err(self.err("\\u escape contains non-hex characters")),
             };
             v = (v << 4) | d;
             self.pos += 1;
@@ -1283,12 +1283,12 @@ impl<'a> JsonParser<'a> {
                     self.pos += 1;
                 }
             }
-            _ => return Err(self.err("số viết sai (chờ chữ số)")),
+            _ => return Err(self.err("malformed number (expected a digit)")),
         }
         if self.peek() == Some(b'.') {
             self.pos += 1;
             if !matches!(self.peek(), Some(b'0'..=b'9')) {
-                return Err(self.err("số viết sai (sau dấu . phải có chữ số)"));
+                return Err(self.err("malformed number (digits required after .)"));
             }
             while matches!(self.peek(), Some(b'0'..=b'9')) {
                 self.pos += 1;
@@ -1300,7 +1300,7 @@ impl<'a> JsonParser<'a> {
                 self.pos += 1;
             }
             if !matches!(self.peek(), Some(b'0'..=b'9')) {
-                return Err(self.err("số viết sai (sau e phải có chữ số)"));
+                return Err(self.err("malformed number (digits required after e)"));
             }
             while matches!(self.peek(), Some(b'0'..=b'9')) {
                 self.pos += 1;
@@ -1340,7 +1340,7 @@ impl<'a> JsonParser<'a> {
 /// cấu hình (cả thư mục lẫn pin).
 pub fn load_config(config_path: &str) -> Result<(Vec<String>, Settings), String> {
     let text = std::fs::read_to_string(config_path)
-        .map_err(|e| format!("không đọc được file cấu hình {config_path}: {e}"))?;
+        .map_err(|e| format!("cannot read config file {config_path}: {e}"))?;
     let base = Path::new(config_path)
         .parent()
         .filter(|p| !p.as_os_str().is_empty());
@@ -1381,7 +1381,7 @@ fn parse_config_legacy(
                 "ignore" => settings.ignores = split_list(value),
                 "debounce" => {
                     settings.debounce_ms = value.parse::<u64>().map_err(|_| {
-                        format!("{config_path} dòng {}: @debounce phải là số nguyên >= 0, nhận được: {value}", lineno + 1)
+                        format!("{config_path} line {}: @debounce must be an integer >= 0, got: {value}", lineno + 1)
                     })?;
                 }
                 "recursive" => match value {
@@ -1389,7 +1389,7 @@ fn parse_config_legacy(
                     "false" => settings.recursive = false,
                     _ => {
                         return Err(format!(
-                            "{config_path} dòng {}: @recursive phải là true hoặc false, nhận được: {value}",
+                            "{config_path} line {}: @recursive must be true or false, got: {value}",
                             lineno + 1
                         ));
                     }
@@ -1400,7 +1400,7 @@ fn parse_config_legacy(
                     // giữ dòng đầu tiên.
                     if value.is_empty() {
                         return Err(format!(
-                            "{config_path} dòng {}: @pin thiếu đường dẫn",
+                            "{config_path} line {}: @pin is missing a path",
                             lineno + 1
                         ));
                     }
@@ -1417,7 +1417,7 @@ fn parse_config_legacy(
                 }
                 _ => {
                     return Err(format!(
-                        "{config_path} dòng {}: cài đặt không rõ: @{key} (chỉ có @exts, @ignore, @debounce, @recursive, @pin)",
+                        "{config_path} line {}: unknown setting: @{key} (only @exts, @ignore, @debounce, @recursive, @pin)",
                         lineno + 1
                     ));
                 }
@@ -1444,7 +1444,7 @@ fn config_from_json(
 ) -> Result<(Vec<String>, Settings), String> {
     let JsonValue::Object(entries) = value else {
         return Err(format!(
-            "{config_path}: file cấu hình JSON phải là 1 object {{...}}"
+            "{config_path}: JSON config file must be one object {{...}}"
         ));
     };
     let mut dirs = Vec::new();
@@ -1460,7 +1460,7 @@ fn config_from_json(
             "recursive" => {
                 let JsonValue::Bool(b) = v else {
                     return Err(format!(
-                        "{config_path}: \"recursive\" phải là true hoặc false"
+                        "{config_path}: \"recursive\" must be true or false"
                     ));
                 };
                 settings.recursive = *b;
@@ -1468,12 +1468,12 @@ fn config_from_json(
             "debounce_ms" => {
                 let JsonValue::Number(raw) = v else {
                     return Err(format!(
-                        "{config_path}: \"debounce_ms\" phải là số nguyên >= 0"
+                        "{config_path}: \"debounce_ms\" must be an integer >= 0"
                     ));
                 };
                 settings.debounce_ms = raw.parse::<u64>().map_err(|_| {
                     format!(
-                        "{config_path}: \"debounce_ms\" phải là số nguyên >= 0, nhận được: {raw}"
+                        "{config_path}: \"debounce_ms\" must be an integer >= 0, got: {raw}"
                     )
                 })?;
             }
@@ -1492,12 +1492,12 @@ fn config_from_json(
             }
             "pins" => {
                 let JsonValue::Array(items) = v else {
-                    return Err(format!("{config_path}: \"pins\" phải là 1 array"));
+                    return Err(format!("{config_path}: \"pins\" must be an array"));
                 };
                 for item in items {
                     let JsonValue::Object(pin_entries) = item else {
                         return Err(format!(
-                            "{config_path}: mỗi phần tử \"pins\" phải là 1 object {{\"path\": ...}}"
+                            "{config_path}: every \"pins\" element must be an object {{\"path\": ...}}"
                         ));
                     };
                     let mut pin_path: Option<String> = None;
@@ -1507,7 +1507,7 @@ fn config_from_json(
                             "path" => {
                                 let JsonValue::Str(s) = pv else {
                                     return Err(format!(
-                                        "{config_path}: \"pins[].path\" phải là chuỗi"
+                                        "{config_path}: \"pins[].path\" must be a string"
                                     ));
                                 };
                                 pin_path = Some(s.clone());
@@ -1517,19 +1517,19 @@ fn config_from_json(
                                 JsonValue::Str(s) => command = Some(s.clone()),
                                 _ => {
                                     return Err(format!(
-                                        "{config_path}: \"pins[].command\" phải là chuỗi hoặc null"
+                                        "{config_path}: \"pins[].command\" must be a string or null"
                                     ));
                                 }
                             },
                             _ => {
                                 return Err(format!(
-                                    "{config_path}: khóa không rõ trong pins: \"{pk}\" (chỉ có \"path\", \"command\")"
+                                    "{config_path}: unknown key in pins: \"{pk}\" (only \"path\", \"command\")"
                                 ));
                             }
                         }
                     }
                     let Some(p) = pin_path else {
-                        return Err(format!("{config_path}: phần tử \"pins\" thiếu \"path\""));
+                        return Err(format!("{config_path}: \"pins\" element is missing \"path\""));
                     };
                     let pin = Pin {
                         path: PathBuf::from(resolve_config_path(&p, base)),
@@ -1542,7 +1542,7 @@ fn config_from_json(
             }
             _ => {
                 return Err(format!(
-                    "{config_path}: khóa không rõ: \"{key}\" (chỉ có \"dirs\", \"recursive\", \"debounce_ms\", \"exts\", \"ignores\", \"pins\")"
+                    "{config_path}: unknown key: \"{key}\" (only \"dirs\", \"recursive\", \"debounce_ms\", \"exts\", \"ignores\", \"pins\")"
                 ));
             }
         }
@@ -1553,12 +1553,12 @@ fn config_from_json(
 /// Đọc 1 array chuỗi từ JSON (mỗi phần tử phải là chuỗi).
 fn json_string_list(v: &JsonValue, config_path: &str, key: &str) -> Result<Vec<String>, String> {
     let JsonValue::Array(items) = v else {
-        return Err(format!("{config_path}: \"{key}\" phải là 1 array chuỗi"));
+        return Err(format!("{config_path}: \"{key}\" must be an array of strings"));
     };
     let mut out = Vec::new();
     for item in items {
         let JsonValue::Str(s) = item else {
-            return Err(format!("{config_path}: \"{key}\" chỉ được chứa chuỗi"));
+            return Err(format!("{config_path}: \"{key}\" may only contain strings"));
         };
         out.push(s.clone());
     }
@@ -1641,11 +1641,11 @@ pub fn save_config(config_path: &Path, dirs: &[PathBuf], settings: &Settings) ->
     let out = config_to_json(dirs, settings);
     let tmp_path = config_path.with_extension("tmp");
     std::fs::write(&tmp_path, out)
-        .map_err(|e| format!("không ghi được file cấu hình tạm {}: {e}", tmp_path.display()))?;
+        .map_err(|e| format!("cannot write temp config file {}: {e}", tmp_path.display()))?;
     std::fs::rename(&tmp_path, config_path).map_err(|e| {
         let _ = std::fs::remove_file(&tmp_path);
         format!(
-            "không lưu được file cấu hình {}: {e}",
+            "cannot save config file {}: {e}",
             config_path.display()
         )
     })?;
@@ -2216,12 +2216,12 @@ mod tests {
         assert_eq!(format_bytes(0), "0 B");
         assert_eq!(format_bytes(512), "512 B");
         assert_eq!(format_bytes(1023), "1023 B");
-        assert_eq!(format_bytes(1024), "1,0 KB");
-        assert_eq!(format_bytes(1536), "1,5 KB");
-        assert_eq!(format_bytes(15432), "15,1 KB");
-        assert_eq!(format_bytes(1048576), "1,0 MB");
-        assert_eq!(format_bytes(1073741824), "1,0 GB");
-        assert_eq!(format_delta(2871), "+2,8 KB");
+        assert_eq!(format_bytes(1024), "1.0 KB");
+        assert_eq!(format_bytes(1536), "1.5 KB");
+        assert_eq!(format_bytes(15432), "15.1 KB");
+        assert_eq!(format_bytes(1048576), "1.0 MB");
+        assert_eq!(format_bytes(1073741824), "1.0 GB");
+        assert_eq!(format_delta(2871), "+2.8 KB");
         assert_eq!(format_delta(-512), "-512 B");
         assert_eq!(format_delta(0), "±0 B");
     }
@@ -2267,16 +2267,16 @@ mod tests {
         s.delta = Some(2871);
         assert_eq!(
             format_human(&s, &ident()),
-            "2026-11-12 22:00:00  MODIFIED  lam@may1  15,1 KB (+2,8 KB)  /a/main.rs"
+            "2026-11-12 22:00:00  MODIFIED  lam@may1  15.1 KB (+2.8 KB)  /a/main.rs"
         );
         assert!(format_json(&s, &ident()).contains("\"size\":15432"));
         assert!(format_json(&s, &ident()).contains("\"delta\":2871"));
         // Sửa nhưng size không đổi.
         s.delta = Some(0);
-        assert!(format_human(&s, &ident()).contains("15,1 KB (±0 B)"));
+        assert!(format_human(&s, &ident()).contains("15.1 KB (±0 B)"));
         // Lần đầu thấy: có size, không delta.
         s.delta = None;
-        assert!(format_human(&s, &ident()).contains("15,1 KB  /a/main.rs"));
+        assert!(format_human(&s, &ident()).contains("15.1 KB  /a/main.rs"));
         assert!(!format_json(&s, &ident()).contains("\"delta\""));
         // Không rõ size: cột size là —, JSON không có trường size.
         s.size = None;

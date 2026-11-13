@@ -36,7 +36,7 @@ fn real_main() -> i32 {
     let args = match parse_args(argv) {
         Ok(a) => a,
         Err(msg) => {
-            eprintln!("Lỗi: {msg}\n");
+            eprintln!("Error: {msg}\n");
             eprint!("{}", usage());
             return 1;
         }
@@ -87,7 +87,7 @@ fn real_main() -> i32 {
                     // File --config chưa tồn tại: bắt đầu rỗng, sẽ
                     // tạo khi lưu từ giao diện web.
                 } else {
-                    eprintln!("Lỗi: {msg}");
+                    eprintln!("Error: {msg}");
                     return 1;
                 }
             }
@@ -111,7 +111,7 @@ fn real_main() -> i32 {
     }
 
     if raw_dirs.is_empty() && !args.serve {
-        eprintln!("Lỗi: chưa chỉ định thư mục nào để theo dõi.\n");
+        eprintln!("Error: no folders specified to watch.\n");
         eprint!("{}", usage());
         return 1;
     }
@@ -129,11 +129,11 @@ fn real_main() -> i32 {
                 }
             }
             Ok(_) => {
-                eprintln!("Lỗi: không phải thư mục: {dir}");
+                eprintln!("Error: not a folder: {dir}");
                 return 1;
             }
             Err(_) => {
-                eprintln!("Lỗi: thư mục không tồn tại hoặc không đọc được: {dir}");
+                eprintln!("Error: folder does not exist or is not readable: {dir}");
                 return 1;
             }
         }
@@ -150,7 +150,7 @@ fn real_main() -> i32 {
                 log_writer = Some(BufWriter::new(file));
             }
             Err(e) => {
-                eprintln!("Lỗi: không mở được file log {log}: {e}");
+                eprintln!("Error: cannot open log file {log}: {e}");
                 return 1;
             }
         }
@@ -166,7 +166,7 @@ fn real_main() -> i32 {
     let mut watcher = match RecommendedWatcher::new(tx, Config::default()) {
         Ok(w) => w,
         Err(e) => {
-            eprintln!("Lỗi: không tạo được watcher: {e}");
+            eprintln!("Error: cannot create watcher: {e}");
             return 2;
         }
     };
@@ -177,7 +177,7 @@ fn real_main() -> i32 {
     };
     for root in &roots {
         if let Err(e) = watcher.watch(root, mode) {
-            eprintln!("Lỗi: không theo dõi được {}: {e}", root.display());
+            eprintln!("Error: cannot watch {}: {e}", root.display());
             return 2;
         }
     }
@@ -203,13 +203,13 @@ fn real_main() -> i32 {
                 let server_shared = shared.clone();
                 std::thread::spawn(move || {
                     if let Err(e) = serve(listener, server_shared) {
-                        eprintln!("Lỗi: giao diện web dừng: {e}");
+                        eprintln!("Error: web UI stopped: {e}");
                     }
                 });
             }
             Err(e) => {
                 eprintln!(
-                    "Lỗi: không bật được giao diện web trên cổng {}: {e}",
+                    "Error: cannot start web UI on port {}: {e}",
                     args.port
                 );
                 return 2;
@@ -220,38 +220,39 @@ fn real_main() -> i32 {
     // Banner ra stderr để stdout luôn sạch (pipe sang file / tool khác
     // chỉ nhận event, kể cả khi dùng --json).
     eprintln!(
-        "file-watcher {VERSION} — đang lắng nghe {} thư mục ({}; debounce {}ms)",
+        "file-watcher {VERSION} — watching {} folder{} ({}; debounce {}ms)",
         roots.len(),
-        if recursive { "đệ quy" } else { "không đệ quy" },
+        if roots.len() == 1 { "" } else { "s" },
+        if recursive { "recursive" } else { "non-recursive" },
         settings.debounce_ms
     );
-    eprintln!("  máy: {}", identity.label());
+    eprintln!("  machine: {}", identity.label());
     for root in &roots {
         eprintln!("  {}", root.display());
     }
     if !settings.exts.is_empty() {
-        eprintln!("  chỉ hiện đuôi: {}", settings.exts.join(", "));
+        eprintln!("  only extensions: {}", settings.exts.join(", "));
     }
     if !settings.ignores.is_empty() {
-        eprintln!("  bỏ qua chuỗi: {}", settings.ignores.join(", "));
+        eprintln!("  ignore substrings: {}", settings.ignores.join(", "));
     }
     if let Some(log) = &args.log {
-        eprintln!("  ghi log thêm vào: {log}");
+        eprintln!("  appending log to: {log}");
     }
     if args.exec.is_some() {
-        eprintln!("  chạy lệnh mỗi event (--exec)");
+        eprintln!("  running a command on every event (--exec)");
     }
     if args.serve {
         eprintln!(
-            "  giao diện web: http://127.0.0.1:{} (chỉ máy này mở được)",
+            "  web UI: http://127.0.0.1:{} (this machine only)",
             args.port
         );
         match &config_path {
-            Some(p) => eprintln!("  file cấu hình: {}", p.display()),
-            None => eprintln!("  không có file cấu hình: thay đổi từ giao diện chỉ giữ trong phiên này"),
+            Some(p) => eprintln!("  config file: {}", p.display()),
+            None => eprintln!("  no config file: UI changes only last for this session"),
         }
     }
-    eprintln!("Nhấn Ctrl+C để dừng.");
+    eprintln!("Press Ctrl+C to stop.");
 
     let mut coalescer = Coalescer::new();
     // Ghi nhớ kích thước file đã thấy để tính delta (xem SizeTracker).
@@ -318,14 +319,14 @@ fn handle_event(
     let event = match item {
         Ok(e) => e,
         Err(e) => {
-            eprintln!("lỗi watcher: {e}");
+            eprintln!("watcher error: {e}");
             return;
         }
     };
     // Cờ Rescan = hàng đợi event của OS đã tràn, có thể đã bỏ sót
     // thay đổi. Không bịa event file, chỉ cảnh báo ra stderr.
     if event.flag() == Some(notify::event::Flag::Rescan) {
-        eprintln!("cảnh báo: hàng đợi event tràn, có thể đã bỏ sót thay đổi — nên kiểm tra lại thư mục");
+        eprintln!("warning: event queue overflowed, some changes may have been missed — please re-check the folder");
         return;
     }
     let Some(summary) = summarize(&event, now_string()) else {
@@ -464,7 +465,7 @@ fn run_hook(template: &str, summary: &Summary, identity: &Identity) {
     #[cfg(not(windows))]
     let spawned = std::process::Command::new("sh").args(["-c", &cmd]).spawn();
     if let Err(e) = spawned {
-        eprintln!("không chạy được lệnh --exec: {e}");
+        eprintln!("cannot run --exec command: {e}");
     }
 }
 

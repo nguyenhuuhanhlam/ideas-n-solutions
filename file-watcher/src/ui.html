@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="vi">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -301,63 +301,63 @@
 <div class="app">
   <div class="brand"><i></i> file-watcher</div>
   <div class="topbar">
-    <button id="sideToggle" title="Thu gọn sidebar" aria-label="Thu gọn / mở sidebar">‹</button>
+    <button id="sideToggle" title="Collapse sidebar" aria-label="Collapse / expand sidebar">‹</button>
     <span id="identity" class="identity mono muted"></span>
-    <div class="status"><span id="dot" class="dot"></span><span id="statusText">Đang kết nối…</span></div>
+    <div class="status"><span id="dot" class="dot"></span><span id="statusText">Connecting…</span></div>
     <div id="counts" class="mono muted"></div>
   </div>
 
   <div class="sidewrap">
   <nav class="side">
-    <h6>Thư mục theo dõi (<span id="dirCount">0</span>)</h6>
+    <h6>Watched folders (<span id="dirCount">0</span>)</h6>
     <ul id="dirList"></ul>
     <div class="sideblock">
       <div class="addrow">
-        <input id="dirInput" type="text" placeholder="D:\code\project hoặc /home/user/code" autocomplete="off">
-        <button id="addBtn">Thêm</button>
+        <input id="dirInput" type="text" placeholder="D:\code\project or /home/user/code" autocomplete="off">
+        <button id="addBtn">Add</button>
       </div>
       <p id="dirError" class="error"></p>
-      <p class="hint">Gõ đường dẫn đầy đủ rồi bấm Thêm. Trình duyệt không chọn được thư mục trên máy nên cần gõ tay. Thêm/xóa áp dụng ngay và lưu vào file cấu hình.</p>
+      <p class="hint">Type the full path, then click Add. The browser can't pick a folder on this machine, so it must be typed. Add/remove applies immediately and is saved to the config file.</p>
     </div>
-    <h6>Cài đặt</h6>
+    <h6>Settings</h6>
     <div class="sideblock">
-      <label class="checkrow"><input type="checkbox" id="recursive" checked> Đệ quy (theo dõi cả thư mục con)</label>
+      <label class="checkrow"><input type="checkbox" id="recursive" checked> Recursive (watch subfolders too)</label>
       <div class="field">
         <label for="debounce">Debounce (ms)</label>
         <input id="debounce" type="number" min="0" step="50" value="200">
       </div>
       <div class="field">
-        <label for="exts">Chỉ đuôi file</label>
+        <label for="exts">Only file extensions</label>
         <input id="exts" type="text" placeholder="rs,md,txt" autocomplete="off">
       </div>
       <div class="field">
-        <label for="ignores">Bỏ qua đường dẫn chứa</label>
+        <label for="ignores">Ignore paths containing</label>
         <input id="ignores" type="text" placeholder="target,node_modules,.tmp" autocomplete="off">
       </div>
-      <button id="applyBtn">Áp dụng</button>
+      <button id="applyBtn">Apply</button>
       <p id="cfgMsg" class="ok"></p>
     </div>
-    <h6>Màu nền</h6>
+    <h6>Background color</h6>
     <div class="sideblock">
       <div class="swatches" id="tintSwatches">
-        <button class="swatch selected" data-tint="" title="Mặc định (không màu)" aria-label="Không màu nền"></button>
-        <button class="swatch" data-tint="gray" style="--sw:#787878" title="Xám" aria-label="Nền xám"></button>
-        <button class="swatch" data-tint="blue" style="--sw:#2563eb" title="Xanh dương" aria-label="Nền xanh dương"></button>
-        <button class="swatch" data-tint="green" style="--sw:#16a34a" title="Xanh lá" aria-label="Nền xanh lá"></button>
-        <button class="swatch" data-tint="amber" style="--sw:#d97706" title="Vàng" aria-label="Nền vàng"></button>
-        <button class="swatch" data-tint="red" style="--sw:#dc2626" title="Đỏ" aria-label="Nền đỏ"></button>
-        <button class="swatch" data-tint="purple" style="--sw:#9333ea" title="Tím" aria-label="Nền tím"></button>
+        <button class="swatch selected" data-tint="" title="Default (no color)" aria-label="No background color"></button>
+        <button class="swatch" data-tint="gray" style="--sw:#787878" title="Gray" aria-label="Gray background"></button>
+        <button class="swatch" data-tint="blue" style="--sw:#2563eb" title="Blue" aria-label="Blue background"></button>
+        <button class="swatch" data-tint="green" style="--sw:#16a34a" title="Green" aria-label="Green background"></button>
+        <button class="swatch" data-tint="amber" style="--sw:#d97706" title="Amber" aria-label="Amber background"></button>
+        <button class="swatch" data-tint="red" style="--sw:#dc2626" title="Red" aria-label="Red background"></button>
+        <button class="swatch" data-tint="purple" style="--sw:#9333ea" title="Purple" aria-label="Purple background"></button>
       </div>
       <div class="field tint-opacity disabled" id="tintOpacityField" style="margin-top:10px">
-        <label for="tintOpacity">Độ đậm <span id="tintOpacityVal" class="mono">8%</span></label>
+        <label for="tintOpacity">Opacity <span id="tintOpacityVal" class="mono">8%</span></label>
         <input id="tintOpacity" type="range" min="0" max="50" step="1" value="8" disabled>
       </div>
-      <p class="hint">Màu nền chỉ áp cho các vùng xung quanh (sidebar, topbar, dải stat, toolbar, tab). Khu vực log luôn giữ nền gốc để dễ đọc.</p>
+      <p class="hint">The background color only applies to the surrounding areas (sidebar, topbar, stat strip, toolbar, tabs). The log area always keeps the original background for readability.</p>
     </div>
-    <h6>Thông tin</h6>
+    <h6>Info</h6>
     <div class="sideblock foot">
-      <p>File cấu hình: <code id="cfgFile">—</code></p>
-      <p style="margin-top:8px">Giao diện này chỉ chạy trên máy này (127.0.0.1). Mọi thay đổi lưu ngay vào file cấu hình nên khởi động lại vẫn giữ nguyên.</p>
+      <p>Config file: <code id="cfgFile">—</code></p>
+      <p style="margin-top:8px">This interface only runs on this machine (127.0.0.1). Every change is saved to the config file immediately, so it survives restarts.</p>
     </div>
   </nav>
     <div class="fade fade-top" id="sideFadeTop"></div>
@@ -366,34 +366,34 @@
 
   <main class="main">
     <section class="stats">
-      <div class="stat" title="Số đếm trong 1000 dòng log gần nhất"><div class="muted">Đã tạo</div><div class="v mono" id="statCreated">0</div><div class="delta muted mono" id="statCreatedSub">chưa có</div></div>
-      <div class="stat" title="Số đếm trong 1000 dòng log gần nhất"><div class="muted">Đã sửa</div><div class="v mono" id="statModified">0</div><div class="delta muted mono" id="statModifiedSub">chưa có</div></div>
-      <div class="stat" title="Số đếm trong 1000 dòng log gần nhất"><div class="muted">Đã xóa</div><div class="v mono" id="statRemoved">0</div><div class="delta muted mono" id="statRemovedSub">chưa có</div></div>
-      <div class="stat" title="Số đếm trong 1000 dòng log gần nhất"><div class="muted">Đổi tên</div><div class="v mono" id="statRenamed">0</div><div class="delta muted mono" id="statRenamedSub">chưa có</div></div>
+      <div class="stat" title="Counts within the latest 1000 log lines"><div class="muted">Created</div><div class="v mono" id="statCreated">0</div><div class="delta muted mono" id="statCreatedSub">none yet</div></div>
+      <div class="stat" title="Counts within the latest 1000 log lines"><div class="muted">Modified</div><div class="v mono" id="statModified">0</div><div class="delta muted mono" id="statModifiedSub">none yet</div></div>
+      <div class="stat" title="Counts within the latest 1000 log lines"><div class="muted">Removed</div><div class="v mono" id="statRemoved">0</div><div class="delta muted mono" id="statRemovedSub">none yet</div></div>
+      <div class="stat" title="Counts within the latest 1000 log lines"><div class="muted">Renamed</div><div class="v mono" id="statRenamed">0</div><div class="delta muted mono" id="statRenamedSub">none yet</div></div>
     </section>
     <div class="toolbar">
-      <label><input type="checkbox" class="kindf" value="created" checked> Tạo</label>
-      <label><input type="checkbox" class="kindf" value="modified" checked> Sửa</label>
-      <label><input type="checkbox" class="kindf" value="removed" checked> Xóa</label>
-      <label><input type="checkbox" class="kindf" value="renamed" checked> Đổi tên</label>
-      <input id="search" type="text" placeholder="Lọc theo tên file…" autocomplete="off">
+      <label><input type="checkbox" class="kindf" value="created" checked> Created</label>
+      <label><input type="checkbox" class="kindf" value="modified" checked> Modified</label>
+      <label><input type="checkbox" class="kindf" value="removed" checked> Removed</label>
+      <label><input type="checkbox" class="kindf" value="renamed" checked> Renamed</label>
+      <input id="search" type="text" placeholder="Filter by file name…" autocomplete="off">
       <div class="spacer"></div>
-      <label><input type="checkbox" id="autoscroll" checked> Tự cuộn</label>
-      <button id="pauseBtn">Tạm dừng</button>
-      <button id="clearBtn">Xóa log</button>
+      <label><input type="checkbox" id="autoscroll" checked> Auto-scroll</label>
+      <button id="pauseBtn">Pause</button>
+      <button id="clearBtn">Clear log</button>
     </div>
     <div class="tabs">
-      <button class="tabbtn active" data-tab="all">Tất cả <span class="tabcount" id="countAll"></span></button>
-      <button class="tabbtn" data-tab="pinned">Đã ghim <span class="tabcount" id="countPinned"></span></button>
-      <button class="tabbtn" data-tab="deleted">Đã xóa <span class="tabcount" id="countDeleted"></span></button>
+      <button class="tabbtn active" data-tab="all">All <span class="tabcount" id="countAll"></span></button>
+      <button class="tabbtn" data-tab="pinned">Pinned <span class="tabcount" id="countPinned"></span></button>
+      <button class="tabbtn" data-tab="deleted">Deleted <span class="tabcount" id="countDeleted"></span></button>
     </div>
     <div class="logwrap">
-      <div id="log"><p class="empty">Chưa có thay đổi nào. Sửa, tạo hoặc xóa file trong thư mục đang theo dõi để thấy log ở đây.</p></div>
+      <div id="log"><p class="empty">No changes yet. Create, modify, or delete a file in a watched folder to see log entries here.</p></div>
       <div class="fade fade-top" id="logFadeTop"></div>
       <div class="fade fade-bottom" id="logFadeBottom"></div>
     </div>
   </main>
-  <div id="sideResizer" tabindex="0" role="separator" aria-orientation="vertical" aria-label="Đổi chiều rộng sidebar" title="Kéo để đổi chiều rộng sidebar (bấm đúp để về 320px)"></div>
+  <div id="sideResizer" tabindex="0" role="separator" aria-orientation="vertical" aria-label="Resize sidebar" title="Drag to resize the sidebar (double-click to reset to 320px)"></div>
 </div>
 <div id="toast"></div>
 <script>
@@ -465,7 +465,7 @@
     appEl.style.setProperty("--side-w", sideW + "px");
     appEl.classList.toggle("collapsed", sideCollapsed);
     sideToggleEl.textContent = sideCollapsed ? "›" : "‹";
-    sideToggleEl.title = sideCollapsed ? "Mở sidebar" : "Thu gọn sidebar";
+    sideToggleEl.title = sideCollapsed ? "Expand sidebar" : "Collapse sidebar";
     resizerEl.setAttribute("aria-valuenow", String(sideW));
   }
   function saveSideState() {
@@ -711,12 +711,12 @@
 
   var KIND_LABEL = { created: "CREATED", modified: "MODIFIED", removed: "REMOVED", renamed: "RENAMED" };
 
-  // Định dạng byte như phía Rust: đơn vị 1024, dấu phẩy thập phân.
+  // Byte formatting, same as the Rust side: base 1024, decimal point.
   function formatBytes(n) {
     if (n < 1024) return n + " B";
-    if (n < 1048576) return (n / 1024).toFixed(1).replace(".", ",") + " KB";
-    if (n < 1073741824) return (n / 1048576).toFixed(1).replace(".", ",") + " MB";
-    return (n / 1073741824).toFixed(1).replace(".", ",") + " GB";
+    if (n < 1048576) return (n / 1024).toFixed(1) + " KB";
+    if (n < 1073741824) return (n / 1048576).toFixed(1) + " MB";
+    return (n / 1073741824).toFixed(1) + " GB";
   }
 
   function sizeText(e) {
@@ -835,8 +835,8 @@
     }
     if (first === null || last === null) return null;
     var d = last - first;
-    if (d === 0) return "tổng ±0 B";
-    return "tổng " + (d > 0 ? "+" : "-") + formatBytes(Math.abs(d));
+    if (d === 0) return "net ±0 B";
+    return "net " + (d > 0 ? "+" : "-") + formatBytes(Math.abs(d));
   }
 
   function isPinned(path) {
@@ -870,10 +870,10 @@
         lastEv = e;
       }
     });
-    if (!isWatched(c)) return "ngoài vùng theo dõi" + (count ? " · " + count + " event" : "");
-    if (!lastEv) return "chưa có event";
-    if (lastEv.event === "removed") return "đã xóa · " + count + " event";
-    return KIND_LABEL[lastEv.event] + " " + shortTime(lastEv.time) + " · " + count + " event";
+    if (!isWatched(c)) return "outside watched folders" + (count ? " · " + count + (count === 1 ? " event" : " events") : "");
+    if (!lastEv) return "no events yet";
+    if (lastEv.event === "removed") return "deleted · " + count + (count === 1 ? " event" : " events");
+    return KIND_LABEL[lastEv.event] + " " + shortTime(lastEv.time) + " · " + count + (count === 1 ? " event" : " events");
   }
 
   // Badge thư mục cha: bấm để copy full path + tên file.
@@ -891,7 +891,7 @@
     // file đã xóa thì làm ở tab Đã ghim.
     if (activeTab === "deleted") return "";
     var on = isPinned(path);
-    return '<button class="pinbtn' + (on ? " on" : "") + '" data-pin="' + esc(path) + '" title="' + (on ? "Bỏ ghim file này" : "Ghim file này") + '">📌</button>';
+    return '<button class="pinbtn' + (on ? " on" : "") + '" data-pin="' + esc(path) + '" title="' + (on ? "Unpin this file" : "Pin this file") + '">📌</button>';
   }
 
   // Phần đường dẫn của 1 dòng log: badge + tên file. Đổi tên: tên cũ
@@ -935,16 +935,16 @@
   // Ghim chỉ bằng nút 📌 ở dòng log (0.9.4 bỏ ô nhập đường dẫn
   // ghim tay vì gây rối UX).
   function pinManageHtml() {
-    var html = '<div class="pinmanage"><h6>File đã ghim (' + pins.length + ")</h6>";
+    var html = '<div class="pinmanage"><h6>Pinned files (' + pins.length + ")</h6>";
     if (!pins.length) {
-      html += '<p class="hint">Chưa ghim file nào. Bấm 📌 ở dòng log để ghim file đó.</p>';
+      html += '<p class="hint">No files pinned yet. Click 📌 on a log row to pin that file.</p>';
     } else {
       html += '<ul class="pinlist">';
       pins.forEach(function (p) {
         var sp = splitPath(p.path);
         html += '<li>' + badgeHtml(p.path) + ' <span class="fname">' + esc(sp.name) + "</span>"
           + '<span class="pinstatus">' + esc(pinStatus(p.path)) + "</span>"
-          + '<button class="pinunpin" data-unpin="' + esc(p.path) + '" title="Bỏ ghim">×</button></li>';
+          + '<button class="pinunpin" data-unpin="' + esc(p.path) + '" title="Unpin">×</button></li>';
       });
       html += "</ul>";
     }
@@ -974,7 +974,7 @@
 
   function setStat(id, n, lastTime) {
     document.getElementById(id).textContent = String(n);
-    document.getElementById(id + "Sub").textContent = lastTime ? "mới nhất " + shortTime(lastTime) : "chưa có";
+    document.getElementById(id + "Sub").textContent = lastTime ? "latest " + shortTime(lastTime) : "none yet";
   }
 
   function render() {
@@ -1027,16 +1027,16 @@
     }
     if (!groups.length) {
       var filtering = q.length > 0 || !kinds.created || !kinds.modified || !kinds.removed || !kinds.renamed;
-      if (filtering || tabs[activeTab].length > 0) html += '<p class="empty">Không có dòng nào khớp bộ lọc.</p>';
-      else if (activeTab === "deleted") html += '<p class="empty">Chưa có file nào bị xóa.</p>';
-      else if (activeTab === "pinned") { if (pins.length) html += '<p class="empty">Chưa có event nào của file đã ghim.</p>'; }
-      else if (!entries.length) html += '<p class="empty">Chưa có thay đổi nào. Sửa, tạo hoặc xóa file trong thư mục đang theo dõi để thấy log ở đây.</p>';
-      else html += '<p class="empty">Mọi file đều đã bị xóa — xem tab Đã xóa.</p>';
+      if (filtering || tabs[activeTab].length > 0) html += '<p class="empty">No rows match the filter.</p>';
+      else if (activeTab === "deleted") html += '<p class="empty">No files have been deleted yet.</p>';
+      else if (activeTab === "pinned") { if (pins.length) html += '<p class="empty">No events for pinned files yet.</p>'; }
+      else if (!entries.length) html += '<p class="empty">No changes yet. Create, modify, or delete a file in a watched folder to see log entries here.</p>';
+      else html += '<p class="empty">All files have been deleted — see the Deleted tab.</p>';
     }
     prevGroupCounts = newCounts;
     logEl.innerHTML = html;
     if (document.getElementById("autoscroll").checked) logEl.scrollTop = logEl.scrollHeight;
-    countsEl.textContent = entries.length + " dòng · " + lastSeq + " event (từ khi chạy)";
+    countsEl.textContent = entries.length + (entries.length === 1 ? " row" : " rows") + " · " + lastSeq + (lastSeq === 1 ? " event" : " events") + " (since start)";
     updateFades();
   }
 
@@ -1064,7 +1064,7 @@
   function copyPath(btn) {
     var text = btn.getAttribute("data-copy") || "";
     var done = function (ok) {
-      btn.textContent = ok ? "✓ Đã copy" : "✗ Lỗi copy";
+      btn.textContent = ok ? "✓ Copied" : "✗ Copy failed";
       setTimeout(function () {
         if (btn.isConnected) btn.textContent = btn.getAttribute("data-label") || "";
       }, 1000);
@@ -1095,9 +1095,9 @@
     postForm("/api/pins", { action: adding ? "add" : "remove", path: path }).then(function (res) {
       if (res.ok) {
         loadConfig(); // tải lại pins từ server rồi render
-        showToast(adding ? "Đã ghim file." : "Đã bỏ ghim.");
+        showToast(adding ? "File pinned." : "File unpinned.");
       } else {
-        showToast(res.err || "Ghim thất bại.");
+        showToast(res.err || "Failed to pin.");
       }
     });
   }
@@ -1105,7 +1105,7 @@
   function connect() {
     if (es) es.close();
     es = new EventSource("/events?after=" + lastSeq);
-    es.onopen = function () { setStatus(true, "Đã kết nối — log realtime"); };
+    es.onopen = function () { setStatus(true, "Connected — live log"); };
     es.onmessage = function (ev) {
       try {
         var e = JSON.parse(ev.data);
@@ -1115,7 +1115,7 @@
       catch (err) { /* bỏ qua dòng hỏng */ }
     };
     es.onerror = function () {
-      setStatus(false, "Mất kết nối — đang thử lại…");
+      setStatus(false, "Connection lost — retrying…");
       es.close();
       es = null;
       if (reconnectTimer) clearTimeout(reconnectTimer);
@@ -1135,7 +1135,7 @@
       span.textContent = cleanPath(d);
       var btn = document.createElement("button");
       btn.textContent = "×";
-      btn.title = "Bỏ theo dõi thư mục này";
+      btn.title = "Stop watching this folder";
       btn.addEventListener("click", function () { removeDir(d); });
       li.appendChild(span);
       li.appendChild(btn);
@@ -1147,7 +1147,7 @@
     document.getElementById("debounce").value = cfg.debounce_ms;
     document.getElementById("exts").value = (cfg.exts || []).join(",");
     document.getElementById("ignores").value = (cfg.ignores || []).join(",");
-    cfgFileEl.textContent = cfg.config_file || "không lưu file (chỉ phiên này)";
+    cfgFileEl.textContent = cfg.config_file || "not saved to a file (this session only)";
     render();
   }
 
@@ -1155,7 +1155,7 @@
     fetch("/api/config")
       .then(function (r) { return r.json(); })
       .then(fillConfig)
-      .catch(function () { setStatus(false, "Không tải được cấu hình"); });
+      .catch(function () { setStatus(false, "Failed to load config"); });
   }
 
   function loadLog() {
@@ -1180,11 +1180,11 @@
 
   function addDir() {
     var dir = dirInputEl.value.trim();
-    if (!dir) { dirErrorEl.textContent = "Chưa nhập đường dẫn thư mục."; return; }
+    if (!dir) { dirErrorEl.textContent = "No folder path entered."; return; }
     dirErrorEl.textContent = "";
     postForm("/api/dirs", { action: "add", dir: dir }).then(function (res) {
       if (res.ok) { dirInputEl.value = ""; loadConfig(); }
-      else dirErrorEl.textContent = res.err || "Thêm thư mục thất bại.";
+      else dirErrorEl.textContent = res.err || "Failed to add folder.";
     });
   }
 
@@ -1192,7 +1192,7 @@
     dirErrorEl.textContent = "";
     postForm("/api/dirs", { action: "remove", dir: dir }).then(function (res) {
       if (res.ok) loadConfig();
-      else dirErrorEl.textContent = res.err || "Xóa thư mục thất bại.";
+      else dirErrorEl.textContent = res.err || "Failed to remove folder.";
     });
   }
 
@@ -1206,11 +1206,11 @@
       ignores: document.getElementById("ignores").value
     }).then(function (res) {
       if (res.ok) {
-        cfgMsgEl.textContent = "Đã áp dụng và lưu vào file cấu hình.";
+        cfgMsgEl.textContent = "Applied and saved to the config file.";
         loadConfig();
       } else {
         cfgMsgEl.className = "error";
-        cfgMsgEl.textContent = res.err || "Áp dụng thất bại.";
+        cfgMsgEl.textContent = res.err || "Failed to apply.";
       }
     });
   }
@@ -1223,7 +1223,7 @@
   document.getElementById("clearBtn").addEventListener("click", function () { entries = []; render(); });
   document.getElementById("pauseBtn").addEventListener("click", function () {
     paused = !paused;
-    this.textContent = paused ? "Tiếp tục" : "Tạm dừng";
+    this.textContent = paused ? "Resume" : "Pause";
     if (!paused) render();
   });
   document.querySelectorAll(".tabbtn").forEach(function (btn) {

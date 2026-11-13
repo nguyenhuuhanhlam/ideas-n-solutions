@@ -7,6 +7,10 @@ Với `--serve`, app mở thêm giao diện web local (http://127.0.0.1:8787)
 để cấu hình thư mục theo dõi và xem log theo thời gian thực — vẫn 1
 file binary duy nhất, không thêm dependency (xem "Giao diện web").
 
+Giao diện web và CLI dùng tiếng Anh (từ 0.9.5); tài liệu này vẫn
+viết bằng tiếng Việt, chỉ các nhãn trong giao diện được trích
+nguyên văn bằng tiếng Anh.
+
 ## Vì sao nhẹ, nhanh
 
 - **Không polling.** Dùng API thông báo của hệ điều hành qua crate
@@ -92,7 +96,7 @@ luôn sạch — pipe sang file hay tool khác chỉ nhận event.
 | `--ignore <a,b>` | — | Bỏ qua đường dẫn chứa chuỗi này (không phân biệt hoa/thường, vd: `.tmp,~$,node_modules`). |
 | `--log <file>` | — | Ghi thêm mọi dòng event vào file (append, cùng định dạng với stdout). File log nằm trong thư mục đang theo dõi vẫn an toàn: event do chính nó gây ra được tự loại, không vòng lặp. |
 | `--json` | dạng đọc | In mỗi event 1 dòng JSON thay vì dạng đọc được. |
-| `--exec "<lệnh>"` | — | Chạy lệnh mỗi khi có event, không chờ kết quả (không chặn watcher). Placeholder: `{path}` `{event}` `{time}` `{from}` `{user}` `{pc}` `{size}` `{delta}` — `{size}`/`{delta}` là số byte thô, rỗng khi không rõ. Chạy qua `cmd /C` trên Windows, `sh -c` trên Linux/macOS. |
+| `--exec "<command>"` | — | Chạy lệnh mỗi khi có event, không chờ kết quả (không chặn watcher). Placeholder: `{path}` `{event}` `{time}` `{from}` `{user}` `{pc}` `{size}` `{delta}` — `{size}`/`{delta}` là số byte thô, rỗng khi không rõ. Chạy qua `cmd /C` trên Windows, `sh -c` trên Linux/macOS. |
 | `--pc-id <id>` | hostname | Ghi đè PC ID trong log (mặc định: hostname của máy, xem "User + PC ID trong log"). |
 | `-h, --help` | — | Hiện hướng dẫn. |
 | `-V, --version` | — | Hiện phiên bản. |
@@ -116,8 +120,8 @@ không truy cập được từ máy khác trong mạng.
   Trên Windows, đường dẫn hiển thị và lưu luôn dạng thường (`C:\...`):
   tiền tố verbatim `\\?\` do hệ thống sinh ra được bỏ đi ngay khi
   nhận — kể cả đường dẫn trong file cấu hình cũ.
-- **Cài đặt:** đệ quy (bật/tắt), debounce (ms), chỉ đuôi file, bỏ
-  qua chuỗi — nút Áp dụng lưu ngay vào file cấu hình. Đổi đệ quy
+- **Settings:** đệ quy (bật/tắt), debounce (ms), chỉ đuôi file, bỏ
+  qua chuỗi — nút Apply lưu ngay vào file cấu hình. Đổi đệ quy
   thì app watch lại toàn bộ thư mục với chế độ mới; đổi bộ lọc áp
   dụng ngay cho event tiếp theo.
 - **Log realtime:** event mới hiện ngay qua SSE (Server-Sent Events),
@@ -131,22 +135,22 @@ không truy cập được từ máy khác trong mạng.
   mới, tên cũ hiện chữ thường.
 - **Nhóm (collapse):** event của cùng 1 file trong 5 phút gộp
   thành 1 nhóm; nhóm từ 3 event trở lên thu gọn mặc định, hiện số
-  lượng, khoảng giờ, event mới nhất và chênh lệch ròng (`tổng`).
+  lượng, khoảng giờ, event mới nhất và chênh lệch ròng (`net`).
   Bấm vào nhóm để mở ra xem từng event. Event mới vào nhóm đang
   thu gọn chỉ tăng số đếm (kèm chớp sáng nhẹ), không tự bung ra.
   Khi đang gõ tìm kiếm, các nhóm tự bung ra để thấy dòng khớp.
-- **Tabs:** log chia 3 tab — **Tất cả** (chỉ file đang tồn tại),
-  **Đã ghim** (event của file đã ghim), **Đã xóa** (toàn bộ lịch sử
+- **Tabs:** log chia 3 tab — **All** (chỉ file đang tồn tại),
+  **Pinned** (event của file đã ghim), **Deleted** (toàn bộ lịch sử
   của file đã bị xóa, kể cả tạo/sửa trước khi xóa). File bị xóa rồi
-  tạo lại: lịch sử cũ ở lại tab Đã xóa, event mới quay về Tất cả.
-  Tab Đã xóa không hiện nút ghim (file đã xóa thì ghim không có tác
-  dụng; muốn bỏ ghim file đã xóa thì làm ở tab Đã ghim).
+  tạo lại: lịch sử cũ ở lại tab Deleted, event mới quay về All.
+  Tab Deleted không hiện nút ghim (file đã xóa thì ghim không có tác
+  dụng; muốn bỏ ghim file đã xóa thì làm ở tab Pinned).
 - **Ghim file:** bấm 📌 ở dòng log hoặc nhóm để ghim file đó (bấm
-  lại để bỏ ghim). Tab Đã ghim chỉ liệt kê file đã ghim kèm trạng
+  lại để bỏ ghim). Tab Pinned chỉ liệt kê file đã ghim kèm trạng
   thái và nút × để bỏ ghim (từ 0.9.4 bỏ ô nhập đường dẫn ghim tay
   vì gây rối UX). Ghim là đường dẫn cố định, không chạy theo đổi
   tên. File ngoài vùng theo dõi vẫn ghim được, hiện trạng thái
-  "ngoài vùng theo dõi". Ghim lưu vào file cấu hình JSON (mục
+  "outside watched folders". Ghim lưu vào file cấu hình JSON (mục
   `"pins"`) nên khởi động lại vẫn còn; dữ liệu ghim đã để sẵn chỗ
   cho lệnh xử lý riêng theo file (sẽ làm sau).
 - **Phong cách hairline grid:** nền sáng (tối theo hệ thống qua
@@ -165,7 +169,7 @@ không truy cập được từ máy khác trong mạng.
   khi còn nội dung phía trên/dưới thì mép tương ứng hiện vệt mờ
   nhạt, mờ dần khi cuộn tới cuối. Cuộn bằng chuột/bàn phím như
   bình thường.
-- **Màu nền:** mục "Màu nền" ở sidebar chọn màu nền cho các vùng
+- **Background color:** mục "Background color" ở sidebar chọn màu nền cho các vùng
   xung quanh (sidebar, topbar, dải stat, toolbar, tab) — 6 màu
   cơ bản (xám, xanh dương, xanh lá, vàng, đỏ, tím) + mặc định
   không màu; thanh trượt chỉnh độ đậm 0–50% (mặc định 8%).
@@ -305,7 +309,7 @@ hostname), dùng flag `--pc-id`:
 file-watcher D:\code\project --pc-id may-phong-ke-toan
 ```
 
-Định danh cũng hiện trên banner khởi động (`máy: lam@desktop-iua61p0`),
+Định danh cũng hiện trên banner khởi động (`machine: lam@desktop-iua61p0`),
 trên đầu giao diện web, trong `GET /api/config` (`"user"`, `"pc"`),
 và dùng được trong `--exec` qua placeholder `{user}` `{pc}`.
 
