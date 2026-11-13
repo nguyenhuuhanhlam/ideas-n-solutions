@@ -121,6 +121,28 @@ không truy cập được từ máy khác trong mạng.
   màu theo loại (tạo/sửa/xóa/đổi tên), có lọc theo loại + tìm theo
   tên file, tạm dừng, tự cuộn, xóa log hiển thị. Trang tải lần đầu
   nhận tối đa 1000 dòng log gần nhất.
+- **Badge thư mục cha:** mỗi dòng log chỉ hiện tên file kèm badge
+  là 2 đoạn cuối của thư mục cha (vd: `…/project/src`) thay vì
+  full path dài. Rê chuột vào badge thấy full path, bấm vào badge
+  để copy full path + tên file. Dòng đổi tên chỉ gắn badge ở tên
+  mới, tên cũ hiện chữ thường.
+- **Nhóm (collapse):** event của cùng 1 file trong 5 phút gộp
+  thành 1 nhóm; nhóm từ 3 event trở lên thu gọn mặc định, hiện số
+  lượng, khoảng giờ, event mới nhất và chênh lệch ròng (`tổng`).
+  Bấm vào nhóm để mở ra xem từng event. Event mới vào nhóm đang
+  thu gọn chỉ tăng số đếm (kèm chớp sáng nhẹ), không tự bung ra.
+  Khi đang gõ tìm kiếm, các nhóm tự bung ra để thấy dòng khớp.
+- **Tabs:** log chia 3 tab — **Tất cả** (chỉ file đang tồn tại),
+  **Đã ghim** (event của file đã ghim), **Đã xóa** (toàn bộ lịch sử
+  của file đã bị xóa, kể cả tạo/sửa trước khi xóa). File bị xóa rồi
+  tạo lại: lịch sử cũ ở lại tab Đã xóa, event mới quay về Tất cả.
+- **Ghim file:** bấm 📌 ở dòng log hoặc nhóm để ghim file đó (bấm
+  lại để bỏ ghim), hoặc gõ đường dẫn trong tab Đã ghim. Ghim là
+  đường dẫn cố định, không chạy theo đổi tên. File ngoài vùng theo
+  dõi vẫn ghim được, hiện trạng thái "ngoài vùng theo dõi". Ghim
+  lưu vào file cấu hình dạng dòng `@pin ...` nên khởi động lại vẫn
+  còn; dữ liệu ghim đã để sẵn chỗ cho lệnh xử lý riêng theo file
+  (sẽ làm sau).
 - **Khởi động rỗng:** `--serve` không cần thư mục nào — mở giao diện
   rồi thêm thư mục sau cũng được; file `watch.txt` được tạo khi lưu
   thay đổi đầu tiên.
@@ -135,6 +157,7 @@ API dùng nội bộ (không cần nhớ để xài giao diện):
 | `GET /api/log?after=N` | Log gần đây, các event có số thứ tự > N. |
 | `POST /api/dirs` | Thêm/xóa thư mục (`action=add\|remove&dir=...`). |
 | `POST /api/config` | Đổi cài đặt (`recursive` / `debounce_ms` / `exts` / `ignores`). |
+| `POST /api/pins` | Ghim/bỏ ghim file (`action=add\|remove&path=...`). |
 
 ## File cấu hình
 
@@ -146,9 +169,14 @@ Ngoài danh sách thư mục, file cấu hình còn chứa được cài đặt 
 @debounce 200
 @exts rs,md
 @ignore target,node_modules
+@pin D:\code\project\quan-trong.txt
 D:\code\project
 C:\Users\ten\Documents\ghi-chu
 ```
+
+Dòng `@pin <đường-dẫn-file>` ghim 1 file để theo dõi riêng trong
+giao diện web (tab Đã ghim). Đường dẫn tương đối hiểu theo thư mục
+chứa file cấu hình, giống thư mục. Ghim trùng nhau tự loại bỏ.
 
 - File cũ chỉ có thư mục (không có dòng `@`) vẫn đọc bình thường.
 - Dòng `@` không rõ hoặc giá trị sai thì app báo lỗi rõ dòng nào
@@ -297,14 +325,17 @@ im lặng — event đã mất thì không bịa lại được.
   log của giao diện web.
 - `src/web.rs` — giao diện web: HTTP server viết tay bằng
   `std::net::TcpListener` (không thêm dependency), SSE log realtime,
-  API cấu hình/thư mục. Trạng thái dùng chung với vòng lặp watcher
+  API cấu hình/thư mục/ghim. Trạng thái dùng chung với vòng lặp watcher
   qua `Shared` (Mutex) nên thêm/xóa thư mục áp dụng ngay.
 - `src/ui.html` — trang giao diện duy nhất, nhúng vào binary lúc
   build (`include_str!`), vanilla JS, không framework, không asset
-  ngoài.
+  ngoài. Nhóm/collapse, tabs, badge copy, ghim đều xử lý ở client
+  (server chỉ lưu ghim + phục vụ event).
 
 ## Chưa có (hướng mở rộng)
 
+- Quy trình xử lý riêng theo file ghim (vd: file ghim bị sửa thì
+  chạy 1 lệnh riêng) — dữ liệu ghim đã có sẵn chỗ cho lệnh.
 - Tray app Windows có cửa sổ Settings chọn thư mục (kiểu
   Clipboard Tool) thay vì CLI.
 - Chạy nền dạng service / autostart khi đăng nhập Windows.

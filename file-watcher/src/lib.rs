@@ -931,6 +931,27 @@ where
     Ok(args)
 }
 
+/// 1 file được ghim trong giao diện web (tab Đã ghim).
+/// Ghim là đường dẫn cố định: file bị đổi tên thì ghim ở lại đường
+/// dẫn cũ, không chạy theo tên mới (chốt với user 2026-11-13).
+/// `command` để dành cho quy trình xử lý riêng theo file (vd: chạy
+/// lệnh khi file này bị sửa) — chưa dùng ở 0.5.0, luôn None; file
+/// cấu hình hiện chỉ lưu đường dẫn.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Pin {
+    pub path: PathBuf,
+    pub command: Option<String>,
+}
+
+impl Pin {
+    pub fn new(path: PathBuf) -> Self {
+        Pin {
+            path,
+            command: None,
+        }
+    }
+}
+
 /// Cài đặt đi kèm danh sách thư mục trong file cấu hình.
 /// Giá trị mặc định = giá trị mặc định của CLI.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -939,6 +960,7 @@ pub struct Settings {
     pub ignores: Vec<String>,
     pub debounce_ms: u64,
     pub recursive: bool,
+    pub pins: Vec<Pin>,
 }
 
 impl Default for Settings {
@@ -948,6 +970,7 @@ impl Default for Settings {
             ignores: Vec::new(),
             debounce_ms: 200,
             recursive: true,
+            pins: Vec::new(),
         }
     }
 }
@@ -960,10 +983,12 @@ impl Default for Settings {
 /// @ignore target,node_modules
 /// @debounce 200
 /// @recursive true
+/// @pin D:\code\project\quan-trong.txt
 /// ```
 ///
 /// Đường dẫn tương đối được hiểu tương đối theo thư mục chứa file cấu
-/// hình. File cũ (chỉ có thư mục, không có dòng @) vẫn đọc bình thường.
+/// hình (cả thư mục lẫn @pin). File cũ (chỉ có thư mục, không có dòng
+/// @) vẫn đọc bình thường.
 pub fn load_config(config_path: &str) -> Result<(Vec<String>, Settings), String> {
     let text = std::fs::read_to_string(config_path)
         .map_err(|e| format!("không đọc được file cấu hình {config_path}: {e}"))?;
@@ -1000,9 +1025,30 @@ pub fn load_config(config_path: &str) -> Result<(Vec<String>, Settings), String>
                         ));
                     }
                 },
+                "pin" => {
+                    // value là toàn bộ phần còn lại của dòng (đường
+                    // dẫn có thể chứa khoảng trắng). Trùng nhau thì
+                    // giữ dòng đầu tiên.
+                    if value.is_empty() {
+                        return Err(format!(
+                            "{config_path} dòng {}: @pin thiếu đường dẫn",
+                            lineno + 1
+                        ));
+                    }
+                    let p = Path::new(value);
+                    let resolved = if p.is_absolute() || base.is_none() {
+                        p.to_path_buf()
+                    } else {
+                        base.unwrap().join(p)
+                    };
+                    let pin = Pin::new(resolved);
+                    if !settings.pins.contains(&pin) {
+                        settings.pins.push(pin);
+                    }
+                }
                 _ => {
                     return Err(format!(
-                        "{config_path} dòng {}: cài đặt không rõ: @{key} (chỉ có @exts, @ignore, @debounce, @recursive)",
+                        "{config_path} dòng {}: cài đặt không rõ: @{key} (chỉ có @exts, @ignore, @debounce, @recursive, @pin)",
                         lineno + 1
                     ));
                 }
@@ -1037,6 +1083,9 @@ pub fn save_config(config_path: &Path, dirs: &[PathBuf], settings: &Settings) ->
     }
     if !settings.ignores.is_empty() {
         out.push_str(&format!("@ignore {}\n", settings.ignores.join(",")));
+    }
+    for pin in &settings.pins {
+        out.push_str(&format!("@pin {}\n", pin.path.to_string_lossy()));
     }
     for dir in dirs {
         out.push_str(&dir.to_string_lossy());
@@ -1426,10 +1475,10 @@ mod tests {
         assert_eq!(dirs[0], "/a/code");
         assert!(dirs[1].ends_with("b/relative"));
         assert_eq!(settings, Settings::default());
-        // File có dòng @: parse đủ 4 cài đặt, lỗi rõ khi sai.
+        // File có dòng @: parse đủ cài đặt + @pin, lỗi rõ khi sai.
         std::fs::write(
             &path,
-            "@exts rs,MD\n@ignore target, .tmp\n@debounce 50\n@recursive false\n/a/x\n",
+            "@exts rs,MD\n@ignore target, .tmp\n@debounce 50\n@recursive false\n@pin /a/quan trong.txt\n@pin rel/file.txt\n@pin /a/quan trong.txt\n/a/x\n",
         )
         .unwrap();
         let (dirs, settings) = load_config(path.to_str().unwrap()).unwrap();
@@ -1438,18 +1487,27 @@ mod tests {
         assert_eq!(settings.ignores, vec!["target", "tmp"]);
         assert_eq!(settings.debounce_ms, 50);
         assert!(!settings.recursive);
+        // @pin: đường dẫn có khoảng trắng giữ nguyên, trùng nhau loại
+        // bỏ, tương đối hiểu theo thư mục chứa file cấu hình.
+        assert_eq!(settings.pins.len(), 2);
+        assert_eq!(settings.pins[0].path, PathBuf::from("/a/quan trong.txt"));
+        assert!(settings.pins[1].path.ends_with("rel/file.txt"));
+        assert!(settings.pins[0].command.is_none());
         std::fs::write(&path, "@debounce abc\n").unwrap();
         assert!(load_config(path.to_str().unwrap()).is_err());
         std::fs::write(&path, "@recursive maybe\n").unwrap();
         assert!(load_config(path.to_str().unwrap()).is_err());
+        std::fs::write(&path, "@pin\n").unwrap();
+        assert!(load_config(path.to_str().unwrap()).is_err());
         std::fs::write(&path, "@la-mot-cai-gi-do 1\n").unwrap();
         assert!(load_config(path.to_str().unwrap()).is_err());
-        // Ghi lại rồi đọc lại: khớp.
+        // Ghi lại rồi đọc lại: khớp (kể cả @pin).
         let settings = Settings {
             exts: vec!["rs".to_string()],
             ignores: vec![],
             debounce_ms: 300,
             recursive: true,
+            pins: vec![Pin::new(PathBuf::from("/a/ghim.txt"))],
         };
         save_config(
             &path,

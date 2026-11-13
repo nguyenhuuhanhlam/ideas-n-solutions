@@ -9,12 +9,14 @@
 //! - `GET /events?after=N` — SSE: stream event realtime (JSON 1 dòng,
 //!   cùng định dạng với `--json`), kèm heartbeat mỗi ~15 giây.
 //! - `GET /api/config` — cấu hình hiện tại (thư mục, đệ quy,
-//!   debounce, exts, ignores, file cấu hình).
+//!   debounce, exts, ignores, file cấu hình, danh sách ghim).
 //! - `GET /api/log?after=N` — log gần đây (tối đa 1000 dòng, có số
 //!   thứ tự tăng dần để client nối tiếp qua SSE mà không sót/trùng).
 //! - `POST /api/dirs` — thêm/xóa thư mục theo dõi (áp dụng ngay,
 //!   lưu vào file cấu hình).
 //! - `POST /api/config` — đổi cài đặt (áp dụng ngay, lưu vào file).
+//! - `POST /api/pins` — ghim/bỏ ghim 1 file (lưu vào file cấu hình
+//!   dạng dòng `@pin ...`; không đổi watcher).
 //!
 //! Mọi thay đổi từ giao diện đều: áp dụng live trước, lưu file sau;
 //! lưu lỗi thì rollback thay đổi live và trả lỗi cho giao diện.
@@ -28,7 +30,7 @@ use std::time::Duration;
 
 use notify::{RecursiveMode, Watcher};
 
-use crate::{json_escape, save_config, split_list, Filter, Identity, Settings};
+use crate::{json_escape, save_config, split_list, Filter, Identity, Pin, Settings};
 
 /// Trang giao diện duy nhất, nhúng vào binary lúc build.
 const UI_HTML: &str = include_str!("ui.html");
@@ -52,6 +54,9 @@ pub struct SharedState {
     config_path: Option<PathBuf>,
     /// Định danh máy + user (cố định trong suốt phiên chạy).
     identity: Identity,
+    /// File được ghim từ giao diện web (tab Đã ghim). Chỉ là trạng
+    /// thái hiển thị, không ảnh hưởng watcher; lưu vào file cấu hình.
+    pins: Vec<Pin>,
     /// (số thứ tự tăng dần, 1 dòng JSON của event).
     log: VecDeque<(u64, String)>,
     seq: u64,
@@ -75,6 +80,7 @@ impl Shared {
         recursive: bool,
         config_path: Option<PathBuf>,
         identity: Identity,
+        pins: Vec<Pin>,
     ) -> Self {
         Shared(Arc::new(Mutex::new(SharedState {
             watcher,
@@ -84,6 +90,7 @@ impl Shared {
             recursive,
             config_path,
             identity,
+            pins,
             log: VecDeque::new(),
             seq: 0,
         })))
@@ -138,8 +145,19 @@ impl Shared {
             Some(p) => format!("\"{}\"", json_escape(&p.to_string_lossy())),
             None => "null".to_string(),
         };
+        // `command` để dành cho quy trình riêng theo file, hiện luôn null.
+        let pins: Vec<String> = st
+            .pins
+            .iter()
+            .map(|p| {
+                format!(
+                    "{{\"path\":\"{}\",\"command\":null}}",
+                    json_escape(&p.path.to_string_lossy())
+                )
+            })
+            .collect();
         format!(
-            "{{\"dirs\":[{}],\"recursive\":{},\"debounce_ms\":{},\"exts\":[{}],\"ignores\":[{}],\"config_file\":{},\"events\":{},\"user\":\"{}\",\"pc\":\"{}\"}}",
+            "{{\"dirs\":[{}],\"recursive\":{},\"debounce_ms\":{},\"exts\":[{}],\"ignores\":[{}],\"config_file\":{},\"events\":{},\"user\":\"{}\",\"pc\":\"{}\",\"pins\":[{}]}}",
             list(&dirs),
             st.recursive,
             st.debounce_ms,
@@ -148,7 +166,8 @@ impl Shared {
             config_file,
             st.seq,
             json_escape(&st.identity.user),
-            json_escape(&st.identity.pc)
+            json_escape(&st.identity.pc),
+            pins.join(",")
         )
     }
 
@@ -162,6 +181,7 @@ impl Shared {
             ignores: st.filter.ignores.clone(),
             debounce_ms: st.debounce_ms,
             recursive: st.recursive,
+            pins: st.pins.clone(),
         };
         save_config(path, &st.roots, &settings)
     }
@@ -213,6 +233,42 @@ impl Shared {
             let mode = mode_of(st.recursive);
             let _ = st.watcher.watch(&removed, mode);
             st.roots.insert(pos, removed);
+            return Err(e);
+        }
+        Ok(())
+    }
+
+    /// Ghim 1 file (tab Đã ghim). Đường dẫn phải tuyệt đối; tồn tại
+    /// thì canonicalize, chưa tồn tại thì giữ nguyên để ghim trước
+    /// file sẽ xuất hiện sau. Ghim trùng thì không làm gì
+    /// (idempotent). Chỉ lưu trạng thái + file cấu hình, không đổi
+    /// watcher — file ngoài vùng theo dõi vẫn ghim được, giao diện
+    /// sẽ đánh dấu "ngoài vùng theo dõi".
+    pub fn add_pin(&self, path: &str) -> Result<(), String> {
+        let normalized = normalize_pin_path(path)?;
+        let mut st = lock(&self.0);
+        if find_pin(&st.pins, &normalized, path).is_some() {
+            return Ok(());
+        }
+        st.pins.push(Pin::new(normalized));
+        if let Err(e) = Self::save_locked(&st) {
+            st.pins.pop();
+            return Err(e);
+        }
+        Ok(())
+    }
+
+    /// Bỏ ghim 1 file. Không có trong danh sách thì vẫn Ok
+    /// (idempotent — giao diện có thể gọi lại sau khi mất mạng).
+    pub fn remove_pin(&self, path: &str) -> Result<(), String> {
+        let normalized = normalize_pin_path(path)?;
+        let mut st = lock(&self.0);
+        let Some(pos) = find_pin(&st.pins, &normalized, path) else {
+            return Ok(());
+        };
+        let removed = st.pins.remove(pos);
+        if let Err(e) = Self::save_locked(&st) {
+            st.pins.insert(pos, removed);
             return Err(e);
         }
         Ok(())
@@ -293,6 +349,36 @@ fn mode_of(recursive: bool) -> RecursiveMode {
     } else {
         RecursiveMode::NonRecursive
     }
+}
+
+/// Chuẩn hóa đường dẫn ghim: phải tuyệt đối; tồn tại thì
+/// canonicalize (gộp symlink, đúng chữ hoa/thường thật trên
+/// Windows); chưa tồn tại thì giữ nguyên. Trên Windows đổi `/`
+/// thành `\` cho nhất quán với đường dẫn event.
+fn normalize_pin_path(path: &str) -> Result<PathBuf, String> {
+    let p = Path::new(path);
+    if !p.is_absolute() {
+        return Err(format!("đường dẫn ghim phải tuyệt đối: {path}"));
+    }
+    if let Ok(canon) = p.canonicalize() {
+        return Ok(canon);
+    }
+    #[cfg(windows)]
+    {
+        Ok(PathBuf::from(path.replace('/', "\\")))
+    }
+    #[cfg(not(windows))]
+    {
+        Ok(p.to_path_buf())
+    }
+}
+
+/// Tìm ghim khớp: so cả dạng đã chuẩn hóa lẫn chuỗi gốc, vì file
+/// ghim lúc chưa tồn tại (lưu dạng thô) có thể đã xuất hiện sau đó
+/// (chuẩn hóa ra dạng khác) — cả 2 đều phải nhận ra là cùng 1 ghim.
+fn find_pin(pins: &[Pin], normalized: &Path, raw: &str) -> Option<usize> {
+    pins.iter()
+        .position(|p| p.path == normalized || p.path.to_string_lossy() == raw)
 }
 
 /// Chạy server web trên listener đã bind sẵn (bind ở luồng chính để
@@ -456,6 +542,19 @@ fn handle_connection(mut stream: TcpStream, shared: &Shared) {
             let result = match form.get("action").map(|s| s.as_str()) {
                 Some("add") => shared.add_dir(&dir),
                 Some("remove") => shared.remove_dir(&dir),
+                _ => Err("action phải là add hoặc remove".to_string()),
+            };
+            match result {
+                Ok(()) => json_ok(&mut stream),
+                Err(e) => json_err(&mut stream, &e),
+            }
+        }
+        ("POST", "/api/pins") => {
+            let form = parse_form(&req.body);
+            let path = form.get("path").cloned().unwrap_or_default();
+            let result = match form.get("action").map(|s| s.as_str()) {
+                Some("add") => shared.add_pin(&path),
+                Some("remove") => shared.remove_pin(&path),
                 _ => Err("action phải là add hoặc remove".to_string()),
             };
             match result {

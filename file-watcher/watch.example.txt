@@ -9,6 +9,10 @@
 #   @debounce 200          gộp event dồn dập trong n mili-giây (mặc định 200)
 #   @exts rs,md            chỉ hiện file có đuôi này (để trống là tất cả)
 #   @ignore target,.tmp    bỏ qua đường dẫn chứa chuỗi này
+#   @pin <đường-dẫn-file>  ghim 1 file để theo dõi riêng (tab Đã ghim);
+#                          1 dòng @pin cho 1 file, đường dẫn có khoảng
+#                          trắng vẫn được; ghim từ giao diện web cũng
+#                          lưu thành dòng @pin ở đây
 # Flag CLI gõ rõ (--ext, --ignore, --debounce-ms, --no-recursive)
 # thắng cài đặt trong file này.
 # Giao diện web (--serve) cũng lưu thay đổi vào file này.

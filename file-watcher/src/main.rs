@@ -190,6 +190,7 @@ fn real_main() -> i32 {
         recursive,
         config_path.clone(),
         identity.clone(),
+        settings.pins.clone(),
     );
 
     // Giao diện web: bind ở luồng chính để cổng bị chiếm báo lỗi ngay.
