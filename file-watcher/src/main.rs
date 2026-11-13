@@ -7,6 +7,11 @@
 //! - Chỉ 2 dependency (notify + chrono), không async runtime.
 //! - Debounce gộp các event dồn dập (vd: 1 lần lưu file của editor)
 //!   thành 1 dòng log duy nhất.
+//!
+//! Với `--serve`, app mở thêm giao diện web trên 127.0.0.1 để cấu
+//! hình thư mục theo dõi và xem log realtime (xem `web.rs`). Giao
+//! diện dùng chung trạng thái với vòng lặp watcher qua `Shared`
+//! (thêm/xóa thư mục áp dụng ngay, không cần khởi động lại).
 
 use std::fs::{File, OpenOptions};
 use std::io::{BufWriter, Write};
@@ -15,9 +20,10 @@ use std::sync::mpsc::{self, RecvTimeoutError};
 use std::time::Duration;
 
 use file_watcher::{
-    format_human, format_json, load_config_dirs, now_string, parse_args, summarize, usage,
-    Coalescer, Filter, Summary, VERSION,
+    format_human, format_json, load_config, now_string, parse_args, summarize, usage,
+    Coalescer, Filter, Settings, Summary, VERSION,
 };
+use file_watcher::web::{serve, Shared};
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
 fn main() {
@@ -43,18 +49,58 @@ fn real_main() -> i32 {
         return 0;
     }
 
-    // Gom thư mục từ CLI + file cấu hình (nếu có).
+    // File cấu hình: --config nếu có; với --serve mà không có --config
+    // thì mặc định dùng watch.txt ở thư mục hiện tại (nếu có).
+    let config_path: Option<PathBuf> = match &args.config {
+        Some(c) => Some(PathBuf::from(c)),
+        None if args.serve => Some(PathBuf::from("watch.txt")),
+        None => None,
+    };
+
+    // Đọc file cấu hình (thư mục + cài đặt @...). File --config chỉ
+    // định rõ mà không đọc được thì báo lỗi và dừng — trừ khi đang
+    // --serve: lúc đó coi như bắt đầu rỗng, giao diện web sẽ tạo file
+    // khi user thêm thư mục đầu tiên.
+    let mut settings = Settings::default();
     let mut raw_dirs = args.dirs.clone();
-    if let Some(config) = &args.config {
-        match load_config_dirs(config) {
-            Ok(mut dirs) => raw_dirs.append(&mut dirs),
+    if let Some(config) = &config_path {
+        let config_str = config.to_string_lossy().into_owned();
+        match load_config(&config_str) {
+            Ok((mut dirs, cfg_settings)) => {
+                settings = cfg_settings;
+                raw_dirs.append(&mut dirs);
+            }
             Err(msg) => {
-                eprintln!("Lỗi: {msg}");
-                return 1;
+                if args.serve && args.config.is_none() {
+                    // watch.txt mặc định chưa có: bắt đầu rỗng.
+                } else if args.serve && !config.exists() {
+                    // File --config chưa tồn tại: bắt đầu rỗng, sẽ
+                    // tạo khi lưu từ giao diện web.
+                } else {
+                    eprintln!("Lỗi: {msg}");
+                    return 1;
+                }
             }
         }
     }
-    if raw_dirs.is_empty() {
+
+    // CLI thắng file cấu hình — nhưng chỉ với flag user gõ rõ (xem
+    // *_set trong Args), nếu không giá trị mặc định của CLI sẽ đè
+    // cài đặt trong file.
+    if args.exts_set {
+        settings.exts = args.exts.clone();
+    }
+    if args.ignores_set {
+        settings.ignores = args.ignores.clone();
+    }
+    if args.debounce_set {
+        settings.debounce_ms = args.debounce_ms;
+    }
+    if args.recursive_set {
+        settings.recursive = args.recursive;
+    }
+
+    if raw_dirs.is_empty() && !args.serve {
         eprintln!("Lỗi: chưa chỉ định thư mục nào để theo dõi.\n");
         eprint!("{}", usage());
         return 1;
@@ -98,11 +144,10 @@ fn real_main() -> i32 {
     }
 
     let filter = Filter {
-        exts: args.exts.clone(),
-        ignores: args.ignores.clone(),
+        exts: settings.exts.clone(),
+        ignores: settings.ignores.clone(),
     };
-    let debounce = Duration::from_millis(args.debounce_ms);
-    let recursive = args.recursive;
+    let recursive = settings.recursive;
 
     let (tx, rx) = mpsc::channel();
     let mut watcher = match RecommendedWatcher::new(tx, Config::default()) {
@@ -124,28 +169,71 @@ fn real_main() -> i32 {
         }
     }
 
+    // Trạng thái dùng chung với giao diện web (thêm/xóa thư mục,
+    // đổi cài đặt, log realtime). Watcher chuyển vào đây để luồng
+    // web có thể watch/unwatch trực tiếp.
+    let shared = Shared::new(
+        watcher,
+        roots.clone(),
+        filter,
+        settings.debounce_ms,
+        recursive,
+        config_path.clone(),
+    );
+
+    // Giao diện web: bind ở luồng chính để cổng bị chiếm báo lỗi ngay.
+    if args.serve {
+        match std::net::TcpListener::bind(("127.0.0.1", args.port)) {
+            Ok(listener) => {
+                let server_shared = shared.clone();
+                std::thread::spawn(move || {
+                    if let Err(e) = serve(listener, server_shared) {
+                        eprintln!("Lỗi: giao diện web dừng: {e}");
+                    }
+                });
+            }
+            Err(e) => {
+                eprintln!(
+                    "Lỗi: không bật được giao diện web trên cổng {}: {e}",
+                    args.port
+                );
+                return 2;
+            }
+        }
+    }
+
     // Banner ra stderr để stdout luôn sạch (pipe sang file / tool khác
     // chỉ nhận event, kể cả khi dùng --json).
     eprintln!(
         "file-watcher {VERSION} — đang lắng nghe {} thư mục ({}; debounce {}ms)",
         roots.len(),
         if recursive { "đệ quy" } else { "không đệ quy" },
-        args.debounce_ms
+        settings.debounce_ms
     );
     for root in &roots {
         eprintln!("  {}", root.display());
     }
-    if !args.exts.is_empty() {
-        eprintln!("  chỉ hiện đuôi: {}", args.exts.join(", "));
+    if !settings.exts.is_empty() {
+        eprintln!("  chỉ hiện đuôi: {}", settings.exts.join(", "));
     }
-    if !args.ignores.is_empty() {
-        eprintln!("  bỏ qua chuỗi: {}", args.ignores.join(", "));
+    if !settings.ignores.is_empty() {
+        eprintln!("  bỏ qua chuỗi: {}", settings.ignores.join(", "));
     }
     if let Some(log) = &args.log {
         eprintln!("  ghi log thêm vào: {log}");
     }
     if args.exec.is_some() {
         eprintln!("  chạy lệnh mỗi event (--exec)");
+    }
+    if args.serve {
+        eprintln!(
+            "  giao diện web: http://127.0.0.1:{} (chỉ máy này mở được)",
+            args.port
+        );
+        match &config_path {
+            Some(p) => eprintln!("  file cấu hình: {}", p.display()),
+            None => eprintln!("  không có file cấu hình: thay đổi từ giao diện chỉ giữ trong phiên này"),
+        }
     }
     eprintln!("Nhấn Ctrl+C để dừng.");
 
@@ -154,26 +242,22 @@ fn real_main() -> i32 {
 
     // Vòng lặp chính: recv() block cho tới khi có event nên lúc rảnh
     // không tốn CPU; khi có event thì gom thêm trong cửa sổ debounce.
+    // Filter + debounce đọc lại từ trạng thái dùng chung cho MỖI event
+    // (xem handle_event) và mỗi lần chờ, để thay đổi từ giao diện web
+    // áp dụng ngay cả với event đang dồn dập — nếu chỉ đọc 1 lần ở
+    // đầu batch thì batch đầu tiên sau khi đổi cài đặt vẫn dùng bộ
+    // lọc cũ (bắt được khi test live ngày 2026-11-13).
     loop {
         let first = match rx.recv() {
             Ok(item) => item,
             Err(_) => break, // watcher đã dừng (không xảy ra khi chạy thường)
         };
-        handle_event(first, &filter, log_path.as_ref(), &mut coalescer);
+        handle_event(first, &shared, log_path.as_ref(), &mut coalescer);
 
-        if args.debounce_ms == 0 {
-            flush(
-                &mut coalescer,
-                &args.json,
-                &args.exec,
-                &mut log_writer,
-                &stdout,
-            );
-            continue;
-        }
         loop {
+            let debounce = Duration::from_millis(shared.snapshot().1);
             match rx.recv_timeout(debounce) {
-                Ok(item) => handle_event(item, &filter, log_path.as_ref(), &mut coalescer),
+                Ok(item) => handle_event(item, &shared, log_path.as_ref(), &mut coalescer),
                 Err(RecvTimeoutError::Timeout) => break,
                 Err(RecvTimeoutError::Disconnected) => {
                     flush(
@@ -182,6 +266,7 @@ fn real_main() -> i32 {
                         &args.exec,
                         &mut log_writer,
                         &stdout,
+                        &shared,
                     );
                     return 0;
                 }
@@ -193,16 +278,18 @@ fn real_main() -> i32 {
             &args.exec,
             &mut log_writer,
             &stdout,
+            &shared,
         );
     }
     0
 }
 
 /// Xử lý 1 item từ channel: lỗi watcher thì báo stderr và tiếp tục;
-/// event thì rút gọn -> lọc -> đưa vào bộ gộp.
+/// event thì rút gọn -> lọc (bộ lọc đọc mới từ trạng thái dùng chung
+/// cho mỗi event) -> đưa vào bộ gộp.
 fn handle_event(
     item: Result<notify::Event, notify::Error>,
-    filter: &Filter,
+    shared: &Shared,
     log_path: Option<&PathBuf>,
     coalescer: &mut Coalescer,
 ) {
@@ -229,13 +316,17 @@ fn handle_event(
             return;
         }
     }
+    // Bộ lọc đọc mới cho mỗi event: rẻ (1 lock + clone 2 Vec ngắn),
+    // đổi từ giao diện web áp dụng ngay.
+    let (filter, _) = shared.snapshot();
     if !filter.allows(&summary) {
         return;
     }
     coalescer.push(summary);
 }
 
-/// In toàn bộ event đã gộp: stdout + file log + lệnh --exec.
+/// In toàn bộ event đã gộp: stdout + file log + lệnh --exec + đẩy
+/// vào log của giao diện web (luôn dạng JSON).
 /// Gom thành 1 lần ghi cho stdout/log để không xen kẽ khi pipe.
 fn flush(
     coalescer: &mut Coalescer,
@@ -243,6 +334,7 @@ fn flush(
     exec: &Option<String>,
     log_writer: &mut Option<BufWriter<File>>,
     stdout: &std::io::Stdout,
+    shared: &Shared,
 ) {
     if coalescer.is_empty() {
         // Vẫn phải dọn bộ gộp (các mục đã Drop) để cửa sổ sau sạch.
@@ -258,6 +350,7 @@ fn flush(
             out.push_str(&format_human(s));
         }
         out.push('\n');
+        shared.push_event(format_json(s));
     }
     {
         let mut lock = stdout.lock();

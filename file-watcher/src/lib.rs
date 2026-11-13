@@ -3,6 +3,8 @@
 //! đầu ra. Không có IO ở đây ngoài timestamp, nên test được bằng
 //! `cargo test` mà không cần chạm vào hệ thống file thật.
 
+pub mod web;
+
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
@@ -385,7 +387,7 @@ impl Coalescer {
 
 /// Bộ lọc đầu ra: đuôi file cho phép và chuỗi đường dẫn cần bỏ qua.
 /// Cả hai đều so khớp không phân biệt hoa/thường.
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Filter {
     /// Đuôi file (không có dấu chấm, đã lowercase). Rỗng = nhận tất cả.
     pub exts: Vec<String>,
@@ -520,8 +522,20 @@ pub struct Args {
     pub json: bool,
     /// Lệnh chạy mỗi khi có event (placeholder {path} {event} {time} {from}).
     pub exec: Option<String>,
+    /// Bật giao diện web local (localhost) để cấu hình + xem log realtime.
+    pub serve: bool,
+    /// Cổng của giao diện web (mặc định 8787).
+    pub port: u16,
     pub help: bool,
     pub version: bool,
+    /// Các flag dưới đây ghi lại "user có gõ rõ flag này không", để
+    /// khi gộp với file cấu hình thì CLI thắng — nếu không, giá trị
+    /// mặc định của CLI sẽ vô tình đè cài đặt trong file.
+    pub exts_set: bool,
+    pub ignores_set: bool,
+    pub debounce_set: bool,
+    pub recursive_set: bool,
+    pub port_set: bool,
 }
 
 impl Args {
@@ -529,6 +543,7 @@ impl Args {
         Args {
             recursive: true,
             debounce_ms: 200,
+            port: 8787,
             ..Default::default()
         }
     }
@@ -553,17 +568,26 @@ pub fn usage() -> String {
         \x20 --log <file>          ghi thêm mọi dòng event vào file (append)\n\
         \x20 --json                in mỗi event 1 dòng JSON thay vì dạng đọc được\n\
         \x20 --exec \"<lệnh>\"       chạy lệnh mỗi khi có event ({{path}} {{event}} {{time}} {{from}})\n\
+        \x20 --serve              bật giao diện web local để cấu hình thư mục + xem log realtime\n\
+        \x20 --port <n>           cổng giao diện web (mặc định 8787; chỉ có nghĩa với --serve)\n\
         \x20 -h, --help            hiện hướng dẫn này\n\
         \x20 -V, --version         hiện phiên bản\n\
         \n\
         Ví dụ:\n\
         \x20 file-watcher D:\\code\\project\n\
         \x20 file-watcher C:\\a D:\\b --ext rs,md --ignore target,node_modules\n\
-        \x20 file-watcher . --log events.log --exec \"echo {{event}} {{path}}\"\n"
+        \x20 file-watcher . --log events.log --exec \"echo {{event}} {{path}}\"\n\
+        \x20 file-watcher --config watch.txt --serve\n\
+        \x20 file-watcher --serve --port 9000\n\
+        \n\
+        Giao diện web chỉ nghe trên 127.0.0.1 (máy này), mở trình duyệt\n\
+        vào http://127.0.0.1:8787 (hoặc cổng đã chọn). Khi bật --serve mà\n\
+        không có --config, app dùng file watch.txt ở thư mục hiện tại\n\
+        (nếu có) và lưu thay đổi từ giao diện vào đó.\n"
     )
 }
 
-fn split_list(value: &str) -> Vec<String> {
+pub(crate) fn split_list(value: &str) -> Vec<String> {
     value
         .split(',')
         .map(|s| s.trim().trim_start_matches('.').to_lowercase())
@@ -613,19 +637,41 @@ where
         match flag.as_str() {
             "-h" | "--help" => args.help = true,
             "-V" | "--version" => args.version = true,
-            "--no-recursive" => args.recursive = false,
+            "--no-recursive" => {
+                args.recursive = false;
+                args.recursive_set = true;
+            }
             "--json" => args.json = true,
+            "--serve" => args.serve = true,
             "--config" => args.config = Some(take_value(&mut iter)?),
             "--log" => args.log = Some(take_value(&mut iter)?),
             "--exec" => args.exec = Some(take_value(&mut iter)?),
+            "--port" => {
+                let v = take_value(&mut iter)?;
+                let port = v
+                    .parse::<u32>()
+                    .map_err(|_| format!("--port phải là số nguyên 1-65535, nhận được: {v}"))?;
+                if !(1..=65535).contains(&port) {
+                    return Err(format!("--port phải là số nguyên 1-65535, nhận được: {v}"));
+                }
+                args.port = port as u16;
+                args.port_set = true;
+            }
             "--debounce-ms" => {
                 let v = take_value(&mut iter)?;
                 args.debounce_ms = v
                     .parse::<u64>()
                     .map_err(|_| format!("--debounce-ms phải là số nguyên >= 0, nhận được: {v}"))?;
+                args.debounce_set = true;
             }
-            "--ext" => args.exts = split_list(&take_value(&mut iter)?),
-            "--ignore" => args.ignores = split_list(&take_value(&mut iter)?),
+            "--ext" => {
+                args.exts = split_list(&take_value(&mut iter)?);
+                args.exts_set = true;
+            }
+            "--ignore" => {
+                args.ignores = split_list(&take_value(&mut iter)?);
+                args.ignores_set = true;
+            }
             _ => {
                 if flag.starts_with('-') {
                     return Err(format!("tham số không rõ: {flag}"));
@@ -634,22 +680,88 @@ where
             }
         }
     }
+    if args.port_set && !args.serve {
+        return Err("--port chỉ có nghĩa khi dùng kèm --serve".to_string());
+    }
     Ok(args)
 }
 
-/// Đọc danh sách thư mục từ file cấu hình: 1 dòng = 1 thư mục,
-/// dòng trống và dòng bắt đầu bằng `#` được bỏ qua. Đường dẫn
-/// tương đối được hiểu tương đối theo thư mục chứa file cấu hình.
-pub fn load_config_dirs(config_path: &str) -> Result<Vec<String>, String> {
+/// Cài đặt đi kèm danh sách thư mục trong file cấu hình.
+/// Giá trị mặc định = giá trị mặc định của CLI.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Settings {
+    pub exts: Vec<String>,
+    pub ignores: Vec<String>,
+    pub debounce_ms: u64,
+    pub recursive: bool,
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Settings {
+            exts: Vec::new(),
+            ignores: Vec::new(),
+            debounce_ms: 200,
+            recursive: true,
+        }
+    }
+}
+
+/// Đọc file cấu hình: 1 dòng = 1 thư mục, dòng trống và dòng bắt đầu
+/// bằng `#` được bỏ qua. Ngoài ra, dòng bắt đầu bằng `@` là cài đặt:
+///
+/// ```text
+/// @exts rs,md
+/// @ignore target,node_modules
+/// @debounce 200
+/// @recursive true
+/// ```
+///
+/// Đường dẫn tương đối được hiểu tương đối theo thư mục chứa file cấu
+/// hình. File cũ (chỉ có thư mục, không có dòng @) vẫn đọc bình thường.
+pub fn load_config(config_path: &str) -> Result<(Vec<String>, Settings), String> {
     let text = std::fs::read_to_string(config_path)
         .map_err(|e| format!("không đọc được file cấu hình {config_path}: {e}"))?;
     let base = Path::new(config_path)
         .parent()
         .filter(|p| !p.as_os_str().is_empty());
     let mut dirs = Vec::new();
-    for line in text.lines() {
-        let line = line.trim();
+    let mut settings = Settings::default();
+    for (lineno, raw) in text.lines().enumerate() {
+        let line = raw.trim();
         if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        if let Some(rest) = line.strip_prefix('@') {
+            let (key, value) = match rest.split_once(char::is_whitespace) {
+                Some((k, v)) => (k, v.trim()),
+                None => (rest, ""),
+            };
+            match key {
+                "exts" => settings.exts = split_list(value),
+                "ignore" => settings.ignores = split_list(value),
+                "debounce" => {
+                    settings.debounce_ms = value.parse::<u64>().map_err(|_| {
+                        format!("{config_path} dòng {}: @debounce phải là số nguyên >= 0, nhận được: {value}", lineno + 1)
+                    })?;
+                }
+                "recursive" => match value {
+                    "true" => settings.recursive = true,
+                    "false" => settings.recursive = false,
+                    _ => {
+                        return Err(format!(
+                            "{config_path} dòng {}: @recursive phải là true hoặc false, nhận được: {value}",
+                            lineno + 1
+                        ));
+                    }
+                },
+                _ => {
+                    return Err(format!(
+                        "{config_path} dòng {}: cài đặt không rõ: @{key} (chỉ có @exts, @ignore, @debounce, @recursive)",
+                        lineno + 1
+                    ));
+                }
+            }
             continue;
         }
         let path = Path::new(line);
@@ -659,7 +771,48 @@ pub fn load_config_dirs(config_path: &str) -> Result<Vec<String>, String> {
             dirs.push(base.unwrap().join(path).to_string_lossy().into_owned());
         }
     }
-    Ok(dirs)
+    Ok((dirs, settings))
+}
+
+/// Ghi lại file cấu hình (danh sách thư mục + cài đặt).
+/// Ghi qua file tạm rồi đổi tên để không hỏng file gốc nếu app bị
+/// ngắt giữa chừng. Thư mục được ghi nguyên văn như truyền vào
+/// (nên truyền đường dẫn đã canonicalize từ giao diện web).
+pub fn save_config(config_path: &Path, dirs: &[PathBuf], settings: &Settings) -> Result<(), String> {
+    let mut out = String::from(
+        "# file-watcher — thư mục theo dõi (tự lưu bởi giao diện web)\n\
+         # 1 dòng = 1 thư mục. Dòng bắt đầu bằng @ là cài đặt.\n",
+    );
+    out.push_str(&format!(
+        "@recursive {}\n@debounce {}\n",
+        settings.recursive, settings.debounce_ms
+    ));
+    if !settings.exts.is_empty() {
+        out.push_str(&format!("@exts {}\n", settings.exts.join(",")));
+    }
+    if !settings.ignores.is_empty() {
+        out.push_str(&format!("@ignore {}\n", settings.ignores.join(",")));
+    }
+    for dir in dirs {
+        out.push_str(&dir.to_string_lossy());
+        out.push('\n');
+    }
+    let tmp_path = config_path.with_extension("tmp");
+    std::fs::write(&tmp_path, out)
+        .map_err(|e| format!("không ghi được file cấu hình tạm {}: {e}", tmp_path.display()))?;
+    std::fs::rename(&tmp_path, config_path).map_err(|e| {
+        let _ = std::fs::remove_file(&tmp_path);
+        format!(
+            "không lưu được file cấu hình {}: {e}",
+            config_path.display()
+        )
+    })?;
+    Ok(())
+}
+
+/// Đọc danh sách thư mục từ file cấu hình (bỏ qua các dòng cài đặt @).
+pub fn load_config_dirs(config_path: &str) -> Result<Vec<String>, String> {
+    Ok(load_config(config_path)?.0)
 }
 
 #[cfg(test)]
@@ -964,5 +1117,82 @@ mod tests {
         assert!(parse_args(["--log"]).is_err());
         let a = parse_args(["--ignore", ".TMP, ~$"]).unwrap();
         assert_eq!(a.ignores, vec!["tmp", "~$"]);
+    }
+
+    #[test]
+    fn parse_args_serve_and_set_flags() {
+        let a = parse_args(["--serve"]).unwrap();
+        assert!(a.serve);
+        assert_eq!(a.port, 8787);
+        assert!(!a.port_set);
+        let a = parse_args(["--serve", "--port", "9000"]).unwrap();
+        assert_eq!(a.port, 9000);
+        assert!(a.port_set);
+        // --port mà không có --serve thì lỗi.
+        assert!(parse_args(["--port", "9000"]).is_err());
+        assert!(parse_args(["--serve", "--port", "0"]).is_err());
+        assert!(parse_args(["--serve", "--port", "70000"]).is_err());
+        // Cờ *_set chỉ bật khi user gõ rõ.
+        let a = parse_args(["--ext", "rs"]).unwrap();
+        assert!(a.exts_set);
+        assert!(!a.ignores_set);
+        assert!(!a.debounce_set);
+        assert!(!a.recursive_set);
+        let a = parse_args(["--no-recursive", "--debounce-ms", "50", "--ignore", "tmp"]).unwrap();
+        assert!(a.recursive_set);
+        assert!(a.debounce_set);
+        assert!(a.ignores_set);
+        assert!(!a.exts_set);
+    }
+
+    #[test]
+    fn config_settings_roundtrip() {
+        let dir = std::env::temp_dir().join("file-watcher-test-config");
+        let _ = std::fs::create_dir_all(&dir);
+        let path = dir.join("watch.txt");
+        // File cũ chỉ có thư mục: đọc được, cài đặt mặc định.
+        std::fs::write(&path, "# ghi chú\n\n/a/code\nb/relative\n").unwrap();
+        let (dirs, settings) = load_config(path.to_str().unwrap()).unwrap();
+        assert_eq!(dirs.len(), 2);
+        assert_eq!(dirs[0], "/a/code");
+        assert!(dirs[1].ends_with("b/relative"));
+        assert_eq!(settings, Settings::default());
+        // File có dòng @: parse đủ 4 cài đặt, lỗi rõ khi sai.
+        std::fs::write(
+            &path,
+            "@exts rs,MD\n@ignore target, .tmp\n@debounce 50\n@recursive false\n/a/x\n",
+        )
+        .unwrap();
+        let (dirs, settings) = load_config(path.to_str().unwrap()).unwrap();
+        assert_eq!(dirs, vec!["/a/x"]);
+        assert_eq!(settings.exts, vec!["rs", "md"]);
+        assert_eq!(settings.ignores, vec!["target", "tmp"]);
+        assert_eq!(settings.debounce_ms, 50);
+        assert!(!settings.recursive);
+        std::fs::write(&path, "@debounce abc\n").unwrap();
+        assert!(load_config(path.to_str().unwrap()).is_err());
+        std::fs::write(&path, "@recursive maybe\n").unwrap();
+        assert!(load_config(path.to_str().unwrap()).is_err());
+        std::fs::write(&path, "@la-mot-cai-gi-do 1\n").unwrap();
+        assert!(load_config(path.to_str().unwrap()).is_err());
+        // Ghi lại rồi đọc lại: khớp.
+        let settings = Settings {
+            exts: vec!["rs".to_string()],
+            ignores: vec![],
+            debounce_ms: 300,
+            recursive: true,
+        };
+        save_config(
+            &path,
+            &[PathBuf::from("/a/one"), PathBuf::from("/b/two")],
+            &settings,
+        )
+        .unwrap();
+        let (dirs, back) = load_config(path.to_str().unwrap()).unwrap();
+        assert_eq!(dirs, vec!["/a/one", "/b/two"]);
+        assert_eq!(back, settings);
+        // File tạm không còn sót lại.
+        assert!(!dir.join("watch.tmp").exists());
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

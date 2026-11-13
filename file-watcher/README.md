@@ -3,6 +3,10 @@
 CLI lắng nghe thay đổi file trong 1 hoặc nhiều thư mục, viết bằng Rust.
 Tiêu chí: **nhẹ, nhanh** — chạy nền cả ngày không đáng kể tài nguyên.
 
+Với `--serve`, app mở thêm giao diện web local (http://127.0.0.1:8787)
+để cấu hình thư mục theo dõi và xem log theo thời gian thực — vẫn 1
+file binary duy nhất, không thêm dependency (xem "Giao diện web").
+
 ## Vì sao nhẹ, nhanh
 
 - **Không polling.** Dùng API thông báo của hệ điều hành qua crate
@@ -12,18 +16,23 @@ Tiêu chí: **nhẹ, nhanh** — chạy nền cả ngày không đáng kể tài
 - **Chỉ 2 dependency trực tiếp:** `notify` (nhận event) và `chrono`
   (giờ địa phương). Không async runtime, không framework parse CLI
   (tự parse vài chục dòng), không serde (JSON ghi tay, config là
-  file text thuần).
+  file text thuần). Giao diện web dùng `std::net::TcpListener`
+  viết tay (không thêm crate nào), trang HTML nhúng sẵn trong binary.
 - **Profile release tối ưu:** `opt-level = 3`, LTO toàn bộ,
   1 codegen unit, strip symbol, `panic = "abort"`.
 
-Số đo thật trên Linux (build release, đo ngày 2026-11-12):
+Số đo thật trên Linux (build release, đo ngày 2026-11-13, bản 0.2.0
+với `--serve` đang bật):
 
 | Chỉ số | Giá trị |
 | --- | --- |
-| Kích thước binary | 639.648 byte (~625 KiB), 1 file duy nhất |
-| RAM lúc rảnh | ~2,5 MB (RSS) |
+| Kích thước binary | 726.192 byte (~709 KiB), 1 file duy nhất |
+| RAM lúc rảnh | ~2,7 MB (RSS) |
 | CPU lúc rảnh | 0,0% (đo trong 5 giây) |
-| Luồng | 2 (main + backend của OS) |
+| Luồng | 3 (main + backend của OS + server web) |
+
+Bản CLI thuần 0.1.0 đo ngày 2026-11-12 là ~625 KiB / ~2,5 MB /
+2 luồng — giao diện web chỉ thêm ~84 KiB binary và ~0,2 MB RAM.
 
 Trên Windows con số sẽ khác đôi chút, nhưng cùng tầm đó (exe 1 file,
 không cần DLL kèm theo, không cần cài Rust trên máy chạy).
@@ -58,6 +67,10 @@ file-watcher . --log events.log --exec "echo {event} {path}"
 
 # Dạng JSON 1 dòng/event, để pipe sang tool khác
 file-watcher . --json > events.jsonl
+
+# Giao diện web: cấu hình thư mục + xem log realtime
+file-watcher --config watch.txt --serve
+file-watcher --serve --port 9000
 ```
 
 Nhấn `Ctrl+C` để dừng. Banner khởi động in ra stderr nên stdout
@@ -67,7 +80,9 @@ luôn sạch — pipe sang file hay tool khác chỉ nhận event.
 
 | Tùy chọn | Mặc định | Nghĩa |
 | --- | --- | --- |
-| `--config <file>` | — | Đọc danh sách thư mục từ file text: 1 dòng = 1 thư mục, dòng trống và dòng bắt đầu bằng `#` được bỏ qua. Đường dẫn tương đối hiểu theo thư mục chứa file. Gộp chung với thư mục gõ trên CLI, trùng nhau tự loại. |
+| `--config <file>` | — | Đọc danh sách thư mục từ file text: 1 dòng = 1 thư mục, dòng trống và dòng bắt đầu bằng `#` được bỏ qua. Đường dẫn tương đối hiểu theo thư mục chứa file. Gộp chung với thư mục gõ trên CLI, trùng nhau tự loại. File còn có thể chứa dòng cài đặt `@exts` / `@ignore` / `@debounce` / `@recursive` (xem "File cấu hình"). |
+| `--serve` | tắt | Bật giao diện web local trên http://127.0.0.1:8787 (xem "Giao diện web"). Khi bật mà không có `--config`, app dùng file `watch.txt` ở thư mục hiện tại (nếu có) và lưu thay đổi vào đó. Cho phép khởi động với 0 thư mục rồi thêm sau trên giao diện. |
+| `--port <n>` | 8787 | Cổng giao diện web (1–65535; chỉ có nghĩa với `--serve`). Cổng bị chiếm thì app báo lỗi và thoát ngay (exit 2). |
 | `--no-recursive` | đệ quy | Chỉ theo dõi tầng trên cùng của mỗi thư mục. |
 | `--debounce-ms <n>` | 200 | Gộp các event dồn dập trong n mili-giây thành 1 dòng (xem "Quy tắc gộp"). `0` = in ngay từng event, không gộp. |
 | `--ext <a,b,c>` | tất cả | Chỉ hiện file có đuôi này (không phân biệt hoa/thường, vd: `rs,md,txt`). |
@@ -80,6 +95,65 @@ luôn sạch — pipe sang file hay tool khác chỉ nhận event.
 
 Thư mục không tồn tại, không phải thư mục, hoặc file log không mở
 được đều báo lỗi rõ ràng và thoát ngay (exit 1), không chạy nửa vời.
+
+## Giao diện web (`--serve`)
+
+```sh
+file-watcher --config watch.txt --serve
+```
+
+Mở trình duyệt vào http://127.0.0.1:8787 (hoặc cổng đã chọn với
+`--port`). Server chỉ bind `127.0.0.1` nên chỉ máy này mở được,
+không truy cập được từ máy khác trong mạng.
+
+- **Cấu hình thư mục:** thêm/xóa thư mục theo dõi (gõ đường dẫn đầy
+  đủ — trình duyệt không chọn được thư mục trên máy). Thêm/xóa áp
+  dụng ngay, không cần khởi động lại, và lưu ngay vào file cấu hình.
+- **Cài đặt:** đệ quy (bật/tắt), debounce (ms), chỉ đuôi file, bỏ
+  qua chuỗi — nút Áp dụng lưu ngay vào file cấu hình. Đổi đệ quy
+  thì app watch lại toàn bộ thư mục với chế độ mới; đổi bộ lọc áp
+  dụng ngay cho event tiếp theo.
+- **Log realtime:** event mới hiện ngay qua SSE (Server-Sent Events),
+  màu theo loại (tạo/sửa/xóa/đổi tên), có lọc theo loại + tìm theo
+  tên file, tạm dừng, tự cuộn, xóa log hiển thị. Trang tải lần đầu
+  nhận tối đa 1000 dòng log gần nhất.
+- **Khởi động rỗng:** `--serve` không cần thư mục nào — mở giao diện
+  rồi thêm thư mục sau cũng được; file `watch.txt` được tạo khi lưu
+  thay đổi đầu tiên.
+
+API dùng nội bộ (không cần nhớ để xài giao diện):
+
+| Endpoint | Nghĩa |
+| --- | --- |
+| `GET /` | Trang giao diện (1 file HTML nhúng sẵn). |
+| `GET /events?after=N` | SSE stream event realtime (JSON, số thứ tự tăng dần). |
+| `GET /api/config` | Cấu hình hiện tại (JSON). |
+| `GET /api/log?after=N` | Log gần đây, các event có số thứ tự > N. |
+| `POST /api/dirs` | Thêm/xóa thư mục (`action=add\|remove&dir=...`). |
+| `POST /api/config` | Đổi cài đặt (`recursive` / `debounce_ms` / `exts` / `ignores`). |
+
+## File cấu hình
+
+Ngoài danh sách thư mục, file cấu hình còn chứa được cài đặt —
+1 dòng `@tên giá-trị` (xem `watch.example.txt`):
+
+```text
+@recursive true
+@debounce 200
+@exts rs,md
+@ignore target,node_modules
+D:\code\project
+C:\Users\ten\Documents\ghi-chu
+```
+
+- File cũ chỉ có thư mục (không có dòng `@`) vẫn đọc bình thường.
+- Dòng `@` không rõ hoặc giá trị sai thì app báo lỗi rõ dòng nào
+  và dừng, không chạy với cài đặt đoán mò.
+- **Thứ tự ưu tiên:** flag CLI thắng file cấu hình — nhưng chỉ khi
+  user gõ rõ flag đó (`--ext`, `--ignore`, `--debounce-ms`,
+  `--no-recursive`). Không gõ thì cài đặt trong file được giữ.
+- Giao diện web lưu file qua file tạm rồi đổi tên, nên app bị ngắt
+  giữa lúc lưu cũng không hỏng file gốc.
 
 ## Định dạng đầu ra
 
@@ -152,9 +226,18 @@ im lặng — event đã mất thì không bịa lại được.
 ## Cấu trúc code
 
 - `src/lib.rs` — logic thuần: rút gọn event, gộp debounce, lọc,
-  format đầu ra, parse CLI. Có 13 unit test (`cargo test`).
+  format đầu ra, parse CLI, đọc/ghi file cấu hình (gồm dòng cài đặt
+  `@...`). Cả crate có 16 unit test (`cargo test`).
 - `src/main.rs` — vòng lặp watcher: mở watcher, nhận event qua
-  channel, in ra stdout / file log / chạy `--exec`.
+  channel, in ra stdout / file log / chạy `--exec`, đẩy event vào
+  log của giao diện web.
+- `src/web.rs` — giao diện web: HTTP server viết tay bằng
+  `std::net::TcpListener` (không thêm dependency), SSE log realtime,
+  API cấu hình/thư mục. Trạng thái dùng chung với vòng lặp watcher
+  qua `Shared` (Mutex) nên thêm/xóa thư mục áp dụng ngay.
+- `src/ui.html` — trang giao diện duy nhất, nhúng vào binary lúc
+  build (`include_str!`), vanilla JS, không framework, không asset
+  ngoài.
 
 ## Chưa có (hướng mở rộng)
 

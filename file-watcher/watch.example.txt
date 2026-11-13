@@ -2,6 +2,16 @@
 # 1 dòng = 1 thư mục. Dòng trống và dòng bắt đầu bằng # được bỏ qua.
 # Đường dẫn tương đối được hiểu tương đối theo thư mục chứa file này.
 # Copy file này thành watch.txt rồi sửa lại cho máy của bạn.
+#
+# Dòng bắt đầu bằng @ là cài đặt (không bắt buộc — thiếu thì dùng
+# mặc định; file cũ chỉ có thư mục vẫn đọc bình thường):
+#   @recursive true        đệ quy (true/false, mặc định true)
+#   @debounce 200          gộp event dồn dập trong n mili-giây (mặc định 200)
+#   @exts rs,md            chỉ hiện file có đuôi này (để trống là tất cả)
+#   @ignore target,.tmp    bỏ qua đường dẫn chứa chuỗi này
+# Flag CLI gõ rõ (--ext, --ignore, --debounce-ms, --no-recursive)
+# thắng cài đặt trong file này.
+# Giao diện web (--serve) cũng lưu thay đổi vào file này.
 
 # Ví dụ trên Windows:
 # D:\code\project
