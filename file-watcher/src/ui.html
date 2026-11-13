@@ -124,6 +124,7 @@
   .row:nth-child(odd) { background: rgba(255, 255, 255, .02); }
   .row .time { color: var(--dim); flex-shrink: 0; }
   .row .kind { flex-shrink: 0; width: 76px; font-weight: 700; }
+  .row .who { color: var(--dim); flex-shrink: 0; }
   .row.created .kind { color: var(--green); }
   .row.modified .kind { color: var(--blue); }
   .row.removed .kind { color: var(--red); }
@@ -236,7 +237,8 @@
     for (var i = 0; i < entries.length; i++) {
       var e = entries[i];
       if (!kinds[e.event]) continue;
-      var hay = (e.path + " " + (e.from || "")).toLowerCase();
+      var who = (e.user || "?") + "@" + (e.pc || "?");
+      var hay = (e.path + " " + (e.from || "") + " " + who).toLowerCase();
       if (q && hay.indexOf(q) === -1) continue;
       var target;
       if (e.event === "renamed") {
@@ -247,7 +249,7 @@
       } else {
         target = esc(e.path);
       }
-      html += '<div class="row ' + esc(e.event) + '"><span class="time">' + esc(e.time) + '</span><span class="kind">' + KIND_LABEL[e.event] + '</span><span>' + target + "</span></div>";
+      html += '<div class="row ' + esc(e.event) + '"><span class="time">' + esc(e.time) + '</span><span class="kind">' + KIND_LABEL[e.event] + '</span><span class="who">' + esc(who) + '</span><span>' + target + "</span></div>";
       shown++;
     }
     logEl.innerHTML = shown ? html : '<p class="empty">Không có dòng nào khớp bộ lọc.</p>';
