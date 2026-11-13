@@ -168,8 +168,11 @@ không truy cập được từ máy khác trong mạng.
   xung quanh (sidebar, topbar, dải stat, toolbar, tab) — 6 màu
   cơ bản (xám, xanh dương, xanh lá, vàng, đỏ, tím) + mặc định
   không màu; thanh trượt chỉnh độ đậm 0–50% (mặc định 8%).
-  Khu vực log luôn giữ nền gốc để dễ đọc. Lựa chọn lưu trong
-  trình duyệt nên mở lại vẫn giữ.
+  Khu vực log luôn giữ nền gốc để dễ đọc. Đường kẻ trong các
+  vùng đã nhuộm tự đổi màu theo tint (giữ sắc, lệch độ sáng
+  14 điểm: đậm hơn ở theme sáng, sáng hơn ở theme tối) để vẫn
+  tương phản với nền; line trong log và viền ngoài app giữ
+  nguyên. Lựa chọn lưu trong trình duyệt nên mở lại vẫn giữ.
 - **Khởi động rỗng:** `--serve` không cần thư mục nào — mở giao diện
   rồi thêm thư mục sau cũng được; file `watch.json` được tạo khi lưu
   thay đổi đầu tiên.
