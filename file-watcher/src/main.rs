@@ -20,8 +20,8 @@ use std::sync::mpsc::{self, RecvTimeoutError};
 use std::time::Duration;
 
 use file_watcher::{
-    format_human, format_json, load_config, now_string, parse_args, summarize, usage,
-    Coalescer, Filter, Settings, Summary, VERSION,
+    detect_identity, format_human, format_json, load_config, now_string, parse_args, summarize,
+    usage, Coalescer, Filter, Identity, Settings, Summary, VERSION,
 };
 use file_watcher::web::{serve, Shared};
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
@@ -47,6 +47,15 @@ fn real_main() -> i32 {
     if args.version {
         println!("file-watcher {VERSION}");
         return 0;
+    }
+
+    // Định danh máy + user, ghi kèm vào mỗi dòng log. PC ID mặc định
+    // là hostname, --pc-id ghi đè khi cần tên khác.
+    let mut identity = detect_identity();
+    if let Some(pc_id) = &args.pc_id {
+        if !pc_id.trim().is_empty() {
+            identity.pc = pc_id.trim().to_string();
+        }
     }
 
     // File cấu hình: --config nếu có; với --serve mà không có --config
@@ -179,6 +188,7 @@ fn real_main() -> i32 {
         settings.debounce_ms,
         recursive,
         config_path.clone(),
+        identity.clone(),
     );
 
     // Giao diện web: bind ở luồng chính để cổng bị chiếm báo lỗi ngay.
@@ -210,6 +220,7 @@ fn real_main() -> i32 {
         if recursive { "đệ quy" } else { "không đệ quy" },
         settings.debounce_ms
     );
+    eprintln!("  máy: {}", identity.label());
     for root in &roots {
         eprintln!("  {}", root.display());
     }
@@ -267,6 +278,7 @@ fn real_main() -> i32 {
                         &mut log_writer,
                         &stdout,
                         &shared,
+                        &identity,
                     );
                     return 0;
                 }
@@ -279,6 +291,7 @@ fn real_main() -> i32 {
             &mut log_writer,
             &stdout,
             &shared,
+            &identity,
         );
     }
     0
@@ -326,7 +339,8 @@ fn handle_event(
 }
 
 /// In toàn bộ event đã gộp: stdout + file log + lệnh --exec + đẩy
-/// vào log của giao diện web (luôn dạng JSON).
+/// vào log của giao diện web (luôn dạng JSON). Mỗi dòng đều ghi kèm
+/// user + PC ID của máy chạy.
 /// Gom thành 1 lần ghi cho stdout/log để không xen kẽ khi pipe.
 fn flush(
     coalescer: &mut Coalescer,
@@ -335,6 +349,7 @@ fn flush(
     log_writer: &mut Option<BufWriter<File>>,
     stdout: &std::io::Stdout,
     shared: &Shared,
+    identity: &Identity,
 ) {
     if coalescer.is_empty() {
         // Vẫn phải dọn bộ gộp (các mục đã Drop) để cửa sổ sau sạch.
@@ -345,12 +360,12 @@ fn flush(
     let mut out = String::new();
     for s in &summaries {
         if *json {
-            out.push_str(&format_json(s));
+            out.push_str(&format_json(s, identity));
         } else {
-            out.push_str(&format_human(s));
+            out.push_str(&format_human(s, identity));
         }
         out.push('\n');
-        shared.push_event(format_json(s));
+        shared.push_event(format_json(s, identity));
     }
     {
         let mut lock = stdout.lock();
@@ -363,14 +378,14 @@ fn flush(
     }
     if let Some(template) = exec {
         for s in &summaries {
-            run_hook(template, s);
+            run_hook(template, s, identity);
         }
     }
 }
 
 /// Chạy lệnh --exec cho 1 event, không chờ kết quả (không chặn vòng
-/// lặp watcher). Placeholder: {path} {event} {time} {from}.
-fn run_hook(template: &str, summary: &Summary) {
+/// lặp watcher). Placeholder: {path} {event} {time} {from} {user} {pc}.
+fn run_hook(template: &str, summary: &Summary, identity: &Identity) {
     let from = summary
         .from
         .as_ref()
@@ -380,7 +395,9 @@ fn run_hook(template: &str, summary: &Summary) {
         .replace("{path}", &summary.path.to_string_lossy())
         .replace("{event}", summary.kind.name())
         .replace("{time}", &summary.time)
-        .replace("{from}", &from);
+        .replace("{from}", &from)
+        .replace("{user}", &identity.user)
+        .replace("{pc}", &identity.pc);
     #[cfg(windows)]
     let spawned = std::process::Command::new("cmd").args(["/C", &cmd]).spawn();
     #[cfg(not(windows))]

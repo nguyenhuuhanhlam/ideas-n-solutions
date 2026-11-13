@@ -442,11 +442,106 @@ pub fn json_escape(s: &str) -> String {
     out
 }
 
-/// Dạng đọc được: `2026-11-12 22:55:01  MODIFIED  D:\code\main.rs`
-/// Rename đủ 2 đầu: `...  RENAMED   cũ -> mới`.
-/// Chỉ biết 1 đầu: `...  RENAMED   cũ -> ?` (đổi tên đi) hoặc
-/// `...  RENAMED   ? -> mới` (đổi tên từ ngoài vào).
-pub fn format_human(summary: &Summary) -> String {
+/// Định danh máy + user chạy watcher, ghi kèm vào mỗi dòng log để
+/// gom log từ nhiều máy vẫn biết event nào từ máy nào, user nào.
+///
+/// - `user`: tên tài khoản đang chạy — biến môi trường USERNAME
+///   (Windows) / USER / LOGNAME, nếu không có thì chạy lệnh `whoami`
+///   (có sẵn trên Windows/Linux/macOS).
+/// - `pc`: "PC ID" = tên máy (hostname) — COMPUTERNAME (Windows) /
+///   HOSTNAME / file /etc/hostname, nếu không có thì chạy lệnh
+///   `hostname`. Hostname là cách user vẫn gọi tên các máy của mình
+///   (vd: desktop-iua61p0, nhhlx1carbon), đủ để phân biệt log giữa
+///   các máy. Muốn ID khác thì dùng flag `--pc-id` để ghi đè.
+/// - Không đọc được bằng cách nào thì là "unknown", không bao giờ
+///   để trống.
+///
+/// Lệnh `hostname`/`whoami` chỉ chạy 1 lần lúc khởi động và chỉ khi
+/// biến môi trường không có — cần thiết vì HOSTNAME là biến shell
+/// của bash, không export nên tiến trình con không thấy, và có máy
+/// để trống /etc/hostname (bắt được khi test live trên VM
+/// 2026-11-13: cả 2 đều thiếu, chỉ còn lệnh mới ra tên máy).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Identity {
+    pub user: String,
+    pub pc: String,
+}
+
+impl Identity {
+    /// Dạng gọn hiện trên banner và giao diện web: `user@pc`.
+    pub fn label(&self) -> String {
+        format!("{}@{}", self.user, self.pc)
+    }
+}
+
+fn non_empty(var: &str) -> Option<String> {
+    std::env::var(var)
+        .ok()
+        .map(|v| v.trim().to_string())
+        .filter(|v| !v.is_empty())
+}
+
+fn detect_hostname() -> String {
+    // Windows: COMPUTERNAME. Unix: HOSTNAME, rồi /etc/hostname.
+    if let Some(name) = non_empty("COMPUTERNAME") {
+        return name;
+    }
+    if let Some(name) = non_empty("HOSTNAME") {
+        return name;
+    }
+    #[cfg(unix)]
+    if let Ok(content) = std::fs::read_to_string("/etc/hostname") {
+        let name = content.trim().to_string();
+        if !name.is_empty() {
+            return name;
+        }
+    }
+    // Lưới cuối: lệnh hostname có sẵn trên Windows/Linux/macOS.
+    if let Some(name) = run_command_once("hostname") {
+        return name;
+    }
+    "unknown".to_string()
+}
+
+/// Chạy 1 lệnh hệ thống, lấy stdout đã trim. Chỉ dùng 1 lần lúc
+/// khởi động để nhận định danh khi biến môi trường thiếu.
+fn run_command_once(cmd: &str) -> Option<String> {
+    let output = std::process::Command::new(cmd).output().ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let text = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    if text.is_empty() {
+        None
+    } else {
+        Some(text)
+    }
+}
+
+pub fn detect_identity() -> Identity {
+    let user = non_empty("USERNAME")
+        .or_else(|| non_empty("USER"))
+        .or_else(|| non_empty("LOGNAME"))
+        .or_else(|| {
+            run_command_once("whoami").map(|u| {
+                // whoami trên Windows trả về DOMAIN\user — chỉ lấy
+                // phần user cho khớp với USERNAME.
+                u.rsplit('\\').next().unwrap_or(&u).to_string()
+            })
+        })
+        .unwrap_or_else(|| "unknown".to_string());
+    Identity {
+        user,
+        pc: detect_hostname(),
+    }
+}
+
+/// Dạng đọc được: `2026-11-12 22:55:01  MODIFIED  lam@may1  D:\code\main.rs`
+/// Rename đủ 2 đầu: `...  RENAMED   lam@may1  cũ -> mới`.
+/// Chỉ biết 1 đầu: `...  RENAMED   lam@may1  cũ -> ?` (đổi tên đi)
+/// hoặc `...  RENAMED   lam@may1  ? -> mới` (đổi tên từ ngoài vào).
+pub fn format_human(summary: &Summary, identity: &Identity) -> String {
+    let who = identity.label();
     if summary.kind == Kind::Renamed {
         let target = match summary.side {
             Some(RenameSide::Both) => format!(
@@ -459,24 +554,26 @@ pub fn format_human(summary: &Summary) -> String {
             _ => summary.path.display().to_string(),
         };
         return format!(
-            "{}  {:<8}  {}",
+            "{}  {:<8}  {}  {}",
             summary.time,
             summary.kind.label(),
+            who,
             target
         );
     }
     format!(
-        "{}  {:<8}  {}",
+        "{}  {:<8}  {}  {}",
         summary.time,
         summary.kind.label(),
+        who,
         summary.path.display()
     )
 }
 
-/// 1 dòng JSON: `{"time":"...","event":"modified","path":"..."}`
+/// 1 dòng JSON: `{"time":"...","event":"modified","path":"...","user":"lam","pc":"may1"}`
 /// Rename có thêm `"direction":"both"|"from"|"to"|"any"`, và Both
 /// có thêm `"from":"..."` (tên cũ).
-pub fn format_json(summary: &Summary) -> String {
+pub fn format_json(summary: &Summary, identity: &Identity) -> String {
     let mut out = format!(
         "{{\"time\":\"{}\",\"event\":\"{}\",\"path\":\"{}\"",
         json_escape(&summary.time),
@@ -497,6 +594,11 @@ pub fn format_json(summary: &Summary) -> String {
             }
         }
     }
+    out.push_str(&format!(
+        ",\"user\":\"{}\",\"pc\":\"{}\"",
+        json_escape(&identity.user),
+        json_escape(&identity.pc)
+    ));
     out.push('}');
     out
 }
@@ -522,6 +624,8 @@ pub struct Args {
     pub json: bool,
     /// Lệnh chạy mỗi khi có event (placeholder {path} {event} {time} {from}).
     pub exec: Option<String>,
+    /// Ghi đè PC ID tự nhận (mặc định: hostname của máy).
+    pub pc_id: Option<String>,
     /// Bật giao diện web local (localhost) để cấu hình + xem log realtime.
     pub serve: bool,
     /// Cổng của giao diện web (mặc định 8787).
@@ -567,7 +671,8 @@ pub fn usage() -> String {
         \x20 --ignore <a,b>        bỏ qua đường dẫn chứa chuỗi này (vd: .tmp,~$,node_modules)\n\
         \x20 --log <file>          ghi thêm mọi dòng event vào file (append)\n\
         \x20 --json                in mỗi event 1 dòng JSON thay vì dạng đọc được\n\
-        \x20 --exec \"<lệnh>\"       chạy lệnh mỗi khi có event ({{path}} {{event}} {{time}} {{from}})\n\
+        \x20 --exec \"<lệnh>\"       chạy lệnh mỗi khi có event ({{path}} {{event}} {{time}} {{from}} {{user}} {{pc}})\n\
+        \x20 --pc-id <id>          ghi đè PC ID trong log (mặc định: hostname của máy)\n\
         \x20 --serve              bật giao diện web local để cấu hình thư mục + xem log realtime\n\
         \x20 --port <n>           cổng giao diện web (mặc định 8787; chỉ có nghĩa với --serve)\n\
         \x20 -h, --help            hiện hướng dẫn này\n\
@@ -646,6 +751,7 @@ where
             "--config" => args.config = Some(take_value(&mut iter)?),
             "--log" => args.log = Some(take_value(&mut iter)?),
             "--exec" => args.exec = Some(take_value(&mut iter)?),
+            "--pc-id" => args.pc_id = Some(take_value(&mut iter)?),
             "--port" => {
                 let v = take_value(&mut iter)?;
                 let port = v
@@ -852,6 +958,13 @@ mod tests {
         }
     }
 
+    fn ident() -> Identity {
+        Identity {
+            user: "lam".to_string(),
+            pc: "may1".to_string(),
+        }
+    }
+
     #[test]
     fn summarize_maps_kinds() {
         assert!(matches!(
@@ -972,8 +1085,8 @@ mod tests {
         assert_eq!(out.len(), 1);
         assert_eq!(out[0].side, Some(RenameSide::Both));
         assert_eq!(
-            format_human(&out[0]),
-            "2026-11-12 22:00:00  RENAMED   /a/cu.txt -> /a/moi.txt"
+            format_human(&out[0], &ident()),
+            "2026-11-12 22:00:00  RENAMED   lam@may1  /a/cu.txt -> /a/moi.txt"
         );
     }
 
@@ -1002,8 +1115,8 @@ mod tests {
         assert_eq!(out.len(), 1);
         assert_eq!(out[0].side, Some(RenameSide::Both));
         assert_eq!(
-            format_human(&out[0]),
-            "2026-11-12 22:00:00  RENAMED   /a/cu.txt -> /a/moi.txt"
+            format_human(&out[0], &ident()),
+            "2026-11-12 22:00:00  RENAMED   lam@may1  /a/cu.txt -> /a/moi.txt"
         );
     }
 
@@ -1020,15 +1133,15 @@ mod tests {
         assert_eq!(out[0].side, Some(RenameSide::From));
         assert_eq!(out[2].side, Some(RenameSide::To));
         assert_eq!(
-            format_human(&out[0]),
-            "2026-11-12 22:00:00  RENAMED   /a/out.txt -> ?"
+            format_human(&out[0], &ident()),
+            "2026-11-12 22:00:00  RENAMED   lam@may1  /a/out.txt -> ?"
         );
         assert_eq!(
-            format_human(&out[2]),
-            "2026-11-12 22:00:00  RENAMED   ? -> /a/in.txt"
+            format_human(&out[2], &ident()),
+            "2026-11-12 22:00:00  RENAMED   lam@may1  ? -> /a/in.txt"
         );
-        assert!(format_json(&out[0]).contains("\"direction\":\"from\""));
-        assert!(format_json(&out[2]).contains("\"direction\":\"to\""));
+        assert!(format_json(&out[0], &ident()).contains("\"direction\":\"from\""));
+        assert!(format_json(&out[2], &ident()).contains("\"direction\":\"to\""));
     }
 
     #[test]
@@ -1092,13 +1205,23 @@ mod tests {
         assert_eq!(json_escape("tiếng Việt"), "tiếng Việt");
         let s = ren(RenameSide::Both, "/a/mới.txt", Some("/a/cũ.txt"), None);
         assert_eq!(
-            format_json(&s),
-            "{\"time\":\"2026-11-12 22:00:00\",\"event\":\"renamed\",\"path\":\"/a/mới.txt\",\"direction\":\"both\",\"from\":\"/a/cũ.txt\"}"
+            format_json(&s, &ident()),
+            "{\"time\":\"2026-11-12 22:00:00\",\"event\":\"renamed\",\"path\":\"/a/mới.txt\",\"direction\":\"both\",\"from\":\"/a/cũ.txt\",\"user\":\"lam\",\"pc\":\"may1\"}"
         );
         assert_eq!(
-            format_human(&s),
-            "2026-11-12 22:00:00  RENAMED   /a/cũ.txt -> /a/mới.txt"
+            format_human(&s, &ident()),
+            "2026-11-12 22:00:00  RENAMED   lam@may1  /a/cũ.txt -> /a/mới.txt"
         );
+    }
+
+    #[test]
+    fn detect_identity_never_empty() {
+        // Giá trị thật tùy máy chạy test, chỉ khẳng định không bao giờ
+        // để trống và label() có dạng user@pc.
+        let id = detect_identity();
+        assert!(!id.user.is_empty());
+        assert!(!id.pc.is_empty());
+        assert_eq!(id.label(), format!("{}@{}", id.user, id.pc));
     }
 
     #[test]
@@ -1117,6 +1240,9 @@ mod tests {
         assert!(parse_args(["--log"]).is_err());
         let a = parse_args(["--ignore", ".TMP, ~$"]).unwrap();
         assert_eq!(a.ignores, vec!["tmp", "~$"]);
+        let a = parse_args(["--pc-id", "may-phong-ke-toan"]).unwrap();
+        assert_eq!(a.pc_id.as_deref(), Some("may-phong-ke-toan"));
+        assert!(parse_args(["--pc-id"]).is_err());
     }
 
     #[test]

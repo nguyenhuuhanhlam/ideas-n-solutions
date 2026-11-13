@@ -28,7 +28,7 @@ use std::time::Duration;
 
 use notify::{RecursiveMode, Watcher};
 
-use crate::{json_escape, save_config, split_list, Filter, Settings};
+use crate::{json_escape, save_config, split_list, Filter, Identity, Settings};
 
 /// Trang giao diện duy nhất, nhúng vào binary lúc build.
 const UI_HTML: &str = include_str!("ui.html");
@@ -50,6 +50,8 @@ pub struct SharedState {
     debounce_ms: u64,
     recursive: bool,
     config_path: Option<PathBuf>,
+    /// Định danh máy + user (cố định trong suốt phiên chạy).
+    identity: Identity,
     /// (số thứ tự tăng dần, 1 dòng JSON của event).
     log: VecDeque<(u64, String)>,
     seq: u64,
@@ -72,6 +74,7 @@ impl Shared {
         debounce_ms: u64,
         recursive: bool,
         config_path: Option<PathBuf>,
+        identity: Identity,
     ) -> Self {
         Shared(Arc::new(Mutex::new(SharedState {
             watcher,
@@ -80,6 +83,7 @@ impl Shared {
             debounce_ms,
             recursive,
             config_path,
+            identity,
             log: VecDeque::new(),
             seq: 0,
         })))
@@ -135,14 +139,16 @@ impl Shared {
             None => "null".to_string(),
         };
         format!(
-            "{{\"dirs\":[{}],\"recursive\":{},\"debounce_ms\":{},\"exts\":[{}],\"ignores\":[{}],\"config_file\":{},\"events\":{}}}",
+            "{{\"dirs\":[{}],\"recursive\":{},\"debounce_ms\":{},\"exts\":[{}],\"ignores\":[{}],\"config_file\":{},\"events\":{},\"user\":\"{}\",\"pc\":\"{}\"}}",
             list(&dirs),
             st.recursive,
             st.debounce_ms,
             list(&st.filter.exts),
             list(&st.filter.ignores),
             config_file,
-            st.seq
+            st.seq,
+            json_escape(&st.identity.user),
+            json_escape(&st.identity.pc)
         )
     }
 

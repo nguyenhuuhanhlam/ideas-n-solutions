@@ -33,6 +33,8 @@ với `--serve` đang bật):
 
 Bản CLI thuần 0.1.0 đo ngày 2026-11-12 là ~625 KiB / ~2,5 MB /
 2 luồng — giao diện web chỉ thêm ~84 KiB binary và ~0,2 MB RAM.
+Bản 0.3.0 (thêm user + PC ID vào log): binary 735.064 byte
+(~718 KiB).
 
 Trên Windows con số sẽ khác đôi chút, nhưng cùng tầm đó (exe 1 file,
 không cần DLL kèm theo, không cần cài Rust trên máy chạy).
@@ -89,7 +91,8 @@ luôn sạch — pipe sang file hay tool khác chỉ nhận event.
 | `--ignore <a,b>` | — | Bỏ qua đường dẫn chứa chuỗi này (không phân biệt hoa/thường, vd: `.tmp,~$,node_modules`). |
 | `--log <file>` | — | Ghi thêm mọi dòng event vào file (append, cùng định dạng với stdout). File log nằm trong thư mục đang theo dõi vẫn an toàn: event do chính nó gây ra được tự loại, không vòng lặp. |
 | `--json` | dạng đọc | In mỗi event 1 dòng JSON thay vì dạng đọc được. |
-| `--exec "<lệnh>"` | — | Chạy lệnh mỗi khi có event, không chờ kết quả (không chặn watcher). Placeholder: `{path}` `{event}` `{time}` `{from}`. Chạy qua `cmd /C` trên Windows, `sh -c` trên Linux/macOS. |
+| `--exec "<lệnh>"` | — | Chạy lệnh mỗi khi có event, không chờ kết quả (không chặn watcher). Placeholder: `{path}` `{event}` `{time}` `{from}` `{user}` `{pc}`. Chạy qua `cmd /C` trên Windows, `sh -c` trên Linux/macOS. |
+| `--pc-id <id>` | hostname | Ghi đè PC ID trong log (mặc định: hostname của máy, xem "User + PC ID trong log"). |
 | `-h, --help` | — | Hiện hướng dẫn. |
 | `-V, --version` | — | Hiện phiên bản. |
 
@@ -157,15 +160,16 @@ C:\Users\ten\Documents\ghi-chu
 
 ## Định dạng đầu ra
 
-Dạng đọc được (mặc định), giờ địa phương:
+Dạng đọc được (mặc định), giờ địa phương — mỗi dòng ghi kèm
+`user@pc` của máy chạy:
 
 ```
-2026-11-12 22:55:01  CREATED   D:\code\project\src\main.rs
-2026-11-12 22:55:02  MODIFIED  D:\code\project\src\main.rs
-2026-11-12 22:55:03  REMOVED   D:\code\project\cu.txt
-2026-11-12 22:55:04  RENAMED   D:\code\project\cu.txt -> D:\code\project\moi.txt
-2026-11-12 22:55:05  RENAMED   D:\code\project\ra-ngoai.txt -> ?
-2026-11-12 22:55:06  RENAMED   ? -> D:\code\project\tu-ngoai-vao.txt
+2026-11-12 22:55:01  CREATED   lam@desktop-iua61p0  D:\code\project\src\main.rs
+2026-11-12 22:55:02  MODIFIED  lam@desktop-iua61p0  D:\code\project\src\main.rs
+2026-11-12 22:55:03  REMOVED   lam@desktop-iua61p0  D:\code\project\cu.txt
+2026-11-12 22:55:04  RENAMED   lam@desktop-iua61p0  D:\code\project\cu.txt -> D:\code\project\moi.txt
+2026-11-12 22:55:05  RENAMED   lam@desktop-iua61p0  D:\code\project\ra-ngoai.txt -> ?
+2026-11-12 22:55:06  RENAMED   lam@desktop-iua61p0  ? -> D:\code\project\tu-ngoai-vao.txt
 ```
 
 Rename có 3 dạng: đủ 2 đầu (`cũ -> mới`), chỉ biết tên cũ
@@ -175,13 +179,42 @@ mới (`? -> mới`, đổi tên từ ngoài vào).
 Dạng JSON (`--json`), 1 object 1 dòng:
 
 ```json
-{"time":"2026-11-12 22:55:04","event":"renamed","path":"D:\\code\\project\\moi.txt","direction":"both","from":"D:\\code\\project\\cu.txt"}
-{"time":"2026-11-12 22:55:02","event":"modified","path":"D:\\code\\project\\src\\main.rs"}
+{"time":"2026-11-12 22:55:04","event":"renamed","path":"D:\\code\\project\\moi.txt","direction":"both","from":"D:\\code\\project\\cu.txt","user":"lam","pc":"desktop-iua61p0"}
+{"time":"2026-11-12 22:55:02","event":"modified","path":"D:\\code\\project\\src\\main.rs","user":"lam","pc":"desktop-iua61p0"}
 ```
 
 `event` là 1 trong 4 giá trị `created` / `modified` / `removed` /
 `renamed`. Rename có thêm `"direction": "both" | "from" | "to" |
-"any"`, và `both` có thêm `"from"` (tên cũ).
+"any"`, và `both` có thêm `"from"` (tên cũ). Mọi event đều có
+`"user"` và `"pc"` — kể cả event qua SSE và `/api/log` của giao
+diện web.
+
+## User + PC ID trong log
+
+Mỗi dòng log ghi kèm user đang chạy và PC ID của máy, để gom log
+từ nhiều máy vẫn biết event nào từ máy nào. Nhận tự động lúc khởi
+động, không cần cấu hình:
+
+- **User:** biến môi trường `USERNAME` (Windows) / `USER` /
+  `LOGNAME`; không có thì chạy lệnh `whoami` (`DOMAIN\user` trên
+  Windows được rút gọn thành `user`).
+- **PC ID:** hostname của máy — `COMPUTERNAME` (Windows) /
+  `HOSTNAME` / file `/etc/hostname`; không có thì chạy lệnh
+  `hostname`. Lệnh chỉ chạy 1 lần lúc khởi động và chỉ khi biến
+  môi trường thiếu (bash không export `HOSTNAME` cho tiến trình
+  con, và có máy để trống `/etc/hostname`).
+- Không nhận được bằng cách nào thì ghi `unknown`, không để trống.
+
+Muốn PC ID khác hostname (vd: tên gợi nhớ hơn, hoặc 2 máy trùng
+hostname), dùng flag `--pc-id`:
+
+```sh
+file-watcher D:\code\project --pc-id may-phong-ke-toan
+```
+
+Định danh cũng hiện trên banner khởi động (`máy: lam@desktop-iua61p0`),
+trên đầu giao diện web, trong `GET /api/config` (`"user"`, `"pc"`),
+và dùng được trong `--exec` qua placeholder `{user}` `{pc}`.
 
 ## Quy tắc gộp (debounce)
 
@@ -227,7 +260,8 @@ im lặng — event đã mất thì không bịa lại được.
 
 - `src/lib.rs` — logic thuần: rút gọn event, gộp debounce, lọc,
   format đầu ra, parse CLI, đọc/ghi file cấu hình (gồm dòng cài đặt
-  `@...`). Cả crate có 16 unit test (`cargo test`).
+  `@...`), nhận định danh user + PC ID. Cả crate có 17 unit test
+  (`cargo test`).
 - `src/main.rs` — vòng lặp watcher: mở watcher, nhận event qua
   channel, in ra stdout / file log / chạy `--exec`, đẩy event vào
   log của giao diện web.
