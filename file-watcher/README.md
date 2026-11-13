@@ -159,6 +159,12 @@ không truy cập được từ máy khác trong mạng.
   khi còn nội dung phía trên/dưới thì mép tương ứng hiện vệt mờ
   nhạt, mờ dần khi cuộn tới cuối. Cuộn bằng chuột/bàn phím như
   bình thường.
+- **Màu nền:** mục "Màu nền" ở sidebar chọn màu nền cho các vùng
+  xung quanh (sidebar, topbar, dải stat, toolbar, tab) — 6 màu
+  cơ bản (xám, xanh dương, xanh lá, vàng, đỏ, tím) + mặc định
+  không màu; thanh trượt chỉnh độ đậm 0–50% (mặc định 8%).
+  Khu vực log luôn giữ nền gốc để dễ đọc. Lựa chọn lưu trong
+  trình duyệt nên mở lại vẫn giữ.
 - **Khởi động rỗng:** `--serve` không cần thư mục nào — mở giao diện
   rồi thêm thư mục sau cũng được; file `watch.json` được tạo khi lưu
   thay đổi đầu tiên.

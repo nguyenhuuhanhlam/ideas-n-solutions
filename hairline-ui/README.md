@@ -249,6 +249,24 @@ nền `--bg`, viền 1px `--line`, radius 0, padding `9px 16px`,
 `translateY` (transition .2s). Chỉ dùng cho xác nhận ngắn
 (vd: "Đã copy đường dẫn").
 
+### Màu nền (tint) — từ File Watcher 0.9.0
+
+Các vùng xung quanh (brand, topbar, sidebar, dải stat, toolbar,
+tabs) có thể nhuộm 1 trong 6 màu cơ bản (xám, xanh dương, xanh
+lá, vàng, đỏ, tím) với độ đậm 0–50% (mặc định 8%). Khu vực log
+luôn giữ nền gốc để dễ đọc.
+
+- Cơ chế: JS đặt biến `--tint` (rgba) lên `.app`; các vùng trong
+  danh sách dùng `background: var(--tint, transparent)`. Màu +
+  độ đậm đã chọn lưu `localStorage`.
+- Chọn màu bằng ô vuông 22px (màu nằm trong biến `--sw` của từng
+  ô; ô mặc định là đường chéo = không màu); ô đang chọn có viền
+  accent 2px. Thanh trượt độ đậm dùng `accent-color`, tắt khi
+  chưa chọn màu.
+- Vệt mờ của sidebar dùng màu đã pha (tint trên nền, tính theo
+  theme sáng/tối hiện tại) để không lộ vệt trắng trên nền đã
+  nhuộm; vệt của log giữ nguyên.
+
 ### Vệt mờ báo cuộn (thay thanh trượt)
 
 - Thanh cuộn **ẩn hẳn** ở sidebar và log:
@@ -352,6 +370,7 @@ chưa làm):
 | 0.6.0 | 2026-11-13 | Viết lại giao diện theo Hairline grid từ file demo; thêm dải stat 4 ô. |
 | 0.7.0 | 2026-11-13 | Sidebar co dãn (kéo tay nắm 160–480px, bấm đúp reset, phím mũi tên) + thu gọn (nút ‹/›), lưu localStorage. |
 | 0.8.0 | 2026-11-13 | Sidebar mặc định 320px (từ 220px); ẩn thanh cuộn, vệt mờ 28px báo cuộn ở sidebar + log. |
+| 0.9.0 | 2026-11-13 | Chọn màu nền cho các vùng xung quanh (trừ log): 6 màu cơ bản + chỉnh độ đậm 0–50%, lưu localStorage; vệt mờ sidebar pha theo màu nền. |
 
 ## Tham chiếu
 

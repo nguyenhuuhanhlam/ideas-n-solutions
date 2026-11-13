@@ -105,6 +105,16 @@
   .fade.show { opacity: 1; }
   .fade-top { top: 0; background: linear-gradient(to bottom, var(--bg), var(--fade-from)); }
   .fade-bottom { bottom: 0; background: linear-gradient(to top, var(--bg), var(--fade-from)); }
+  /* Vệt mờ của sidebar dùng màu đã pha (tint trên nền, JS đặt qua
+     --side-fade-solid/--side-fade-from) để không lộ vệt trắng khi
+     sidebar đang nhuộm màu. Vệt của log giữ nguyên (log không nhuộm). */
+  .sidewrap .fade-top { background: linear-gradient(to bottom, var(--side-fade-solid, var(--bg)), var(--side-fade-from, var(--fade-from))); }
+  .sidewrap .fade-bottom { background: linear-gradient(to top, var(--side-fade-solid, var(--bg)), var(--side-fade-from, var(--fade-from))); }
+  /* Màu nền tùy chọn: --tint (rgba, JS đặt) áp cho mọi vùng xung
+     quanh — brand, topbar, sidebar, stat, toolbar, tabs. Khu vực
+     log (.logwrap) CỐ Ý không nằm trong danh sách để luôn giữ
+     nền gốc, dễ đọc. */
+  .brand, .topbar, .sidewrap, .stats, .toolbar, .tabs { background: var(--tint, transparent); }
   .sidewrap { position: relative; border-right: 1px solid var(--line); min-height: 0; }
   .side { height: 100%; overflow-y: auto; }
   .side h6 {
@@ -153,6 +163,17 @@
     white-space: nowrap;
   }
   button:hover { background: var(--hover); border-color: var(--muted); }
+  /* Ô chọn màu nền: vuông 22px, màu nằm trong biến --sw của từng ô
+     (ô mặc định là đường chéo = không màu). Ô đang chọn có viền
+     accent 2px. Hover không đổi nền ô (chỉ đậm viền) để vẫn thấy
+     đúng màu. */
+  .swatches { display: flex; gap: 6px; flex-wrap: wrap; }
+  .swatch { width: 22px; height: 22px; padding: 0; background: var(--sw, transparent); flex-shrink: 0; }
+  .swatch:hover { background: var(--sw, transparent); }
+  .swatch[data-tint=""] { --sw: linear-gradient(to top right, transparent calc(50% - 1px), var(--muted) 50%, transparent calc(50% + 1px)); }
+  .swatch.selected { outline: 2px solid var(--accent); outline-offset: 1px; }
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  .tint-opacity.disabled { opacity: .45; }
   .hint { color: var(--muted); font-size: 12.5px; line-height: 1.5; margin-top: 8px; }
   .error { color: var(--red); font-size: 13px; min-height: 1.2em; margin-top: 8px; }
   .ok { color: var(--green); font-size: 13px; min-height: 1.2em; margin-top: 8px; }
@@ -315,6 +336,23 @@
       </div>
       <button id="applyBtn">Áp dụng</button>
       <p id="cfgMsg" class="ok"></p>
+    </div>
+    <h6>Màu nền</h6>
+    <div class="sideblock">
+      <div class="swatches" id="tintSwatches">
+        <button class="swatch selected" data-tint="" title="Mặc định (không màu)" aria-label="Không màu nền"></button>
+        <button class="swatch" data-tint="gray" style="--sw:#787878" title="Xám" aria-label="Nền xám"></button>
+        <button class="swatch" data-tint="blue" style="--sw:#2563eb" title="Xanh dương" aria-label="Nền xanh dương"></button>
+        <button class="swatch" data-tint="green" style="--sw:#16a34a" title="Xanh lá" aria-label="Nền xanh lá"></button>
+        <button class="swatch" data-tint="amber" style="--sw:#d97706" title="Vàng" aria-label="Nền vàng"></button>
+        <button class="swatch" data-tint="red" style="--sw:#dc2626" title="Đỏ" aria-label="Nền đỏ"></button>
+        <button class="swatch" data-tint="purple" style="--sw:#9333ea" title="Tím" aria-label="Nền tím"></button>
+      </div>
+      <div class="field tint-opacity disabled" id="tintOpacityField" style="margin-top:10px">
+        <label for="tintOpacity">Độ đậm <span id="tintOpacityVal" class="mono">8%</span></label>
+        <input id="tintOpacity" type="range" min="0" max="50" step="1" value="8" disabled>
+      </div>
+      <p class="hint">Màu nền chỉ áp cho các vùng xung quanh (sidebar, topbar, dải stat, toolbar, tab). Khu vực log luôn giữ nền gốc để dễ đọc.</p>
     </div>
     <h6>Thông tin</h6>
     <div class="sideblock foot">
@@ -505,6 +543,93 @@
   }
   sideEl.addEventListener("scroll", updateFades);
   logEl.addEventListener("scroll", updateFades);
+
+  // Màu nền các vùng xung quanh (trừ log): chọn 1 trong 6 màu cơ
+  // bản + chỉnh độ đậm 0–50% (mặc định 8%, đủ thấy mà không chói).
+  // Màu áp qua biến --tint (rgba) lên .app; các vùng trong danh
+  // sách CSS dùng background var(--tint), log không nằm trong đó
+  // nên giữ nguyên. Màu + độ đậm lưu localStorage.
+  var TINTS = {
+    gray: [120, 120, 120],
+    blue: [37, 99, 235],
+    green: [22, 163, 74],
+    amber: [217, 119, 6],
+    red: [220, 38, 38],
+    purple: [147, 51, 234],
+  };
+  var TINT_DEFAULT_OPACITY = 8;
+  var sidewrapEl = document.querySelector(".sidewrap");
+  var tintOpacityEl = document.getElementById("tintOpacity");
+  var tintOpacityValEl = document.getElementById("tintOpacityVal");
+  var tintOpacityFieldEl = document.getElementById("tintOpacityField");
+
+  var tintKey = "";
+  var tintOpacity = TINT_DEFAULT_OPACITY;
+  (function loadTintState() {
+    var k = storeGet("file-watcher-tint");
+    if (k && TINTS[k]) tintKey = k;
+    var o = parseInt(storeGet("file-watcher-tint-opacity"), 10);
+    if (!isNaN(o)) tintOpacity = Math.max(0, Math.min(50, o));
+  })();
+
+  function themeBg() {
+    // Không có matchMedia (trình duyệt rất cũ) thì mặc định nền sáng.
+    var mq = window.matchMedia
+      ? window.matchMedia("(prefers-color-scheme: dark)")
+      : null;
+    return mq && mq.matches ? [11, 11, 12] : [255, 255, 255];
+  }
+  function updateFadeColors() {
+    // Màu vệt mờ của sidebar = tint pha trên nền (theo theme sáng/
+    // tối) để vệt mờ hòa vào nền đã nhuộm, không lộ vệt trắng.
+    // Log không nhuộm nên vệt của log vẫn dùng --bg/--fade-from.
+    var bg = themeBg();
+    var rgb = TINTS[tintKey];
+    var a = rgb ? tintOpacity / 100 : 0;
+    var r = Math.round((rgb ? rgb[0] : bg[0]) * a + bg[0] * (1 - a));
+    var g = Math.round((rgb ? rgb[1] : bg[1]) * a + bg[1] * (1 - a));
+    var b = Math.round((rgb ? rgb[2] : bg[2]) * a + bg[2] * (1 - a));
+    sidewrapEl.style.setProperty("--side-fade-solid", "rgb(" + r + ", " + g + ", " + b + ")");
+    sidewrapEl.style.setProperty("--side-fade-from", "rgba(" + r + ", " + g + ", " + b + ", 0)");
+  }
+  function applyTint() {
+    var rgb = TINTS[tintKey];
+    var tint = rgb
+      ? "rgba(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ", " + tintOpacity / 100 + ")"
+      : "transparent";
+    appEl.style.setProperty("--tint", tint);
+    document.querySelectorAll(".swatch").forEach(function (btn) {
+      btn.classList.toggle("selected", btn.getAttribute("data-tint") === tintKey);
+    });
+    tintOpacityEl.value = String(tintOpacity);
+    tintOpacityValEl.textContent = tintOpacity + "%";
+    tintOpacityEl.disabled = !rgb;
+    tintOpacityFieldEl.classList.toggle("disabled", !rgb);
+    updateFadeColors();
+  }
+  function saveTintState() {
+    storeSet("file-watcher-tint", tintKey);
+    storeSet("file-watcher-tint-opacity", String(tintOpacity));
+  }
+  document.querySelectorAll(".swatch").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      tintKey = btn.getAttribute("data-tint");
+      applyTint();
+      saveTintState();
+    });
+  });
+  tintOpacityEl.addEventListener("input", function () {
+    tintOpacity = parseInt(tintOpacityEl.value, 10) || 0;
+    applyTint();
+    saveTintState();
+  });
+  var darkMq = window.matchMedia
+    ? window.matchMedia("(prefers-color-scheme: dark)")
+    : null;
+  if (darkMq && darkMq.addEventListener) {
+    darkMq.addEventListener("change", updateFadeColors);
+  }
+  applyTint();
 
   // Nhóm: event mới vào nhóm đang mở của file đó nếu cách event cuối
   // trong nhóm <= 5 phút, nếu không mở nhóm mới. Nhóm từ 3 event trở
