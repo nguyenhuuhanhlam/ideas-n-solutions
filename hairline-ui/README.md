@@ -7,7 +7,7 @@
 > component, hành vi — để sau này tách ra thành thư viện dùng chung
 > mà không phải đoán lại từ đầu.
 >
-> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.8.0.
+> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.0.
 
 ## Nguồn gốc
 
