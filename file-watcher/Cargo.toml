@@ -1,6 +1,6 @@
 [package]
 name = "file-watcher"
-version = "0.9.3"
+version = "0.9.4"
 edition = "2021"
 description = "Lightweight file watcher: logs changes in one or more folders using OS-native notifications (no polling)"
 license = "MIT"

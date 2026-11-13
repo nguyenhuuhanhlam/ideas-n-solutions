@@ -142,12 +142,13 @@ không truy cập được từ máy khác trong mạng.
   Tab Đã xóa không hiện nút ghim (file đã xóa thì ghim không có tác
   dụng; muốn bỏ ghim file đã xóa thì làm ở tab Đã ghim).
 - **Ghim file:** bấm 📌 ở dòng log hoặc nhóm để ghim file đó (bấm
-  lại để bỏ ghim), hoặc gõ đường dẫn trong tab Đã ghim. Ghim là
-  đường dẫn cố định, không chạy theo đổi tên. File ngoài vùng theo
-  dõi vẫn ghim được, hiện trạng thái "ngoài vùng theo dõi". Ghim
-  lưu vào file cấu hình JSON (mục `"pins"`) nên khởi động lại vẫn
-  còn; dữ liệu ghim đã để sẵn chỗ cho lệnh xử lý riêng theo file
-  (sẽ làm sau).
+  lại để bỏ ghim). Tab Đã ghim chỉ liệt kê file đã ghim kèm trạng
+  thái và nút × để bỏ ghim (từ 0.9.4 bỏ ô nhập đường dẫn ghim tay
+  vì gây rối UX). Ghim là đường dẫn cố định, không chạy theo đổi
+  tên. File ngoài vùng theo dõi vẫn ghim được, hiện trạng thái
+  "ngoài vùng theo dõi". Ghim lưu vào file cấu hình JSON (mục
+  `"pins"`) nên khởi động lại vẫn còn; dữ liệu ghim đã để sẵn chỗ
+  cho lệnh xử lý riêng theo file (sẽ làm sau).
 - **Phong cách hairline grid:** nền sáng (tối theo hệ thống qua
   `prefers-color-scheme`), mọi phân tách chỉ bằng đường line 1px,
   không card nổi, không shadow, không bo góc. Dải stat 4 ô đếm

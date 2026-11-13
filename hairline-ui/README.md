@@ -7,7 +7,7 @@
 > component, hành vi — để sau này tách ra thành thư viện dùng chung
 > mà không phải đoán lại từ đầu.
 >
-> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.3.
+> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.4.
 
 ## Nguồn gốc
 
@@ -239,7 +239,8 @@ Khối trên cùng của tab Đã ghim: `h6` + số lượng; danh sách
 ghim mỗi dòng có badge + tên file + **trạng thái đẩy sát phải**
 (muted, không xuống dòng: `ngoài vùng theo dõi` / `chưa có
 event` / `đã xóa` / `LOẠI giờ · N event`) + nút `×` đỏ bỏ ghim.
-Bên dưới là ô nhập đường dẫn + nút Ghim (dạng `addrow`).
+(Từ 0.9.4 bỏ ô nhập đường dẫn + nút Ghim bên dưới vì gây rối
+UX — ghim chỉ bằng nút 📌 ở dòng log.)
 
 ### Toast
 
@@ -380,6 +381,7 @@ chưa làm):
 | 0.9.1 | 2026-11-13 | Sửa lỗi hiển thị đường dẫn Windows: bỏ tiền tố verbatim `\\?\` ở mọi nơi (sidebar, log, file cấu hình) — danh sách thư mục theo dõi hiện dạng thường `C:\...`. |
 | 0.9.2 | 2026-11-13 | Tab Đã xóa không hiện nút ghim (dòng thường lẫn tiêu đề nhóm): file đã xóa thì ghim không có tác dụng; bỏ ghim file đã xóa vẫn làm được ở tab Đã ghim. |
 | 0.9.3 | 2026-11-13 | Line trong vùng nhuộm tự đổi màu theo tint: giữ sắc, lệch độ sáng cố định 14 điểm (đậm hơn ở theme sáng, sáng hơn ở theme tối); log và viền ngoài app giữ line gốc. |
+| 0.9.4 | 2026-11-13 | Tab Đã ghim bỏ ô nhập đường dẫn ghim tay (gây rối UX): chỉ còn danh sách file đã ghim + nút × bỏ ghim; ghim chỉ bằng nút 📌 ở dòng log. |
 
 ## Tham chiếu
 

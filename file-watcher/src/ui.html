@@ -422,7 +422,6 @@
   var activeTab = "all"; // "all" | "pinned" | "deleted"
   var expandedGroups = Object.create(null); // groupId -> true (nhóm đang mở)
   var prevGroupCounts = Object.create(null); // groupId -> số event ở lần render trước (để chớp sáng)
-  var pinMsgText = "";   // thông báo lỗi khi ghim bằng ô nhập (giữ qua các lần render)
   var toastTimer = null;
 
   // Sidebar co dãn + thu gọn: chiều rộng và trạng thái lưu
@@ -932,12 +931,13 @@
       + "</div>";
   }
 
-  // Khối quản lý ghim ở đầu tab Đã ghim: danh sách file đã ghim +
-  // ô nhập đường dẫn để ghim file bất kỳ.
+  // Khối quản lý ghim ở đầu tab Đã ghim: danh sách file đã ghim.
+  // Ghim chỉ bằng nút 📌 ở dòng log (0.9.4 bỏ ô nhập đường dẫn
+  // ghim tay vì gây rối UX).
   function pinManageHtml() {
     var html = '<div class="pinmanage"><h6>File đã ghim (' + pins.length + ")</h6>";
     if (!pins.length) {
-      html += '<p class="hint">Chưa ghim file nào. Bấm 📌 ở dòng log để ghim file đó, hoặc gõ đường dẫn bên dưới.</p>';
+      html += '<p class="hint">Chưa ghim file nào. Bấm 📌 ở dòng log để ghim file đó.</p>';
     } else {
       html += '<ul class="pinlist">';
       pins.forEach(function (p) {
@@ -948,8 +948,7 @@
       });
       html += "</ul>";
     }
-    html += '<div class="addrow"><input id="pinInput" type="text" placeholder="D:\\duong\\dan\\file.txt" autocomplete="off"><button id="pinAddBtn">Ghim</button></div>'
-      + '<p id="pinMsg" class="error">' + esc(pinMsgText) + "</p></div>";
+    html += "</div>";
     return html;
   }
 
@@ -979,12 +978,6 @@
   }
 
   function render() {
-    // Ô nhập ghim nằm trong #log nên render lại sẽ mất chữ đang gõ:
-    // giữ lại giá trị + focus trước khi vẽ lại.
-    var pinInput = document.getElementById("pinInput");
-    var pinVal = pinInput ? pinInput.value : "";
-    var pinFocused = !!(pinInput && document.activeElement === pinInput);
-
     var kinds = activeKinds();
     var q = document.getElementById("search").value.trim().toLowerCase();
     var tabs = computeTabs();
@@ -1042,16 +1035,6 @@
     }
     prevGroupCounts = newCounts;
     logEl.innerHTML = html;
-    if (pinVal || pinFocused) {
-      var ni = document.getElementById("pinInput");
-      if (ni) {
-        ni.value = pinVal;
-        if (pinFocused) {
-          ni.focus();
-          ni.setSelectionRange(ni.value.length, ni.value.length);
-        }
-      }
-    }
     if (document.getElementById("autoscroll").checked) logEl.scrollTop = logEl.scrollHeight;
     countsEl.textContent = entries.length + " dòng · " + lastSeq + " event (từ khi chạy)";
     updateFades();
@@ -1115,25 +1098,6 @@
         showToast(adding ? "Đã ghim file." : "Đã bỏ ghim.");
       } else {
         showToast(res.err || "Ghim thất bại.");
-      }
-    });
-  }
-
-  function addPinFromInput() {
-    var input = document.getElementById("pinInput");
-    var path = input ? input.value.trim() : "";
-    pinMsgText = "";
-    if (!path) { pinMsgText = "Chưa nhập đường dẫn file."; render(); return; }
-    postForm("/api/pins", { action: "add", path: path }).then(function (res) {
-      if (res.ok) {
-        pinMsgText = "";
-        var cur = document.getElementById("pinInput");
-        if (cur) cur.value = ""; // xóa ô nhập trước khi render lại
-        loadConfig();
-        showToast("Đã ghim file.");
-      } else {
-        pinMsgText = res.err || "Ghim thất bại.";
-        render();
       }
     });
   }
@@ -1271,9 +1235,9 @@
   });
 
   // 1 listener duy nhất trên #log cho mọi tương tác trong log
-  // (badge copy, nút ghim, mở/đóng nhóm, ghim bằng ô nhập) — các
-  // phần tử này được vẽ lại mỗi lần render nên không gắn listener
-  // riêng từng cái được.
+  // (badge copy, nút ghim/bỏ ghim, mở/đóng nhóm) — các phần tử
+  // này được vẽ lại mỗi lần render nên không gắn listener riêng
+  // từng cái được.
   logEl.addEventListener("click", function (ev) {
     var t = ev.target;
     var closest = function (sel) { return t.closest ? t.closest(sel) : null; };
@@ -1283,7 +1247,6 @@
     if (pinBtn) { togglePin(pinBtn.getAttribute("data-pin")); return; }
     var unpin = closest(".pinunpin");
     if (unpin) { togglePin(unpin.getAttribute("data-unpin")); return; }
-    if (t.id === "pinAddBtn") { addPinFromInput(); return; }
     var head = closest("[data-group]");
     if (head) {
       var id = head.getAttribute("data-group");
@@ -1292,10 +1255,6 @@
       render();
     }
   });
-  logEl.addEventListener("keydown", function (ev) {
-    if (ev.target.id === "pinInput" && ev.key === "Enter") addPinFromInput();
-  });
-
   loadConfig();
   loadLog();
 })();
