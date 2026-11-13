@@ -20,9 +20,9 @@ use std::sync::mpsc::{self, RecvTimeoutError};
 use std::time::Duration;
 
 use file_watcher::{
-    detect_identity, format_human, format_json, load_config, now_string, parse_args, summarize,
-    usage, Coalescer, Filter, Identity, Kind, RenameSide, Settings, SizeTracker, Summary,
-    VERSION,
+    detect_identity, format_human, format_json, load_config, now_string, parse_args,
+    strip_verbatim_prefix, summarize, usage, Coalescer, Filter, Identity, Kind, RenameSide,
+    Settings, SizeTracker, Summary, VERSION,
 };
 use file_watcher::web::{serve, Shared};
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
@@ -116,11 +116,14 @@ fn real_main() -> i32 {
         return 1;
     }
 
-    // Canonicalize + kiểm tra từng thư mục, loại trùng.
+    // Canonicalize + kiểm tra từng thư mục, loại trùng. Bỏ tiền tố
+    // verbatim \\?\ mà canonicalize sinh ra trên Windows, nếu
+    // không notify trả event với tiền tố đó và mọi đầu ra đều bẩn.
     let mut roots: Vec<PathBuf> = Vec::new();
     for dir in &raw_dirs {
         match Path::new(dir).canonicalize() {
             Ok(canon) if canon.is_dir() => {
+                let canon = strip_verbatim_prefix(&canon);
                 if !roots.contains(&canon) {
                     roots.push(canon);
                 }
@@ -473,7 +476,8 @@ fn absolute_log_path(log: &str) -> PathBuf {
     let abs = std::path::absolute(path).unwrap_or_else(|_| path.to_path_buf());
     if let (Some(parent), Some(name)) = (abs.parent(), abs.file_name()) {
         if let Ok(canon_parent) = parent.canonicalize() {
-            return canon_parent.join(name);
+            // Bỏ \\?\ để so khớp được với đường dẫn event (đã sạch).
+            return strip_verbatim_prefix(&canon_parent).join(name);
         }
     }
     abs

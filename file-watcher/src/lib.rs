@@ -116,16 +116,65 @@ pub fn now_string() -> String {
     chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string()
 }
 
+/// Bỏ tiền tố verbatim `\\?\` của Windows khỏi đường dẫn:
+/// `\\?\C:\a\b` -> `C:\a\b`, `\\?\UNC\server\share` ->
+/// `\\server\share`. Tiền tố này do `canonicalize` sinh ra và
+/// `notify` kế thừa qua thư mục gốc đã watch, nên mọi đường dẫn
+/// vào app đều đi qua đây trước khi hiển thị, lưu hay so sánh.
+/// Xử lý chuỗi thuần, chạy được trên mọi nền tảng (test được cả
+/// trên Linux); đường dẫn không có tiền tố giữ nguyên.
+pub fn strip_verbatim_prefix(p: &Path) -> PathBuf {
+    let s = p.to_string_lossy();
+    if let Some(rest) = s.strip_prefix(r"\\?\UNC\") {
+        return PathBuf::from(format!(r"\\{rest}"));
+    }
+    if let Some(rest) = s.strip_prefix(r"\\?\") {
+        return PathBuf::from(rest);
+    }
+    p.to_path_buf()
+}
+
+/// Đường dẫn có tuyệt đối không — tính cả dạng Windows
+/// (`C:\...`, `C:/...`, `\\server\share`) khi chạy trên nền tảng
+/// khác, để file cấu hình viết trên Windows vẫn đọc đúng.
+/// Gọi sau `strip_verbatim_prefix` (dạng `\\?\...` đã gọn).
+fn is_absolute_any(p: &Path) -> bool {
+    if p.is_absolute() {
+        return true;
+    }
+    let s = p.to_string_lossy();
+    let b = s.as_bytes();
+    // Ổ đĩa Windows: C:\ hoặc C:/
+    if b.len() >= 3
+        && b[0].is_ascii_alphabetic()
+        && b[1] == b':'
+        && (b[2] == b'\\' || b[2] == b'/')
+    {
+        return true;
+    }
+    // UNC: \\server\share.
+    s.starts_with(r"\\")
+}
+
 /// Rút gọn một `notify::Event` thành `Summary`.
 /// Trả về None cho các event nên bỏ qua: đọc file (Access) và Other.
 pub fn summarize(event: &notify::Event, time: String) -> Option<Summary> {
     if event.paths.is_empty() {
         return None;
     }
+    // Đường dẫn event nối từ thư mục gốc đã watch; trên Windows
+    // gốc đó từng mang tiền tố verbatim \\?\ (do canonicalize) nên
+    // event cũng mang theo — bỏ ngay tại đây để mọi đầu ra (CLI,
+    // file log, JSON, --exec, giao diện web) đều sạch.
+    let paths: Vec<PathBuf> = event
+        .paths
+        .iter()
+        .map(|p| strip_verbatim_prefix(p))
+        .collect();
     match &event.kind {
         EventKind::Create(_) => Some(Summary {
             kind: Kind::Created,
-            path: event.paths[0].clone(),
+            path: paths[0].clone(),
             from: None,
             side: None,
             tracker: None,
@@ -137,12 +186,12 @@ pub fn summarize(event: &notify::Event, time: String) -> Option<Summary> {
             use notify::event::RenameMode;
             let tracker = event.tracker();
             match mode {
-                RenameMode::Both if event.paths.len() >= 2 => {
+                RenameMode::Both if paths.len() >= 2 => {
                     // Đủ 2 đầu: paths[0] = nguồn, paths[1] = đích.
                     Some(Summary {
                         kind: Kind::Renamed,
-                        from: Some(event.paths[0].clone()),
-                        path: event.paths[1].clone(),
+                        from: Some(paths[0].clone()),
+                        path: paths[1].clone(),
                         side: Some(RenameSide::Both),
                         tracker,
                         time,
@@ -152,8 +201,8 @@ pub fn summarize(event: &notify::Event, time: String) -> Option<Summary> {
                 }
                 RenameMode::From => Some(Summary {
                     kind: Kind::Renamed,
-                    from: Some(event.paths[0].clone()),
-                    path: event.paths[0].clone(),
+                    from: Some(paths[0].clone()),
+                    path: paths[0].clone(),
                     side: Some(RenameSide::From),
                     tracker,
                     time,
@@ -163,7 +212,7 @@ pub fn summarize(event: &notify::Event, time: String) -> Option<Summary> {
                 RenameMode::To => Some(Summary {
                     kind: Kind::Renamed,
                     from: None,
-                    path: event.paths[0].clone(),
+                    path: paths[0].clone(),
                     side: Some(RenameSide::To),
                     tracker,
                     time,
@@ -175,7 +224,7 @@ pub fn summarize(event: &notify::Event, time: String) -> Option<Summary> {
                 _ => Some(Summary {
                     kind: Kind::Renamed,
                     from: None,
-                    path: event.paths[0].clone(),
+                    path: paths[0].clone(),
                     side: Some(RenameSide::Any),
                     tracker,
                     time,
@@ -186,7 +235,7 @@ pub fn summarize(event: &notify::Event, time: String) -> Option<Summary> {
         }
         EventKind::Modify(_) => Some(Summary {
             kind: Kind::Modified,
-            path: event.paths[0].clone(),
+            path: paths[0].clone(),
             from: None,
             side: None,
             tracker: None,
@@ -196,7 +245,7 @@ pub fn summarize(event: &notify::Event, time: String) -> Option<Summary> {
         }),
         EventKind::Remove(_) => Some(Summary {
             kind: Kind::Removed,
-            path: event.paths[0].clone(),
+            path: paths[0].clone(),
             from: None,
             side: None,
             tracker: None,
@@ -1355,11 +1404,11 @@ fn parse_config_legacy(
                             lineno + 1
                         ));
                     }
-                    let p = Path::new(value);
-                    let resolved = if p.is_absolute() || base.is_none() {
-                        p.to_path_buf()
+                    let p = strip_verbatim_prefix(Path::new(value));
+                    let resolved = if is_absolute_any(&p) || base.is_none() {
+                        p
                     } else {
-                        base.unwrap().join(p)
+                        base.unwrap().join(&p)
                     };
                     let pin = Pin::new(resolved);
                     if !settings.pins.contains(&pin) {
@@ -1375,11 +1424,11 @@ fn parse_config_legacy(
             }
             continue;
         }
-        let path = Path::new(line);
-        if path.is_absolute() || base.is_none() {
-            dirs.push(line.to_string());
+        let path = strip_verbatim_prefix(Path::new(line));
+        if is_absolute_any(&path) || base.is_none() {
+            dirs.push(path.to_string_lossy().into_owned());
         } else {
-            dirs.push(base.unwrap().join(path).to_string_lossy().into_owned());
+            dirs.push(base.unwrap().join(&path).to_string_lossy().into_owned());
         }
     }
     Ok((dirs, settings))
@@ -1519,11 +1568,14 @@ fn json_string_list(v: &JsonValue, config_path: &str, key: &str) -> Result<Vec<S
 /// Đường dẫn trong file cấu hình: tuyệt đối thì giữ nguyên, tương đối
 /// thì hiểu theo thư mục chứa file cấu hình.
 fn resolve_config_path(p: &str, base: Option<&Path>) -> String {
-    let path = Path::new(p);
-    if path.is_absolute() || base.is_none() {
-        p.to_string()
+    // Bỏ tiền tố verbatim \\?\ trước (file cũ lưu dạng đó), rồi
+    // mới xét tuyệt đối/tương đối — kể cả dạng Windows khi đọc
+    // trên nền tảng khác.
+    let clean = strip_verbatim_prefix(Path::new(p));
+    if is_absolute_any(&clean) || base.is_none() {
+        clean.to_string_lossy().into_owned()
     } else {
-        base.unwrap().join(path).to_string_lossy().into_owned()
+        base.unwrap().join(&clean).to_string_lossy().into_owned()
     }
 }
 
@@ -2230,5 +2282,73 @@ mod tests {
         s.size = None;
         assert!(format_human(&s, &ident()).contains("lam@may1  —  /a/main.rs"));
         assert!(!format_json(&s, &ident()).contains("\"size\""));
+    }
+
+    #[test]
+    fn strip_verbatim_prefix_cases() {
+        // Ổ đĩa thường: \\?\C:\... -> C:\...
+        assert_eq!(
+            strip_verbatim_prefix(Path::new(r"\\?\C:\Users\a\Downloads")),
+            PathBuf::from(r"C:\Users\a\Downloads")
+        );
+        // UNC: \\?\UNC\server\share -> \\server\share.
+        assert_eq!(
+            strip_verbatim_prefix(Path::new(r"\\?\UNC\server\share\file.txt")),
+            PathBuf::from(r"\\server\share\file.txt")
+        );
+        // Không có tiền tố: giữ nguyên (cả Windows lẫn Unix).
+        assert_eq!(
+            strip_verbatim_prefix(Path::new(r"C:\Users\a")),
+            PathBuf::from(r"C:\Users\a")
+        );
+        assert_eq!(
+            strip_verbatim_prefix(Path::new("/home/a/code")),
+            PathBuf::from("/home/a/code")
+        );
+        // Tiền tố nằm giữa chuỗi thì không chạm vào.
+        assert_eq!(
+            strip_verbatim_prefix(Path::new(r"C:\x\?\y")),
+            PathBuf::from(r"C:\x\?\y")
+        );
+    }
+
+    #[test]
+    fn summarize_strips_verbatim_prefix() {
+        let e = ev(Create(CreateKind::File), &[r"\\?\C:\Users\a\file.txt"]);
+        let s = summarize(&e, "2026-11-13 20:00:00".to_string()).unwrap();
+        assert_eq!(s.path, PathBuf::from(r"C:\Users\a\file.txt"));
+        // Đổi tên: cả 2 đầu đều sạch.
+        let e = ev(
+            Modify(ModifyKind::Name(RenameMode::Both)),
+            &[r"\\?\C:\a\cu.txt", r"\\?\C:\a\moi.txt"],
+        );
+        let s = summarize(&e, "2026-11-13 20:00:00".to_string()).unwrap();
+        assert_eq!(s.from.as_deref(), Some(Path::new(r"C:\a\cu.txt")));
+        assert_eq!(s.path, PathBuf::from(r"C:\a\moi.txt"));
+    }
+
+    #[test]
+    fn load_config_strips_verbatim_prefix() {
+        // File cấu hình cũ (trước 0.9.1) đã lưu đường dẫn dạng
+        // verbatim — đọc lại phải tự lành, cả dirs lẫn pins.
+        let dir = std::env::temp_dir().join("file-watcher-test-verbatim");
+        let _ = std::fs::create_dir_all(&dir);
+        let path = dir.join("watch.json");
+        std::fs::write(
+            &path,
+            r#"{
+  "dirs": ["\\\\?\\C:\\Users\\a\\Downloads"],
+  "pins": [{ "path": "\\\\?\\C:\\Users\\a\\note.txt", "command": null }]
+}"#,
+        )
+        .unwrap();
+        let (dirs, settings) = load_config(path.to_str().unwrap()).unwrap();
+        assert_eq!(dirs, vec![r"C:\Users\a\Downloads"]);
+        assert_eq!(settings.pins.len(), 1);
+        assert_eq!(
+            settings.pins[0].path,
+            PathBuf::from(r"C:\Users\a\note.txt")
+        );
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

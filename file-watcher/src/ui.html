@@ -1089,7 +1089,9 @@
     cfg.dirs.forEach(function (d) {
       var li = document.createElement("li");
       var span = document.createElement("span");
-      span.textContent = d;
+      // Hiện dạng đã bỏ tiền tố \\?\ (server 0.9.1+ gửi dạng sạch,
+      // nhưng file cấu hình cũ vẫn có thể chứa dạng verbatim).
+      span.textContent = cleanPath(d);
       var btn = document.createElement("button");
       btn.textContent = "×";
       btn.title = "Bỏ theo dõi thư mục này";

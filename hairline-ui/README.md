@@ -7,7 +7,7 @@
 > component, hành vi — để sau này tách ra thành thư viện dùng chung
 > mà không phải đoán lại từ đầu.
 >
-> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.0.
+> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.1.
 
 ## Nguồn gốc
 
@@ -371,6 +371,7 @@ chưa làm):
 | 0.7.0 | 2026-11-13 | Sidebar co dãn (kéo tay nắm 160–480px, bấm đúp reset, phím mũi tên) + thu gọn (nút ‹/›), lưu localStorage. |
 | 0.8.0 | 2026-11-13 | Sidebar mặc định 320px (từ 220px); ẩn thanh cuộn, vệt mờ 28px báo cuộn ở sidebar + log. |
 | 0.9.0 | 2026-11-13 | Chọn màu nền cho các vùng xung quanh (trừ log): 6 màu cơ bản + chỉnh độ đậm 0–50%, lưu localStorage; vệt mờ sidebar pha theo màu nền. |
+| 0.9.1 | 2026-11-13 | Sửa lỗi hiển thị đường dẫn Windows: bỏ tiền tố verbatim `\\?\` ở mọi nơi (sidebar, log, file cấu hình) — danh sách thư mục theo dõi hiện dạng thường `C:\...`. |
 
 ## Tham chiếu
 

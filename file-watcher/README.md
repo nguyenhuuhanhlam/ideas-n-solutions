@@ -113,6 +113,9 @@ không truy cập được từ máy khác trong mạng.
 - **Cấu hình thư mục:** thêm/xóa thư mục theo dõi (gõ đường dẫn đầy
   đủ — trình duyệt không chọn được thư mục trên máy). Thêm/xóa áp
   dụng ngay, không cần khởi động lại, và lưu ngay vào file cấu hình.
+  Trên Windows, đường dẫn hiển thị và lưu luôn dạng thường (`C:\...`):
+  tiền tố verbatim `\\?\` do hệ thống sinh ra được bỏ đi ngay khi
+  nhận — kể cả đường dẫn trong file cấu hình cũ.
 - **Cài đặt:** đệ quy (bật/tắt), debounce (ms), chỉ đuôi file, bỏ
   qua chuỗi — nút Áp dụng lưu ngay vào file cấu hình. Đổi đệ quy
   thì app watch lại toàn bộ thư mục với chế độ mới; đổi bộ lọc áp

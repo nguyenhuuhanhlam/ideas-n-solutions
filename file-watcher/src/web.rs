@@ -30,7 +30,9 @@ use std::time::Duration;
 
 use notify::{RecursiveMode, Watcher};
 
-use crate::{json_escape, save_config, split_list, Filter, Identity, Pin, Settings};
+use crate::{
+    json_escape, save_config, split_list, strip_verbatim_prefix, Filter, Identity, Pin, Settings,
+};
 
 /// Trang giao diện duy nhất, nhúng vào binary lúc build.
 const UI_HTML: &str = include_str!("ui.html");
@@ -189,9 +191,12 @@ impl Shared {
     /// Thêm 1 thư mục: kiểm tra tồn tại -> watch live -> lưu file.
     /// Lưu lỗi thì bỏ watch vừa thêm (rollback).
     pub fn add_dir(&self, dir: &str) -> Result<(), String> {
-        let canon = Path::new(dir).canonicalize().map_err(|_| {
+        // Bỏ tiền tố verbatim \\?\ mà canonicalize sinh ra trên
+        // Windows — nếu không thư mục lưu vào watch.json và hiện
+        // ở sidebar đều mang tiền tố thừa đó.
+        let canon = strip_verbatim_prefix(&Path::new(dir).canonicalize().map_err(|_| {
             format!("thư mục không tồn tại hoặc không đọc được: {dir}")
-        })?;
+        })?);
         if !canon.is_dir() {
             return Err(format!("không phải thư mục: {dir}"));
         }
@@ -217,9 +222,12 @@ impl Shared {
 
     /// Xóa 1 thư mục khỏi danh sách theo dõi (unwatch live + lưu file).
     pub fn remove_dir(&self, dir: &str) -> Result<(), String> {
-        let canon = Path::new(dir)
-            .canonicalize()
-            .map_err(|_| format!("thư mục không tồn tại: {dir}"))?;
+        // Bỏ \\?\ như add_dir để so khớp được với thư mục đã lưu.
+        let canon = strip_verbatim_prefix(
+            &Path::new(dir)
+                .canonicalize()
+                .map_err(|_| format!("thư mục không tồn tại: {dir}"))?,
+        );
         let mut st = lock(&self.0);
         let Some(pos) = st.roots.iter().position(|r| r == &canon) else {
             return Err(format!(
@@ -361,7 +369,7 @@ fn normalize_pin_path(path: &str) -> Result<PathBuf, String> {
         return Err(format!("đường dẫn ghim phải tuyệt đối: {path}"));
     }
     if let Ok(canon) = p.canonicalize() {
-        return Ok(canon);
+        return Ok(strip_verbatim_prefix(&canon));
     }
     #[cfg(windows)]
     {
