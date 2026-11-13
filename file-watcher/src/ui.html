@@ -45,15 +45,35 @@
   .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
   .muted { color: var(--muted); }
 
-  /* Khung chính: grid 220px | 1fr, topbar 44px, không gap, chỉ line */
+  /* Khung chính: grid sidebar | 1fr, topbar 44px, không gap, chỉ line.
+     Chiều rộng sidebar nằm trong biến --side-w (JS đổi khi kéo tay nắm
+     hoặc bấm thu gọn); vị trí các vùng đặt rõ để khi thu gọn (ẩn brand
+     + side) topbar/main không bị xếp lại. */
   .app {
+    position: relative;
     display: grid;
-    grid-template-columns: 220px 1fr;
+    grid-template-columns: var(--side-w, 220px) 1fr;
     grid-template-rows: 44px 1fr;
     height: 100vh;
     border: 1px solid var(--line);
   }
   .brand, .topbar, .side, .main { min-width: 0; }
+  .brand { grid-column: 1; grid-row: 1; }
+  .topbar { grid-column: 2; grid-row: 1; }
+  .side { grid-column: 1; grid-row: 2; }
+  .main { grid-column: 2; grid-row: 2; }
+  .app.collapsed { grid-template-columns: 0 1fr; }
+  .app.collapsed .brand, .app.collapsed .side, .app.collapsed #sideResizer { display: none; }
+  /* Tay kéo đổi chiều rộng sidebar: dải 6px ôm đúng đường line giữa
+     2 cột, bình thường vô hình, rê chuột/kéo thì hiện vạch accent. */
+  #sideResizer {
+    position: absolute; top: 0; bottom: 0;
+    left: var(--side-w, 220px);
+    width: 6px; margin-left: -3px;
+    cursor: col-resize; z-index: 5;
+  }
+  #sideResizer:hover, #sideResizer.dragging { background: rgba(37, 99, 235, .12); box-shadow: inset 1px 0 0 var(--accent); }
+  #sideResizer:focus { outline: 1px solid var(--accent); outline-offset: -1px; }
   .brand {
     display: flex; align-items: center; padding: 0 14px; gap: 8px;
     border-bottom: 1px solid var(--line); border-right: 1px solid var(--line);
@@ -221,8 +241,14 @@
 
   @media (max-width: 800px) {
     .app { grid-template-columns: 1fr; grid-template-rows: 44px 44px auto 1fr; height: auto; min-height: 100vh; }
-    .brand { border-right: 0; }
-    .side { border-right: 0; border-bottom: 1px solid var(--line); overflow: visible; }
+    .brand { grid-column: 1; grid-row: 1; border-right: 0; }
+    .topbar { grid-column: 1; grid-row: 2; }
+    .side { grid-column: 1; grid-row: 3; border-right: 0; border-bottom: 1px solid var(--line); overflow: visible; }
+    .main { grid-column: 1; grid-row: 4; }
+    .app.collapsed { grid-template-columns: 1fr; grid-template-rows: 44px 1fr; }
+    .app.collapsed .topbar { grid-row: 1; }
+    .app.collapsed .main { grid-row: 2; }
+    #sideResizer { display: none; }
     .main { overflow: visible; }
     #log { overflow: visible; }
     .stats { grid-template-columns: repeat(2, 1fr); }
@@ -235,6 +261,7 @@
 <div class="app">
   <div class="brand"><i></i> file-watcher</div>
   <div class="topbar">
+    <button id="sideToggle" title="Thu gọn sidebar" aria-label="Thu gọn / mở sidebar">‹</button>
     <span id="identity" class="identity mono muted"></span>
     <div class="status"><span id="dot" class="dot"></span><span id="statusText">Đang kết nối…</span></div>
     <div id="counts" class="mono muted"></div>
@@ -301,6 +328,7 @@
     </div>
     <div id="log"><p class="empty">Chưa có thay đổi nào. Sửa, tạo hoặc xóa file trong thư mục đang theo dõi để thấy log ở đây.</p></div>
   </main>
+  <div id="sideResizer" tabindex="0" role="separator" aria-orientation="vertical" aria-label="Đổi chiều rộng sidebar" title="Kéo để đổi chiều rộng sidebar (bấm đúp để về 220px)"></div>
 </div>
 <div id="toast"></div>
 <script>
@@ -331,6 +359,97 @@
   var prevGroupCounts = Object.create(null); // groupId -> số event ở lần render trước (để chớp sáng)
   var pinMsgText = "";   // thông báo lỗi khi ghim bằng ô nhập (giữ qua các lần render)
   var toastTimer = null;
+
+  // Sidebar co dãn + thu gọn: chiều rộng và trạng thái lưu
+  // localStorage để mở lại vẫn giữ. Kéo tay nắm ở đường line giữa 2
+  // cột (160–480px, tối đa nửa màn hình); bấm đúp tay nắm để về
+  // 220px; phím mũi tên trái/phải khi tay nắm đang focus thì nới/
+  // thu 10px (giữ Shift: 50px).
+  var SIDE_DEFAULT_W = 220;
+  var SIDE_MIN_W = 160;
+  var SIDE_MAX_W = 480;
+  var appEl = document.querySelector(".app");
+  var sideToggleEl = document.getElementById("sideToggle");
+  var resizerEl = document.getElementById("sideResizer");
+
+  function storeGet(key) {
+    try { return window.localStorage.getItem(key); } catch (err) { return null; }
+  }
+  function storeSet(key, value) {
+    try { window.localStorage.setItem(key, value); } catch (err) { /* bỏ qua: chế độ riêng tư */ }
+  }
+
+  var sideW = SIDE_DEFAULT_W;
+  var sideCollapsed = false;
+  (function loadSideState() {
+    var w = parseInt(storeGet("file-watcher-side-w"), 10);
+    if (!isNaN(w)) sideW = w;
+    sideCollapsed = storeGet("file-watcher-side-collapsed") === "1";
+  })();
+
+  function sideMaxW() {
+    return Math.min(SIDE_MAX_W, Math.floor(window.innerWidth * 0.5));
+  }
+  function clampSideW(w) {
+    return Math.max(SIDE_MIN_W, Math.min(sideMaxW(), Math.round(w)));
+  }
+  function applySide() {
+    sideW = clampSideW(sideW);
+    appEl.style.setProperty("--side-w", sideW + "px");
+    appEl.classList.toggle("collapsed", sideCollapsed);
+    sideToggleEl.textContent = sideCollapsed ? "›" : "‹";
+    sideToggleEl.title = sideCollapsed ? "Mở sidebar" : "Thu gọn sidebar";
+    resizerEl.setAttribute("aria-valuenow", String(sideW));
+  }
+  function saveSideState() {
+    storeSet("file-watcher-side-w", String(sideW));
+    storeSet("file-watcher-side-collapsed", sideCollapsed ? "1" : "0");
+  }
+
+  sideToggleEl.addEventListener("click", function () {
+    sideCollapsed = !sideCollapsed;
+    applySide();
+    saveSideState();
+  });
+  resizerEl.addEventListener("mousedown", function (ev) {
+    ev.preventDefault();
+    var startX = ev.clientX;
+    var startW = sideW;
+    resizerEl.classList.add("dragging");
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    function move(e) {
+      sideW = clampSideW(startW + (e.clientX - startX));
+      appEl.style.setProperty("--side-w", sideW + "px");
+    }
+    function up() {
+      document.removeEventListener("mousemove", move);
+      document.removeEventListener("mouseup", up);
+      resizerEl.classList.remove("dragging");
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      applySide();
+      saveSideState();
+    }
+    document.addEventListener("mousemove", move);
+    document.addEventListener("mouseup", up);
+  });
+  resizerEl.addEventListener("dblclick", function () {
+    sideW = SIDE_DEFAULT_W;
+    applySide();
+    saveSideState();
+  });
+  resizerEl.addEventListener("keydown", function (ev) {
+    var step = ev.shiftKey ? 50 : 10;
+    if (ev.key === "ArrowLeft") { sideW = clampSideW(sideW - step); applySide(); saveSideState(); ev.preventDefault(); }
+    else if (ev.key === "ArrowRight") { sideW = clampSideW(sideW + step); applySide(); saveSideState(); ev.preventDefault(); }
+  });
+  window.addEventListener("resize", function () {
+    // Cửa sổ thu nhỏ: kẹp lại chiều rộng sidebar cho vừa.
+    var clamped = clampSideW(sideW);
+    if (clamped !== sideW) { sideW = clamped; applySide(); saveSideState(); }
+  });
+  applySide();
 
   // Nhóm: event mới vào nhóm đang mở của file đó nếu cách event cuối
   // trong nhóm <= 5 phút, nếu không mở nhóm mới. Nhóm từ 3 event trở

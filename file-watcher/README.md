@@ -148,6 +148,12 @@ không truy cập được từ máy khác trong mạng.
   không card nổi, không shadow, không bo góc. Dải stat 4 ô đếm
   event theo loại (tạo/sửa/xóa/đổi tên) trong 1000 dòng gần nhất,
   kèm giờ event mới nhất của từng loại.
+- **Sidebar co dãn + thu gọn:** kéo tay nắm ở đường line giữa
+  sidebar và nội dung để đổi chiều rộng (160–480px, tối đa nửa màn
+  hình; bấm đúp tay nắm để về 220px; phím mũi tên khi tay nắm đang
+  focus). Nút ‹ ở đầu topbar thu gọn hẳn sidebar, bấm › để mở lại.
+  Chiều rộng và trạng thái thu gọn lưu trong trình duyệt nên mở
+  lại vẫn giữ.
 - **Khởi động rỗng:** `--serve` không cần thư mục nào — mở giao diện
   rồi thêm thư mục sau cũng được; file `watch.txt` được tạo khi lưu
   thay đổi đầu tiên.
