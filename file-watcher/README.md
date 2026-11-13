@@ -143,6 +143,11 @@ không truy cập được từ máy khác trong mạng.
   lưu vào file cấu hình dạng dòng `@pin ...` nên khởi động lại vẫn
   còn; dữ liệu ghim đã để sẵn chỗ cho lệnh xử lý riêng theo file
   (sẽ làm sau).
+- **Phong cách hairline grid:** nền sáng (tối theo hệ thống qua
+  `prefers-color-scheme`), mọi phân tách chỉ bằng đường line 1px,
+  không card nổi, không shadow, không bo góc. Dải stat 4 ô đếm
+  event theo loại (tạo/sửa/xóa/đổi tên) trong 1000 dòng gần nhất,
+  kèm giờ event mới nhất của từng loại.
 - **Khởi động rỗng:** `--serve` không cần thư mục nào — mở giao diện
   rồi thêm thư mục sau cũng được; file `watch.txt` được tạo khi lưu
   thay đổi đầu tiên.

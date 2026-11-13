@@ -5,159 +5,194 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>file-watcher</title>
 <style>
+  /* Phong cách "Hairline grid": không card nổi, không shadow,
+     không bo góc; mọi sự phân tách chỉ bằng đường line 1px.
+     Sáng mặc định, tối theo prefers-color-scheme của hệ thống. */
   :root {
-    --bg: #14161a;
-    --panel: #1d2026;
-    --border: #2e323b;
-    --text: #e6e6e6;
-    --dim: #9aa3ad;
-    --accent: #4f8ff7;
-    --green: #4ade80;
-    --blue: #60a5fa;
-    --red: #f87171;
-    --purple: #c084fc;
-    --mono: "Cascadia Mono", "JetBrains Mono", Consolas, "Courier New", monospace;
+    --bg: #ffffff;
+    --fg: #0a0a0a;
+    --muted: #737373;
+    --line: #e5e5e5;
+    --hover: #fafafa;
+    --accent: #2563eb;
+    --green: #16a34a;
+    --blue: #2563eb;
+    --red: #dc2626;
+    --purple: #9333ea;
   }
-  * { box-sizing: border-box; }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0c;
+      --fg: #ededed;
+      --muted: #8a8a8f;
+      --line: #26262a;
+      --hover: #131315;
+      --accent: #60a5fa;
+      --green: #4ade80;
+      --blue: #60a5fa;
+      --red: #f87171;
+      --purple: #c084fc;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
-    margin: 0;
     background: var(--bg);
-    color: var(--text);
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-    font-size: 14px;
-    display: flex;
-    flex-direction: column;
+    color: var(--fg);
+    font: 13px/1.4 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
-  header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--border);
-    background: var(--panel);
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+  .muted { color: var(--muted); }
+
+  /* Khung chính: grid 220px | 1fr, topbar 44px, không gap, chỉ line */
+  .app {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    grid-template-rows: 44px 1fr;
+    height: 100vh;
+    border: 1px solid var(--line);
   }
-  header h1 { font-size: 16px; margin: 0; font-family: var(--mono); }
-  .identity { font-family: var(--mono); font-size: 13px; color: var(--dim); }
-  .status { display: flex; align-items: center; gap: 6px; color: var(--dim); }
-  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); }
+  .brand, .topbar, .side, .main { min-width: 0; }
+  .brand {
+    display: flex; align-items: center; padding: 0 14px; gap: 8px;
+    border-bottom: 1px solid var(--line); border-right: 1px solid var(--line);
+    font-weight: 600; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .brand i { width: 10px; height: 10px; background: var(--fg); display: inline-block; flex-shrink: 0; }
+  .topbar {
+    display: flex; align-items: center; gap: 16px;
+    padding: 0 14px; border-bottom: 1px solid var(--line);
+  }
+  .identity { font-size: 13px; }
+  .status { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+  .dot { width: 8px; height: 8px; background: var(--red); flex-shrink: 0; }
   .dot.on { background: var(--green); }
-  #counts { margin-left: auto; color: var(--dim); font-family: var(--mono); font-size: 13px; }
-  .layout { display: flex; flex: 1; min-height: 0; }
-  aside {
-    width: 340px;
-    flex-shrink: 0;
-    border-right: 1px solid var(--border);
-    padding: 14px;
-    overflow-y: auto;
-    background: var(--panel);
+  #counts { margin-left: auto; font-size: 13px; }
+
+  .side { border-right: 1px solid var(--line); overflow-y: auto; }
+  .side h6 {
+    font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--line);
   }
-  aside section { margin-bottom: 22px; }
-  aside h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); margin: 0 0 10px; }
-  #dirList { list-style: none; margin: 0 0 10px; padding: 0; }
+  .sideblock { padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  .sideblock:last-child { border-bottom: 0; }
+  #dirList { list-style: none; }
   #dirList li {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 8px;
-    margin-bottom: 4px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-family: var(--mono);
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--line);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 12.5px;
     word-break: break-all;
   }
   #dirList li span { flex: 1; }
   #dirList li button {
     background: none; border: none; color: var(--red);
-    font-size: 16px; line-height: 1; cursor: pointer; padding: 0 2px;
+    font-size: 16px; line-height: 1; cursor: pointer; padding: 0 2px; flex-shrink: 0;
   }
   .addrow { display: flex; gap: 6px; }
   input[type="text"], input[type="number"] {
     flex: 1;
     min-width: 0;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    color: var(--text);
-    border-radius: 6px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--fg);
+    border-radius: 0;
     padding: 7px 9px;
     font-size: 13px;
-    font-family: var(--mono);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
   input:focus { outline: 1px solid var(--accent); }
   button {
-    background: var(--accent);
-    border: none;
-    color: #fff;
-    border-radius: 6px;
-    padding: 7px 14px;
-    font-size: 13px;
+    background: transparent;
+    color: var(--fg);
+    font: inherit;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    padding: 6px 12px;
     cursor: pointer;
     white-space: nowrap;
   }
-  button.ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
-  button:hover { filter: brightness(1.1); }
-  .hint { color: var(--dim); font-size: 12.5px; line-height: 1.5; }
-  .error { color: var(--red); font-size: 13px; min-height: 1.2em; margin: 8px 0 0; }
-  .ok { color: var(--green); font-size: 13px; min-height: 1.2em; margin: 8px 0 0; }
+  button:hover { background: var(--hover); border-color: var(--muted); }
+  .hint { color: var(--muted); font-size: 12.5px; line-height: 1.5; margin-top: 8px; }
+  .error { color: var(--red); font-size: 13px; min-height: 1.2em; margin-top: 8px; }
+  .ok { color: var(--green); font-size: 13px; min-height: 1.2em; margin-top: 8px; }
   .field { margin-bottom: 10px; }
-  .field label { display: block; color: var(--dim); font-size: 12.5px; margin-bottom: 4px; }
+  .field label { display: block; color: var(--muted); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
   .field input[type="text"], .field input[type="number"] { width: 100%; }
   .checkrow { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; cursor: pointer; }
-  .foot { color: var(--dim); font-size: 12.5px; border-top: 1px solid var(--border); padding-top: 12px; }
-  .foot code { font-family: var(--mono); color: var(--text); }
-  main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .foot { color: var(--muted); font-size: 12.5px; line-height: 1.5; }
+  .foot code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--fg); }
+
+  .main { display: flex; flex-direction: column; overflow: hidden; }
+  /* Dải stat: 4 ô dính nhau, ngăn bằng border-right */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); flex-shrink: 0; }
+  .stat { padding: 14px; border-right: 1px solid var(--line); }
+  .stat:last-child { border-right: 0; }
+  .stat .v { font-size: 22px; font-weight: 600; margin-top: 6px; }
+  .delta { font-size: 12px; margin-top: 2px; }
+
   .toolbar {
     display: flex;
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
     padding: 10px 14px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--line);
+    flex-shrink: 0;
   }
-  .toolbar label { display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--dim); }
+  .toolbar label { display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--muted); }
   .toolbar input[type="text"] { max-width: 260px; }
   .toolbar .spacer { flex: 1; }
-  .tabs { display: flex; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border); }
-  .tabbtn { background: transparent; border: 1px solid var(--border); color: var(--dim); }
-  .tabbtn.active { background: var(--panel); color: var(--text); border-color: var(--accent); }
-  .tabbtn .tabcount { opacity: .75; font-family: var(--mono); font-size: 12px; }
-  #log { flex: 1; overflow-y: auto; padding: 8px 0; font-family: var(--mono); font-size: 13px; }
-  .row { display: flex; gap: 10px; padding: 3px 14px; white-space: pre-wrap; word-break: break-all; }
-  .row:nth-child(odd) { background: rgba(255, 255, 255, .02); }
-  .row .time { color: var(--dim); flex-shrink: 0; }
-  .row .kind { flex-shrink: 0; width: 76px; font-weight: 700; }
-  .row .who { color: var(--dim); flex-shrink: 0; }
-  .row .size { color: var(--dim); flex-shrink: 0; }
+
+  .tabs { display: flex; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+  .tabbtn {
+    background: transparent; border: 0; border-right: 1px solid var(--line);
+    color: var(--muted); padding: 9px 14px; border-radius: 0;
+  }
+  .tabbtn:hover { background: var(--hover); border-color: var(--line); }
+  .tabbtn.active { color: var(--fg); box-shadow: inset 0 -2px 0 var(--accent); }
+  .tabbtn .tabcount { opacity: .75; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+
+  #log { flex: 1; overflow-y: auto; padding: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+  .row { display: flex; gap: 10px; padding: 5px 14px; white-space: pre-wrap; word-break: break-all; border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  .row:hover { background: var(--hover); }
+  .row .time { color: var(--muted); flex-shrink: 0; }
+  .row .kind { flex-shrink: 0; width: 82px; }
+  .row .kind i { font-style: normal; display: inline-block; padding: 1px 6px; border: 1px solid currentColor; font-size: 11px; font-weight: 600; }
+  .row .who { color: var(--muted); flex-shrink: 0; }
+  .row .size { color: var(--muted); flex-shrink: 0; }
   .row.created .kind { color: var(--green); }
   .row.modified .kind { color: var(--blue); }
   .row.removed .kind { color: var(--red); }
   .row.renamed .kind { color: var(--purple); }
-  .row .arrow { color: var(--dim); }
+  .row .arrow { color: var(--muted); }
   .row.child { padding-left: 34px; }
   .row.grouphead { cursor: pointer; align-items: center; }
-  .row.grouphead:hover { background: rgba(255, 255, 255, .05); }
-  .row.grouphead .caret { flex-shrink: 0; width: 14px; color: var(--dim); }
+  .row.grouphead .caret { flex-shrink: 0; width: 14px; color: var(--muted); }
   .row.grouphead .gcount { flex-shrink: 0; color: var(--accent); font-weight: 700; }
-  .row.grouphead .glast { color: var(--dim); flex-shrink: 0; }
-  .row.grouphead .gnet { color: var(--dim); flex-shrink: 0; }
+  .row.grouphead .glast { color: var(--muted); flex-shrink: 0; }
+  .row.grouphead .gnet { color: var(--muted); flex-shrink: 0; }
   .row.grouphead .fname { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  @keyframes flash { from { background: rgba(79, 143, 247, .25); } to { background: transparent; } }
+  @keyframes flash { from { background: rgba(37, 99, 235, .12); } to { background: transparent; } }
   .row.flash { animation: flash 1.2s ease-out; }
   .pathbadge {
     flex-shrink: 0;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    color: var(--dim);
-    border-radius: 5px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    border-radius: 0;
     padding: 1px 7px;
     font-size: 12px;
-    font-family: var(--mono);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     cursor: pointer;
   }
-  .pathbadge:hover { color: var(--text); border-color: var(--accent); }
-  .fname { color: var(--text); }
+  .pathbadge:hover { color: var(--fg); border-color: var(--muted); background: transparent; }
+  .fname { color: var(--fg); }
   .pinbtn {
     margin-left: auto;
     flex-shrink: 0;
@@ -165,71 +200,89 @@
     font-size: 14px; line-height: 1; cursor: pointer;
     opacity: .35;
   }
-  .pinbtn:hover { opacity: 1; }
-  .pinbtn.on { opacity: 1; filter: drop-shadow(0 0 2px var(--accent)); }
-  .pinmanage { padding: 10px 14px; border-bottom: 1px solid var(--border); }
-  .pinmanage h3 { margin: 0 0 8px; font-size: 13px; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; }
-  .pinlist { list-style: none; margin: 0 0 10px; padding: 0; }
-  .pinlist li { display: flex; align-items: center; gap: 8px; padding: 6px 8px; margin-bottom: 4px; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; font-family: var(--mono); font-size: 12.5px; }
-  .pinlist .pinstatus { margin-left: auto; color: var(--dim); font-size: 12px; white-space: nowrap; }
+  .pinbtn:hover { opacity: 1; background: none; border: none; }
+  .pinbtn.on { opacity: 1; }
+  .pinmanage { padding: 14px; border-bottom: 1px solid var(--line); }
+  .pinmanage h6 { font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .pinlist { list-style: none; margin-bottom: 10px; }
+  .pinlist li { display: flex; align-items: center; gap: 8px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+  .pinlist li:last-child { border-bottom: 0; }
+  .pinlist .pinstatus { margin-left: auto; color: var(--muted); font-size: 12px; white-space: nowrap; }
   .pinlist .pinunpin { background: none; border: none; color: var(--red); font-size: 16px; line-height: 1; cursor: pointer; padding: 0 2px; }
+  .pinlist .pinunpin:hover { background: none; border: none; }
   #toast {
     position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: var(--panel); border: 1px solid var(--border); color: var(--text);
-    padding: 9px 16px; border-radius: 8px; font-size: 13px;
+    background: var(--bg); border: 1px solid var(--line); color: var(--fg);
+    padding: 9px 16px; border-radius: 0; font-size: 13px;
     opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 10;
   }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .empty { color: var(--dim); padding: 20px 14px; font-family: system-ui, sans-serif; }
+  .empty { color: var(--muted); padding: 20px 14px; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+
   @media (max-width: 800px) {
-    .layout { flex-direction: column; }
-    aside { width: auto; border-right: none; border-bottom: 1px solid var(--border); }
+    .app { grid-template-columns: 1fr; grid-template-rows: 44px 44px auto 1fr; height: auto; min-height: 100vh; }
+    .brand { border-right: 0; }
+    .side { border-right: 0; border-bottom: 1px solid var(--line); overflow: visible; }
+    .main { overflow: visible; }
+    #log { overflow: visible; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(2) { border-right: 0; }
+    .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
   }
 </style>
 </head>
 <body>
-<header>
-  <h1>file-watcher</h1>
-  <span id="identity" class="identity"></span>
-  <div class="status"><span id="dot" class="dot"></span><span id="statusText">Đang kết nối…</span></div>
-  <div id="counts"></div>
-</header>
-<div class="layout">
-  <aside>
-    <section>
-      <h2>Thư mục theo dõi (<span id="dirCount">0</span>)</h2>
-      <ul id="dirList"></ul>
+<div class="app">
+  <div class="brand"><i></i> file-watcher</div>
+  <div class="topbar">
+    <span id="identity" class="identity mono muted"></span>
+    <div class="status"><span id="dot" class="dot"></span><span id="statusText">Đang kết nối…</span></div>
+    <div id="counts" class="mono muted"></div>
+  </div>
+
+  <nav class="side">
+    <h6>Thư mục theo dõi (<span id="dirCount">0</span>)</h6>
+    <ul id="dirList"></ul>
+    <div class="sideblock">
       <div class="addrow">
         <input id="dirInput" type="text" placeholder="D:\code\project hoặc /home/user/code" autocomplete="off">
         <button id="addBtn">Thêm</button>
       </div>
       <p id="dirError" class="error"></p>
       <p class="hint">Gõ đường dẫn đầy đủ rồi bấm Thêm. Trình duyệt không chọn được thư mục trên máy nên cần gõ tay. Thêm/xóa áp dụng ngay và lưu vào file cấu hình.</p>
-    </section>
-    <section>
-      <h2>Cài đặt</h2>
+    </div>
+    <h6>Cài đặt</h6>
+    <div class="sideblock">
       <label class="checkrow"><input type="checkbox" id="recursive" checked> Đệ quy (theo dõi cả thư mục con)</label>
       <div class="field">
-        <label for="debounce">Debounce — gộp event dồn dập trong (ms)</label>
+        <label for="debounce">Debounce (ms)</label>
         <input id="debounce" type="number" min="0" step="50" value="200">
       </div>
       <div class="field">
-        <label for="exts">Chỉ đuôi file (phân tách bằng dấu phẩy, để trống là tất cả)</label>
+        <label for="exts">Chỉ đuôi file</label>
         <input id="exts" type="text" placeholder="rs,md,txt" autocomplete="off">
       </div>
       <div class="field">
-        <label for="ignores">Bỏ qua đường dẫn chứa chuỗi (phân tách bằng dấu phẩy)</label>
+        <label for="ignores">Bỏ qua đường dẫn chứa</label>
         <input id="ignores" type="text" placeholder="target,node_modules,.tmp" autocomplete="off">
       </div>
       <button id="applyBtn">Áp dụng</button>
       <p id="cfgMsg" class="ok"></p>
-    </section>
-    <section class="foot">
+    </div>
+    <h6>Thông tin</h6>
+    <div class="sideblock foot">
       <p>File cấu hình: <code id="cfgFile">—</code></p>
-      <p>Giao diện này chỉ chạy trên máy này (127.0.0.1). Mọi thay đổi lưu ngay vào file cấu hình nên khởi động lại vẫn giữ nguyên.</p>
+      <p style="margin-top:8px">Giao diện này chỉ chạy trên máy này (127.0.0.1). Mọi thay đổi lưu ngay vào file cấu hình nên khởi động lại vẫn giữ nguyên.</p>
+    </div>
+  </nav>
+
+  <main class="main">
+    <section class="stats">
+      <div class="stat" title="Số đếm trong 1000 dòng log gần nhất"><div class="muted">Đã tạo</div><div class="v mono" id="statCreated">0</div><div class="delta muted mono" id="statCreatedSub">chưa có</div></div>
+      <div class="stat" title="Số đếm trong 1000 dòng log gần nhất"><div class="muted">Đã sửa</div><div class="v mono" id="statModified">0</div><div class="delta muted mono" id="statModifiedSub">chưa có</div></div>
+      <div class="stat" title="Số đếm trong 1000 dòng log gần nhất"><div class="muted">Đã xóa</div><div class="v mono" id="statRemoved">0</div><div class="delta muted mono" id="statRemovedSub">chưa có</div></div>
+      <div class="stat" title="Số đếm trong 1000 dòng log gần nhất"><div class="muted">Đổi tên</div><div class="v mono" id="statRenamed">0</div><div class="delta muted mono" id="statRenamedSub">chưa có</div></div>
     </section>
-  </aside>
-  <main>
     <div class="toolbar">
       <label><input type="checkbox" class="kindf" value="created" checked> Tạo</label>
       <label><input type="checkbox" class="kindf" value="modified" checked> Sửa</label>
@@ -238,8 +291,8 @@
       <input id="search" type="text" placeholder="Lọc theo tên file…" autocomplete="off">
       <div class="spacer"></div>
       <label><input type="checkbox" id="autoscroll" checked> Tự cuộn</label>
-      <button id="pauseBtn" class="ghost">Tạm dừng</button>
-      <button id="clearBtn" class="ghost">Xóa log</button>
+      <button id="pauseBtn">Tạm dừng</button>
+      <button id="clearBtn">Xóa log</button>
     </div>
     <div class="tabs">
       <button class="tabbtn active" data-tab="all">Tất cả <span class="tabcount" id="countAll"></span></button>
@@ -485,7 +538,7 @@
 
   function rowHtml(e, child) {
     var who = (e.user || "?") + "@" + (e.pc || "?");
-    return '<div class="row ' + esc(e.event) + (child ? " child" : "") + '"><span class="time">' + esc(e.time) + '</span><span class="kind">' + KIND_LABEL[e.event] + '</span><span class="who">' + esc(who) + '</span><span class="size">' + esc(sizeText(e)) + "</span><span>" + pathHtml(e) + "</span>" + pinBtnHtml(e.path) + "</div>";
+    return '<div class="row ' + esc(e.event) + (child ? " child" : "") + '"><span class="time">' + esc(e.time) + '</span><span class="kind"><i>' + KIND_LABEL[e.event] + '</i></span><span class="who">' + esc(who) + '</span><span class="size">' + esc(sizeText(e)) + "</span><span>" + pathHtml(e) + "</span>" + pinBtnHtml(e.path) + "</div>";
   }
 
   function groupHeadHtml(g, expanded, grew) {
@@ -506,7 +559,7 @@
   // Khối quản lý ghim ở đầu tab Đã ghim: danh sách file đã ghim +
   // ô nhập đường dẫn để ghim file bất kỳ.
   function pinManageHtml() {
-    var html = '<div class="pinmanage"><h3>File đã ghim (' + pins.length + ")</h3>";
+    var html = '<div class="pinmanage"><h6>File đã ghim (' + pins.length + ")</h6>";
     if (!pins.length) {
       html += '<p class="hint">Chưa ghim file nào. Bấm 📌 ở dòng log để ghim file đó, hoặc gõ đường dẫn bên dưới.</p>';
     } else {
@@ -528,6 +581,27 @@
     document.getElementById(id).textContent = "(" + n + ")";
   }
 
+  // Dải stat: số event theo loại trong bộ nhớ hiện tại (tối đa 1000
+  // dòng) + giờ event mới nhất của loại đó.
+  function updateStats() {
+    var counts = { created: 0, modified: 0, removed: 0, renamed: 0 };
+    var latest = { created: null, modified: null, removed: null, renamed: null };
+    entries.forEach(function (e) {
+      if (counts[e.event] === undefined) return;
+      counts[e.event]++;
+      latest[e.event] = e.time;
+    });
+    setStat("statCreated", counts.created, latest.created);
+    setStat("statModified", counts.modified, latest.modified);
+    setStat("statRemoved", counts.removed, latest.removed);
+    setStat("statRenamed", counts.renamed, latest.renamed);
+  }
+
+  function setStat(id, n, lastTime) {
+    document.getElementById(id).textContent = String(n);
+    document.getElementById(id + "Sub").textContent = lastTime ? "mới nhất " + shortTime(lastTime) : "chưa có";
+  }
+
   function render() {
     // Ô nhập ghim nằm trong #log nên render lại sẽ mất chữ đang gõ:
     // giữ lại giá trị + focus trước khi vẽ lại.
@@ -541,6 +615,7 @@
     setTabCount("countAll", tabs.all.length);
     setTabCount("countPinned", tabs.pinned.length);
     setTabCount("countDeleted", tabs.deleted.length);
+    updateStats();
     var list = tabs[activeTab] || [];
     var filtered = [];
     for (var i = 0; i < list.length; i++) {
