@@ -21,7 +21,8 @@ use std::time::Duration;
 
 use file_watcher::{
     detect_identity, format_human, format_json, load_config, now_string, parse_args, summarize,
-    usage, Coalescer, Filter, Identity, Settings, Summary, VERSION,
+    usage, Coalescer, Filter, Identity, Kind, RenameSide, Settings, SizeTracker, Summary,
+    VERSION,
 };
 use file_watcher::web::{serve, Shared};
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
@@ -249,6 +250,8 @@ fn real_main() -> i32 {
     eprintln!("Nhấn Ctrl+C để dừng.");
 
     let mut coalescer = Coalescer::new();
+    // Ghi nhớ kích thước file đã thấy để tính delta (xem SizeTracker).
+    let mut sizes = SizeTracker::new();
     let stdout = std::io::stdout();
 
     // Vòng lặp chính: recv() block cho tới khi có event nên lúc rảnh
@@ -279,6 +282,7 @@ fn real_main() -> i32 {
                         &stdout,
                         &shared,
                         &identity,
+                        &mut sizes,
                     );
                     return 0;
                 }
@@ -292,6 +296,7 @@ fn real_main() -> i32 {
             &stdout,
             &shared,
             &identity,
+            &mut sizes,
         );
     }
     0
@@ -340,7 +345,7 @@ fn handle_event(
 
 /// In toàn bộ event đã gộp: stdout + file log + lệnh --exec + đẩy
 /// vào log của giao diện web (luôn dạng JSON). Mỗi dòng đều ghi kèm
-/// user + PC ID của máy chạy.
+/// user + PC ID của máy chạy và kích thước file (+ delta nếu biết).
 /// Gom thành 1 lần ghi cho stdout/log để không xen kẽ khi pipe.
 fn flush(
     coalescer: &mut Coalescer,
@@ -350,13 +355,19 @@ fn flush(
     stdout: &std::io::Stdout,
     shared: &Shared,
     identity: &Identity,
+    sizes: &mut SizeTracker,
 ) {
     if coalescer.is_empty() {
         // Vẫn phải dọn bộ gộp (các mục đã Drop) để cửa sổ sau sạch.
         let _ = coalescer.take();
         return;
     }
-    let summaries = coalescer.take();
+    let mut summaries = coalescer.take();
+    // Gắn size/delta cho từng dòng TRƯỚC khi format: stat 1 lần lúc
+    // flush cho ra size mới nhất sau cả cửa sổ debounce.
+    for s in &mut summaries {
+        attach_size(s, sizes);
+    }
     let mut out = String::new();
     for s in &summaries {
         if *json {
@@ -383,13 +394,57 @@ fn flush(
     }
 }
 
+/// Kích thước file (byte) nếu đường dẫn là file thường còn tồn tại.
+/// Thư mục và file đã mất đều trả None (size của thư mục theo OS
+/// không có nghĩa — vd: 4096 trên Linux — nên không hiện).
+fn file_size(path: &Path) -> Option<u64> {
+    let meta = std::fs::metadata(path).ok()?;
+    if meta.is_file() {
+        Some(meta.len())
+    } else {
+        None
+    }
+}
+
+/// Gắn `size`/`delta` vào 1 summary đã gộp, qua `SizeTracker`.
+fn attach_size(summary: &mut Summary, sizes: &mut SizeTracker) {
+    let (size, delta) = match summary.kind {
+        Kind::Removed => sizes.observe(&summary.path, None, true),
+        Kind::Renamed => match summary.side {
+            // Đủ 2 đầu: chuyển cache nguồn -> đích rồi stat đích.
+            Some(RenameSide::Both) => {
+                if let Some(from) = &summary.from {
+                    sizes.rename(from, &summary.path);
+                }
+                sizes.observe(&summary.path, file_size(&summary.path), false)
+            }
+            // Chỉ biết tên cũ (đổi tên ra ngoài): như Removed với tên cũ.
+            Some(RenameSide::From) => sizes.observe(&summary.path, None, true),
+            // Chỉ biết tên mới (đổi tên từ ngoài vào) hoặc không rõ chiều.
+            _ => sizes.observe(&summary.path, file_size(&summary.path), false),
+        },
+        _ => sizes.observe(&summary.path, file_size(&summary.path), false),
+    };
+    summary.size = size;
+    summary.delta = delta;
+}
+
 /// Chạy lệnh --exec cho 1 event, không chờ kết quả (không chặn vòng
-/// lặp watcher). Placeholder: {path} {event} {time} {from} {user} {pc}.
+/// lặp watcher). Placeholder: {path} {event} {time} {from} {user} {pc}
+/// {size} {delta} — {size}/{delta} là số byte thô (rỗng khi không rõ).
 fn run_hook(template: &str, summary: &Summary, identity: &Identity) {
     let from = summary
         .from
         .as_ref()
         .map(|p| p.to_string_lossy().into_owned())
+        .unwrap_or_default();
+    let size = summary
+        .size
+        .map(|n| n.to_string())
+        .unwrap_or_default();
+    let delta = summary
+        .delta
+        .map(|d| d.to_string())
         .unwrap_or_default();
     let cmd = template
         .replace("{path}", &summary.path.to_string_lossy())
@@ -397,7 +452,9 @@ fn run_hook(template: &str, summary: &Summary, identity: &Identity) {
         .replace("{time}", &summary.time)
         .replace("{from}", &from)
         .replace("{user}", &identity.user)
-        .replace("{pc}", &identity.pc);
+        .replace("{pc}", &identity.pc)
+        .replace("{size}", &size)
+        .replace("{delta}", &delta);
     #[cfg(windows)]
     let spawned = std::process::Command::new("cmd").args(["/C", &cmd]).spawn();
     #[cfg(not(windows))]

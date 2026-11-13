@@ -125,6 +125,7 @@
   .row .time { color: var(--dim); flex-shrink: 0; }
   .row .kind { flex-shrink: 0; width: 76px; font-weight: 700; }
   .row .who { color: var(--dim); flex-shrink: 0; }
+  .row .size { color: var(--dim); flex-shrink: 0; }
   .row.created .kind { color: var(--green); }
   .row.modified .kind { color: var(--blue); }
   .row.removed .kind { color: var(--red); }
@@ -217,6 +218,22 @@
 
   var KIND_LABEL = { created: "CREATED", modified: "MODIFIED", removed: "REMOVED", renamed: "RENAMED" };
 
+  // Định dạng byte như phía Rust: đơn vị 1024, dấu phẩy thập phân.
+  function formatBytes(n) {
+    if (n < 1024) return n + " B";
+    if (n < 1048576) return (n / 1024).toFixed(1).replace(".", ",") + " KB";
+    if (n < 1073741824) return (n / 1048576).toFixed(1).replace(".", ",") + " MB";
+    return (n / 1073741824).toFixed(1).replace(".", ",") + " GB";
+  }
+
+  function sizeText(e) {
+    if (e.size === undefined || e.size === null) return "—";
+    var s = formatBytes(e.size);
+    if (e.delta === undefined || e.delta === null) return s;
+    if (e.delta === 0) return s + " (±0 B)";
+    return s + " (" + (e.delta > 0 ? "+" : "-") + formatBytes(Math.abs(e.delta)) + ")";
+  }
+
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -249,7 +266,7 @@
       } else {
         target = esc(e.path);
       }
-      html += '<div class="row ' + esc(e.event) + '"><span class="time">' + esc(e.time) + '</span><span class="kind">' + KIND_LABEL[e.event] + '</span><span class="who">' + esc(who) + '</span><span>' + target + "</span></div>";
+      html += '<div class="row ' + esc(e.event) + '"><span class="time">' + esc(e.time) + '</span><span class="kind">' + KIND_LABEL[e.event] + '</span><span class="who">' + esc(who) + '</span><span class="size">' + esc(sizeText(e)) + '</span><span>' + target + "</span></div>";
       shown++;
     }
     logEl.innerHTML = shown ? html : '<p class="empty">Không có dòng nào khớp bộ lọc.</p>';

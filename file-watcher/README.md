@@ -34,7 +34,8 @@ với `--serve` đang bật):
 Bản CLI thuần 0.1.0 đo ngày 2026-11-12 là ~625 KiB / ~2,5 MB /
 2 luồng — giao diện web chỉ thêm ~84 KiB binary và ~0,2 MB RAM.
 Bản 0.3.0 (thêm user + PC ID vào log): binary 735.064 byte
-(~718 KiB).
+(~718 KiB). Bản 0.4.0 (thêm size + delta): binary 768.400 byte
+(~750 KiB).
 
 Trên Windows con số sẽ khác đôi chút, nhưng cùng tầm đó (exe 1 file,
 không cần DLL kèm theo, không cần cài Rust trên máy chạy).
@@ -91,7 +92,7 @@ luôn sạch — pipe sang file hay tool khác chỉ nhận event.
 | `--ignore <a,b>` | — | Bỏ qua đường dẫn chứa chuỗi này (không phân biệt hoa/thường, vd: `.tmp,~$,node_modules`). |
 | `--log <file>` | — | Ghi thêm mọi dòng event vào file (append, cùng định dạng với stdout). File log nằm trong thư mục đang theo dõi vẫn an toàn: event do chính nó gây ra được tự loại, không vòng lặp. |
 | `--json` | dạng đọc | In mỗi event 1 dòng JSON thay vì dạng đọc được. |
-| `--exec "<lệnh>"` | — | Chạy lệnh mỗi khi có event, không chờ kết quả (không chặn watcher). Placeholder: `{path}` `{event}` `{time}` `{from}` `{user}` `{pc}`. Chạy qua `cmd /C` trên Windows, `sh -c` trên Linux/macOS. |
+| `--exec "<lệnh>"` | — | Chạy lệnh mỗi khi có event, không chờ kết quả (không chặn watcher). Placeholder: `{path}` `{event}` `{time}` `{from}` `{user}` `{pc}` `{size}` `{delta}` — `{size}`/`{delta}` là số byte thô, rỗng khi không rõ. Chạy qua `cmd /C` trên Windows, `sh -c` trên Linux/macOS. |
 | `--pc-id <id>` | hostname | Ghi đè PC ID trong log (mặc định: hostname của máy, xem "User + PC ID trong log"). |
 | `-h, --help` | — | Hiện hướng dẫn. |
 | `-V, --version` | — | Hiện phiên bản. |
@@ -161,15 +162,15 @@ C:\Users\ten\Documents\ghi-chu
 ## Định dạng đầu ra
 
 Dạng đọc được (mặc định), giờ địa phương — mỗi dòng ghi kèm
-`user@pc` của máy chạy:
+`user@pc` của máy chạy và kích thước file (+ delta nếu biết):
 
 ```
-2026-11-12 22:55:01  CREATED   lam@desktop-iua61p0  D:\code\project\src\main.rs
-2026-11-12 22:55:02  MODIFIED  lam@desktop-iua61p0  D:\code\project\src\main.rs
-2026-11-12 22:55:03  REMOVED   lam@desktop-iua61p0  D:\code\project\cu.txt
-2026-11-12 22:55:04  RENAMED   lam@desktop-iua61p0  D:\code\project\cu.txt -> D:\code\project\moi.txt
-2026-11-12 22:55:05  RENAMED   lam@desktop-iua61p0  D:\code\project\ra-ngoai.txt -> ?
-2026-11-12 22:55:06  RENAMED   lam@desktop-iua61p0  ? -> D:\code\project\tu-ngoai-vao.txt
+2026-11-12 22:55:01  CREATED   lam@desktop-iua61p0  100 B  D:\code\project\src\main.rs
+2026-11-12 22:55:02  MODIFIED  lam@desktop-iua61p0  150 B (+50 B)  D:\code\project\src\main.rs
+2026-11-12 22:55:03  REMOVED   lam@desktop-iua61p0  150 B  D:\code\project\cu.txt
+2026-11-12 22:55:04  RENAMED   lam@desktop-iua61p0  150 B (±0 B)  D:\code\project\cu.txt -> D:\code\project\moi.txt
+2026-11-12 22:55:05  RENAMED   lam@desktop-iua61p0  12,3 KB  D:\code\project\ra-ngoai.txt -> ?
+2026-11-12 22:55:06  RENAMED   lam@desktop-iua61p0  12,3 KB  ? -> D:\code\project\tu-ngoai-vao.txt
 ```
 
 Rename có 3 dạng: đủ 2 đầu (`cũ -> mới`), chỉ biết tên cũ
@@ -179,15 +180,44 @@ mới (`? -> mới`, đổi tên từ ngoài vào).
 Dạng JSON (`--json`), 1 object 1 dòng:
 
 ```json
-{"time":"2026-11-12 22:55:04","event":"renamed","path":"D:\\code\\project\\moi.txt","direction":"both","from":"D:\\code\\project\\cu.txt","user":"lam","pc":"desktop-iua61p0"}
-{"time":"2026-11-12 22:55:02","event":"modified","path":"D:\\code\\project\\src\\main.rs","user":"lam","pc":"desktop-iua61p0"}
+{"time":"2026-11-12 22:55:04","event":"renamed","path":"D:\\code\\project\\moi.txt","direction":"both","from":"D:\\code\\project\\cu.txt","user":"lam","pc":"desktop-iua61p0","size":15432,"delta":0}
+{"time":"2026-11-12 22:55:02","event":"modified","path":"D:\\code\\project\\src\\main.rs","user":"lam","pc":"desktop-iua61p0","size":15432,"delta":2871}
 ```
 
 `event` là 1 trong 4 giá trị `created` / `modified` / `removed` /
 `renamed`. Rename có thêm `"direction": "both" | "from" | "to" |
 "any"`, và `both` có thêm `"from"` (tên cũ). Mọi event đều có
 `"user"` và `"pc"` — kể cả event qua SSE và `/api/log` của giao
-diện web.
+diện web. `"size"` là kích thước byte (số nguyên), `"delta"` là
+chênh lệch byte so với lần biết trước (có dấu) — cả hai chỉ xuất
+hiện khi biết được (xem dưới đây).
+
+## Kích thước file + thay đổi (delta)
+
+Mỗi dòng log ghi kèm kích thước file sau thay đổi đó, và — khi
+sửa file — chênh lệch so với lần biết trước (`+2,8 KB`, `-512 B`,
+`±0 B` nếu sửa mà size không đổi). Đây là thay đổi về kích thước,
+không phải diff nội dung file.
+
+- **Lần đầu thấy file** chỉ hiện size, chưa có delta: app không
+  quét trước thư mục lúc khởi động (đắt với cây thư mục lớn),
+  nên delta xuất hiện từ lần thứ hai thấy cùng 1 file. File có
+  sẵn từ trước khi chạy app cũng vậy: lần sửa đầu chỉ hiện size,
+  lần sửa sau mới có delta.
+- **Xóa file** hiện kích thước biết được lần cuối trước khi xóa
+  (không có delta — file đã mất).
+- **Đổi tên** chuyển size đã biết sang tên mới nên delta vẫn
+  đúng (thường là `±0 B`); đổi tên đè lên file khác (kiểu lưu
+  atomic của editor) thì delta tính so với nội dung cũ của file
+  đích.
+- **Thư mục** hiện `—` (size thư mục theo OS không có nghĩa,
+  vd: 4096 trên Linux) và không có delta.
+- Size được stat 1 lần lúc in log (cuối cửa sổ debounce) nên
+  luôn là size mới nhất sau cả đợt thay đổi dồn dập, không phải
+  size ở event đầu tiên trong đợt đó.
+- Giao diện web hiện cùng 1 cột size + delta trên từng dòng log;
+  `--exec` dùng được qua placeholder `{size}` `{delta}` (số byte
+  thô, rỗng khi không rõ).
 
 ## User + PC ID trong log
 
@@ -260,8 +290,8 @@ im lặng — event đã mất thì không bịa lại được.
 
 - `src/lib.rs` — logic thuần: rút gọn event, gộp debounce, lọc,
   format đầu ra, parse CLI, đọc/ghi file cấu hình (gồm dòng cài đặt
-  `@...`), nhận định danh user + PC ID. Cả crate có 17 unit test
-  (`cargo test`).
+  `@...`), nhận định danh user + PC ID, theo dõi kích thước file
+  (`SizeTracker`). Cả crate có 20 unit test (`cargo test`).
 - `src/main.rs` — vòng lặp watcher: mở watcher, nhận event qua
   channel, in ra stdout / file log / chạy `--exec`, đẩy event vào
   log của giao diện web.

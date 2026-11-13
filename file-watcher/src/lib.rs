@@ -81,6 +81,15 @@ pub struct Summary {
     pub tracker: Option<usize>,
     /// Thời điểm nhận event đầu tiên, dạng `YYYY-MM-DD HH:MM:SS` (giờ địa phương).
     pub time: String,
+    /// Kích thước file (byte) sau thay đổi này. Với Removed: kích
+    /// thước biết được lần cuối trước khi xóa. None khi không stat
+    /// được (thư mục, file đã mất mà chưa từng thấy). Gắn lúc flush,
+    /// không phải lúc summarize (xem `SizeTracker`).
+    pub size: Option<u64>,
+    /// Chênh lệch kích thước so với lần biết trước đó (byte, có dấu).
+    /// Chỉ có khi cả size cũ và mới đều biết. None cho lần đầu thấy
+    /// file và cho Removed.
+    pub delta: Option<i64>,
 }
 
 impl Summary {
@@ -121,6 +130,8 @@ pub fn summarize(event: &notify::Event, time: String) -> Option<Summary> {
             side: None,
             tracker: None,
             time,
+            size: None,
+            delta: None,
         }),
         EventKind::Modify(notify::event::ModifyKind::Name(mode)) => {
             use notify::event::RenameMode;
@@ -135,6 +146,8 @@ pub fn summarize(event: &notify::Event, time: String) -> Option<Summary> {
                         side: Some(RenameSide::Both),
                         tracker,
                         time,
+                        size: None,
+                        delta: None,
                     })
                 }
                 RenameMode::From => Some(Summary {
@@ -144,6 +157,8 @@ pub fn summarize(event: &notify::Event, time: String) -> Option<Summary> {
                     side: Some(RenameSide::From),
                     tracker,
                     time,
+                    size: None,
+                    delta: None,
                 }),
                 RenameMode::To => Some(Summary {
                     kind: Kind::Renamed,
@@ -152,6 +167,8 @@ pub fn summarize(event: &notify::Event, time: String) -> Option<Summary> {
                     side: Some(RenameSide::To),
                     tracker,
                     time,
+                    size: None,
+                    delta: None,
                 }),
                 // Any, hoặc Both nhưng chỉ có 1 đường dẫn: giữ nguyên
                 // đường dẫn duy nhất, chiều không rõ.
@@ -162,6 +179,8 @@ pub fn summarize(event: &notify::Event, time: String) -> Option<Summary> {
                     side: Some(RenameSide::Any),
                     tracker,
                     time,
+                    size: None,
+                    delta: None,
                 }),
             }
         }
@@ -172,6 +191,8 @@ pub fn summarize(event: &notify::Event, time: String) -> Option<Summary> {
             side: None,
             tracker: None,
             time,
+            size: None,
+            delta: None,
         }),
         EventKind::Remove(_) => Some(Summary {
             kind: Kind::Removed,
@@ -180,6 +201,8 @@ pub fn summarize(event: &notify::Event, time: String) -> Option<Summary> {
             side: None,
             tracker: None,
             time,
+            size: None,
+            delta: None,
         }),
         // Access (đọc file) và Other: ồn, không phải thay đổi nội dung.
         _ => None,
@@ -289,6 +312,8 @@ impl Coalescer {
                                 side: Some(RenameSide::Both),
                                 tracker: from_tracker,
                                 time: from_time,
+                                size: None,
+                                delta: None,
                             };
                         }
                         return;
@@ -423,6 +448,108 @@ impl Filter {
     }
 }
 
+/// Ghi nhớ kích thước file đã thấy để tính chênh lệch (delta) cho
+/// lần thay đổi sau. Logic thuần (không stat ở đây): `main.rs` stat
+/// file lúc flush rồi gọi `observe`.
+///
+/// Vì sao gắn size lúc flush thay vì lúc nhận event: `Coalescer`
+/// gộp nhiều event trong cửa sổ debounce thành 1 dòng — size gắn
+/// lúc nhận event sẽ lỗi thời ngay khi event sau trong cùng cửa sổ
+/// đổi file tiếp. Stat 1 lần lúc flush cho ra size mới nhất và
+/// delta đúng (so với lần flush trước), lại ít syscall hơn.
+///
+/// Không quét trước thư mục lúc khởi động (đắt với cây thư mục lớn,
+/// tốn RAM): delta chỉ xuất hiện từ lần thứ hai thấy cùng 1 file.
+/// Lần đầu thấy file chỉ hiện size, không có delta — README ghi rõ.
+#[derive(Default)]
+pub struct SizeTracker {
+    sizes: HashMap<PathBuf, u64>,
+}
+
+impl SizeTracker {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Ghi nhận 1 event đã gộp sắp được in. `current` là kích thước
+    /// stat được lúc flush (None = không phải file thường / đã mất).
+    /// Trả về (size để hiện, delta so với lần biết trước).
+    /// - File còn: delta = mới − cũ (nếu đã biết cũ); cập nhật cache.
+    /// - File mất (`removed`): trả size biết lần cuối rồi quên cache.
+    /// - Stat lỗi nhưng không phải Removed: giữ cache, hiện size cũ
+    ///   (nếu có) để log không trống vô cớ.
+    pub fn observe(
+        &mut self,
+        path: &Path,
+        current: Option<u64>,
+        removed: bool,
+    ) -> (Option<u64>, Option<i64>) {
+        match current {
+            Some(n) => {
+                let delta = self.sizes.get(path).map(|old| n as i64 - *old as i64);
+                self.sizes.insert(path.to_path_buf(), n);
+                (Some(n), delta)
+            }
+            None => {
+                if removed {
+                    (self.sizes.remove(path), None)
+                } else {
+                    (self.sizes.get(path).copied(), None)
+                }
+            }
+        }
+    }
+
+    /// Đổi tên: chuyển cache từ nguồn sang đích để delta của đích
+    /// tính đúng (thường là ±0). Nếu đích đã có cache (file bị ghi
+    /// đè bởi lần đổi tên, kiểu lưu atomic) thì giữ cache của đích
+    /// — delta khi đó mới đúng (so với nội dung cũ của đích).
+    pub fn rename(&mut self, from: &Path, to: &Path) {
+        if let Some(size) = self.sizes.remove(from) {
+            self.sizes.entry(to.to_path_buf()).or_insert(size);
+        }
+    }
+}
+
+/// Định dạng byte cho người đọc, đơn vị 1024, 1 chữ số thập phân
+/// với dấu phẩy (kiểu Việt Nam): `512 B`, `15,1 KB`, `2,0 MB`.
+pub fn format_bytes(n: u64) -> String {
+    const KB: f64 = 1024.0;
+    const MB: f64 = 1024.0 * 1024.0;
+    const GB: f64 = 1024.0 * 1024.0 * 1024.0;
+    let n = n as f64;
+    if n < KB {
+        format!("{} B", n as u64)
+    } else if n < MB {
+        format!("{:.1} KB", n / KB).replace('.', ",")
+    } else if n < GB {
+        format!("{:.1} MB", n / MB).replace('.', ",")
+    } else {
+        format!("{:.1} GB", n / GB).replace('.', ",")
+    }
+}
+
+/// Định dạng delta có dấu: `+2,8 KB`, `-512 B`, `±0 B`.
+fn format_delta(d: i64) -> String {
+    if d == 0 {
+        return "±0 B".to_string();
+    }
+    let sign = if d > 0 { "+" } else { "-" };
+    format!("{sign}{}", format_bytes(d.unsigned_abs()))
+}
+
+/// Phần kích thước trong dòng log dạng đọc được:
+/// `15,1 KB (+2,8 KB)`, `15,1 KB` (chưa biết delta), `—` (không rõ).
+fn size_part(summary: &Summary) -> String {
+    match summary.size {
+        None => "—".to_string(),
+        Some(n) => match summary.delta {
+            Some(d) => format!("{} ({})", format_bytes(n), format_delta(d)),
+            None => format_bytes(n),
+        },
+    }
+}
+
 /// Escape chuỗi cho JSON (chỉ đủ dùng cho 1 object 1 dòng).
 pub fn json_escape(s: &str) -> String {
     let mut out = String::with_capacity(s.len() + 2);
@@ -536,12 +663,14 @@ pub fn detect_identity() -> Identity {
     }
 }
 
-/// Dạng đọc được: `2026-11-12 22:55:01  MODIFIED  lam@may1  D:\code\main.rs`
-/// Rename đủ 2 đầu: `...  RENAMED   lam@may1  cũ -> mới`.
-/// Chỉ biết 1 đầu: `...  RENAMED   lam@may1  cũ -> ?` (đổi tên đi)
-/// hoặc `...  RENAMED   lam@may1  ? -> mới` (đổi tên từ ngoài vào).
+/// Dạng đọc được: `2026-11-12 22:55:01  MODIFIED  lam@may1  15,1 KB (+2,8 KB)  D:\code\main.rs`
+/// Rename đủ 2 đầu: `...  RENAMED   lam@may1  15,1 KB  cũ -> mới`.
+/// Chỉ biết 1 đầu: `...  RENAMED   lam@may1  12,3 KB  cũ -> ?` (đổi tên đi)
+/// hoặc `...  RENAMED   lam@may1  12,3 KB  ? -> mới` (đổi tên từ ngoài vào).
+/// Không rõ size (thư mục, file mất mà chưa từng thấy): cột size là `—`.
 pub fn format_human(summary: &Summary, identity: &Identity) -> String {
     let who = identity.label();
+    let size = size_part(summary);
     if summary.kind == Kind::Renamed {
         let target = match summary.side {
             Some(RenameSide::Both) => format!(
@@ -554,25 +683,29 @@ pub fn format_human(summary: &Summary, identity: &Identity) -> String {
             _ => summary.path.display().to_string(),
         };
         return format!(
-            "{}  {:<8}  {}  {}",
+            "{}  {:<8}  {}  {}  {}",
             summary.time,
             summary.kind.label(),
             who,
+            size,
             target
         );
     }
     format!(
-        "{}  {:<8}  {}  {}",
+        "{}  {:<8}  {}  {}  {}",
         summary.time,
         summary.kind.label(),
         who,
+        size,
         summary.path.display()
     )
 }
 
-/// 1 dòng JSON: `{"time":"...","event":"modified","path":"...","user":"lam","pc":"may1"}`
+/// 1 dòng JSON: `{"time":"...","event":"modified","path":"...","user":"lam","pc":"may1","size":15432,"delta":2871}`
 /// Rename có thêm `"direction":"both"|"from"|"to"|"any"`, và Both
-/// có thêm `"from":"..."` (tên cũ).
+/// có thêm `"from":"..."` (tên cũ). `"size"` là byte (số nguyên),
+/// chỉ có khi stat được; `"delta"` là chênh lệch byte (có dấu),
+/// chỉ có khi cả size cũ và mới đều biết.
 pub fn format_json(summary: &Summary, identity: &Identity) -> String {
     let mut out = format!(
         "{{\"time\":\"{}\",\"event\":\"{}\",\"path\":\"{}\"",
@@ -599,6 +732,12 @@ pub fn format_json(summary: &Summary, identity: &Identity) -> String {
         json_escape(&identity.user),
         json_escape(&identity.pc)
     ));
+    if let Some(size) = summary.size {
+        out.push_str(&format!(",\"size\":{size}"));
+    }
+    if let Some(delta) = summary.delta {
+        out.push_str(&format!(",\"delta\":{delta}"));
+    }
     out.push('}');
     out
 }
@@ -671,7 +810,7 @@ pub fn usage() -> String {
         \x20 --ignore <a,b>        bỏ qua đường dẫn chứa chuỗi này (vd: .tmp,~$,node_modules)\n\
         \x20 --log <file>          ghi thêm mọi dòng event vào file (append)\n\
         \x20 --json                in mỗi event 1 dòng JSON thay vì dạng đọc được\n\
-        \x20 --exec \"<lệnh>\"       chạy lệnh mỗi khi có event ({{path}} {{event}} {{time}} {{from}} {{user}} {{pc}})\n\
+        \x20 --exec \"<lệnh>\"       chạy lệnh mỗi khi có event ({{path}} {{event}} {{time}} {{from}} {{user}} {{pc}} {{size}} {{delta}})\n\
         \x20 --pc-id <id>          ghi đè PC ID trong log (mặc định: hostname của máy)\n\
         \x20 --serve              bật giao diện web local để cấu hình thư mục + xem log realtime\n\
         \x20 --port <n>           cổng giao diện web (mặc định 8787; chỉ có nghĩa với --serve)\n\
@@ -944,6 +1083,8 @@ mod tests {
             side: None,
             tracker: None,
             time: "2026-11-12 22:00:00".to_string(),
+            size: None,
+            delta: None,
         }
     }
 
@@ -955,6 +1096,8 @@ mod tests {
             side: Some(side),
             tracker,
             time: "2026-11-12 22:00:00".to_string(),
+            size: None,
+            delta: None,
         }
     }
 
@@ -1086,7 +1229,7 @@ mod tests {
         assert_eq!(out[0].side, Some(RenameSide::Both));
         assert_eq!(
             format_human(&out[0], &ident()),
-            "2026-11-12 22:00:00  RENAMED   lam@may1  /a/cu.txt -> /a/moi.txt"
+            "2026-11-12 22:00:00  RENAMED   lam@may1  —  /a/cu.txt -> /a/moi.txt"
         );
     }
 
@@ -1116,7 +1259,7 @@ mod tests {
         assert_eq!(out[0].side, Some(RenameSide::Both));
         assert_eq!(
             format_human(&out[0], &ident()),
-            "2026-11-12 22:00:00  RENAMED   lam@may1  /a/cu.txt -> /a/moi.txt"
+            "2026-11-12 22:00:00  RENAMED   lam@may1  —  /a/cu.txt -> /a/moi.txt"
         );
     }
 
@@ -1134,11 +1277,11 @@ mod tests {
         assert_eq!(out[2].side, Some(RenameSide::To));
         assert_eq!(
             format_human(&out[0], &ident()),
-            "2026-11-12 22:00:00  RENAMED   lam@may1  /a/out.txt -> ?"
+            "2026-11-12 22:00:00  RENAMED   lam@may1  —  /a/out.txt -> ?"
         );
         assert_eq!(
             format_human(&out[2], &ident()),
-            "2026-11-12 22:00:00  RENAMED   lam@may1  ? -> /a/in.txt"
+            "2026-11-12 22:00:00  RENAMED   lam@may1  —  ? -> /a/in.txt"
         );
         assert!(format_json(&out[0], &ident()).contains("\"direction\":\"from\""));
         assert!(format_json(&out[2], &ident()).contains("\"direction\":\"to\""));
@@ -1210,7 +1353,7 @@ mod tests {
         );
         assert_eq!(
             format_human(&s, &ident()),
-            "2026-11-12 22:00:00  RENAMED   lam@may1  /a/cũ.txt -> /a/mới.txt"
+            "2026-11-12 22:00:00  RENAMED   lam@may1  —  /a/cũ.txt -> /a/mới.txt"
         );
     }
 
@@ -1320,5 +1463,78 @@ mod tests {
         // File tạm không còn sót lại.
         assert!(!dir.join("watch.tmp").exists());
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn format_bytes_units() {
+        assert_eq!(format_bytes(0), "0 B");
+        assert_eq!(format_bytes(512), "512 B");
+        assert_eq!(format_bytes(1023), "1023 B");
+        assert_eq!(format_bytes(1024), "1,0 KB");
+        assert_eq!(format_bytes(1536), "1,5 KB");
+        assert_eq!(format_bytes(15432), "15,1 KB");
+        assert_eq!(format_bytes(1048576), "1,0 MB");
+        assert_eq!(format_bytes(1073741824), "1,0 GB");
+        assert_eq!(format_delta(2871), "+2,8 KB");
+        assert_eq!(format_delta(-512), "-512 B");
+        assert_eq!(format_delta(0), "±0 B");
+    }
+
+    #[test]
+    fn size_tracker_deltas() {
+        let mut t = SizeTracker::new();
+        let a = Path::new("/a/f.txt");
+        let b = Path::new("/a/g.txt");
+        // Lần đầu thấy: có size, chưa có delta.
+        assert_eq!(t.observe(a, Some(100), false), (Some(100), None));
+        // Sửa to lên / nhỏ xuống / giữ nguyên.
+        assert_eq!(t.observe(a, Some(150), false), (Some(150), Some(50)));
+        assert_eq!(t.observe(a, Some(10), false), (Some(10), Some(-140)));
+        assert_eq!(t.observe(a, Some(10), false), (Some(10), Some(0)));
+        // Stat lỗi nhưng không phải Removed: giữ cache, hiện size cũ.
+        assert_eq!(t.observe(a, None, false), (Some(10), None));
+        // Xóa: trả size biết lần cuối rồi quên; thấy lại thì như mới.
+        assert_eq!(t.observe(a, None, true), (Some(10), None));
+        assert_eq!(t.observe(a, None, true), (None, None));
+        assert_eq!(t.observe(a, Some(5), false), (Some(5), None));
+        // Đổi tên: cache chuyển sang tên mới, delta tính tiếp.
+        t.observe(b, Some(200), false);
+        t.rename(b, Path::new("/a/h.txt"));
+        assert_eq!(
+            t.observe(Path::new("/a/h.txt"), Some(200), false),
+            (Some(200), Some(0))
+        );
+        assert_eq!(t.observe(b, None, true), (None, None));
+        // Đổi tên đè lên file đã có cache: giữ cache của đích.
+        let c = Path::new("/a/tmp");
+        let d = Path::new("/a/real.txt");
+        t.observe(c, Some(999), false);
+        t.observe(d, Some(50), false);
+        t.rename(c, d);
+        assert_eq!(t.observe(d, Some(60), false), (Some(60), Some(10)));
+    }
+
+    #[test]
+    fn format_with_size_and_delta() {
+        let mut s = sum(Kind::Modified, "/a/main.rs");
+        s.size = Some(15432);
+        s.delta = Some(2871);
+        assert_eq!(
+            format_human(&s, &ident()),
+            "2026-11-12 22:00:00  MODIFIED  lam@may1  15,1 KB (+2,8 KB)  /a/main.rs"
+        );
+        assert!(format_json(&s, &ident()).contains("\"size\":15432"));
+        assert!(format_json(&s, &ident()).contains("\"delta\":2871"));
+        // Sửa nhưng size không đổi.
+        s.delta = Some(0);
+        assert!(format_human(&s, &ident()).contains("15,1 KB (±0 B)"));
+        // Lần đầu thấy: có size, không delta.
+        s.delta = None;
+        assert!(format_human(&s, &ident()).contains("15,1 KB  /a/main.rs"));
+        assert!(!format_json(&s, &ident()).contains("\"delta\""));
+        // Không rõ size: cột size là —, JSON không có trường size.
+        s.size = None;
+        assert!(format_human(&s, &ident()).contains("lam@may1  —  /a/main.rs"));
+        assert!(!format_json(&s, &ident()).contains("\"size\""));
     }
 }
