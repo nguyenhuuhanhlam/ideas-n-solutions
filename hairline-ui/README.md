@@ -254,7 +254,7 @@ nền `--bg`, viền 1px `--line`, radius 0, padding `9px 16px`,
 
 Các vùng xung quanh (brand, topbar, sidebar, dải stat, toolbar,
 tabs) có thể nhuộm 1 trong 6 màu cơ bản (xám, xanh dương, xanh
-lá, vàng, đỏ, tím) với độ đậm 0–50% (mặc định 8%). Khu vực log
+lá, vàng, đỏ, tím) với độ đậm 0–50% (mặc định 10%). Khu vực log
 luôn giữ nền gốc để dễ đọc.
 
 - Cơ chế: JS đặt biến `--tint` (rgba) lên `.app`; các vùng trong
@@ -276,7 +276,7 @@ luôn giữ nền gốc để dễ đọc.
 - Hover trong vùng nhuộm (kit 2026-11-14, chưa vào File
   Watcher): JS ghi đè `--hover` riêng trên cùng 6 vùng — màu
   hover lấy gam màu của tint, lệch độ sáng theo tham số
-  Hover lift (0–12 điểm, mặc định 6; tối đi ở theme sáng,
+  Hover lift (0–12 điểm, mặc định 5; tối đi ở theme sáng,
   sáng lên ở theme tối, cùng hướng với line), giữ sắc/bão
   hòa. Thanh trượt Hover lift nằm trong khối chọn tint,
   lưu localStorage (`hairline-hover-lift`), vô hiệu khi

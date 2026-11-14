@@ -51,12 +51,12 @@
     update(); return update;
   }
 
-  /* Tint picker: swatches + opacity 0–50% (default 8%). Sets --tint on .app.
+  /* Tint picker: swatches + opacity 0–50% (default 10%). Sets --tint on .app.
      Sidebar fades are blended (tint over bg, light/dark aware) so no white seam.
      Lines inside tinted regions (from 0.9.3) shift a fixed lightness delta from
      the effective tinted bg, keeping the tint's hue/saturation. Button/tab
      hover inside tinted regions (kit 2026-11-14) shifts by the adjustable
-     Hover lift (0–12pts, default 6), in the tint's hue. */
+     Hover lift (0–12pts, default 5), in the tint's hue. */
   var TINTS = { gray: "#787878", blue: "#2563eb", green: "#16a34a", amber: "#d97706", red: "#dc2626", purple: "#9333ea" };
   function hexRgb(hex) { return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)]; }
   /* RGB [0-255] -> HSL [h 0-360, s 0-1, l 0-1]. */
@@ -106,16 +106,16 @@
   /* Hover lift inside tinted regions: a lightness shift from the effective
      tinted bg, hue/saturation kept — darker in light theme, lighter in
      dark theme (same direction as the lines). Adjustable 0–12 points via
-     the Hover lift slider (default 6). History: the first version used the
+     the Hover lift slider (default 5). History: the first version used the
      stock --hover token's own delta (light -1.96, dark +3.33, measured
      from #ffffff->#fafafa and #0b0b0c->#131315), but on a tinted bg that
      was too subtle to see, so the lift became a parameter instead. */
-  var HOVER_LIFT_DEFAULT = 6, HOVER_LIFT_MIN = 0, HOVER_LIFT_MAX = 12;
+  var HOVER_LIFT_DEFAULT = 5, HOVER_LIFT_MIN = 0, HOVER_LIFT_MAX = 12;
   function adaptHoverColor(bg, dark, lift) {
     return shiftLightness(bg, (dark ? 1 : -1) * lift);
   }
   function initTint(app, swatchEls, opacityEl, opacityValEl, hoverEl, hoverValEl) {
-    var name = lsGet(LS_T, ""), op = parseInt(lsGet(LS_TO, "8"), 10); if (isNaN(op)) op = 8;
+    var name = lsGet(LS_T, ""), op = parseInt(lsGet(LS_TO, "10"), 10); if (isNaN(op)) op = 10;
     var lift = parseInt(lsGet(LS_HL, String(HOVER_LIFT_DEFAULT)), 10);
     if (isNaN(lift)) lift = HOVER_LIFT_DEFAULT;
     lift = Math.max(HOVER_LIFT_MIN, Math.min(HOVER_LIFT_MAX, lift));
