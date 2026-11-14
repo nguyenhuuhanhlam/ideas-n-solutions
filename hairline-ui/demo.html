@@ -6,7 +6,7 @@
 <div class="app" id="app">
   <div class="brand"><i></i> hairline-ui demo</div>
   <div class="topbar">
-    <button id="sideToggle" title="Collapse sidebar" aria-label="Collapse / expand sidebar">‹</button>
+    <button id="sideToggle" title="Collapse sidebar" aria-label="Collapse / expand sidebar"><svg class="hl-icon"><use href="icons/lucide-sprite.svg#hl-chevron-left"/></svg></button>
     <span class="status"><span class="dot on"></span><span>Demo — every interaction works for real (drag sidebar, tint, fades)</span></span>
   </div>
   <div class="sidewrap">
@@ -52,12 +52,13 @@
       <label><input type="checkbox" checked> Created</label><label><input type="checkbox" checked> Modified</label>
       <label><input type="checkbox" checked> Deleted</label><label><input type="checkbox" checked> Renamed</label>
       <input type="text" placeholder="Filter by file name…" autocomplete="off"><div class="spacer"></div>
-      <label><input type="checkbox" checked> Auto-scroll</label><button>Pause</button><button>Clear log</button>
+      <label><input type="checkbox" checked> Auto-scroll</label><button class="btn-icon"><svg class="hl-icon"><use href="icons/lucide-sprite.svg#hl-pause"/></svg>Pause</button><button class="btn-icon"><svg class="hl-icon"><use href="icons/lucide-sprite.svg#hl-trash-2"/></svg>Clear log</button>
     </div>
     <div class="tabs">
-      <button class="tabbtn active" data-tab="all">All <span class="tabcount">3</span></button>
-      <button class="tabbtn" data-tab="pinned">Pinned <span class="tabcount">0</span></button>
-      <button class="tabbtn" data-tab="deleted">Deleted <span class="tabcount">0</span></button>
+      <button class="tabbtn active" data-tab="all"><svg class="hl-icon"><use href="icons/lucide-sprite.svg#hl-list"/></svg>All <span class="tabcount">3</span></button>
+      <button class="tabbtn" data-tab="pinned"><svg class="hl-icon"><use href="icons/lucide-sprite.svg#hl-pin"/></svg>Pinned <span class="tabcount">0</span></button>
+      <button class="tabbtn" data-tab="deleted"><svg class="hl-icon"><use href="icons/lucide-sprite.svg#hl-trash-2"/></svg>Deleted <span class="tabcount">0</span></button>
+      <button class="tabbtn" data-tab="icons"><svg class="hl-icon"><use href="icons/lucide-sprite.svg#hl-layout-grid"/></svg>Icons <span class="tabcount">21</span></button>
     </div>
     <div class="logwrap">
       <div class="hl-log" id="log">
@@ -68,6 +69,29 @@
         <p class="empty">Click a badge to copy the full path; the RENAMED row above is flashing. Scroll the log when there are more rows to see the scroll fades — the scrollbar is always hidden.</p>
       </div>
       <div class="fade fade-top" id="logFadeTop"></div><div class="fade fade-bottom" id="logFadeBottom"></div>
+    </div>
+    <div class="icon-gallery" id="iconGallery" hidden>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-pin"/></svg><span class="mono">pin</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-search"/></svg><span class="mono">search</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-pause"/></svg><span class="mono">pause</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-play"/></svg><span class="mono">play</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-trash-2"/></svg><span class="mono">trash-2</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-folder"/></svg><span class="mono">folder</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-file"/></svg><span class="mono">file</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-settings"/></svg><span class="mono">settings</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-copy"/></svg><span class="mono">copy</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-refresh-cw"/></svg><span class="mono">refresh-cw</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-x"/></svg><span class="mono">x</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-plus"/></svg><span class="mono">plus</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-check"/></svg><span class="mono">check</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-chevron-left"/></svg><span class="mono">chevron-left</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-chevron-right"/></svg><span class="mono">chevron-right</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-chevron-down"/></svg><span class="mono">chevron-down</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-list"/></svg><span class="mono">list</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-layout-grid"/></svg><span class="mono">layout-grid</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-circle-alert"/></svg><span class="mono">circle-alert</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-circle-check"/></svg><span class="mono">circle-check</span></div>
+      <div class="icon-cell"><svg class="hl-icon hl-icon--24"><use href="icons/lucide-sprite.svg#hl-info"/></svg><span class="mono">info</span></div>
     </div>
   </main>
   <div class="side-resizer" id="sideResizer" tabindex="0" role="separator" aria-orientation="vertical" aria-label="Resize sidebar" title="Drag to resize the sidebar (double-click to return to 320px)"></div>
@@ -90,9 +114,12 @@
       else Hairline.toast(toastEl, p);
     });
   });
+  var logWrap = document.querySelector(".logwrap"), gallery = document.getElementById("iconGallery");
   document.querySelectorAll(".tabbtn").forEach(function (t) {
     t.addEventListener("click", function () {
       document.querySelectorAll(".tabbtn").forEach(function (x) { x.classList.toggle("active", x === t); });
+      var showIcons = t.getAttribute("data-tab") === "icons";
+      logWrap.hidden = showIcons; gallery.hidden = !showIcons;
     });
   });
 })();

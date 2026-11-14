@@ -289,6 +289,34 @@ luôn giữ nền gốc để dễ đọc.
   `position: relative`) — KHÔNG nằm trong phần tử cuộn — để
   không bị cuốn theo nội dung khi cuộn.
 
+### Icons — Lucide (thêm 2026-11-14)
+
+Bộ icon duy nhất của hệ là **Lucide** (lưới 24×24, SVG stroke,
+giấy phép ISC), dùng dưới dạng sprite rút gọn
+`icons/lucide-sprite.svg` — 21 icon, ghim bản `lucide-static`
+**1.73.0**, build bằng `node icons/build-sprite.mjs`. Không
+dùng emoji làm icon (📌, ×, ▸/▾ đều có icon thay thế trong
+sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
+
+- **Quy tắc nét:** nét icon luôn hiển thị đúng **1px vật lý**
+  như mọi line khác của hệ: `stroke-width = 24 / cỡ hiển thị`.
+  Class `.hl-icon` (mặc định 16px → 1.5), `.hl-icon--20`
+  (→ 1.2), `.hl-icon--24` (→ 1). Sprite KHÔNG chứa
+  `stroke-width` (script build sẽ fail nếu SVG gốc có) — độ
+  dày nét chỉ đến từ CSS, kế thừa qua `<use>`.
+- **Cách dùng:** `<svg class="hl-icon"><use
+  href="icons/lucide-sprite.svg#hl-pin"/></svg>`; nút có cả
+  icon + chữ dùng thêm class `.btn-icon`. Màu icon ăn theo
+  `currentColor` như chữ.
+- **Thêm icon:** thêm tên Lucide vào mảng `ICONS` trong
+  `icons/build-sprite.mjs` rồi chạy lại script; sprite và
+  gallery trong demo tự khớp (demo có tab Icons liệt kê toàn
+  bộ sprite).
+- **Lưu ý:** sprite ngoài cần phục vụ qua http(s) — mở file
+  HTML trực tiếp (`file://`) có trình duyệt sẽ chặn `<use>`
+  trỏ file ngoài. App một file (như File Watcher) thì nhúng
+  thẳng nội dung sprite vào trong HTML thay vì trỏ file ngoài.
+
 ## Hành vi & chuyển động
 
 - **Hover:** chỉ đổi nền (`--hover`) hoặc đậm viền/chữ. Không
