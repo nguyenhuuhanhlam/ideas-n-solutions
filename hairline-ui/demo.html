@@ -1,63 +1,63 @@
 <!doctype html>
-<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hairline UI — component demo</title>
 <link rel="stylesheet" href="hairline.css"></head>
 <body>
 <div class="app" id="app">
   <div class="brand"><i></i> hairline-ui demo</div>
   <div class="topbar">
-    <button id="sideToggle" title="Thu gọn sidebar" aria-label="Thu gọn / mở sidebar">‹</button>
-    <span class="status"><span class="dot on"></span><span>Demo — mọi tương tác đều chạy thật (kéo sidebar, tint, fades)</span></span>
+    <button id="sideToggle" title="Collapse sidebar" aria-label="Collapse / expand sidebar">‹</button>
+    <span class="status"><span class="dot on"></span><span>Demo — every interaction works for real (drag sidebar, tint, fades)</span></span>
   </div>
   <div class="sidewrap">
     <nav class="side" id="side">
-      <h6>Thành phần</h6>
-      <div class="sideblock"><p class="hint">Trang này là bản trưng bày sống cho hệ Hairline: app shell, sidebar kéo 160–480px, stat, toolbar, tabs, log rows, path badge, toast, vệt mờ, tint. Nguồn chuẩn: <code>README.md</code> trong thư mục này.</p></div>
-      <h6>Màu nền (tint)</h6>
+      <h6>Components</h6>
+      <div class="sideblock"><p class="hint">This page is a living showcase for the Hairline system: app shell, draggable sidebar (160–480px), stats, toolbar, tabs, log rows, path badge, toast, fades, tint. Source of truth: <code>README.md</code> in this folder.</p></div>
+      <h6>Background color (tint)</h6>
       <div class="sideblock">
         <div class="swatches" id="tintSwatches">
-          <button class="swatch selected" data-tint="" title="Mặc định (không màu)" aria-label="Không màu nền"></button>
-          <button class="swatch" data-tint="gray" style="--sw:#787878" title="Xám" aria-label="Nền xám"></button>
-          <button class="swatch" data-tint="blue" style="--sw:#2563eb" title="Xanh dương" aria-label="Nền xanh dương"></button>
-          <button class="swatch" data-tint="green" style="--sw:#16a34a" title="Xanh lá" aria-label="Nền xanh lá"></button>
-          <button class="swatch" data-tint="amber" style="--sw:#d97706" title="Vàng" aria-label="Nền vàng"></button>
-          <button class="swatch" data-tint="red" style="--sw:#dc2626" title="Đỏ" aria-label="Nền đỏ"></button>
-          <button class="swatch" data-tint="purple" style="--sw:#9333ea" title="Tím" aria-label="Nền tím"></button>
+          <button class="swatch selected" data-tint="" title="Default (no color)" aria-label="No background color"></button>
+          <button class="swatch" data-tint="gray" style="--sw:#787878" title="Gray" aria-label="Gray background"></button>
+          <button class="swatch" data-tint="blue" style="--sw:#2563eb" title="Blue" aria-label="Blue background"></button>
+          <button class="swatch" data-tint="green" style="--sw:#16a34a" title="Green" aria-label="Green background"></button>
+          <button class="swatch" data-tint="amber" style="--sw:#d97706" title="Amber" aria-label="Amber background"></button>
+          <button class="swatch" data-tint="red" style="--sw:#dc2626" title="Red" aria-label="Red background"></button>
+          <button class="swatch" data-tint="purple" style="--sw:#9333ea" title="Purple" aria-label="Purple background"></button>
         </div>
         <div class="field tint-opacity disabled" id="tintOpacityField" style="margin-top:10px">
-          <label for="tintOpacity">Độ đậm <span id="tintOpacityVal" class="mono">8%</span></label>
+          <label for="tintOpacity">Opacity <span id="tintOpacityVal" class="mono">8%</span></label>
           <input id="tintOpacity" type="range" min="0" max="50" step="1" value="8" disabled>
         </div>
-        <p class="hint">Chỉ nhuộm các vùng xung quanh; khu log giữ nền gốc.</p>
+        <p class="hint">Only the surrounding areas are tinted; the log keeps its original background.</p>
       </div>
-      <h6>Form mẫu</h6>
+      <h6>Sample form</h6>
       <div class="sideblock">
-        <div class="field"><label for="demoInput">Trường văn bản</label><input id="demoInput" type="text" placeholder="monospace, viền 1px"></div>
-        <label class="checkrow"><input type="checkbox" checked> Ô chọn</label>
-        <button id="toastBtn">Hiện toast</button>
+        <div class="field"><label for="demoInput">Text field</label><input id="demoInput" type="text" placeholder="monospace, 1px border"></div>
+        <label class="checkrow"><input type="checkbox" checked> Checkbox</label>
+        <button id="toastBtn">Show toast</button>
       </div>
-      <h6>Thông tin</h6>
-      <div class="sideblock"><p class="hint">Kéo tay nắm ở đường line giữa sidebar và nội dung; bấm đúp về 320px. Dưới 800px sidebar xếp chồng lên trên.</p></div>
+      <h6>Info</h6>
+      <div class="sideblock"><p class="hint">Drag the handle on the line between sidebar and content; double-click returns to 320px. Below 800px the sidebar stacks on top.</p></div>
     </nav>
     <div class="fade fade-top" id="sideFadeTop"></div><div class="fade fade-bottom" id="sideFadeBottom"></div>
   </div>
   <main class="main">
     <section class="stats">
-      <div class="stat"><div class="muted">Đã tạo</div><div class="v mono">128</div><div class="delta mono" style="color:var(--green)">+12 hôm nay</div></div>
-      <div class="stat"><div class="muted">Đã sửa</div><div class="v mono">342</div><div class="delta mono" style="color:var(--green)">+48 hôm nay</div></div>
-      <div class="stat"><div class="muted">Đã xóa</div><div class="v mono">17</div><div class="delta mono" style="color:var(--red)">-3 hôm nay</div></div>
-      <div class="stat"><div class="muted">Đổi tên</div><div class="v mono">9</div><div class="delta muted mono">chưa có hôm nay</div></div>
+      <div class="stat"><div class="muted">Created</div><div class="v mono">128</div><div class="delta mono" style="color:var(--green)">+12 today</div></div>
+      <div class="stat"><div class="muted">Modified</div><div class="v mono">342</div><div class="delta mono" style="color:var(--green)">+48 today</div></div>
+      <div class="stat"><div class="muted">Deleted</div><div class="v mono">17</div><div class="delta mono" style="color:var(--red)">-3 today</div></div>
+      <div class="stat"><div class="muted">Renamed</div><div class="v mono">9</div><div class="delta muted mono">none today</div></div>
     </section>
     <div class="toolbar">
-      <label><input type="checkbox" checked> Tạo</label><label><input type="checkbox" checked> Sửa</label>
-      <label><input type="checkbox" checked> Xóa</label><label><input type="checkbox" checked> Đổi tên</label>
-      <input type="text" placeholder="Lọc theo tên file…" autocomplete="off"><div class="spacer"></div>
-      <label><input type="checkbox" checked> Tự cuộn</label><button>Tạm dừng</button><button>Xóa log</button>
+      <label><input type="checkbox" checked> Created</label><label><input type="checkbox" checked> Modified</label>
+      <label><input type="checkbox" checked> Deleted</label><label><input type="checkbox" checked> Renamed</label>
+      <input type="text" placeholder="Filter by file name…" autocomplete="off"><div class="spacer"></div>
+      <label><input type="checkbox" checked> Auto-scroll</label><button>Pause</button><button>Clear log</button>
     </div>
     <div class="tabs">
-      <button class="tabbtn active" data-tab="all">Tất cả <span class="tabcount">3</span></button>
-      <button class="tabbtn" data-tab="pinned">Đã ghim <span class="tabcount">0</span></button>
-      <button class="tabbtn" data-tab="deleted">Đã xóa <span class="tabcount">0</span></button>
+      <button class="tabbtn active" data-tab="all">All <span class="tabcount">3</span></button>
+      <button class="tabbtn" data-tab="pinned">Pinned <span class="tabcount">0</span></button>
+      <button class="tabbtn" data-tab="deleted">Deleted <span class="tabcount">0</span></button>
     </div>
     <div class="logwrap">
       <div class="hl-log" id="log">
@@ -65,12 +65,12 @@
         <div class="row modified"><span class="time">10:05:08</span><span class="tag">MODIFIED</span><span class="muted">lam@pc</span><button class="pathbadge" title="C:\code\file-watcher\src\ui.html" data-copy="C:\code\file-watcher\src\ui.html">…/file-watcher/src</button><span>ui.html</span><span class="muted mono" style="margin-left:auto">150 B (+50 B)</span></div>
         <div class="row removed"><span class="time">10:06:12</span><span class="tag">REMOVED</span><span class="muted">lam@pc</span><button class="pathbadge" title="C:\code\file-watcher\tmp\old.txt" data-copy="C:\code\file-watcher\tmp\old.txt">…/file-watcher/tmp</button><span>old.txt</span><span class="muted mono" style="margin-left:auto">10 B</span></div>
         <div class="row renamed flash"><span class="time">10:07:44</span><span class="tag">RENAMED</span><span class="muted">lam@pc</span><span>cu.txt</span><span class="muted mono">-&gt;</span><button class="pathbadge" title="C:\code\file-watcher\src\moi.txt" data-copy="C:\code\file-watcher\src\moi.txt">…/file-watcher/src</button><span>moi.txt</span><span class="muted mono" style="margin-left:auto">10 B (±0 B)</span></div>
-        <p class="empty">Badge copy full path khi bấm; hàng RENAMED ở trên đang chớp sáng (flash). Cuộn log khi có nhiều hàng hơn để thấy vệt mờ báo cuộn — thanh cuộn luôn ẩn.</p>
+        <p class="empty">Click a badge to copy the full path; the RENAMED row above is flashing. Scroll the log when there are more rows to see the scroll fades — the scrollbar is always hidden.</p>
       </div>
       <div class="fade fade-top" id="logFadeTop"></div><div class="fade fade-bottom" id="logFadeBottom"></div>
     </div>
   </main>
-  <div class="side-resizer" id="sideResizer" tabindex="0" role="separator" aria-orientation="vertical" aria-label="Đổi chiều rộng sidebar" title="Kéo để đổi chiều rộng sidebar (bấm đúp để về 320px)"></div>
+  <div class="side-resizer" id="sideResizer" tabindex="0" role="separator" aria-orientation="vertical" aria-label="Resize sidebar" title="Drag to resize the sidebar (double-click to return to 320px)"></div>
 </div>
 <div class="hl-toast" id="toast"></div>
 <script src="hairline.js"></script>
@@ -82,11 +82,11 @@
   Hairline.initFades(document.getElementById("log"), document.getElementById("logFadeTop"), document.getElementById("logFadeBottom"));
   Hairline.initTint(app, Array.prototype.slice.call(document.querySelectorAll("#tintSwatches .swatch")), document.getElementById("tintOpacity"), document.getElementById("tintOpacityVal"));
   var toastEl = document.getElementById("toast");
-  document.getElementById("toastBtn").addEventListener("click", function () { Hairline.toast(toastEl, "Toast — viền 1px, không bo góc"); });
+  document.getElementById("toastBtn").addEventListener("click", function () { Hairline.toast(toastEl, "Toast — 1px border, no rounded corners"); });
   document.querySelectorAll(".pathbadge").forEach(function (b) {
     b.addEventListener("click", function () {
       var p = b.getAttribute("data-copy");
-      if (navigator.clipboard) navigator.clipboard.writeText(p).then(function () { Hairline.toast(toastEl, "Đã copy: " + p); }, function () { Hairline.toast(toastEl, p); });
+      if (navigator.clipboard) navigator.clipboard.writeText(p).then(function () { Hairline.toast(toastEl, "Copied: " + p); }, function () { Hairline.toast(toastEl, p); });
       else Hairline.toast(toastEl, p);
     });
   });

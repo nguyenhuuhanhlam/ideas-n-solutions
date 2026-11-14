@@ -1,4 +1,4 @@
-/* Hairline UI — shared JS helpers (starter kit, from File Watcher 0.7–0.9 behaviour)
+/* Hairline UI — shared JS helpers (starter kit, synced with File Watcher 0.9.6)
    Plain vanilla, no framework. Call Hairline.init({...}) or use pieces.
    Spec: hairline-ui/README.md */
 (function (global) {
@@ -51,22 +51,80 @@
   }
 
   /* Tint picker: swatches + opacity 0–50% (default 8%). Sets --tint on .app.
-     Sidebar fades are blended (tint over bg, light/dark aware) so no white seam. */
+     Sidebar fades are blended (tint over bg, light/dark aware) so no white seam.
+     Lines inside tinted regions (from 0.9.3) shift a fixed lightness delta from
+     the effective tinted bg, keeping the tint's hue/saturation. */
   var TINTS = { gray: "#787878", blue: "#2563eb", green: "#16a34a", amber: "#d97706", red: "#dc2626", purple: "#9333ea" };
   function hexRgb(hex) { return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)]; }
+  /* RGB [0-255] -> HSL [h 0-360, s 0-1, l 0-1]. */
+  function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var h = 0, s = 0, l = (max + min) / 2;
+    if (max !== min) {
+      var d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+      else if (max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h *= 60;
+    }
+    return [h, s, l];
+  }
+  /* HSL -> RGB [0-255] (rounded). */
+  function hslToRgb(h, s, l) {
+    var c = (1 - Math.abs(2 * l - 1)) * s;
+    var x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+    var m = l - c / 2;
+    var r = 0, g = 0, b = 0;
+    if (h < 60) { r = c; g = x; }
+    else if (h < 120) { r = x; g = c; }
+    else if (h < 180) { g = c; b = x; }
+    else if (h < 240) { g = x; b = c; }
+    else if (h < 300) { r = x; b = c; }
+    else { r = c; b = x; }
+    return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
+  }
+  /* Fixed lightness offset of tinted-region lines from their effective bg:
+     14 points — slightly more than the default gap (white bg 100 -> line
+     #e5e5e5 ~90) so lines stay visible on a coloured bg. Darker in light
+     theme, lighter in dark theme; hue/saturation untouched. */
+  var LINE_LIGHTNESS_DELTA = 14;
+  function adaptLineColor(bg, dark) {
+    var hsl = rgbToHsl(bg[0], bg[1], bg[2]);
+    var l = hsl[2] + (dark ? 1 : -1) * LINE_LIGHTNESS_DELTA / 100;
+    l = Math.max(0, Math.min(1, l));
+    return hslToRgb(hsl[0], hsl[1], l);
+  }
   function initTint(app, swatchEls, opacityEl, opacityValEl) {
     var name = lsGet(LS_T, ""), op = parseInt(lsGet(LS_TO, "8"), 10); if (isNaN(op)) op = 8;
     function isDark() { return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches); }
+    /* Per-region --line override for the 6 tinted regions (same list as the
+       --tint backgrounds in CSS); log region and app outer border keep the
+       stock --line. No tint selected -> overrides removed. */
+    function updateLineColors(tintedBg) {
+      var val = "";
+      if (tintedBg) {
+        var c = adaptLineColor(tintedBg, isDark());
+        val = "rgb(" + c[0] + ", " + c[1] + ", " + c[2] + ")";
+      }
+      app.querySelectorAll(".brand, .topbar, .sidewrap, .stats, .toolbar, .tabs").forEach(function (el) {
+        if (tintedBg) el.style.setProperty("--line", val);
+        else el.style.removeProperty("--line");
+      });
+    }
     function apply() {
       var rgb = TINTS[name], bg = isDark() ? [11,11,12] : [255,255,255];
+      var tinted = null;
       if (!rgb) { app.style.removeProperty("--tint"); app.style.removeProperty("--side-fade-solid"); app.style.removeProperty("--side-fade-from"); }
       else {
         var c = hexRgb(rgb), a = op / 100;
         app.style.setProperty("--tint", "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + a + ")");
-        var m = bg.map(function (b, i) { return Math.round(c[i] * a + b * (1 - a)); });
-        app.style.setProperty("--side-fade-solid", "rgb(" + m.join(",") + ")");
-        app.style.setProperty("--side-fade-from", "rgba(" + m.join(",") + ",0)");
+        tinted = bg.map(function (b, i) { return Math.round(c[i] * a + b * (1 - a)); });
+        app.style.setProperty("--side-fade-solid", "rgb(" + tinted.join(",") + ")");
+        app.style.setProperty("--side-fade-from", "rgba(" + tinted.join(",") + ",0)");
       }
+      updateLineColors(tinted);
       if (opacityEl) { opacityEl.disabled = !rgb; opacityEl.value = op; }
       if (opacityValEl) opacityValEl.textContent = op + "%";
       var holder = opacityEl && opacityEl.closest(".tint-opacity"); if (holder) holder.classList.toggle("disabled", !rgb);

@@ -341,8 +341,13 @@ luôn giữ nền gốc để dễ đọc.
 ## Hướng phát triển thành hệ sinh thái riêng
 
 Ý định của người dùng: tách phong cách này ra khỏi File Watcher
-để dùng cho các ứng dụng khác. Các bước gợi ý (chưa quyết,
-chưa làm):
+để dùng cho các ứng dụng khác. Các bước gợi ý:
+
+> Đã làm (2026-11-13–14): bước 1, 2, 3, 5 — starter kit
+> `hairline.css` + `hairline.js` + `demo.html` trong thư mục này,
+> đồng bộ tới File Watcher 0.9.6. Còn lại: bước 4 (quy ước đặt
+> tên, quyết sau khi có ứng dụng thứ hai), bước 6 (repo/package
+> riêng khi có từ 2 ứng dụng dùng trở lên).
 
 1. **Tách token + base thành `hairline.css`:** `:root` variables
    (sáng/tối), reset, typography, button, input, hint/error,
