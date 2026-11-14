@@ -149,9 +149,9 @@ không truy cập được từ máy khác trong mạng.
   tạo lại: lịch sử cũ ở lại tab Deleted, event mới quay về All.
   Tab Deleted không hiện nút ghim (file đã xóa thì ghim không có tác
   dụng; muốn bỏ ghim file đã xóa thì làm ở tab Pinned).
-- **Ghim file:** bấm 📌 ở dòng log hoặc nhóm để ghim file đó (bấm
+- **Ghim file:** bấm icon ghim ở dòng log hoặc nhóm để ghim file đó (bấm
   lại để bỏ ghim). Tab Pinned chỉ liệt kê file đã ghim kèm trạng
-  thái và nút × để bỏ ghim (từ 0.9.4 bỏ ô nhập đường dẫn ghim tay
+  thái và nút bỏ ghim (icon x) (từ 0.9.4 bỏ ô nhập đường dẫn ghim tay
   vì gây rối UX). Ghim là đường dẫn cố định, không chạy theo đổi
   tên. File ngoài vùng theo dõi vẫn ghim được, hiện trạng thái
   "outside watched folders". Ghim lưu vào file cấu hình JSON (mục
@@ -159,7 +159,10 @@ không truy cập được từ máy khác trong mạng.
   cho lệnh xử lý riêng theo file (sẽ làm sau).
 - **Phong cách hairline grid:** nền sáng (tối theo hệ thống qua
   `prefers-color-scheme`), mọi phân tách chỉ bằng đường line 1px,
-  không card nổi, không shadow, không bo góc. Dải stat 4 ô đếm
+  không card nổi, không shadow, không bo góc. Icon Lucide nét 1px
+  (từ 0.9.7, sprite nhúng thẳng vào giao diện — xem
+  `hairline-ui/icons/`), thay emoji và ký tự trang trí trước đây.
+  Dải stat 4 ô đếm
   event theo loại (tạo/sửa/xóa/đổi tên) trong 1000 dòng gần nhất,
   kèm giờ event mới nhất của từng loại.
 - **Sidebar co dãn + thu gọn:** mặc định rộng 320px để nội dung

@@ -7,7 +7,7 @@
 > component, hành vi — để sau này tách ra thành thư viện dùng chung
 > mà không phải đoán lại từ đầu.
 >
-> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.6.
+> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.7.
 
 ## Nguồn gốc
 
@@ -373,7 +373,8 @@ sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
 
 > Đã làm (2026-11-13–14): bước 1, 2, 3, 5 — starter kit
 > `hairline.css` + `hairline.js` + `demo.html` trong thư mục này,
-> đồng bộ tới File Watcher 0.9.6. Còn lại: bước 4 (quy ước đặt
+> đồng bộ tới File Watcher 0.9.7 (kể cả bộ icon Lucide, File
+> Watcher nhúng sprite của kit vào `ui.html`). Còn lại: bước 4 (quy ước đặt
 > tên, quyết sau khi có ứng dụng thứ hai), bước 6 (repo/package
 > riêng khi có từ 2 ứng dụng dùng trở lên).
 
@@ -417,6 +418,7 @@ sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
 | 0.9.4 | 2026-11-13 | Tab Đã ghim bỏ ô nhập đường dẫn ghim tay (gây rối UX): chỉ còn danh sách file đã ghim + nút × bỏ ghim; ghim chỉ bằng nút 📌 ở dòng log. |
 | 0.9.5 | 2026-11-13 | Toàn bộ app chuyển sang tiếng Anh (UI web + CLI): nhãn, tab, hint, toast, help text, thông báo lỗi, banner; kích thước đổi sang dấu chấm thập phân (`1.5 KB`, `net +1.0 KB`). Comment trong code và tài liệu vẫn tiếng Việt. |
 | 0.9.6 | 2026-11-14 | Giao diện web luôn bật (`--serve` không còn cần; `--no-serve` để tắt). Cổng chỉnh được trong Settings (mục Settings thêm ô Port): đổi là server bind lại ngay, trình duyệt tự chuyển sang cổng mới; cổng lưu vào `watch.json`, `--port` thắng file lúc khởi động, cổng bị chiếm thì tự lấy cổng trống tiếp theo. |
+| 0.9.7 | 2026-11-14 | Icon Lucide thay emoji/ký tự trang trí: nút ghim (📌 → icon pin), caret nhóm (▸/▾ → chevron), nút bỏ theo dõi/bỏ ghim (× → icon x), nút thu gọn sidebar (‹/› → chevron); tab và nút toolbar có icon kèm nhãn; nút Pause đổi cả icon (pause/play). Sprite 21 icon nhúng thẳng vào `ui.html` (lấy từ kit `hairline-ui/icons/`, nét 1px vật lý). |
 
 ## Tham chiếu
 
