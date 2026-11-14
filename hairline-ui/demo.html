@@ -30,6 +30,10 @@
           <label for="tintOpacity">Opacity <span id="tintOpacityVal" class="mono">8%</span></label>
           <input id="tintOpacity" type="range" min="0" max="50" step="1" value="8" disabled>
         </div>
+        <div class="field tint-opacity disabled" id="hoverLiftField" style="margin-top:10px">
+          <label for="hoverLift">Hover lift <span id="hoverLiftVal" class="mono">6 pts</span></label>
+          <input id="hoverLift" type="range" min="0" max="12" step="1" value="6" disabled>
+        </div>
         <p class="hint">Only the surrounding areas are tinted; the log keeps its original background.</p>
       </div>
       <h6>Sample form</h6>
@@ -38,7 +42,7 @@
         <label class="checkrow"><input type="checkbox" checked> Checkbox</label>
         <button id="toastBtn">Show toast</button>
         <button class="demo-hover" style="margin-left:6px">Hover preview</button>
-        <p class="hint">Hover preview pins the hover colour: with a tint set, it takes the tint's hue (same lightness shift as the stock hover). Hover any real button to compare.</p>
+        <p class="hint">Hover preview pins the hover colour: with a tint set, it takes the tint's hue. Adjust its strength with the Hover lift slider above. Hover any real button to compare.</p>
       </div>
       <h6>Info</h6>
       <div class="sideblock"><p class="hint">Drag the handle on the line between sidebar and content; double-click returns to 320px. Below 800px the sidebar stacks on top.</p></div>
@@ -108,7 +112,7 @@
   Hairline.initSidebar({ app: app, resizer: document.getElementById("sideResizer"), toggle: document.getElementById("sideToggle") });
   Hairline.initFades(document.getElementById("side"), document.getElementById("sideFadeTop"), document.getElementById("sideFadeBottom"));
   Hairline.initFades(document.getElementById("log"), document.getElementById("logFadeTop"), document.getElementById("logFadeBottom"));
-  Hairline.initTint(app, Array.prototype.slice.call(document.querySelectorAll("#tintSwatches .swatch")), document.getElementById("tintOpacity"), document.getElementById("tintOpacityVal"));
+  Hairline.initTint(app, Array.prototype.slice.call(document.querySelectorAll("#tintSwatches .swatch")), document.getElementById("tintOpacity"), document.getElementById("tintOpacityVal"), document.getElementById("hoverLift"), document.getElementById("hoverLiftVal"));
   var toastEl = document.getElementById("toast");
   document.getElementById("toastBtn").addEventListener("click", function () { Hairline.toast(toastEl, "Toast — 1px border, no rounded corners"); });
   document.querySelectorAll(".pathbadge").forEach(function (b) {

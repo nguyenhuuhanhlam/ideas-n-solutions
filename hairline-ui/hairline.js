@@ -4,7 +4,7 @@
    Spec: hairline-ui/README.md */
 (function (global) {
   "use strict";
-  var LS_W = "hairline-side-w", LS_C = "hairline-side-collapsed", LS_T = "hairline-tint", LS_TO = "hairline-tint-opacity";
+  var LS_W = "hairline-side-w", LS_C = "hairline-side-collapsed", LS_T = "hairline-tint", LS_TO = "hairline-tint-opacity", LS_HL = "hairline-hover-lift";
   var DEFAULT_W = 320, MIN_W = 160, MAX_W = 480;
   function lsGet(k, d) { try { var v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -55,8 +55,8 @@
      Sidebar fades are blended (tint over bg, light/dark aware) so no white seam.
      Lines inside tinted regions (from 0.9.3) shift a fixed lightness delta from
      the effective tinted bg, keeping the tint's hue/saturation. Button/tab
-     hover inside tinted regions (kit 2026-11-14) shifts by the same lightness
-     delta as the stock --hover token, in the tint's hue. */
+     hover inside tinted regions (kit 2026-11-14) shifts by the adjustable
+     Hover lift (0–12pts, default 6), in the tint's hue. */
   var TINTS = { gray: "#787878", blue: "#2563eb", green: "#16a34a", amber: "#d97706", red: "#dc2626", purple: "#9333ea" };
   function hexRgb(hex) { return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)]; }
   /* RGB [0-255] -> HSL [h 0-360, s 0-1, l 0-1]. */
@@ -103,17 +103,22 @@
   function adaptLineColor(bg, dark) {
     return shiftLightness(bg, (dark ? 1 : -1) * LINE_LIGHTNESS_DELTA);
   }
-  /* Hover lift inside tinted regions: the SAME lightness delta as the stock
-     --hover token, measured from the tokens — light #ffffff (L100) ->
-     #fafafa (L98.04) = -1.96; dark #0b0b0c (L4.51) -> #131315 (L7.84) =
-     +3.33 — applied to the effective tinted bg, hue/saturation kept.
-     If the --hover token ever changes, re-measure these two numbers. */
-  var HOVER_DELTA_LIGHT = -1.96, HOVER_DELTA_DARK = 3.33;
-  function adaptHoverColor(bg, dark) {
-    return shiftLightness(bg, dark ? HOVER_DELTA_DARK : HOVER_DELTA_LIGHT);
+  /* Hover lift inside tinted regions: a lightness shift from the effective
+     tinted bg, hue/saturation kept — darker in light theme, lighter in
+     dark theme (same direction as the lines). Adjustable 0–12 points via
+     the Hover lift slider (default 6). History: the first version used the
+     stock --hover token's own delta (light -1.96, dark +3.33, measured
+     from #ffffff->#fafafa and #0b0b0c->#131315), but on a tinted bg that
+     was too subtle to see, so the lift became a parameter instead. */
+  var HOVER_LIFT_DEFAULT = 6, HOVER_LIFT_MIN = 0, HOVER_LIFT_MAX = 12;
+  function adaptHoverColor(bg, dark, lift) {
+    return shiftLightness(bg, (dark ? 1 : -1) * lift);
   }
-  function initTint(app, swatchEls, opacityEl, opacityValEl) {
+  function initTint(app, swatchEls, opacityEl, opacityValEl, hoverEl, hoverValEl) {
     var name = lsGet(LS_T, ""), op = parseInt(lsGet(LS_TO, "8"), 10); if (isNaN(op)) op = 8;
+    var lift = parseInt(lsGet(LS_HL, String(HOVER_LIFT_DEFAULT)), 10);
+    if (isNaN(lift)) lift = HOVER_LIFT_DEFAULT;
+    lift = Math.max(HOVER_LIFT_MIN, Math.min(HOVER_LIFT_MAX, lift));
     function isDark() { return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches); }
     /* Per-region --line override for the 6 tinted regions (same list as the
        --tint backgrounds in CSS); log region and app outer border keep the
@@ -135,7 +140,7 @@
     function updateHoverColors(tintedBg) {
       var val = "";
       if (tintedBg) {
-        var c = adaptHoverColor(tintedBg, isDark());
+        var c = adaptHoverColor(tintedBg, isDark(), lift);
         val = "rgb(" + c[0] + ", " + c[1] + ", " + c[2] + ")";
       }
       app.querySelectorAll(".brand, .topbar, .sidewrap, .stats, .toolbar, .tabs").forEach(function (el) {
@@ -159,10 +164,14 @@
       if (opacityEl) { opacityEl.disabled = !rgb; opacityEl.value = op; }
       if (opacityValEl) opacityValEl.textContent = op + "%";
       var holder = opacityEl && opacityEl.closest(".tint-opacity"); if (holder) holder.classList.toggle("disabled", !rgb);
+      if (hoverEl) { hoverEl.disabled = !rgb; hoverEl.value = lift; }
+      if (hoverValEl) hoverValEl.textContent = lift + " pts";
+      var hoverHolder = hoverEl && hoverEl.closest(".tint-opacity"); if (hoverHolder) hoverHolder.classList.toggle("disabled", !rgb);
       swatchEls.forEach(function (el) { el.classList.toggle("selected", (el.getAttribute("data-tint") || "") === name); });
     }
     swatchEls.forEach(function (el) { el.addEventListener("click", function () { name = el.getAttribute("data-tint") || ""; lsSet(LS_T, name); apply(); }); });
     if (opacityEl) opacityEl.addEventListener("input", function () { op = parseInt(opacityEl.value, 10) || 0; lsSet(LS_TO, op); apply(); });
+    if (hoverEl) hoverEl.addEventListener("input", function () { lift = parseInt(hoverEl.value, 10) || 0; lift = Math.max(HOVER_LIFT_MIN, Math.min(HOVER_LIFT_MAX, lift)); lsSet(LS_HL, lift); apply(); });
     if (window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", apply);
     apply(); return apply;
   }

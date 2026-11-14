@@ -275,12 +275,17 @@ luôn giữ nền gốc để dễ đọc.
   ghi đè.
 - Hover trong vùng nhuộm (kit 2026-11-14, chưa vào File
   Watcher): JS ghi đè `--hover` riêng trên cùng 6 vùng — màu
-  hover lấy gam màu của tint, lệch độ sáng ĐÚNG bằng độ lệch
-  của token `--hover` gốc (sáng −1.96 điểm: `#ffffff` →
-  `#fafafa`; tối +3.33 điểm: `#0b0b0c` → `#131315`), giữ sắc/bão
-  hòa. Nút/tab trong vùng nhuộm hover ra màu tint; dòng log
-  (không nhuộm) hover vẫn xám trung tính; không chọn tint thì
-  gỡ ghi đè.
+  hover lấy gam màu của tint, lệch độ sáng theo tham số
+  Hover lift (0–12 điểm, mặc định 6; tối đi ở theme sáng,
+  sáng lên ở theme tối, cùng hướng với line), giữ sắc/bão
+  hòa. Thanh trượt Hover lift nằm trong khối chọn tint,
+  lưu localStorage (`hairline-hover-lift`), vô hiệu khi
+  không chọn tint. Bản đầu dùng đúng độ lệch của token
+  `--hover` gốc (sáng −1.96, tối +3.33 điểm) nhưng nhìn
+  quá mờ trên nền tint nên đổi thành tham số chỉnh được.
+  Nút/tab trong vùng nhuộm hover ra màu tint; dòng log
+  (không nhuộm) hover vẫn xám trung tính; không chọn tint
+  thì gỡ ghi đè.
 
 ### Vệt mờ báo cuộn (thay thanh trượt)
 
