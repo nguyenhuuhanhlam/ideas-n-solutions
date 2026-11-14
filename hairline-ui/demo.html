@@ -1,7 +1,9 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hairline UI — component demo</title>
-<link rel="stylesheet" href="hairline.css"></head>
+<link rel="stylesheet" href="hairline.css">
+<style>/* Demo-only: pins the hover background so the tinted hover colour can be seen without hovering. */
+.demo-hover { background: var(--hover); border-color: var(--muted); }</style></head>
 <body>
 <div class="app" id="app">
   <div class="brand"><i></i> hairline-ui demo</div>
@@ -12,7 +14,7 @@
   <div class="sidewrap">
     <nav class="side" id="side">
       <h6>Components</h6>
-      <div class="sideblock"><p class="hint">This page is a living showcase for the Hairline system: app shell, draggable sidebar (160–480px), stats, toolbar, tabs, log rows, path badge, toast, fades, tint. Source of truth: <code>README.md</code> in this folder.</p></div>
+      <div class="sideblock"><p class="hint">This page is a living showcase for the Hairline system: app shell, draggable sidebar (160–480px), stats, toolbar, tabs, log rows, path badge, toast, fades, tint, tinted hover. Source of truth: <code>README.md</code> in this folder.</p></div>
       <h6>Background color (tint)</h6>
       <div class="sideblock">
         <div class="swatches" id="tintSwatches">
@@ -35,6 +37,8 @@
         <div class="field"><label for="demoInput">Text field</label><input id="demoInput" type="text" placeholder="monospace, 1px border"></div>
         <label class="checkrow"><input type="checkbox" checked> Checkbox</label>
         <button id="toastBtn">Show toast</button>
+        <button class="demo-hover" style="margin-left:6px">Hover preview</button>
+        <p class="hint">Hover preview pins the hover colour: with a tint set, it takes the tint's hue (same lightness shift as the stock hover). Hover any real button to compare.</p>
       </div>
       <h6>Info</h6>
       <div class="sideblock"><p class="hint">Drag the handle on the line between sidebar and content; double-click returns to 320px. Below 800px the sidebar stacks on top.</p></div>

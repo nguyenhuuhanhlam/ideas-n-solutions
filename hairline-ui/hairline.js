@@ -1,4 +1,5 @@
-/* Hairline UI — shared JS helpers (starter kit, synced with File Watcher 0.9.6)
+/* Hairline UI — shared JS helpers (starter kit, synced with File Watcher 0.9.7;
+   tinted hover 2026-11-14 is kit-only until File Watcher adopts it)
    Plain vanilla, no framework. Call Hairline.init({...}) or use pieces.
    Spec: hairline-ui/README.md */
 (function (global) {
@@ -53,7 +54,9 @@
   /* Tint picker: swatches + opacity 0–50% (default 8%). Sets --tint on .app.
      Sidebar fades are blended (tint over bg, light/dark aware) so no white seam.
      Lines inside tinted regions (from 0.9.3) shift a fixed lightness delta from
-     the effective tinted bg, keeping the tint's hue/saturation. */
+     the effective tinted bg, keeping the tint's hue/saturation. Button/tab
+     hover inside tinted regions (kit 2026-11-14) shifts by the same lightness
+     delta as the stock --hover token, in the tint's hue. */
   var TINTS = { gray: "#787878", blue: "#2563eb", green: "#16a34a", amber: "#d97706", red: "#dc2626", purple: "#9333ea" };
   function hexRgb(hex) { return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)]; }
   /* RGB [0-255] -> HSL [h 0-360, s 0-1, l 0-1]. */
@@ -85,16 +88,29 @@
     else { r = c; b = x; }
     return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
   }
+  /* Shift a colour's lightness by deltaPoints (HSL, hue/saturation kept),
+     clamped to 0–100. Shared by the tinted line and hover colours. */
+  function shiftLightness(bg, deltaPoints) {
+    var hsl = rgbToHsl(bg[0], bg[1], bg[2]);
+    var l = Math.max(0, Math.min(1, hsl[2] + deltaPoints / 100));
+    return hslToRgb(hsl[0], hsl[1], l);
+  }
   /* Fixed lightness offset of tinted-region lines from their effective bg:
      14 points — slightly more than the default gap (white bg 100 -> line
      #e5e5e5 ~90) so lines stay visible on a coloured bg. Darker in light
      theme, lighter in dark theme; hue/saturation untouched. */
   var LINE_LIGHTNESS_DELTA = 14;
   function adaptLineColor(bg, dark) {
-    var hsl = rgbToHsl(bg[0], bg[1], bg[2]);
-    var l = hsl[2] + (dark ? 1 : -1) * LINE_LIGHTNESS_DELTA / 100;
-    l = Math.max(0, Math.min(1, l));
-    return hslToRgb(hsl[0], hsl[1], l);
+    return shiftLightness(bg, (dark ? 1 : -1) * LINE_LIGHTNESS_DELTA);
+  }
+  /* Hover lift inside tinted regions: the SAME lightness delta as the stock
+     --hover token, measured from the tokens — light #ffffff (L100) ->
+     #fafafa (L98.04) = -1.96; dark #0b0b0c (L4.51) -> #131315 (L7.84) =
+     +3.33 — applied to the effective tinted bg, hue/saturation kept.
+     If the --hover token ever changes, re-measure these two numbers. */
+  var HOVER_DELTA_LIGHT = -1.96, HOVER_DELTA_DARK = 3.33;
+  function adaptHoverColor(bg, dark) {
+    return shiftLightness(bg, dark ? HOVER_DELTA_DARK : HOVER_DELTA_LIGHT);
   }
   function initTint(app, swatchEls, opacityEl, opacityValEl) {
     var name = lsGet(LS_T, ""), op = parseInt(lsGet(LS_TO, "8"), 10); if (isNaN(op)) op = 8;
@@ -113,6 +129,20 @@
         else el.style.removeProperty("--line");
       });
     }
+    /* Same 6 regions, --hover override: buttons/tabs hovered inside a
+       tinted region show the tint's hue instead of neutral grey. The log
+       region is untinted, so log-row hover keeps the stock --hover. */
+    function updateHoverColors(tintedBg) {
+      var val = "";
+      if (tintedBg) {
+        var c = adaptHoverColor(tintedBg, isDark());
+        val = "rgb(" + c[0] + ", " + c[1] + ", " + c[2] + ")";
+      }
+      app.querySelectorAll(".brand, .topbar, .sidewrap, .stats, .toolbar, .tabs").forEach(function (el) {
+        if (tintedBg) el.style.setProperty("--hover", val);
+        else el.style.removeProperty("--hover");
+      });
+    }
     function apply() {
       var rgb = TINTS[name], bg = isDark() ? [11,11,12] : [255,255,255];
       var tinted = null;
@@ -125,6 +155,7 @@
         app.style.setProperty("--side-fade-from", "rgba(" + tinted.join(",") + ",0)");
       }
       updateLineColors(tinted);
+      updateHoverColors(tinted);
       if (opacityEl) { opacityEl.disabled = !rgb; opacityEl.value = op; }
       if (opacityValEl) opacityValEl.textContent = op + "%";
       var holder = opacityEl && opacityEl.closest(".tint-opacity"); if (holder) holder.classList.toggle("disabled", !rgb);
