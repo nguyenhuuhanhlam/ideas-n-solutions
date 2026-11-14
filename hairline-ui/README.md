@@ -7,7 +7,7 @@
 > component, hành vi — để sau này tách ra thành thư viện dùng chung
 > mà không phải đoán lại từ đầu.
 >
-> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.7.
+> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.8.
 
 ## Nguồn gốc
 
@@ -273,19 +273,19 @@ luôn giữ nền gốc để dễ đọc.
   theme tối — rồi ghi đè `--line` riêng trên 6 vùng đã nhuộm.
   Log và viền ngoài app giữ `--line` gốc; không chọn màu thì gỡ
   ghi đè.
-- Hover trong vùng nhuộm (kit 2026-11-14, chưa vào File
-  Watcher): JS ghi đè `--hover` riêng trên cùng 6 vùng — màu
-  hover lấy gam màu của tint, lệch độ sáng theo tham số
-  Hover lift (0–12 điểm, mặc định 5; tối đi ở theme sáng,
-  sáng lên ở theme tối, cùng hướng với line), giữ sắc/bão
-  hòa. Thanh trượt Hover lift nằm trong khối chọn tint,
-  lưu localStorage (`hairline-hover-lift`), vô hiệu khi
-  không chọn tint. Bản đầu dùng đúng độ lệch của token
-  `--hover` gốc (sáng −1.96, tối +3.33 điểm) nhưng nhìn
-  quá mờ trên nền tint nên đổi thành tham số chỉnh được.
-  Nút/tab trong vùng nhuộm hover ra màu tint; dòng log
-  (không nhuộm) hover vẫn xám trung tính; không chọn tint
-  thì gỡ ghi đè.
+- Hover trong vùng nhuộm (từ File Watcher 0.9.8): JS ghi đè
+  `--hover` riêng trên cùng 6 vùng — màu hover lấy gam màu của
+  tint, lệch độ sáng theo tham số Hover lift (0–12 điểm, mặc
+  định 5; tối đi ở theme sáng, sáng lên ở theme tối, cùng
+  hướng với line), giữ sắc/bão hòa. Thanh trượt Hover lift
+  nằm trong khối chọn tint, lưu localStorage
+  (`hairline-hover-lift`, ở File Watcher là
+  `file-watcher-hover-lift`), vô hiệu khi không chọn tint.
+  Bản đầu dùng đúng độ lệch của token `--hover` gốc (sáng
+  −1.96, tối +3.33 điểm) nhưng nhìn quá mờ trên nền tint
+  nên đổi thành tham số chỉnh được. Nút/tab trong vùng nhuộm
+  hover ra màu tint; dòng log (không nhuộm) hover vẫn xám
+  trung tính; không chọn tint thì gỡ ghi đè.
 
 ### Vệt mờ báo cuộn (thay thanh trượt)
 
@@ -386,8 +386,9 @@ sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
 
 > Đã làm (2026-11-13–14): bước 1, 2, 3, 5 — starter kit
 > `hairline.css` + `hairline.js` + `demo.html` trong thư mục này,
-> đồng bộ tới File Watcher 0.9.7 (kể cả bộ icon Lucide, File
-> Watcher nhúng sprite của kit vào `ui.html`). Còn lại: bước 4 (quy ước đặt
+> đồng bộ tới File Watcher 0.9.8 (kể cả bộ icon Lucide và hover
+> nhuộm tint có Hover lift, File Watcher nhúng sprite của kit vào
+> `ui.html`). Còn lại: bước 4 (quy ước đặt
 > tên, quyết sau khi có ứng dụng thứ hai), bước 6 (repo/package
 > riêng khi có từ 2 ứng dụng dùng trở lên).
 
@@ -432,6 +433,7 @@ sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
 | 0.9.5 | 2026-11-13 | Toàn bộ app chuyển sang tiếng Anh (UI web + CLI): nhãn, tab, hint, toast, help text, thông báo lỗi, banner; kích thước đổi sang dấu chấm thập phân (`1.5 KB`, `net +1.0 KB`). Comment trong code và tài liệu vẫn tiếng Việt. |
 | 0.9.6 | 2026-11-14 | Giao diện web luôn bật (`--serve` không còn cần; `--no-serve` để tắt). Cổng chỉnh được trong Settings (mục Settings thêm ô Port): đổi là server bind lại ngay, trình duyệt tự chuyển sang cổng mới; cổng lưu vào `watch.json`, `--port` thắng file lúc khởi động, cổng bị chiếm thì tự lấy cổng trống tiếp theo. |
 | 0.9.7 | 2026-11-14 | Icon Lucide thay emoji/ký tự trang trí: nút ghim (📌 → icon pin), caret nhóm (▸/▾ → chevron), nút bỏ theo dõi/bỏ ghim (× → icon x), nút thu gọn sidebar (‹/› → chevron); tab và nút toolbar có icon kèm nhãn; nút Pause đổi cả icon (pause/play). Sprite 21 icon nhúng thẳng vào `ui.html` (lấy từ kit `hairline-ui/icons/`, nét 1px vật lý). |
+| 0.9.8 | 2026-11-14 | Hover trong vùng nhuộm ăn theo màu tint: ghi đè `--hover` riêng trên 6 vùng đã nhuộm, lệch độ sáng theo tham số Hover lift (0–12 điểm, mặc định 5; tối đi ở theme sáng, sáng lên ở theme tối, cùng hướng với line); thanh trượt Hover lift trong khối chọn tint, lưu `file-watcher-hover-lift`; hover dòng log vẫn xám trung tính. Mặc định mới: độ đậm tint 10% (trước 8%). |
 
 ## Tham chiếu
 

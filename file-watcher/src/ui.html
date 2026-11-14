@@ -462,8 +462,12 @@
         <button class="swatch" data-tint="purple" style="--sw:#9333ea" title="Purple" aria-label="Purple background"></button>
       </div>
       <div class="field tint-opacity disabled" id="tintOpacityField" style="margin-top:10px">
-        <label for="tintOpacity">Opacity <span id="tintOpacityVal" class="mono">8%</span></label>
-        <input id="tintOpacity" type="range" min="0" max="50" step="1" value="8" disabled>
+        <label for="tintOpacity">Opacity <span id="tintOpacityVal" class="mono">10%</span></label>
+        <input id="tintOpacity" type="range" min="0" max="50" step="1" value="10" disabled>
+      </div>
+      <div class="field tint-opacity disabled" id="hoverLiftField" style="margin-top:10px">
+        <label for="hoverLift">Hover lift <span id="hoverLiftVal" class="mono">5 pts</span></label>
+        <input id="hoverLift" type="range" min="0" max="12" step="1" value="5" disabled>
       </div>
       <p class="hint">The background color only applies to the surrounding areas (sidebar, topbar, stat strip, toolbar, tabs). The log area always keeps the original background for readability.</p>
     </div>
@@ -658,10 +662,13 @@
   logEl.addEventListener("scroll", updateFades);
 
   // Màu nền các vùng xung quanh (trừ log): chọn 1 trong 6 màu cơ
-  // bản + chỉnh độ đậm 0–50% (mặc định 8%, đủ thấy mà không chói).
+  // bản + chỉnh độ đậm 0–50% (mặc định 10%, đủ thấy mà không chói).
   // Màu áp qua biến --tint (rgba) lên .app; các vùng trong danh
   // sách CSS dùng background var(--tint), log không nằm trong đó
-  // nên giữ nguyên. Màu + độ đậm lưu localStorage.
+  // nên giữ nguyên. Hover của nút/tab trong vùng nhuộm cũng ăn
+  // theo màu tint, lệch độ sáng theo tham số Hover lift (0–12
+  // điểm, mặc định 5) — xem adaptHoverColor bên dưới. Màu + độ
+  // đậm + lift lưu localStorage.
   var TINTS = {
     gray: [120, 120, 120],
     blue: [37, 99, 235],
@@ -670,19 +677,26 @@
     red: [220, 38, 38],
     purple: [147, 51, 234],
   };
-  var TINT_DEFAULT_OPACITY = 8;
+  var TINT_DEFAULT_OPACITY = 10;
+  var HOVER_LIFT_DEFAULT = 5, HOVER_LIFT_MIN = 0, HOVER_LIFT_MAX = 12;
   var sidewrapEl = document.querySelector(".sidewrap");
   var tintOpacityEl = document.getElementById("tintOpacity");
   var tintOpacityValEl = document.getElementById("tintOpacityVal");
   var tintOpacityFieldEl = document.getElementById("tintOpacityField");
+  var hoverLiftEl = document.getElementById("hoverLift");
+  var hoverLiftValEl = document.getElementById("hoverLiftVal");
+  var hoverLiftFieldEl = document.getElementById("hoverLiftField");
 
   var tintKey = "";
   var tintOpacity = TINT_DEFAULT_OPACITY;
+  var tintHoverLift = HOVER_LIFT_DEFAULT;
   (function loadTintState() {
     var k = storeGet("file-watcher-tint");
     if (k && TINTS[k]) tintKey = k;
     var o = parseInt(storeGet("file-watcher-tint-opacity"), 10);
     if (!isNaN(o)) tintOpacity = Math.max(0, Math.min(50, o));
+    var h = parseInt(storeGet("file-watcher-hover-lift"), 10);
+    if (!isNaN(h)) tintHoverLift = Math.max(HOVER_LIFT_MIN, Math.min(HOVER_LIFT_MAX, h));
   })();
 
   function isDarkTheme() {
@@ -748,6 +762,14 @@
       Math.round((b + m) * 255),
     ];
   }
+  // Lệch độ sáng của một màu theo điểm HSL (giữ sắc/bão hòa),
+  // chặn trong 0–100. Dùng chung cho màu line và màu hover trong
+  // vùng nhuộm.
+  function shiftLightness(bg, deltaPoints) {
+    var hsl = rgbToHsl(bg[0], bg[1], bg[2]);
+    var l = Math.max(0, Math.min(1, hsl[2] + deltaPoints / 100));
+    return hslToRgb(hsl[0], hsl[1], l);
+  }
   // Line trong vùng nhuộm lệch khỏi nền hiệu dụng một khoảng độ
   // sáng cố định (giữ nguyên sắc/bão hòa của tint): theme sáng thì
   // đậm hơn, theme tối thì sáng hơn. 14 điểm — nhỉnh hơn khoảng
@@ -755,10 +777,16 @@
   // rõ trên nền có màu.
   var LINE_LIGHTNESS_DELTA = 14;
   function adaptLineColor(bg) {
-    var hsl = rgbToHsl(bg[0], bg[1], bg[2]);
-    var l = hsl[2] + (isDarkTheme() ? 1 : -1) * LINE_LIGHTNESS_DELTA / 100;
-    l = Math.max(0, Math.min(1, l));
-    return hslToRgb(hsl[0], hsl[1], l);
+    return shiftLightness(bg, (isDarkTheme() ? 1 : -1) * LINE_LIGHTNESS_DELTA);
+  }
+  // Hover của nút/tab trong vùng nhuộm (từ 0.9.8): lấy gam màu của
+  // tint, lệch độ sáng theo tham số Hover lift (0–12 điểm, mặc
+  // định 5) — tối đi ở theme sáng, sáng lên ở theme tối, cùng
+  // hướng với line. Bản đầu dùng đúng độ lệch của token --hover
+  // gốc (sáng −1.96, tối +3.33 điểm) nhưng nhìn quá mờ trên nền
+  // tint nên đổi thành tham số chỉnh được.
+  function adaptHoverColor(bg) {
+    return shiftLightness(bg, (isDarkTheme() ? 1 : -1) * tintHoverLift);
   }
   // Đặt --line riêng cho 6 vùng đã nhuộm (cùng danh sách với nền
   // --tint trong CSS) để line của chúng tương phản với nền tint;
@@ -776,6 +804,21 @@
       else el.style.removeProperty("--line");
     });
   }
+  // Cùng 6 vùng, ghi đè --hover: nút/tab hover trong vùng nhuộm
+  // hiện màu tint thay vì xám trung tính. Vùng log không nhuộm nên
+  // hover của dòng log giữ --hover gốc.
+  function updateHoverColors() {
+    var rgb = TINTS[tintKey];
+    var val = "";
+    if (rgb) {
+      var c = adaptHoverColor(effectiveTintedBg());
+      val = "rgb(" + c[0] + ", " + c[1] + ", " + c[2] + ")";
+    }
+    document.querySelectorAll(".brand, .topbar, .sidewrap, .stats, .toolbar, .tabs").forEach(function (el) {
+      if (rgb) el.style.setProperty("--hover", val);
+      else el.style.removeProperty("--hover");
+    });
+  }
   function applyTint() {
     var rgb = TINTS[tintKey];
     var tint = rgb
@@ -789,12 +832,18 @@
     tintOpacityValEl.textContent = tintOpacity + "%";
     tintOpacityEl.disabled = !rgb;
     tintOpacityFieldEl.classList.toggle("disabled", !rgb);
+    hoverLiftEl.value = String(tintHoverLift);
+    hoverLiftValEl.textContent = tintHoverLift + " pts";
+    hoverLiftEl.disabled = !rgb;
+    hoverLiftFieldEl.classList.toggle("disabled", !rgb);
     updateFadeColors();
     updateLineColors();
+    updateHoverColors();
   }
   function saveTintState() {
     storeSet("file-watcher-tint", tintKey);
     storeSet("file-watcher-tint-opacity", String(tintOpacity));
+    storeSet("file-watcher-hover-lift", String(tintHoverLift));
   }
   document.querySelectorAll(".swatch").forEach(function (btn) {
     btn.addEventListener("click", function () {
@@ -808,11 +857,17 @@
     applyTint();
     saveTintState();
   });
+  hoverLiftEl.addEventListener("input", function () {
+    tintHoverLift = parseInt(hoverLiftEl.value, 10) || 0;
+    tintHoverLift = Math.max(HOVER_LIFT_MIN, Math.min(HOVER_LIFT_MAX, tintHoverLift));
+    applyTint();
+    saveTintState();
+  });
   var darkMq = window.matchMedia
     ? window.matchMedia("(prefers-color-scheme: dark)")
     : null;
   if (darkMq && darkMq.addEventListener) {
-    // Đổi theme sáng/tối: tính lại cả vệt mờ lẫn màu line.
+    // Đổi theme sáng/tối: tính lại vệt mờ, màu line và màu hover.
     darkMq.addEventListener("change", applyTint);
   }
   applyTint();

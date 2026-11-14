@@ -179,12 +179,17 @@ không truy cập được từ máy khác trong mạng.
 - **Background color:** mục "Background color" ở sidebar chọn màu nền cho các vùng
   xung quanh (sidebar, topbar, dải stat, toolbar, tab) — 6 màu
   cơ bản (xám, xanh dương, xanh lá, vàng, đỏ, tím) + mặc định
-  không màu; thanh trượt chỉnh độ đậm 0–50% (mặc định 8%).
+  không màu; thanh trượt chỉnh độ đậm 0–50% (mặc định 10%).
   Khu vực log luôn giữ nền gốc để dễ đọc. Đường kẻ trong các
   vùng đã nhuộm tự đổi màu theo tint (giữ sắc, lệch độ sáng
   14 điểm: đậm hơn ở theme sáng, sáng hơn ở theme tối) để vẫn
   tương phản với nền; line trong log và viền ngoài app giữ
-  nguyên. Lựa chọn lưu trong trình duyệt nên mở lại vẫn giữ.
+  nguyên. Hover của nút/tab trong các vùng đã nhuộm cũng ăn
+  theo màu tint (từ 0.9.8): lệch độ sáng theo thanh trượt
+  Hover lift (0–12 điểm, mặc định 5; tối đi ở theme sáng,
+  sáng lên ở theme tối, cùng hướng với line); hover của dòng
+  log vẫn xám trung tính. Lựa chọn lưu trong trình duyệt nên
+  mở lại vẫn giữ.
 - **Khởi động rỗng:** app không cần thư mục nào — mở giao diện rồi
   thêm thư mục sau cũng được; file `watch.json` được tạo khi lưu
   thay đổi đầu tiên. Muốn chạy thuần CLI không giao diện thì dùng

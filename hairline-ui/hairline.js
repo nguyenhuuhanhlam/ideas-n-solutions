@@ -1,5 +1,4 @@
-/* Hairline UI — shared JS helpers (starter kit, synced with File Watcher 0.9.7;
-   tinted hover 2026-11-14 is kit-only until File Watcher adopts it)
+/* Hairline UI — shared JS helpers (starter kit, synced with File Watcher 0.9.8)
    Plain vanilla, no framework. Call Hairline.init({...}) or use pieces.
    Spec: hairline-ui/README.md */
 (function (global) {
