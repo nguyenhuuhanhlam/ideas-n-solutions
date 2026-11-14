@@ -7,7 +7,7 @@
 > component, hành vi — để sau này tách ra thành thư viện dùng chung
 > mà không phải đoán lại từ đầu.
 >
-> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.5.
+> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.6.
 
 ## Nguồn gốc
 
@@ -383,6 +383,7 @@ chưa làm):
 | 0.9.3 | 2026-11-13 | Line trong vùng nhuộm tự đổi màu theo tint: giữ sắc, lệch độ sáng cố định 14 điểm (đậm hơn ở theme sáng, sáng hơn ở theme tối); log và viền ngoài app giữ line gốc. |
 | 0.9.4 | 2026-11-13 | Tab Đã ghim bỏ ô nhập đường dẫn ghim tay (gây rối UX): chỉ còn danh sách file đã ghim + nút × bỏ ghim; ghim chỉ bằng nút 📌 ở dòng log. |
 | 0.9.5 | 2026-11-13 | Toàn bộ app chuyển sang tiếng Anh (UI web + CLI): nhãn, tab, hint, toast, help text, thông báo lỗi, banner; kích thước đổi sang dấu chấm thập phân (`1.5 KB`, `net +1.0 KB`). Comment trong code và tài liệu vẫn tiếng Việt. |
+| 0.9.6 | 2026-11-14 | Giao diện web luôn bật (`--serve` không còn cần; `--no-serve` để tắt). Cổng chỉnh được trong Settings (mục Settings thêm ô Port): đổi là server bind lại ngay, trình duyệt tự chuyển sang cổng mới; cổng lưu vào `watch.json`, `--port` thắng file lúc khởi động, cổng bị chiếm thì tự lấy cổng trống tiếp theo. |
 
 ## Tham chiếu
 

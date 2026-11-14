@@ -1,1 +1,1 @@
-{"debounce_ms":200,"dirs":["D:\\code\\project","C:\\Users\\ten\\Documents\\ghi-chu"],"exts":["rs","md"],"ignores":["target","node_modules"],"pins":[{"command":null,"path":"D:\\code\\project\\quan-trong.txt"}],"recursive":true}
+{"debounce_ms":200,"dirs":["D:\\code\\project","C:\\Users\\ten\\Documents\\ghi-chu"],"exts":["rs","md"],"ignores":["target","node_modules"],"pins":[{"command":null,"path":"D:\\code\\project\\quan-trong.txt"}],"port":8787,"recursive":true}

@@ -814,8 +814,11 @@ pub struct Args {
     pub exec: Option<String>,
     /// Ghi đè PC ID tự nhận (mặc định: hostname của máy).
     pub pc_id: Option<String>,
-    /// Bật giao diện web local (localhost) để cấu hình + xem log realtime.
+    /// Giữ để tương thích ngược: giao diện web giờ luôn bật, trừ khi
+    /// dùng `--no-serve`. Flag này không còn tác dụng gì.
     pub serve: bool,
+    /// Không mở giao diện web (chạy thuần CLI).
+    pub no_serve: bool,
     /// Cổng của giao diện web (mặc định 8787).
     pub port: u16,
     pub help: bool,
@@ -843,6 +846,9 @@ impl Args {
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
+/// Cổng mặc định của giao diện web.
+pub const DEFAULT_PORT: u16 = 8787;
+
 pub fn usage() -> String {
     format!(
         "file-watcher {VERSION} — watch for file changes in one or more folders (light, fast, no polling)\n\
@@ -861,8 +867,8 @@ pub fn usage() -> String {
         \x20 --json                print each event as one JSON line instead of human-readable form\n\
         \x20 --exec \"<command>\"    run a command on every event ({{path}} {{event}} {{time}} {{from}} {{user}} {{pc}} {{size}} {{delta}})\n\
         \x20 --pc-id <id>          override the PC ID in the log (default: machine hostname)\n\
-        \x20 --serve               start the local web UI to configure folders + view the live log\n\
-        \x20 --port <n>            web UI port (default 8787; only meaningful with --serve)\n\
+        \x20 --port <n>            web UI port (default 8787; overrides the port in the config file)\n\
+        \x20 --no-serve            run without the web UI (CLI only)\n\
         \x20 -h, --help            show this help\n\
         \x20 -V, --version         show the version\n\
         \n\
@@ -870,14 +876,34 @@ pub fn usage() -> String {
         \x20 file-watcher D:\\code\\project\n\
         \x20 file-watcher C:\\a D:\\b --ext rs,md --ignore target,node_modules\n\
         \x20 file-watcher . --log events.log --exec \"echo {{event}} {{path}}\"\n\
-        \x20 file-watcher --config watch.json --serve\n\
-        \x20 file-watcher --serve --port 9000\n\
+        \x20 file-watcher --config watch.json\n\
+        \x20 file-watcher --port 9000\n\
         \n\
-        The web UI only listens on 127.0.0.1 (this machine); open a browser\n\
-        at http://127.0.0.1:8787 (or the chosen port). With --serve and no\n\
-        --config, the app uses watch.json in the current folder (if any)\n\
-        and saves UI changes to it.\n"
+        The web UI is always on (unless --no-serve) and only listens on\n\
+        127.0.0.1 (this machine); open a browser at http://127.0.0.1:8787\n\
+        (or the chosen port). The port can be changed in the UI (Settings)\n\
+        and is saved to the config file. With no --config, the app uses\n\
+        watch.json in the current folder (if any) and saves UI changes\n\
+        to it.\n"
     )
+}
+
+/// Bind `127.0.0.1` tại `start`; nếu cổng bị chiếm thì thử cổng tiếp
+/// theo (tới 65535). Trả listener + cổng thực tế đã bind được. Lỗi
+/// khác (không phải "cổng bị chiếm") thì dừng ngay, không thử tiếp.
+pub fn bind_first_free(start: u16) -> std::io::Result<(std::net::TcpListener, u16)> {
+    let mut port = start;
+    loop {
+        match std::net::TcpListener::bind(("127.0.0.1", port)) {
+            Ok(listener) => return Ok((listener, port)),
+            Err(e) => {
+                if e.kind() != std::io::ErrorKind::AddrInUse || port == 65535 {
+                    return Err(e);
+                }
+                port += 1;
+            }
+        }
+    }
 }
 
 pub(crate) fn split_list(value: &str) -> Vec<String> {
@@ -936,6 +962,7 @@ where
             }
             "--json" => args.json = true,
             "--serve" => args.serve = true,
+            "--no-serve" => args.no_serve = true,
             "--config" => args.config = Some(take_value(&mut iter)?),
             "--log" => args.log = Some(take_value(&mut iter)?),
             "--exec" => args.exec = Some(take_value(&mut iter)?),
@@ -974,9 +1001,6 @@ where
             }
         }
     }
-    if args.port_set && !args.serve {
-        return Err("--port only makes sense with --serve".to_string());
-    }
     Ok(args)
 }
 
@@ -1010,6 +1034,9 @@ pub struct Settings {
     pub debounce_ms: u64,
     pub recursive: bool,
     pub pins: Vec<Pin>,
+    /// Cổng giao diện web (lưu trong file cấu hình, chỉnh được từ
+    /// giao diện; `--port` gõ rõ lúc khởi động thắng giá trị này).
+    pub port: u16,
 }
 
 impl Default for Settings {
@@ -1020,6 +1047,7 @@ impl Default for Settings {
             debounce_ms: 200,
             recursive: true,
             pins: Vec::new(),
+            port: DEFAULT_PORT,
         }
     }
 }
@@ -1394,6 +1422,21 @@ fn parse_config_legacy(
                         ));
                     }
                 },
+                "port" => {
+                    let p = value.parse::<u32>().map_err(|_| {
+                        format!(
+                            "{config_path} line {}: @port must be an integer 1-65535, got: {value}",
+                            lineno + 1
+                        )
+                    })?;
+                    if !(1..=65535).contains(&p) {
+                        return Err(format!(
+                            "{config_path} line {}: @port must be an integer 1-65535, got: {value}",
+                            lineno + 1
+                        ));
+                    }
+                    settings.port = p as u16;
+                }
                 "pin" => {
                     // value là toàn bộ phần còn lại của dòng (đường
                     // dẫn có thể chứa khoảng trắng). Trùng nhau thì
@@ -1417,7 +1460,7 @@ fn parse_config_legacy(
                 }
                 _ => {
                     return Err(format!(
-                        "{config_path} line {}: unknown setting: @{key} (only @exts, @ignore, @debounce, @recursive, @pin)",
+                        "{config_path} line {}: unknown setting: @{key} (only @exts, @ignore, @debounce, @recursive, @pin, @port)",
                         lineno + 1
                     ));
                 }
@@ -1476,6 +1519,22 @@ fn config_from_json(
                         "{config_path}: \"debounce_ms\" must be an integer >= 0, got: {raw}"
                     )
                 })?;
+            }
+            "port" => {
+                let JsonValue::Number(raw) = v else {
+                    return Err(format!(
+                        "{config_path}: \"port\" must be an integer 1-65535"
+                    ));
+                };
+                let p = raw.parse::<u32>().map_err(|_| {
+                    format!("{config_path}: \"port\" must be an integer 1-65535, got: {raw}")
+                })?;
+                if !(1..=65535).contains(&p) {
+                    return Err(format!(
+                        "{config_path}: \"port\" must be an integer 1-65535, got: {raw}"
+                    ));
+                }
+                settings.port = p as u16;
             }
             "exts" => {
                 // Chuẩn hóa giống dạng cũ: trim, bỏ dấu chấm đầu, viết thường.
@@ -1542,7 +1601,7 @@ fn config_from_json(
             }
             _ => {
                 return Err(format!(
-                    "{config_path}: unknown key: \"{key}\" (only \"dirs\", \"recursive\", \"debounce_ms\", \"exts\", \"ignores\", \"pins\")"
+                    "{config_path}: unknown key: \"{key}\" (only \"dirs\", \"recursive\", \"debounce_ms\", \"exts\", \"ignores\", \"pins\", \"port\")"
                 ));
             }
         }
@@ -1598,6 +1657,7 @@ fn config_to_json(dirs: &[PathBuf], settings: &Settings) -> String {
     }
     out.push_str(&format!("  \"recursive\": {},\n", settings.recursive));
     out.push_str(&format!("  \"debounce_ms\": {},\n", settings.debounce_ms));
+    out.push_str(&format!("  \"port\": {},\n", settings.port));
     let short_list = |items: &[String]| -> String {
         items
             .iter()
@@ -1989,15 +2049,20 @@ mod tests {
     fn parse_args_serve_and_set_flags() {
         let a = parse_args(["--serve"]).unwrap();
         assert!(a.serve);
+        assert!(!a.no_serve);
         assert_eq!(a.port, 8787);
         assert!(!a.port_set);
         let a = parse_args(["--serve", "--port", "9000"]).unwrap();
         assert_eq!(a.port, 9000);
         assert!(a.port_set);
-        // --port mà không có --serve thì lỗi.
-        assert!(parse_args(["--port", "9000"]).is_err());
-        assert!(parse_args(["--serve", "--port", "0"]).is_err());
-        assert!(parse_args(["--serve", "--port", "70000"]).is_err());
+        // 0.9.6: --port không cần --serve nữa (web UI luôn bật).
+        let a = parse_args(["--port", "9000"]).unwrap();
+        assert_eq!(a.port, 9000);
+        assert!(a.port_set);
+        assert!(parse_args(["--port", "0"]).is_err());
+        assert!(parse_args(["--port", "70000"]).is_err());
+        let a = parse_args(["--no-serve"]).unwrap();
+        assert!(a.no_serve);
         // Cờ *_set chỉ bật khi user gõ rõ.
         let a = parse_args(["--ext", "rs"]).unwrap();
         assert!(a.exts_set);
@@ -2009,6 +2074,20 @@ mod tests {
         assert!(a.debounce_set);
         assert!(a.ignores_set);
         assert!(!a.exts_set);
+    }
+
+    #[test]
+    fn bind_first_free_skips_busy_port() {
+        // Giữ 1 cổng trống rồi yêu cầu đúng cổng đó: phải nhảy sang cổng khác.
+        let busy = std::net::TcpListener::bind(("127.0.0.1", 0)).unwrap();
+        let busy_port = busy.local_addr().unwrap().port();
+        let (listener, got) = bind_first_free(busy_port).unwrap();
+        assert!(got > busy_port);
+        assert!(got <= 65535);
+        // Cổng trống thì bind đúng cổng đó.
+        drop(listener);
+        let (_listener2, got2) = bind_first_free(got).unwrap();
+        assert_eq!(got2, got);
     }
 
     #[test]
@@ -2026,7 +2105,7 @@ mod tests {
         // File có dòng @: parse đủ cài đặt + @pin, lỗi rõ khi sai.
         std::fs::write(
             &path,
-            "@exts rs,MD\n@ignore target, .tmp\n@debounce 50\n@recursive false\n@pin /a/quan trong.txt\n@pin rel/file.txt\n@pin /a/quan trong.txt\n/a/x\n",
+            "@exts rs,MD\n@ignore target, .tmp\n@debounce 50\n@recursive false\n@port 9002\n@pin /a/quan trong.txt\n@pin rel/file.txt\n@pin /a/quan trong.txt\n/a/x\n",
         )
         .unwrap();
         let (dirs, settings) = load_config(path.to_str().unwrap()).unwrap();
@@ -2035,6 +2114,7 @@ mod tests {
         assert_eq!(settings.ignores, vec!["target", "tmp"]);
         assert_eq!(settings.debounce_ms, 50);
         assert!(!settings.recursive);
+        assert_eq!(settings.port, 9002);
         // @pin: đường dẫn có khoảng trắng giữ nguyên, trùng nhau loại
         // bỏ, tương đối hiểu theo thư mục chứa file cấu hình.
         assert_eq!(settings.pins.len(), 2);
@@ -2047,6 +2127,10 @@ mod tests {
         assert!(load_config(path.to_str().unwrap()).is_err());
         std::fs::write(&path, "@pin\n").unwrap();
         assert!(load_config(path.to_str().unwrap()).is_err());
+        std::fs::write(&path, "@port 0\n").unwrap();
+        assert!(load_config(path.to_str().unwrap()).is_err());
+        std::fs::write(&path, "@port 70000\n").unwrap();
+        assert!(load_config(path.to_str().unwrap()).is_err());
         std::fs::write(&path, "@la-mot-cai-gi-do 1\n").unwrap();
         assert!(load_config(path.to_str().unwrap()).is_err());
         // Ghi lại (dạng JSON từ 0.8.0) rồi đọc lại: khớp (kể cả pin).
@@ -2056,6 +2140,7 @@ mod tests {
             debounce_ms: 300,
             recursive: true,
             pins: vec![Pin::new(PathBuf::from("/a/ghim.txt"))],
+            port: 9001,
         };
         save_config(
             &path,
@@ -2094,6 +2179,7 @@ mod tests {
   "dirs": ["/a/code", "rel/dir"],
   "recursive": false,
   "debounce_ms": 50,
+  "port": 9000,
   "exts": ["RS", ".md"],
   "ignores": ["Target", " .tmp "],
   "pins": [
@@ -2109,6 +2195,7 @@ mod tests {
         assert!(dirs[1].ends_with("rel/dir"));
         assert!(!settings.recursive);
         assert_eq!(settings.debounce_ms, 50);
+        assert_eq!(settings.port, 9000);
         assert_eq!(settings.exts, vec!["rs", "md"]);
         assert_eq!(settings.ignores, vec!["target", "tmp"]);
         assert_eq!(settings.pins.len(), 2);
@@ -2125,6 +2212,7 @@ mod tests {
         .unwrap();
         let saved = std::fs::read_to_string(&path).unwrap();
         assert!(saved.starts_with("{\n  \"dirs\": [\n"));
+        assert!(saved.contains("\"port\": 9000"));
         assert!(saved.contains("\"command\": \"echo xong\""));
         assert!(saved.contains("\"command\": null"));
         let (dirs, back) = load_config(path.to_str().unwrap()).unwrap();
@@ -2144,6 +2232,10 @@ mod tests {
             r#"{"dirs": "khong-phai-array"}"#,
             r#"{"debounce_ms": -5}"#,
             r#"{"debounce_ms": 12.5}"#,
+            r#"{"port": 0}"#,
+            r#"{"port": 70000}"#,
+            r#"{"port": "9000"}"#,
+            r#"{"port": 12.5}"#,
             r#"{"recursive": "true"}"#,
             r#"{"exts": ["rs", 1]}"#,
             // Khóa lạ.

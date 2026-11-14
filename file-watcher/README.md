@@ -3,9 +3,10 @@
 CLI lắng nghe thay đổi file trong 1 hoặc nhiều thư mục, viết bằng Rust.
 Tiêu chí: **nhẹ, nhanh** — chạy nền cả ngày không đáng kể tài nguyên.
 
-Với `--serve`, app mở thêm giao diện web local (http://127.0.0.1:8787)
-để cấu hình thư mục theo dõi và xem log theo thời gian thực — vẫn 1
-file binary duy nhất, không thêm dependency (xem "Giao diện web").
+App luôn mở giao diện web local (http://127.0.0.1:8787, trừ khi
+dùng `--no-serve`) để cấu hình thư mục theo dõi và xem log theo thời
+gian thực — vẫn 1 file binary duy nhất, không thêm dependency (xem
+"Giao diện web").
 
 Giao diện web và CLI dùng tiếng Anh (từ 0.9.5); tài liệu này vẫn
 viết bằng tiếng Việt, chỉ các nhãn trong giao diện được trích
@@ -76,8 +77,9 @@ file-watcher . --log events.log --exec "echo {event} {path}"
 file-watcher . --json > events.jsonl
 
 # Giao diện web: cấu hình thư mục + xem log realtime
-file-watcher --config watch.json --serve
-file-watcher --serve --port 9000
+file-watcher --config watch.json
+file-watcher --port 9000
+file-watcher . --no-serve
 ```
 
 Nhấn `Ctrl+C` để dừng. Banner khởi động in ra stderr nên stdout
@@ -88,8 +90,8 @@ luôn sạch — pipe sang file hay tool khác chỉ nhận event.
 | Tùy chọn | Mặc định | Nghĩa |
 | --- | --- | --- |
 | `--config <file>` | — | Đọc cấu hình từ file JSON (xem "File cấu hình"). Đường dẫn tương đối hiểu theo thư mục chứa file. Gộp chung với thư mục gõ trên CLI, trùng nhau tự loại. File text cũ (1 dòng = 1 thư mục, dòng `@...` là cài đặt) vẫn đọc bình thường. |
-| `--serve` | tắt | Bật giao diện web local trên http://127.0.0.1:8787 (xem "Giao diện web"). Khi bật mà không có `--config`, app dùng file `watch.json` ở thư mục hiện tại (nếu có) và lưu thay đổi vào đó. Cho phép khởi động với 0 thư mục rồi thêm sau trên giao diện. |
-| `--port <n>` | 8787 | Cổng giao diện web (1–65535; chỉ có nghĩa với `--serve`). Cổng bị chiếm thì app báo lỗi và thoát ngay (exit 2). |
+| `--no-serve` | tắt | Không mở giao diện web (chạy thuần CLI). Mặc định giao diện web luôn bật trên http://127.0.0.1:8787 (xem "Giao diện web"). Khi không có `--config`, app dùng file `watch.json` ở thư mục hiện tại (nếu có) và lưu thay đổi vào đó. Cho phép khởi động với 0 thư mục rồi thêm sau trên giao diện. |
+| `--port <n>` | 8787 | Cổng giao diện web (1–65535; thắng cổng trong file cấu hình). Cổng bị chiếm lúc khởi động thì app tự lấy cổng trống tiếp theo và in rõ cổng thực tế trên banner. Đổi được từ giao diện (mục Settings) — đổi là áp dụng ngay, trình duyệt tự chuyển sang cổng mới. |
 | `--no-recursive` | đệ quy | Chỉ theo dõi tầng trên cùng của mỗi thư mục. |
 | `--debounce-ms <n>` | 200 | Gộp các event dồn dập trong n mili-giây thành 1 dòng (xem "Quy tắc gộp"). `0` = in ngay từng event, không gộp. |
 | `--ext <a,b,c>` | tất cả | Chỉ hiện file có đuôi này (không phân biệt hoa/thường, vd: `rs,md,txt`). |
@@ -104,10 +106,10 @@ luôn sạch — pipe sang file hay tool khác chỉ nhận event.
 Thư mục không tồn tại, không phải thư mục, hoặc file log không mở
 được đều báo lỗi rõ ràng và thoát ngay (exit 1), không chạy nửa vời.
 
-## Giao diện web (`--serve`)
+## Giao diện web
 
 ```sh
-file-watcher --config watch.json --serve
+file-watcher --config watch.json
 ```
 
 Mở trình duyệt vào http://127.0.0.1:8787 (hoặc cổng đã chọn với
@@ -120,10 +122,12 @@ không truy cập được từ máy khác trong mạng.
   Trên Windows, đường dẫn hiển thị và lưu luôn dạng thường (`C:\...`):
   tiền tố verbatim `\\?\` do hệ thống sinh ra được bỏ đi ngay khi
   nhận — kể cả đường dẫn trong file cấu hình cũ.
-- **Settings:** đệ quy (bật/tắt), debounce (ms), chỉ đuôi file, bỏ
-  qua chuỗi — nút Apply lưu ngay vào file cấu hình. Đổi đệ quy
-  thì app watch lại toàn bộ thư mục với chế độ mới; đổi bộ lọc áp
-  dụng ngay cho event tiếp theo.
+- **Settings:** đệ quy (bật/tắt), debounce (ms), cổng giao diện web,
+  chỉ đuôi file, bỏ qua chuỗi — nút Apply lưu ngay vào file cấu
+  hình. Đổi đệ quy thì app watch lại toàn bộ thư mục với chế độ
+  mới; đổi bộ lọc áp dụng ngay cho event tiếp theo; đổi cổng thì
+  server bind lại ngay và trình duyệt tự chuyển sang cổng mới
+  (cổng bị chiếm thì báo lỗi, giữ nguyên cổng cũ).
 - **Log realtime:** event mới hiện ngay qua SSE (Server-Sent Events),
   màu theo loại (tạo/sửa/xóa/đổi tên), có lọc theo loại + tìm theo
   tên file, tạm dừng, tự cuộn, xóa log hiển thị. Trang tải lần đầu
@@ -178,9 +182,10 @@ không truy cập được từ máy khác trong mạng.
   14 điểm: đậm hơn ở theme sáng, sáng hơn ở theme tối) để vẫn
   tương phản với nền; line trong log và viền ngoài app giữ
   nguyên. Lựa chọn lưu trong trình duyệt nên mở lại vẫn giữ.
-- **Khởi động rỗng:** `--serve` không cần thư mục nào — mở giao diện
-  rồi thêm thư mục sau cũng được; file `watch.json` được tạo khi lưu
-  thay đổi đầu tiên.
+- **Khởi động rỗng:** app không cần thư mục nào — mở giao diện rồi
+  thêm thư mục sau cũng được; file `watch.json` được tạo khi lưu
+  thay đổi đầu tiên. Muốn chạy thuần CLI không giao diện thì dùng
+  `--no-serve` (lúc đó phải có ít nhất 1 thư mục).
 
 API dùng nội bộ (không cần nhớ để xài giao diện):
 
@@ -191,7 +196,7 @@ API dùng nội bộ (không cần nhớ để xài giao diện):
 | `GET /api/config` | Cấu hình hiện tại (JSON). |
 | `GET /api/log?after=N` | Log gần đây, các event có số thứ tự > N. |
 | `POST /api/dirs` | Thêm/xóa thư mục (`action=add\|remove&dir=...`). |
-| `POST /api/config` | Đổi cài đặt (`recursive` / `debounce_ms` / `exts` / `ignores`). |
+| `POST /api/config` | Đổi cài đặt (`recursive` / `debounce_ms` / `port` / `exts` / `ignores`); trả về cổng hiện tại (`{"ok":true,"port":N}`). |
 | `POST /api/pins` | Ghim/bỏ ghim file (`action=add\|remove&path=...`). |
 
 ## File cấu hình
@@ -203,6 +208,7 @@ File cấu hình là JSON (xem `watch.example.json`):
   "dirs": ["D:\\code\\project", "C:\\Users\\ten\\Documents\\ghi-chu"],
   "recursive": true,
   "debounce_ms": 200,
+  "port": 8787,
   "exts": ["rs", "md"],
   "ignores": ["target", "node_modules"],
   "pins": [{ "path": "D:\\code\\project\\quan-trong.txt", "command": null }]
@@ -210,19 +216,21 @@ File cấu hình là JSON (xem `watch.example.json`):
 ```
 
 - Mọi trường đều không bắt buộc (thiếu thì dùng mặc định: đệ quy
-  bật, debounce 200ms, không lọc đuôi, không bỏ qua, không ghim).
+  bật, debounce 200ms, cổng 8787, không lọc đuôi, không bỏ qua,
+  không ghim).
 - `"pins"` ghim file để theo dõi riêng trong giao diện web (tab Đã
   ghim). `"command"` để dành cho lệnh xử lý riêng theo file (chưa
   dùng — luôn `null`). Ghim trùng nhau tự loại bỏ.
 - Khóa lạ, sai kiểu hoặc JSON sai cú pháp thì app báo lỗi rõ ràng
   và dừng, không chạy với cài đặt đoán mò.
 - File cũ dạng text (1 dòng = 1 thư mục, dòng `@exts`/`@ignore`/
-  `@debounce`/`@recursive`/`@pin` là cài đặt) vẫn đọc bình thường.
-  Khi lưu từ giao diện web, file được ghi lại dạng JSON.
+  `@debounce`/`@recursive`/`@pin`/`@port` là cài đặt) vẫn đọc bình
+  thường. Khi lưu từ giao diện web, file được ghi lại dạng JSON.
 - Đường dẫn tương đối hiểu theo thư mục chứa file cấu hình.
 - **Thứ tự ưu tiên:** flag CLI thắng file cấu hình — nhưng chỉ khi
   user gõ rõ flag đó (`--ext`, `--ignore`, `--debounce-ms`,
-  `--no-recursive`). Không gõ thì cài đặt trong file được giữ.
+  `--no-recursive`, `--port`). Không gõ thì cài đặt trong file
+  được giữ.
 - Giao diện web lưu file qua file tạm rồi đổi tên, nên app bị ngắt
   giữa lúc lưu cũng không hỏng file gốc.
 

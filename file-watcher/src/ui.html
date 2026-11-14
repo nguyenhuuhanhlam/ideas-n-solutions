@@ -327,6 +327,11 @@
         <input id="debounce" type="number" min="0" step="50" value="200">
       </div>
       <div class="field">
+        <label for="port">Web UI port</label>
+        <input id="port" type="number" min="1" max="65535" step="1" value="8787">
+      </div>
+      <p class="hint">Changing the port moves this page to the new port.</p>
+      <div class="field">
         <label for="exts">Only file extensions</label>
         <input id="exts" type="text" placeholder="rs,md,txt" autocomplete="off">
       </div>
@@ -1145,6 +1150,7 @@
     watchedDirs = cfg.dirs || [];
     document.getElementById("recursive").checked = !!cfg.recursive;
     document.getElementById("debounce").value = cfg.debounce_ms;
+    document.getElementById("port").value = cfg.port || 8787;
     document.getElementById("exts").value = (cfg.exts || []).join(",");
     document.getElementById("ignores").value = (cfg.ignores || []).join(",");
     cfgFileEl.textContent = cfg.config_file || "not saved to a file (this session only)";
@@ -1175,7 +1181,7 @@
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: body
-    }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok && j.ok, err: j.error }; }); });
+    }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok && j.ok, err: j.error, port: j.port }; }); });
   }
 
   function addDir() {
@@ -1202,10 +1208,20 @@
     postForm("/api/config", {
       recursive: document.getElementById("recursive").checked ? "true" : "false",
       debounce_ms: document.getElementById("debounce").value,
+      port: document.getElementById("port").value,
       exts: document.getElementById("exts").value,
       ignores: document.getElementById("ignores").value
     }).then(function (res) {
       if (res.ok) {
+        // Đổi cổng: server đã bind lại, chuyển trình duyệt sang cổng
+        // mới (chờ 500ms để vòng lặp serve kịp đổi listener).
+        if (res.port && String(res.port) !== window.location.port) {
+          cfgMsgEl.textContent = "Moving to port " + res.port + "…";
+          setTimeout(function () {
+            window.location.href = window.location.protocol + "//" + window.location.hostname + ":" + res.port + "/";
+          }, 500);
+          return;
+        }
         cfgMsgEl.textContent = "Applied and saved to the config file.";
         loadConfig();
       } else {

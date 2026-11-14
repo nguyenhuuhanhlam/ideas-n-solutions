@@ -19,7 +19,7 @@ thư mục mới và một thẻ vào trang chủ ở `index.html`.
 | App | Thư mục | Chạy |
 | --- | --- | --- |
 | Clipboard Tool — tool tray trên Windows, nghe clipboard text thuần, chạy module Rust tự động (phát hiện link http/https, loại bỏ `fbclid`, giữ các param còn lại); không lưu clipboard xuống đĩa | `clipboard-tool/` | Windows: `cargo build --release` rồi chạy `target/release/clipboard-tool.exe` (xem `clipboard-tool/README.md`) |
-| File Watcher — CLI Rust lắng nghe thay đổi file trong 1 hoặc nhiều thư mục, dùng API của hệ điều hành (không polling), debounce gộp event dồn dập, lọc theo đuôi file, ghi log, chạy lệnh mỗi khi có thay đổi; `--serve` mở giao diện web local để cấu hình thư mục và xem log realtime (badge thư mục cha bấm để copy, nhóm event thu gọn, 3 tab All / Pinned / Deleted, ghim file theo dõi riêng) | `file-watcher/` | `cargo build --release` rồi chạy `target/release/file-watcher` (Windows: `file-watcher.exe`) (xem `file-watcher/README.md`) |
+| File Watcher — CLI Rust lắng nghe thay đổi file trong 1 hoặc nhiều thư mục, dùng API của hệ điều hành (không polling), debounce gộp event dồn dập, lọc theo đuôi file, ghi log, chạy lệnh mỗi khi có thay đổi; giao diện web local luôn bật để cấu hình thư mục và xem log realtime (badge thư mục cha bấm để copy, nhóm event thu gọn, 3 tab All / Pinned / Deleted, ghim file theo dõi riêng, đổi cổng ngay trong Settings) | `file-watcher/` | `cargo build --release` rồi chạy `target/release/file-watcher` (Windows: `file-watcher.exe`) (xem `file-watcher/README.md`) |
 
 Các app này chỉ có thẻ mô tả tĩnh ở trang chủ `index.html` (không có
 bản demo web) và không có bước build trong workflow Pages, vì chúng là

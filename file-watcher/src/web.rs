@@ -9,12 +9,13 @@
 //! - `GET /events?after=N` — SSE: stream event realtime (JSON 1 dòng,
 //!   cùng định dạng với `--json`), kèm heartbeat mỗi ~15 giây.
 //! - `GET /api/config` — cấu hình hiện tại (thư mục, đệ quy,
-//!   debounce, exts, ignores, file cấu hình, danh sách ghim).
+//!   debounce, cổng, exts, ignores, file cấu hình, danh sách ghim).
 //! - `GET /api/log?after=N` — log gần đây (tối đa 1000 dòng, có số
 //!   thứ tự tăng dần để client nối tiếp qua SSE mà không sót/trùng).
 //! - `POST /api/dirs` — thêm/xóa thư mục theo dõi (áp dụng ngay,
 //!   lưu vào file cấu hình).
-//! - `POST /api/config` — đổi cài đặt (áp dụng ngay, lưu vào file).
+//! - `POST /api/config` — đổi cài đặt (áp dụng ngay, lưu vào file);
+//!   đổi cổng thì server bind lại ngay, trả về cổng mới.
 //! - `POST /api/pins` — ghim/bỏ ghim 1 file (lưu vào file cấu hình
 //!   lưu vào file cấu hình JSON; không đổi watcher).
 //!
@@ -54,6 +55,11 @@ pub struct SharedState {
     debounce_ms: u64,
     recursive: bool,
     config_path: Option<PathBuf>,
+    /// Cổng web UI hiện tại (đổi được từ giao diện, lưu vào file).
+    port: u16,
+    /// Listener mới đã bind sẵn, chờ vòng lặp serve đổi sang (khi
+    /// giao diện đổi port). Vòng lặp lấy ra rồi drop listener cũ.
+    pending_listener: Option<(TcpListener, u16)>,
     /// Định danh máy + user (cố định trong suốt phiên chạy).
     identity: Identity,
     /// File được ghim từ giao diện web (tab Đã ghim). Chỉ là trạng
@@ -83,6 +89,7 @@ impl Shared {
         config_path: Option<PathBuf>,
         identity: Identity,
         pins: Vec<Pin>,
+        port: u16,
     ) -> Self {
         Shared(Arc::new(Mutex::new(SharedState {
             watcher,
@@ -93,9 +100,21 @@ impl Shared {
             config_path,
             identity,
             pins,
+            port,
+            pending_listener: None,
             log: VecDeque::new(),
             seq: 0,
         })))
+    }
+
+    /// Cổng web UI hiện tại.
+    pub fn port(&self) -> u16 {
+        lock(&self.0).port
+    }
+
+    /// Vòng lặp serve lấy listener đang chờ đổi cổng (nếu có).
+    fn take_pending_listener(&self) -> Option<(TcpListener, u16)> {
+        lock(&self.0).pending_listener.take()
     }
 
     /// Đẩy 1 event (đã format JSON) vào log cho giao diện web.
@@ -159,10 +178,11 @@ impl Shared {
             })
             .collect();
         format!(
-            "{{\"dirs\":[{}],\"recursive\":{},\"debounce_ms\":{},\"exts\":[{}],\"ignores\":[{}],\"config_file\":{},\"events\":{},\"user\":\"{}\",\"pc\":\"{}\",\"pins\":[{}]}}",
+            "{{\"dirs\":[{}],\"recursive\":{},\"debounce_ms\":{},\"port\":{},\"exts\":[{}],\"ignores\":[{}],\"config_file\":{},\"events\":{},\"user\":\"{}\",\"pc\":\"{}\",\"pins\":[{}]}}",
             list(&dirs),
             st.recursive,
             st.debounce_ms,
+            st.port,
             list(&st.filter.exts),
             list(&st.filter.ignores),
             config_file,
@@ -184,6 +204,7 @@ impl Shared {
             debounce_ms: st.debounce_ms,
             recursive: st.recursive,
             pins: st.pins.clone(),
+            port: st.port,
         };
         save_config(path, &st.roots, &settings)
     }
@@ -282,21 +303,42 @@ impl Shared {
         Ok(())
     }
 
-    /// Đổi cài đặt (chỉ đổi các trường được truyền vào).
+    /// Đổi cài đặt (chỉ đổi các trường được truyền vào). Trả về cổng
+    /// web UI hiện tại sau khi áp dụng (để giao diện biết có cần
+    /// chuyển sang cổng mới không).
     /// Đổi `recursive` thì watch lại toàn bộ thư mục với chế độ mới;
     /// watch lại lỗi thì giữ nguyên chế độ cũ và trả lỗi.
+    /// Đổi `port`: bind listener mới TRƯỚC khi đổi bất cứ gì —
+    /// bind lỗi (cổng bị chiếm) thì không đổi gì cả. Bind được rồi
+    /// mới đổi state + lưu file; lưu lỗi thì rollback toàn bộ và
+    /// hủy listener mới. Thành công thì listener mới chờ vòng lặp
+    /// serve đổi sang (trong ~50ms).
     pub fn apply_settings(
         &self,
         recursive: Option<bool>,
         debounce_ms: Option<u64>,
         exts: Option<Vec<String>>,
         ignores: Option<Vec<String>>,
-    ) -> Result<(), String> {
+        port: Option<u16>,
+    ) -> Result<u16, String> {
         let mut st = lock(&self.0);
         let old_recursive = st.recursive;
         let old_debounce = st.debounce_ms;
         let old_filter = st.filter.clone();
+        let old_port = st.port;
         let new_recursive = recursive.unwrap_or(old_recursive);
+        let new_port = port.unwrap_or(old_port);
+
+        // Đổi cổng: bind trước để biết chắc cổng mới dùng được.
+        let mut new_listener = None;
+        if new_port != old_port {
+            match TcpListener::bind(("127.0.0.1", new_port)) {
+                Ok(l) => new_listener = Some(l),
+                Err(e) => {
+                    return Err(format!("cannot listen on port {new_port}: {e}"));
+                }
+            }
+        }
 
         // Đổi chế độ đệ quy: watch lại toàn bộ trước khi đổi state.
         if new_recursive != old_recursive {
@@ -333,8 +375,10 @@ impl Shared {
         if let Some(i) = ignores {
             st.filter.ignores = i;
         }
+        st.port = new_port;
         if let Err(e) = Self::save_locked(&st) {
-            // Rollback state + chế độ watch.
+            // Rollback state + chế độ watch + cổng (listener mới
+            // bị drop cùng new_listener, cổng mới được trả lại).
             if st.recursive != old_recursive {
                 let old_mode = mode_of(old_recursive);
                 for root in st.roots.clone() {
@@ -345,9 +389,13 @@ impl Shared {
             st.recursive = old_recursive;
             st.debounce_ms = old_debounce;
             st.filter = old_filter;
+            st.port = old_port;
             return Err(e);
         }
-        Ok(())
+        if let Some(l) = new_listener {
+            st.pending_listener = Some((l, new_port));
+        }
+        Ok(new_port)
     }
 }
 
@@ -390,19 +438,40 @@ fn find_pin(pins: &[Pin], normalized: &Path, raw: &str) -> Option<usize> {
 }
 
 /// Chạy server web trên listener đã bind sẵn (bind ở luồng chính để
-/// lỗi cổng bị chiếm báo ngay khi khởi động thay vì im lặng).
-/// Chặn mãi (tới khi process dừng). Mỗi kết nối xử lý trong 1 luồng riêng.
-pub fn serve(listener: TcpListener, shared: Shared) -> std::io::Result<()> {
-    for stream in listener.incoming() {
-        match stream {
-            Ok(stream) => {
+/// biết cổng thực tế trước khi tạo Shared). Chạy mãi (tới khi process
+/// dừng). Mỗi kết nối xử lý trong 1 luồng riêng.
+///
+/// Vòng lặp accept ở chế độ non-blocking, kiểm tra mỗi ~50ms để
+/// nhận listener mới khi giao diện đổi cổng: listener cũ bị drop
+/// (các kết nối đang mở trên cổng cũ không bị ảnh hưởng), listener
+/// mới thay vào ngay. 50ms là đủ nhanh để trình duyệt chuyển cổng
+/// mà không thấy chờ, và đủ chậm để lúc rảnh CPU vẫn ~0.
+pub fn serve(mut listener: TcpListener, shared: Shared) -> std::io::Result<()> {
+    listener.set_nonblocking(true)?;
+    loop {
+        if let Some((new_listener, _port)) = shared.take_pending_listener() {
+            new_listener.set_nonblocking(true)?;
+            listener = new_listener;
+        }
+        match listener.accept() {
+            Ok((stream, _)) => {
+                // Socket accept từ listener non-blocking cũng ở chế
+                // độ non-blocking (trên Linux) — trả về blocking để
+                // handle_connection đọc bình thường.
+                if stream.set_nonblocking(false).is_err() {
+                    continue;
+                }
                 let shared = shared.clone();
                 std::thread::spawn(move || handle_connection(stream, &shared));
             }
-            Err(_) => continue,
+            Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
+                std::thread::sleep(Duration::from_millis(50));
+            }
+            Err(_) => {
+                std::thread::sleep(Duration::from_millis(50));
+            }
         }
     }
-    Ok(())
 }
 
 struct Request {
@@ -509,6 +578,13 @@ fn json_ok(stream: &mut TcpStream) {
     respond(stream, 200, "application/json", b"{\"ok\":true}");
 }
 
+/// `{"ok":true,"port":N}` — dùng cho POST /api/config để giao diện
+/// biết cổng hiện tại (có thể vừa đổi) mà chuyển trang theo.
+fn json_ok_port(stream: &mut TcpStream, port: u16) {
+    let body = format!("{{\"ok\":true,\"port\":{port}}}");
+    respond(stream, 200, "application/json", body.as_bytes());
+}
+
 fn json_err(stream: &mut TcpStream, message: &str) {
     let body = format!("{{\"ok\":false,\"error\":\"{}\"}}", json_escape(message));
     respond(stream, 400, "application/json", body.as_bytes());
@@ -593,8 +669,18 @@ fn handle_connection(mut stream: TcpStream, shared: &Shared) {
             };
             let exts = form.get("exts").map(|v| split_list(v));
             let ignores = form.get("ignores").map(|v| split_list(v));
-            match shared.apply_settings(recursive, debounce_ms, exts, ignores) {
-                Ok(()) => json_ok(&mut stream),
+            let port = match form.get("port") {
+                Some(v) => match v.parse::<u32>() {
+                    Ok(n) if (1..=65535).contains(&n) => Some(n as u16),
+                    _ => {
+                        json_err(&mut stream, &format!("port must be an integer 1-65535, got: {v}"));
+                        return;
+                    }
+                },
+                None => None,
+            };
+            match shared.apply_settings(recursive, debounce_ms, exts, ignores, port) {
+                Ok(new_port) => json_ok_port(&mut stream, new_port),
                 Err(e) => json_err(&mut stream, &e),
             }
         }
@@ -711,5 +797,137 @@ mod tests {
         assert_eq!(form.get("dir").unwrap(), "C:\\a b");
         assert_eq!(form.get("empty").unwrap(), "");
         assert!(parse_form(b"").is_empty());
+    }
+
+    fn test_shared(port: u16) -> Shared {
+        let (tx, _rx) = std::sync::mpsc::channel();
+        let watcher = notify::RecommendedWatcher::new(tx, notify::Config::default()).unwrap();
+        Shared::new(
+            watcher,
+            vec![],
+            Filter {
+                exts: vec![],
+                ignores: vec![],
+            },
+            200,
+            true,
+            None,
+            Identity {
+                user: "t".to_string(),
+                pc: "p".to_string(),
+            },
+            vec![],
+            port,
+        )
+    }
+
+    /// GET thô qua TcpStream, trả (status, body). None khi không nối được.
+    fn http_get(port: u16, path: &str) -> Option<(u16, String)> {
+        let mut stream = std::net::TcpStream::connect(("127.0.0.1", port)).ok()?;
+        stream.set_read_timeout(Some(Duration::from_secs(2))).ok()?;
+        let req = format!("GET {path} HTTP/1.1\r\nHost: x\r\nConnection: close\r\n\r\n");
+        stream.write_all(req.as_bytes()).ok()?;
+        let mut buf = String::new();
+        stream.read_to_string(&mut buf).ok()?;
+        let (head, body) = buf.split_once("\r\n\r\n")?;
+        let status = head.split_whitespace().nth(1)?.parse().ok()?;
+        Some((status, body.to_string()))
+    }
+
+    fn http_post_form(port: u16, path: &str, body: &str) -> Option<(u16, String)> {
+        let mut stream = std::net::TcpStream::connect(("127.0.0.1", port)).ok()?;
+        stream.set_read_timeout(Some(Duration::from_secs(2))).ok()?;
+        let req = format!(
+            "POST {path} HTTP/1.1\r\nHost: x\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+            body.len()
+        );
+        stream.write_all(req.as_bytes()).ok()?;
+        let mut buf = String::new();
+        stream.read_to_string(&mut buf).ok()?;
+        let (head, resp_body) = buf.split_once("\r\n\r\n")?;
+        let status = head.split_whitespace().nth(1)?.parse().ok()?;
+        Some((status, resp_body.to_string()))
+    }
+
+    fn free_port() -> u16 {
+        let probe = TcpListener::bind(("127.0.0.1", 0)).unwrap();
+        let p = probe.local_addr().unwrap().port();
+        drop(probe);
+        p
+    }
+
+    #[test]
+    fn apply_settings_port_same_free_and_busy() {
+        let shared = test_shared(8787);
+        // Cùng cổng: Ok, không có listener chờ đổi.
+        assert_eq!(
+            shared
+                .apply_settings(None, None, None, None, Some(8787))
+                .unwrap(),
+            8787
+        );
+        assert!(shared.take_pending_listener().is_none());
+        // Cổng trống: Ok + có listener chờ, cổng hiện tại đã đổi.
+        let free = free_port();
+        assert_eq!(
+            shared
+                .apply_settings(None, None, None, None, Some(free))
+                .unwrap(),
+            free
+        );
+        assert_eq!(shared.port(), free);
+        let (l, p) = shared.take_pending_listener().unwrap();
+        assert_eq!(p, free);
+        assert_eq!(l.local_addr().unwrap().port(), free);
+        // Cổng bị chiếm: lỗi, cổng hiện tại giữ nguyên.
+        let busy = TcpListener::bind(("127.0.0.1", 0)).unwrap();
+        let busy_port = busy.local_addr().unwrap().port();
+        let res = shared.apply_settings(None, None, None, None, Some(busy_port));
+        assert!(res.is_err());
+        assert_eq!(shared.port(), free);
+        assert!(shared.take_pending_listener().is_none());
+    }
+
+    #[test]
+    fn port_change_rebinds_live() {
+        let port1 = free_port();
+        let mut port2 = free_port();
+        while port2 == port1 {
+            port2 = free_port();
+        }
+        let shared = test_shared(port1);
+        let listener = TcpListener::bind(("127.0.0.1", port1)).unwrap();
+        let s2 = shared.clone();
+        std::thread::spawn(move || {
+            let _ = serve(listener, s2);
+        });
+        // Chờ server lên trên cổng đầu.
+        let mut up = false;
+        for _ in 0..50 {
+            if let Some((200, body)) = http_get(port1, "/api/config") {
+                assert!(body.contains(&format!("\"port\":{port1}")));
+                up = true;
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(20));
+        }
+        assert!(up, "server khong len tren cong dau");
+        // Đổi cổng qua API.
+        let (status, body) = http_post_form(port1, "/api/config", &format!("port={port2}")).unwrap();
+        assert_eq!(status, 200);
+        assert!(body.contains(&format!("\"port\":{port2}")), "{body}");
+        assert_eq!(shared.port(), port2);
+        // Cổng mới phục vụ trong vòng ~2s; cổng cũ không còn nghe.
+        let mut moved = false;
+        for _ in 0..100 {
+            if let Some((200, body)) = http_get(port2, "/api/config") {
+                assert!(body.contains(&format!("\"port\":{port2}")));
+                moved = true;
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(20));
+        }
+        assert!(moved, "server khong chuyen sang cong moi");
+        assert!(http_get(port1, "/api/config").is_none(), "cong cu van nghe");
     }
 }

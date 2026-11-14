@@ -8,10 +8,11 @@
 //! - Debounce gộp các event dồn dập (vd: 1 lần lưu file của editor)
 //!   thành 1 dòng log duy nhất.
 //!
-//! Với `--serve`, app mở thêm giao diện web trên 127.0.0.1 để cấu
-//! hình thư mục theo dõi và xem log realtime (xem `web.rs`). Giao
-//! diện dùng chung trạng thái với vòng lặp watcher qua `Shared`
-//! (thêm/xóa thư mục áp dụng ngay, không cần khởi động lại).
+//! App luôn mở thêm giao diện web trên 127.0.0.1 (trừ khi dùng
+//! `--no-serve`) để cấu hình thư mục theo dõi và xem log realtime
+//! (xem `web.rs`). Giao diện dùng chung trạng thái với vòng lặp
+//! watcher qua `Shared` (thêm/xóa thư mục áp dụng ngay, không cần
+//! khởi động lại).
 
 use std::fs::{File, OpenOptions};
 use std::io::{BufWriter, Write};
@@ -20,9 +21,9 @@ use std::sync::mpsc::{self, RecvTimeoutError};
 use std::time::Duration;
 
 use file_watcher::{
-    detect_identity, format_human, format_json, load_config, now_string, parse_args,
-    strip_verbatim_prefix, summarize, usage, Coalescer, Filter, Identity, Kind, RenameSide,
-    Settings, SizeTracker, Summary, VERSION,
+    bind_first_free, detect_identity, format_human, format_json, load_config, now_string,
+    parse_args, strip_verbatim_prefix, summarize, usage, Coalescer, Filter, Identity, Kind,
+    RenameSide, Settings, SizeTracker, Summary, VERSION,
 };
 use file_watcher::web::{serve, Shared};
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
@@ -59,18 +60,21 @@ fn real_main() -> i32 {
         }
     }
 
-    // File cấu hình: --config nếu có; với --serve mà không có --config
-    // thì mặc định dùng watch.json ở thư mục hiện tại (nếu có).
+    // Giao diện web luôn bật, trừ khi user dùng --no-serve.
+    let web_enabled = !args.no_serve;
+
+    // File cấu hình: --config nếu có; không có --config thì mặc định
+    // dùng watch.json ở thư mục hiện tại (nếu có).
     let config_path: Option<PathBuf> = match &args.config {
         Some(c) => Some(PathBuf::from(c)),
-        None if args.serve => Some(PathBuf::from("watch.json")),
+        None if web_enabled => Some(PathBuf::from("watch.json")),
         None => None,
     };
 
     // Đọc file cấu hình (thư mục + cài đặt). File --config chỉ
     // định rõ mà không đọc được thì báo lỗi và dừng — trừ khi đang
-    // --serve: lúc đó coi như bắt đầu rỗng, giao diện web sẽ tạo file
-    // khi user thêm thư mục đầu tiên.
+    // mở giao diện web: lúc đó coi như bắt đầu rỗng, giao diện web
+    // sẽ tạo file khi user thêm thư mục đầu tiên.
     let mut settings = Settings::default();
     let mut raw_dirs = args.dirs.clone();
     if let Some(config) = &config_path {
@@ -81,9 +85,9 @@ fn real_main() -> i32 {
                 raw_dirs.append(&mut dirs);
             }
             Err(msg) => {
-                if args.serve && args.config.is_none() {
+                if web_enabled && args.config.is_none() {
                     // watch.json mặc định chưa có: bắt đầu rỗng.
-                } else if args.serve && !config.exists() {
+                } else if web_enabled && !config.exists() {
                     // File --config chưa tồn tại: bắt đầu rỗng, sẽ
                     // tạo khi lưu từ giao diện web.
                 } else {
@@ -109,8 +113,11 @@ fn real_main() -> i32 {
     if args.recursive_set {
         settings.recursive = args.recursive;
     }
+    if args.port_set {
+        settings.port = args.port;
+    }
 
-    if raw_dirs.is_empty() && !args.serve {
+    if raw_dirs.is_empty() && !web_enabled {
         eprintln!("Error: no folders specified to watch.\n");
         eprint!("{}", usage());
         return 1;
@@ -182,6 +189,25 @@ fn real_main() -> i32 {
         }
     }
 
+    // Bind giao diện web trước khi tạo Shared, để biết cổng thực tế
+    // (cổng yêu cầu bị chiếm thì tự nhảy sang cổng trống tiếp theo)
+    // và Shared giữ đúng cổng đó ngay từ đầu.
+    let requested_port = settings.port;
+    let mut web_listener = None;
+    let mut web_port = requested_port;
+    if web_enabled {
+        match bind_first_free(requested_port) {
+            Ok((listener, actual)) => {
+                web_port = actual;
+                web_listener = Some(listener);
+            }
+            Err(e) => {
+                eprintln!("Error: cannot start web UI: {e}");
+                return 2;
+            }
+        }
+    }
+
     // Trạng thái dùng chung với giao diện web (thêm/xóa thư mục,
     // đổi cài đặt, log realtime). Watcher chuyển vào đây để luồng
     // web có thể watch/unwatch trực tiếp.
@@ -194,27 +220,16 @@ fn real_main() -> i32 {
         config_path.clone(),
         identity.clone(),
         settings.pins.clone(),
+        web_port,
     );
 
-    // Giao diện web: bind ở luồng chính để cổng bị chiếm báo lỗi ngay.
-    if args.serve {
-        match std::net::TcpListener::bind(("127.0.0.1", args.port)) {
-            Ok(listener) => {
-                let server_shared = shared.clone();
-                std::thread::spawn(move || {
-                    if let Err(e) = serve(listener, server_shared) {
-                        eprintln!("Error: web UI stopped: {e}");
-                    }
-                });
+    if let Some(listener) = web_listener {
+        let server_shared = shared.clone();
+        std::thread::spawn(move || {
+            if let Err(e) = serve(listener, server_shared) {
+                eprintln!("Error: web UI stopped: {e}");
             }
-            Err(e) => {
-                eprintln!(
-                    "Error: cannot start web UI on port {}: {e}",
-                    args.port
-                );
-                return 2;
-            }
-        }
+        });
     }
 
     // Banner ra stderr để stdout luôn sạch (pipe sang file / tool khác
@@ -242,11 +257,14 @@ fn real_main() -> i32 {
     if args.exec.is_some() {
         eprintln!("  running a command on every event (--exec)");
     }
-    if args.serve {
+    if web_enabled {
         eprintln!(
             "  web UI: http://127.0.0.1:{} (this machine only)",
-            args.port
+            web_port
         );
+        if web_port != requested_port {
+            eprintln!("  (port {requested_port} was busy, using {web_port} instead)");
+        }
         match &config_path {
             Some(p) => eprintln!("  config file: {}", p.display()),
             None => eprintln!("  no config file: UI changes only last for this session"),
