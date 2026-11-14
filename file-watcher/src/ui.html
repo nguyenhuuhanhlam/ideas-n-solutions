@@ -121,6 +121,15 @@
     font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
     color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--line);
   }
+  /* Section thu gọn trong sidebar (từ 0.9.9): tiêu đề là nút
+     bấm; JS gắn class .section-head + icon chevron vào mỗi
+     h6[data-section]. Thuộc tính hidden phải thắng mọi quy tắc
+     display khác nên cần !important (bài học từ kit). */
+  [hidden] { display: none !important; }
+  .side h6.section-head { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+  .side h6.section-head:hover { color: var(--fg); }
+  .side h6.section-head:focus-visible { outline: 1px solid var(--accent); outline-offset: -1px; }
+  .section-chevron { flex-shrink: 0; }
   .sideblock { padding: 12px 14px; border-bottom: 1px solid var(--line); }
   .sideblock:last-child { border-bottom: 0; }
   #dirList { list-style: none; }
@@ -417,7 +426,7 @@
 
   <div class="sidewrap">
   <nav class="side">
-    <h6>Watched folders (<span id="dirCount">0</span>)</h6>
+    <h6 data-section="folders" data-default="open">Watched folders (<span id="dirCount">0</span>)</h6>
     <ul id="dirList"></ul>
     <div class="sideblock">
       <div class="addrow">
@@ -427,7 +436,7 @@
       <p id="dirError" class="error"></p>
       <p class="hint">Type the full path, then click Add. The browser can't pick a folder on this machine, so it must be typed. Add/remove applies immediately and is saved to the config file.</p>
     </div>
-    <h6>Settings</h6>
+    <h6 data-section="settings">Settings</h6>
     <div class="sideblock">
       <label class="checkrow"><input type="checkbox" id="recursive" checked> Recursive (watch subfolders too)</label>
       <div class="field">
@@ -450,7 +459,7 @@
       <button id="applyBtn" class="btn-icon"><svg class="hl-icon"><use href="#hl-check"/></svg>Apply</button>
       <p id="cfgMsg" class="ok"></p>
     </div>
-    <h6>Background color</h6>
+    <h6 data-section="background">Background color</h6>
     <div class="sideblock">
       <div class="swatches" id="tintSwatches">
         <button class="swatch selected" data-tint="" title="Default (no color)" aria-label="No background color"></button>
@@ -471,7 +480,7 @@
       </div>
       <p class="hint">The background color only applies to the surrounding areas (sidebar, topbar, stat strip, toolbar, tabs). The log area always keeps the original background for readability.</p>
     </div>
-    <h6>Info</h6>
+    <h6 data-section="info">Info</h6>
     <div class="sideblock foot">
       <p>Config file: <code id="cfgFile">—</code></p>
       <p style="margin-top:8px">This interface only runs on this machine (127.0.0.1). Every change is saved to the config file immediately, so it survives restarts.</p>
@@ -871,6 +880,50 @@
     darkMq.addEventListener("change", applyTint);
   }
   applyTint();
+
+  // Section thu gọn trong sidebar (từ 0.9.9; component dùng lại,
+  // bản gốc ở kit: Hairline.initCollapsibleSections trong
+  // hairline-ui/hairline.js). Mỗi <h6 data-section="id"> trong
+  // .side thành nút bấm cho section của nó: mọi sibling sau nó
+  // tới <h6> tiếp theo (nên Watched folders gồm cả danh sách lẫn
+  // khối thêm thư mục). Tiêu đề được gắn icon chevron Lucide
+  // (right = đóng, down = mở; sprite đã nhúng thẳng trong trang
+  // nên href chỉ là #hl-...), bấm hoặc Enter/Space để đổi trạng
+  // thái, trạng thái lưu localStorage (mặc định đóng, trừ
+  // data-default="open"). Sau mỗi lần đổi (và lúc init) phát sự
+  // kiện resize để vệt mờ báo cuộn tính lại.
+  (function initCollapsibleSections() {
+    var prefix = "file-watcher-section-";
+    sideEl.querySelectorAll("h6[data-section]").forEach(function (head) {
+      var id = head.getAttribute("data-section");
+      var body = [], el = head.nextElementSibling;
+      while (el && el.tagName !== "H6") { body.push(el); el = el.nextElementSibling; }
+      if (!body.length) return;
+      var saved = storeGet(prefix + id);
+      var open = saved != null ? saved === "1" : head.getAttribute("data-default") === "open";
+      var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "hl-icon section-chevron");
+      svg.setAttribute("aria-hidden", "true");
+      var use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+      svg.appendChild(use);
+      head.insertBefore(svg, head.firstChild);
+      head.classList.add("section-head");
+      head.setAttribute("tabindex", "0");
+      head.setAttribute("role", "button");
+      function apply(save) {
+        use.setAttribute("href", "#hl-chevron-" + (open ? "down" : "right"));
+        head.setAttribute("aria-expanded", open ? "true" : "false");
+        body.forEach(function (b) { b.hidden = !open; });
+        if (save) storeSet(prefix + id, open ? "1" : "0");
+        window.dispatchEvent(new Event("resize"));
+      }
+      head.addEventListener("click", function () { open = !open; apply(true); });
+      head.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open = !open; apply(true); }
+      });
+      apply(false);
+    });
+  })();
 
   // Nhóm: event mới vào nhóm đang mở của file đó nếu cách event cuối
   // trong nhóm <= 5 phút, nếu không mở nhóm mới. Nhóm từ 3 event trở

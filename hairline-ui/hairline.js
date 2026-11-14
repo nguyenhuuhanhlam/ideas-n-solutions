@@ -1,9 +1,9 @@
-/* Hairline UI — shared JS helpers (starter kit, synced with File Watcher 0.9.8)
+/* Hairline UI — shared JS helpers (starter kit, synced with File Watcher 0.9.9)
    Plain vanilla, no framework. Call Hairline.init({...}) or use pieces.
    Spec: hairline-ui/README.md */
 (function (global) {
   "use strict";
-  var LS_W = "hairline-side-w", LS_C = "hairline-side-collapsed", LS_T = "hairline-tint", LS_TO = "hairline-tint-opacity", LS_HL = "hairline-hover-lift";
+  var LS_W = "hairline-side-w", LS_C = "hairline-side-collapsed", LS_T = "hairline-tint", LS_TO = "hairline-tint-opacity", LS_HL = "hairline-hover-lift", LS_S = "hairline-section-";
   var DEFAULT_W = 320, MIN_W = 160, MAX_W = 480;
   function lsGet(k, d) { try { var v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -175,10 +175,57 @@
     apply(); return apply;
   }
 
+  /* Collapsible sidebar sections (from File Watcher 0.9.9). Any
+     <h6 data-section="id"> inside the sidebar becomes the toggle for
+     its section: every sibling after it up to the next <h6> (so a
+     section may hold a list plus a block, like Watched folders).
+     The heading gets a Lucide chevron (right = closed, down =
+     open), click or Enter/Space toggles, and the state persists
+     in localStorage — default closed, unless data-default="open".
+     opts: { spriteBase, storagePrefix, onToggle(id, open) }.
+     spriteBase is the path to the Lucide sprite file; pass ""
+     when the sprite is inlined in the page (File Watcher). A
+     resize event is dispatched after each toggle (and once at
+     init) so the fade indicators recompute. */
+  function initCollapsibleSections(side, opts) {
+    opts = opts || {};
+    var spriteBase = opts.spriteBase == null ? "icons/lucide-sprite.svg" : opts.spriteBase;
+    var prefix = opts.storagePrefix || LS_S;
+    side.querySelectorAll("h6[data-section]").forEach(function (head) {
+      var id = head.getAttribute("data-section");
+      var body = [], el = head.nextElementSibling;
+      while (el && el.tagName !== "H6") { body.push(el); el = el.nextElementSibling; }
+      if (!body.length) return;
+      var open = lsGet(prefix + id, head.getAttribute("data-default") === "open" ? "1" : "0") === "1";
+      var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "hl-icon section-chevron");
+      svg.setAttribute("aria-hidden", "true");
+      var use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+      svg.appendChild(use);
+      head.insertBefore(svg, head.firstChild);
+      head.classList.add("section-head");
+      head.setAttribute("tabindex", "0");
+      head.setAttribute("role", "button");
+      function apply(save) {
+        use.setAttribute("href", spriteBase + "#hl-chevron-" + (open ? "down" : "right"));
+        head.setAttribute("aria-expanded", open ? "true" : "false");
+        body.forEach(function (b) { b.hidden = !open; });
+        if (save) lsSet(prefix + id, open ? "1" : "0");
+        if (opts.onToggle) opts.onToggle(id, open);
+        window.dispatchEvent(new Event("resize"));
+      }
+      head.addEventListener("click", function () { open = !open; apply(true); });
+      head.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open = !open; apply(true); }
+      });
+      apply(false);
+    });
+  }
+
   function toast(el, msg, ms) {
     el.textContent = msg; el.classList.add("show");
     clearTimeout(el._t); el._t = setTimeout(function () { el.classList.remove("show"); }, ms || 1600);
   }
 
-  global.Hairline = { initSidebar: initSidebar, initFades: initFades, initTint: initTint, toast: toast, DEFAULT_W: DEFAULT_W };
+  global.Hairline = { initSidebar: initSidebar, initFades: initFades, initTint: initTint, initCollapsibleSections: initCollapsibleSections, toast: toast, DEFAULT_W: DEFAULT_W };
 })(typeof window !== "undefined" ? window : this);

@@ -7,7 +7,7 @@
 > component, hành vi — để sau này tách ra thành thư viện dùng chung
 > mà không phải đoán lại từ đầu.
 >
-> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.8.
+> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.9.
 
 ## Nguồn gốc
 
@@ -287,6 +287,34 @@ luôn giữ nền gốc để dễ đọc.
   hover ra màu tint; dòng log (không nhuộm) hover vẫn xám
   trung tính; không chọn tint thì gỡ ghi đè.
 
+### Collapsible sidebar sections — từ File Watcher 0.9.9
+
+Component dùng lại cho mọi ứng dụng Hairline: mỗi section
+trong sidebar thu gọn/mở ra bằng chính tiêu đề của nó.
+
+- Markup: `<h6 data-section="id">` trong `.side`; body của
+  section là mọi sibling sau nó tới `<h6>` tiếp theo (nên
+  một section có thể gồm cả danh sách lẫn khối nội dung,
+  như Watched folders). Không cần thêm thẻ bọc.
+- JS: `Hairline.initCollapsibleSections(sideEl, opts)` —
+  tự gắn icon chevron Lucide vào tiêu đề (right = đóng,
+  down = mở), click hoặc Enter/Space để đổi trạng thái,
+  `aria-expanded` + `tabindex` + `role="button"` cho bàn
+  phím, `:focus-visible` viền accent. CSS: `.section-head`
+  (flex, con trỏ pointer, hover đổi sang màu chữ chính).
+- Trạng thái lưu `localStorage` (`hairline-section-<id>`,
+  `"1"` mở / `"0"` đóng) nên mở lại vẫn giữ; mặc định
+  đóng, thêm `data-default="open"` để mở sẵn.
+- `opts.spriteBase` là đường dẫn tới file sprite Lucide
+  (mặc định `icons/lucide-sprite.svg`); truyền `""` khi
+  sprite đã nhúng thẳng trong trang (File Watcher).
+  `opts.storagePrefix` đổi tiền tố khóa lưu trữ;
+  `opts.onToggle(id, open)` chạy sau mỗi lần đổi trạng
+  thái. Sau mỗi lần toggle (và lúc init) component phát
+  sự kiện `resize` để vệt mờ báo cuộn tính lại.
+- Demo: section Components mở sẵn (giới thiệu trang), 3
+  section còn lại đóng mặc định.
+
 ### Vệt mờ báo cuộn (thay thanh trượt)
 
 - Thanh cuộn **ẩn hẳn** ở sidebar và log:
@@ -386,9 +414,10 @@ sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
 
 > Đã làm (2026-11-13–14): bước 1, 2, 3, 5 — starter kit
 > `hairline.css` + `hairline.js` + `demo.html` trong thư mục này,
-> đồng bộ tới File Watcher 0.9.8 (kể cả bộ icon Lucide và hover
-> nhuộm tint có Hover lift, File Watcher nhúng sprite của kit vào
-> `ui.html`). Còn lại: bước 4 (quy ước đặt
+> đồng bộ tới File Watcher 0.9.9 (kể cả bộ icon Lucide, hover
+> nhuộm tint có Hover lift và section thu gọn trong sidebar,
+> File Watcher nhúng sprite của kit vào `ui.html`). Còn lại:
+> bước 4 (quy ước đặt
 > tên, quyết sau khi có ứng dụng thứ hai), bước 6 (repo/package
 > riêng khi có từ 2 ứng dụng dùng trở lên).
 
@@ -434,6 +463,7 @@ sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
 | 0.9.6 | 2026-11-14 | Giao diện web luôn bật (`--serve` không còn cần; `--no-serve` để tắt). Cổng chỉnh được trong Settings (mục Settings thêm ô Port): đổi là server bind lại ngay, trình duyệt tự chuyển sang cổng mới; cổng lưu vào `watch.json`, `--port` thắng file lúc khởi động, cổng bị chiếm thì tự lấy cổng trống tiếp theo. |
 | 0.9.7 | 2026-11-14 | Icon Lucide thay emoji/ký tự trang trí: nút ghim (📌 → icon pin), caret nhóm (▸/▾ → chevron), nút bỏ theo dõi/bỏ ghim (× → icon x), nút thu gọn sidebar (‹/› → chevron); tab và nút toolbar có icon kèm nhãn; nút Pause đổi cả icon (pause/play). Sprite 21 icon nhúng thẳng vào `ui.html` (lấy từ kit `hairline-ui/icons/`, nét 1px vật lý). |
 | 0.9.8 | 2026-11-14 | Hover trong vùng nhuộm ăn theo màu tint: ghi đè `--hover` riêng trên 6 vùng đã nhuộm, lệch độ sáng theo tham số Hover lift (0–12 điểm, mặc định 5; tối đi ở theme sáng, sáng lên ở theme tối, cùng hướng với line); thanh trượt Hover lift trong khối chọn tint, lưu `file-watcher-hover-lift`; hover dòng log vẫn xám trung tính. Mặc định mới: độ đậm tint 10% (trước 8%). |
+| 0.9.9 | 2026-11-14 | Section thu gọn trong sidebar (component dùng lại từ kit `Hairline.initCollapsibleSections`): bấm tiêu đề để thu gọn/mở ra (chevron Lucide right/down, Enter/Space khi focus, `aria-expanded`); mặc định đóng trừ Watched folders; trạng thái từng section lưu `file-watcher-section-<id>`; body của section là mọi sibling tới `<h6>` tiếp theo nên Watched folders gồm cả danh sách lẫn khối thêm thư mục. |
 
 ## Tham chiếu
 

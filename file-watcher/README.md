@@ -171,7 +171,12 @@ không truy cập được từ máy khác trong mạng.
   hình; bấm đúp tay nắm để về 320px; phím mũi tên khi tay nắm đang
   focus). Nút ‹ ở đầu topbar thu gọn hẳn sidebar, bấm › để mở lại.
   Chiều rộng và trạng thái thu gọn lưu trong trình duyệt nên mở
-  lại vẫn giữ.
+  lại vẫn giữ. Các section trong sidebar (Watched folders,
+  Settings, Background color, Info) thu gọn/mở ra bằng cách bấm
+  tiêu đề của nó (từ 0.9.9, component dùng lại từ kit
+  `hairline-ui/`): mặc định đóng trừ Watched folders, trạng thái
+  từng section lưu trong trình duyệt, bấm Enter/Space khi tiêu
+  đề đang focus cũng đổi trạng thái.
 - **Cuộn không thanh trượt:** sidebar và log đều ẩn thanh cuộn;
   khi còn nội dung phía trên/dưới thì mép tương ứng hiện vệt mờ
   nhạt, mờ dần khi cuộn tới cuối. Cuộn bằng chuột/bàn phím như

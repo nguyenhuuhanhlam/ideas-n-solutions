@@ -1,4 +1,4 @@
-/* Hairline UI — shared stylesheet (starter kit, synced with File Watcher 0.9.8)
+/* Hairline UI — shared stylesheet (starter kit, synced with File Watcher 0.9.9)
    Rules: 1px lines only, no cards/shadows/radius, padding inside cells.
    Usage: <link rel="stylesheet" href="hairline.css"> then use .app shell etc.
    Reference spec: hairline-ui/README.md */
@@ -55,6 +55,12 @@ body {
 .sidewrap { position: relative; border-right: 1px solid var(--line); min-height: 0; }
 .side { height: 100%; overflow-y: auto; }
 .side h6, .hl-h6 { font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--line); }
+/* Collapsible sidebar sections (from 0.9.9): the heading is the toggle;
+   JS adds .section-head + a chevron icon to every h6[data-section]. */
+.side h6.section-head { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+.side h6.section-head:hover { color: var(--fg); }
+.side h6.section-head:focus-visible { outline: 1px solid var(--accent); outline-offset: -1px; }
+.section-chevron { flex-shrink: 0; }
 .sideblock { padding: 12px 14px; border-bottom: 1px solid var(--line); } .sideblock:last-child { border-bottom: 0; }
 input[type="text"], input[type="number"] { flex: 1; min-width: 0; background: transparent; border: 1px solid var(--line); color: var(--fg); border-radius: 0; padding: 7px 9px; font-size: 13px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 input:focus { outline: 1px solid var(--accent); }
