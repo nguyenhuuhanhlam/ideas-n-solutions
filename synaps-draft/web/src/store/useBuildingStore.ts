@@ -46,6 +46,10 @@ interface BuildingState {
   viewMode: ViewMode;
   /** View 2D đang xem: mặt bằng (top) hay mặt đứng (left/right). UI, không undo. */
   view2d: View2d;
+  /** Panel trái có đang mở không — View2D dùng để căn khung hình vào vùng nhìn thấy. UI, không undo. */
+  panelVisible: boolean;
+  /** Hiện lưới 2D hay không. UI, không undo. */
+  showGrid: boolean;
   draft: Draft | null;
   past: HistoryEntry[];
   future: HistoryEntry[];
@@ -73,6 +77,8 @@ interface BuildingState {
   setTheme: (theme: Theme) => void;
   setViewMode: (mode: ViewMode) => void;
   setView2d: (view: View2d) => void;
+  setPanelVisible: (visible: boolean) => void;
+  setShowGrid: (visible: boolean) => void;
   setDraft: (draft: Draft | null) => void;
   setCursor: (p: Point | null, snap: SnapKind) => void;
   setLengthInput: (s: string) => void;
@@ -109,6 +115,8 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
   theme: 'light',
   viewMode: '2d',
   view2d: 'top',
+  panelVisible: true,
+  showGrid: true,
   draft: null,
   past: [],
   future: [],
@@ -180,6 +188,8 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
   setUnit: (unit) => set({ unit }),
   setTheme: (theme) => set({ theme }),
   setViewMode: (viewMode) => set({ viewMode }),
+  setPanelVisible: (panelVisible) => set({ panelVisible }),
+  setShowGrid: (showGrid) => set({ showGrid }),
   setView2d: (view2d) =>
     set({
       view2d,

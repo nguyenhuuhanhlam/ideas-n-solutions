@@ -3,8 +3,9 @@ import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { Arc, Layer, Line, Circle, Rect, Stage, Text } from 'react-konva';
 import Segments from '../components/Segments';
+import WallFill from '../components/WallFill';
 import { elevationBounds, elevationUToOffset, projectOpeningToElevation, projectWallToElevation, sortWallsByDepth, type ElevationView } from '../model/elevation';
-import { distance, mergeWallPolygons, midpoint, projectPointOnWall, wallLength, wallPolygon } from '../model/geometry';
+import { distance, mergeWallPolygonsWithHoles, midpoint, projectPointOnWall, wallLength, wallPolygon } from '../model/geometry';
 import { computeGridSegments, gridStepFor } from '../model/grid';
 import { clampOffset, clampSill } from '../model/openingDrag';
 import type { Opening, Point, Wall } from '../model/schema';
@@ -29,33 +30,19 @@ function fmt(valueMm: number, unit: Unit): string {
   return unit === 'mm' ? `${Math.round(valueMm)} mm` : `${(valueMm / 1000).toFixed(2)} m`;
 }
 
+/** Bảng màu Synaps (luôn sáng — không còn theme tối). */
 const COLORS = {
-  light: {
-    bg: '#f8f8f7',
-    grid: '#e4e4e0',
-    axis: '#c9c9c4',
-    wallFill: '#3f3f46',
-    wallStroke: '#27272a',
-    center: '#a1a1aa',
-    selected: '#2563eb',
-    draft: '#2563eb',
-    snap: '#dc2626',
-    text: '#18181b',
-    dim: '#71717a',
-  },
-  dark: {
-    bg: '#17171a',
-    grid: '#26262b',
-    axis: '#3a3a41',
-    wallFill: '#d4d4d8',
-    wallStroke: '#e4e4e7',
-    center: '#71717a',
-    selected: '#60a5fa',
-    draft: '#60a5fa',
-    snap: '#f87171',
-    text: '#f4f4f5',
-    dim: '#a1a1aa',
-  },
+  bg: '#FCFCFC',
+  grid: '#E9E9E7',
+  axis: '#D6D6D2',
+  wallFill: '#8A8A8A',
+  wallStroke: '#6E6E6E',
+  center: '#A8A8A8',
+  selected: '#3B9BD6',
+  draft: '#3B9BD6',
+  snap: '#3B9BD6',
+  text: '#111111',
+  dim: '#71717A',
 } as const;
 
 /** Trạng thái kéo thả (transient, chỉ preview — commit vào store khi thả chuột). */
@@ -145,13 +132,13 @@ export default function View2D() {
   /** View mặt đứng đang xem (null khi ở mặt bằng Top). */
   const elevView: ElevationView | null = view2d === 'top' ? null : view2d;
   const isTop = elevView === null;
-  const theme = useBuildingStore((s) => s.theme);
   const unit = useBuildingStore((s) => s.unit);
   const draft = useBuildingStore((s) => s.draft);
+  const lengthInput = useBuildingStore((s) => s.lengthInput);
   const selectedWallId = useBuildingStore((s) => s.selectedWallId);
   const selectedOpeningId = useBuildingStore((s) => s.selectedOpeningId);
 
-  const c = COLORS[theme];
+  const c = COLORS;
 
   // Tường hiệu dụng: áp preview kéo thả lên trên dữ liệu store.
   const effectiveWalls = useMemo(() => {
@@ -163,9 +150,10 @@ export default function View2D() {
     );
   }, [walls, dragPreview]);
 
-  // Thân tường nối góc sạch: union các polygon trước khi tô.
+  // Thân tường nối góc sạch: union các polygon trước khi tô, GIỮ lỗ phòng
+  // (dùng WallFill evenodd — Line closed chỉ tô vòng ngoài nên phòng bị tô đầy).
   const mergedPolygons = useMemo(
-    () => mergeWallPolygons(effectiveWalls),
+    () => mergeWallPolygonsWithHoles(effectiveWalls),
     [effectiveWalls],
   );
 
@@ -191,20 +179,33 @@ export default function View2D() {
     return () => ro.disconnect();
   }, []);
 
-  // Lần đầu mở mỗi view: căn khung hình vào toàn bộ building.
+  // Lần đầu mở mỗi view: căn khung hình vào toàn bộ building, căn giữa theo
+  // vùng canvas nhìn thấy (trừ phần bị panel trái + toolbar che).
+  // Đọc kích thước thật từ container: state `size` khởi tạo 800×600 nên nếu
+  // fit theo nó thì camera sẽ kẹt ở góc trên-trái màn hình lớn.
+  const panelVisible = useBuildingStore((s) => s.panelVisible);
+  const showGrid = useBuildingStore((s) => s.showGrid);
   useEffect(() => {
-    if (fittedRef.current[view2d] || size.w < 10 || size.h < 10) return;
+    if (fittedRef.current[view2d]) return;
+    const el = containerRef.current;
+    if (!el || el.clientWidth < 100 || el.clientHeight < 100) return;
     fittedRef.current[view2d] = true;
+    const w = el.clientWidth;
+    const h = el.clientHeight;
+    // Chiều rộng phần canvas bị che bên trái: panel 300 + toolbar 56 + các
+    // khoảng cách; khi panel thu gọn chỉ còn toolbar.
+    const overlay = panelVisible ? 388 : 80;
+    const centerX = (overlay + w) / 2;
     const state = useBuildingStore.getState();
     if (view2d === 'top') {
       const scale = Math.min(
         MAX_SCALE,
-        Math.max(MIN_SCALE, Math.min((size.w - 80) / 9000, (size.h - 80) / 7000)),
+        Math.max(MIN_SCALE, Math.min((w - overlay - 80) / 9000, (h - 80) / 7000)),
       );
       state.setCamera({
         scale,
-        x: size.w / 2 - 4000 * scale,
-        y: size.h / 2 - 3000 * scale,
+        x: centerX - 4000 * scale,
+        y: h / 2 - 3000 * scale,
       });
       return;
     }
@@ -212,20 +213,20 @@ export default function View2D() {
     const lvl = selectActiveLevel(state);
     const bounds = lvl ? elevationBounds(lvl.walls, lvl, view2d) : null;
     if (!bounds) return;
-    const w = Math.max(bounds.u1 - bounds.u0, 1000);
-    const h = Math.max(bounds.vTop - bounds.vBottom, 1000);
+    const bw = Math.max(bounds.u1 - bounds.u0, 1000);
+    const bh = Math.max(bounds.vTop - bounds.vBottom, 1000);
     const scale = Math.min(
       MAX_SCALE,
-      Math.max(MIN_SCALE, Math.min((size.w - 80) / w, (size.h - 80) / h)),
+      Math.max(MIN_SCALE, Math.min((w - overlay - 80) / bw, (h - 80) / bh)),
     );
     const uc = (bounds.u0 + bounds.u1) / 2;
     const vc = (bounds.vBottom + bounds.vTop) / 2;
     state.setCamera({
       scale,
-      x: size.w / 2 - uc * scale,
-      y: size.h / 2 + vc * scale,
+      x: centerX - uc * scale,
+      y: h / 2 + vc * scale,
     });
-  }, [size, view2d]);
+  }, [size, view2d, panelVisible]);
 
   // Theo dõi phím Space để pan.
   useEffect(() => {
@@ -633,12 +634,28 @@ export default function View2D() {
   }, [elevView, level, effectiveWalls, effectiveOpenings]);
 
   const draftLen = draft ? Math.round(distance(draft.start, draft.current)) : 0;
-  const draftMid = draft ? midpoint(draft.start, draft.current) : null;
   const selected = effectiveWalls.find((w) => w.id === selectedWallId) ?? null;
 
+  // Pill nổi length/angle bám theo con trỏ khi đang vẽ tường (kiểu Synaps):
+  // vị trí theo tọa độ màn hình của draft.current, kẹp trong khung canvas.
+  let pill: { x: number; y: number; lengthText: string; angleText: string } | null = null;
+  if (draft) {
+    const dx = draft.current.x - draft.start.x;
+    const dy = draft.current.y - draft.start.y;
+    const deg = Math.round(((Math.atan2(dy, dx) * 180) / Math.PI + 360) % 360);
+    const px = camera.x + draft.current.x * camera.scale + 16;
+    const py = camera.y + draft.current.y * camera.scale - 44;
+    pill = {
+      x: Math.min(Math.max(px, 8), Math.max(8, size.w - 240)),
+      y: Math.min(Math.max(py, 8), Math.max(8, size.h - 48)),
+      lengthText: lengthInput ? `${lengthInput} mm — Enter để chốt` : fmt(draftLen, unit),
+      angleText: `⌐ ${deg}°`,
+    };
+  }
+
   // Dimension cho tường đang chọn (chỉ mặt bằng Top): đường song song,
-  // offset 600mm về phía xa tâm building (phía trống), tick 2 đầu + nhãn.
-  let dim: { line: number[]; ext: number[]; ticks: number[]; label: string; lx: number; ly: number; rot: number } | null = null;
+  // offset 600mm về phía xa tâm building (phía trống), mũi tên hở 2 đầu + nhãn.
+  let dim: { line: number[]; ext: number[]; arrows: number[]; label: string; lx: number; ly: number; rot: number } | null = null;
   if (isTop && selected) {
     const len = wallLength(selected);
     if (len > 0) {
@@ -671,7 +688,10 @@ export default function View2D() {
       let rot = (Math.atan2(uy, ux) * 180) / Math.PI;
       if (rot > 90) rot -= 180;
       if (rot < -90) rot += 180;
-      const tickHalf = 80;
+      // Mũi tên hở ở 2 đầu đường kích thước: đỉnh tại đầu đường, 2 cánh
+      // mở ngược vào trong (~120mm dọc đường, ~50mm ngang).
+      const arrowLen = 120;
+      const arrowSpread = 50;
       dim = {
         line: [ds.x, ds.y, de.x, de.y],
         ext: [
@@ -680,9 +700,11 @@ export default function View2D() {
           selected.end.x, selected.end.y,
           selected.end.x + nx * extLen * s, selected.end.y + ny * extLen * s,
         ],
-        ticks: [
-          ds.x - nx * tickHalf, ds.y - ny * tickHalf, ds.x + nx * tickHalf, ds.y + ny * tickHalf,
-          de.x - nx * tickHalf, de.y - ny * tickHalf, de.x + nx * tickHalf, de.y + ny * tickHalf,
+        arrows: [
+          ds.x, ds.y, ds.x + ux * arrowLen + nx * arrowSpread, ds.y + uy * arrowLen + ny * arrowSpread,
+          ds.x, ds.y, ds.x + ux * arrowLen - nx * arrowSpread, ds.y + uy * arrowLen - ny * arrowSpread,
+          de.x, de.y, de.x - ux * arrowLen + nx * arrowSpread, de.y - uy * arrowLen + ny * arrowSpread,
+          de.x, de.y, de.x - ux * arrowLen - nx * arrowSpread, de.y - uy * arrowLen - ny * arrowSpread,
         ],
         label: fmt(len, unit),
         lx: (ds.x + de.x) / 2 + nx * 140 * s,
@@ -717,7 +739,7 @@ export default function View2D() {
   }
 
   return (
-    <div ref={containerRef} className="h-full w-full overflow-hidden" style={{ background: c.bg }}>
+    <div ref={containerRef} className="relative h-full w-full overflow-hidden" style={{ background: c.bg }}>
       <Stage
         ref={stageRef}
         width={size.w}
@@ -738,7 +760,9 @@ export default function View2D() {
         }}
       >
         <Layer x={camera.x} y={camera.y} scaleX={camera.scale} scaleY={camera.scale}>
-          <Segments points={gridLines} stroke={c.grid} strokeWidth={1 / camera.scale} />
+          {showGrid && (
+            <Segments points={gridLines} stroke={c.grid} strokeWidth={1 / camera.scale} />
+          )}
           {isTop ? (
             <Segments
               points={[0, top, 0, bottom, left, 0, right, 0]}
@@ -771,18 +795,13 @@ export default function View2D() {
 
           {isTop ? (
             <>
-          {/* Thân tường: tô từ union (nối góc sạch), không nhận click. */}
-          {mergedPolygons.map((poly, i) => (
-            <Line
-              key={`m-${i}`}
-              points={poly}
-              closed
-              fill={c.wallFill}
-              stroke={c.wallStroke}
-              strokeWidth={1 / camera.scale}
-              listening={false}
-            />
-          ))}
+          {/* Thân tường: tô từ union (nối góc sạch, giữ lỗ phòng), không nhận click. */}
+          <WallFill
+            polygons={mergedPolygons}
+            fill={c.wallFill}
+            stroke={c.wallStroke}
+            strokeWidth={1 / camera.scale}
+          />
 
           {/* Đường tâm từng tường: hiển thị mảnh + vùng click rộng bằng thân tường. */}
           {effectiveWalls.map((w) => {
@@ -905,7 +924,7 @@ export default function View2D() {
             <>
               <Segments points={dim.ext} stroke={c.dim} strokeWidth={1 / camera.scale} />
               <Line points={dim.line} stroke={c.dim} strokeWidth={1.5 / camera.scale} listening={false} />
-              <Segments points={dim.ticks} stroke={c.dim} strokeWidth={1.5 / camera.scale} />
+              <Segments points={dim.arrows} stroke={c.dim} strokeWidth={1.5 / camera.scale} />
               <Text
                 x={dim.lx}
                 y={dim.ly}
@@ -973,30 +992,31 @@ export default function View2D() {
                 dash={[8 / camera.scale, 6 / camera.scale]}
                 listening={false}
               />
-              {draftMid && (
-                <Text
-                  x={draftMid.x}
-                  y={draftMid.y - 24 / camera.scale}
-                  text={`${draftLen} mm`}
-                  fontSize={13 / camera.scale}
-                  fill={c.draft}
-                  align="center"
-                  listening={false}
-                />
-              )}
             </>
           )}
 
-          {/* Marker snap */}
+          {/* Marker snap: vòng tròn xanh + dấu "+" ở tâm. */}
           {draft && (
-            <Circle
-              x={draft.current.x}
-              y={draft.current.y}
-              radius={5 / camera.scale}
-              stroke={c.snap}
-              strokeWidth={1.5 / camera.scale}
-              listening={false}
-            />
+            <>
+              <Circle
+                x={draft.current.x}
+                y={draft.current.y}
+                radius={6 / camera.scale}
+                stroke={c.snap}
+                strokeWidth={1.5 / camera.scale}
+                listening={false}
+              />
+              <Segments
+                points={[
+                  draft.current.x - 5 / camera.scale, draft.current.y,
+                  draft.current.x + 5 / camera.scale, draft.current.y,
+                  draft.current.x, draft.current.y - 5 / camera.scale,
+                  draft.current.x, draft.current.y + 5 / camera.scale,
+                ]}
+                stroke={c.snap}
+                strokeWidth={1.5 / camera.scale}
+              />
+            </>
           )}
             </>
           ) : (
@@ -1078,6 +1098,16 @@ export default function View2D() {
           )}
         </Layer>
       </Stage>
+      {/* Pill nổi length/angle khi đang vẽ tường (thay Text độ dài cũ trên canvas). */}
+      {pill && (
+        <div
+          className="pointer-events-none absolute z-10 flex items-center gap-2 rounded-full border border-syn-border bg-white px-3 py-1.5 text-[13px] text-syn-ink shadow-md"
+          style={{ left: pill.x, top: pill.y }}
+        >
+          <span>{pill.lengthText}</span>
+          <span className="text-syn-grey">{pill.angleText}</span>
+        </div>
+      )}
     </div>
   );
 }

@@ -128,6 +128,30 @@ export function mergeWallPolygons(walls: Wall[]): number[][] {
   return merged.map((poly) => fromRing(poly[0])).filter((flat) => flat.length >= 6);
 }
 
+export interface MergedWallPolygon {
+  /** Vòng ngoài (phẳng [x0,y0,...]). */
+  outer: number[];
+  /** Các lỗ trong (phòng/sân kín) — render phải chừa ra, không tô. */
+  holes: number[][];
+}
+
+/**
+ * Như mergeWallPolygons nhưng GIỮ lỗ trong: vòng tường khép kín (nhà mẫu)
+ * có 2 lỗ phòng; bỏ lỗ sẽ tô đầy cả phòng thành một khối đặc.
+ * Render bằng Konva Shape với fillRule="evenodd".
+ */
+export function mergeWallPolygonsWithHoles(walls: Wall[]): MergedWallPolygon[] {
+  if (walls.length === 0) return [];
+  const polys: Polygon[] = walls.map((w) => [toRing(wallPolygon(w))]);
+  const merged = union(polys[0], ...polys.slice(1));
+  return merged
+    .map((poly) => ({
+      outer: fromRing(poly[0]),
+      holes: poly.slice(1).map(fromRing).filter((h) => h.length >= 6),
+    }))
+    .filter((p) => p.outer.length >= 6);
+}
+
 /**
  * Clamp offset của opening để nó nằm gọn trong tường:
  * offset ∈ [0, max(0, wallLength - width)].

@@ -1,42 +1,41 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { AppWindow, DoorOpen, FileDown, FilePlus2, FolderOpen, MousePointer2, Redo2, Slash, Sun, Moon, Undo2 } from 'lucide-react';
-import PropertiesPanel from './components/PropertiesPanel';
+import ExportDialog from './components/ExportDialog';
+import IconToolbar from './components/IconToolbar';
+import SynapsPanel, { type PanelTab } from './components/SynapsPanel';
+import TopActions from './components/TopActions';
 import { exportDxf } from './export/dxfClient';
 import { downloadBuilding, loadBuildingFromFile } from './export/jsonFile';
 import { distance } from './model/geometry';
 import { seedBuilding } from './model/seed';
 import type { View2d } from './model/elevation';
-import { selectActiveLevel, useBuildingStore, type Unit, type ViewMode } from './store/useBuildingStore';
+import { selectActiveLevel, useBuildingStore, type ViewMode } from './store/useBuildingStore';
 import { createWall, pointAtLength } from './tools/wallTool';
 import View2D from './views/View2D';
 
 // Lazy: bundle 2D ban đầu không mang three.js (~600kB).
 const View3D = lazy(() => import('./views/View3D'));
 
-function fmt(valueMm: number, unit: Unit): string {
-  return unit === 'mm' ? `${Math.round(valueMm)} mm` : `${(valueMm / 1000).toFixed(2)} m`;
-}
+const pillGroup =
+  'flex rounded-full border border-syn-border bg-white p-1 shadow-sm';
+const pillSegment = (active: boolean) =>
+  `rounded-full px-3 py-1 text-xs font-medium ${
+    active ? 'bg-syn-ink text-white' : 'text-syn-grey hover:text-syn-ink'
+  }`;
 
 export default function App() {
   const tool = useBuildingStore((s) => s.tool);
   const unit = useBuildingStore((s) => s.unit);
-  const theme = useBuildingStore((s) => s.theme);
   const viewMode = useBuildingStore((s) => s.viewMode);
   const view2d = useBuildingStore((s) => s.view2d);
-  const cursor = useBuildingStore((s) => s.cursorWorld);
-  const snapKind = useBuildingStore((s) => s.snapKind);
   const camera = useBuildingStore((s) => s.cameras[s.view2d]);
-  const draft = useBuildingStore((s) => s.draft);
-  const lengthInput = useBuildingStore((s) => s.lengthInput);
   const canUndo = useBuildingStore((s) => s.past.length > 0);
   const canRedo = useBuildingStore((s) => s.future.length > 0);
   const wallCount = useBuildingStore((s) => selectActiveLevel(s)?.walls.length ?? 0);
   const openingCount = useBuildingStore((s) => selectActiveLevel(s)?.openings.length ?? 0);
 
-  // Áp class dark cho Tailwind.
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-  }, [theme]);
+  const panelVisible = useBuildingStore((s) => s.panelVisible);
+  const [activeTab, setActiveTab] = useState<PanelTab>('properties');
+  const [exportOpen, setExportOpen] = useState(false);
 
   // Phím tắt toàn cục.
   useEffect(() => {
@@ -122,10 +121,9 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
-  const draftLen = draft ? Math.round(distance(draft.start, draft.current)) : null;
   const store = useBuildingStore.getState;
 
-  // Thông báo ngắn ở status bar (lỗi mở file / xuất DXF, xác nhận đã lưu).
+  // Thông báo ngắn dạng toast (lỗi mở file / xuất DXF, xác nhận đã lưu).
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
   const statusTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const flashStatus = (msg: string) => {
@@ -166,245 +164,146 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen w-screen flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      {/* Header */}
-      <header className="flex h-12 shrink-0 items-center gap-3 border-b border-zinc-200 px-4 dark:border-zinc-800">
-        <h1 className="text-sm font-semibold tracking-tight">Synaps Draft</h1>
-        <span className="text-xs text-zinc-500 dark:text-zinc-400">
-          {wallCount} tường · {openingCount} cửa
-        </span>
-        <div className="ml-auto flex items-center gap-1">
-          {/* Lưu / mở / mới / xuất DXF */}
-          <button
-            type="button"
-            title="Lưu bản vẽ (.json)"
-            onClick={handleSave}
-            className="rounded p-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800"
-          >
-            <FileDown size={16} />
-          </button>
-          <button
-            type="button"
-            title="Mở bản vẽ (.json)"
-            onClick={() => fileInputRef.current?.click()}
-            className="rounded p-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800"
-          >
-            <FolderOpen size={16} />
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json,application/json"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              e.target.value = '';
-              if (file) void handleOpenFile(file);
-            }}
-          />
-          <button
-            type="button"
-            title="Tạo mới từ nhà mẫu"
-            onClick={handleNew}
-            className="rounded p-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800"
-          >
-            <FilePlus2 size={16} />
-          </button>
-          <button
-            type="button"
-            title="Xuất DXF (cần API chạy ở cổng 8000)"
-            onClick={() => void handleExportDxf()}
-            className="mr-2 rounded border border-zinc-300 px-2 py-1 text-xs font-medium hover:bg-zinc-200 dark:border-zinc-700 dark:hover:bg-zinc-800"
-          >
-            Xuất DXF
-          </button>
-          {/* Chuyển view 2D: mặt bằng Top / mặt đứng Left / Right */}
-          {(viewMode === '2d' || viewMode === 'split') && (
-            <div
-              role="group"
-              aria-label="View 2D"
-              className="mr-2 flex rounded border border-zinc-300 dark:border-zinc-700"
+    <div className="relative h-screen w-screen overflow-hidden bg-syn-canvas font-sans text-syn-ink">
+      {/* Canvas chiếm toàn màn hình: 2D, 3D, hoặc chia đôi dọc (2D trái, 3D phải). */}
+      <main className="absolute inset-0 flex">
+        {(viewMode === '2d' || viewMode === 'split') && (
+          <div className={viewMode === 'split' ? 'h-full w-1/2 border-r border-syn-border' : 'h-full w-full'}>
+            <View2D />
+          </div>
+        )}
+        {(viewMode === '3d' || viewMode === 'split') && (
+          <div className={viewMode === 'split' ? 'h-full w-1/2' : 'h-full w-full'}>
+            <Suspense
+              fallback={
+                <div className="flex h-full w-full items-center justify-center text-sm text-syn-grey">
+                  Đang tải 3D…
+                </div>
+              }
             >
-              {(
-                [
-                  ['top', 'Top', 'Mặt bằng (1)'],
-                  ['left', 'Left', 'Mặt đứng nhìn từ tây (2)'],
-                  ['right', 'Right', 'Mặt đứng nhìn từ đông (3)'],
-                ] as [View2d, string, string][]
-              ).map(([view, label, title]) => (
-                <button
-                  key={view}
-                  type="button"
-                  title={title}
-                  onClick={() => store().setView2d(view)}
-                  className={`px-2 py-1 text-xs font-medium first:rounded-l last:rounded-r ${
-                    view2d === view
-                      ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
-                      : 'hover:bg-zinc-200 dark:hover:bg-zinc-800'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          )}
-          {/* Chuyển chế độ xem 2D / 3D / chia đôi */}
-          <div
-            role="group"
-            aria-label="Chế độ xem"
-            className="mr-2 flex rounded border border-zinc-300 dark:border-zinc-700"
-          >
+              <View3D />
+            </Suspense>
+          </div>
+        )}
+      </main>
+
+      {/* Panel trái + toolbar icon, nổi trên canvas */}
+      <div className="absolute bottom-3 left-3 top-3 z-20 flex gap-2">
+        {panelVisible && (
+          <SynapsPanel
+            tab={activeTab}
+            onTabChange={setActiveTab}
+            onCollapse={() => store().setPanelVisible(false)}
+          />
+        )}
+        <IconToolbar
+          tool={tool}
+          view2d={view2d}
+          onSelectTool={(t) => store().setTool(t)}
+          onTogglePanel={() => store().setPanelVisible(!panelVisible)}
+        />
+      </div>
+
+      {/* Chuyển view, nổi giữa trên */}
+      <div className="absolute left-1/2 top-3 z-20 flex -translate-x-1/2 gap-2">
+        {(viewMode === '2d' || viewMode === 'split') && (
+          <div role="group" aria-label="View 2D" className={pillGroup}>
             {(
               [
-                ['2d', '2D', 'Mặt bằng 2D'],
-                ['3d', '3D', 'Xem 3D'],
-                ['split', '2D | 3D', 'Chia đôi: 2D trái, 3D phải'],
-              ] as [ViewMode, string, string][]
-            ).map(([mode, label, title]) => (
+                ['top', 'Top', 'Mặt bằng (1)'],
+                ['left', 'Left', 'Mặt đứng nhìn từ tây (2)'],
+                ['right', 'Right', 'Mặt đứng nhìn từ đông (3)'],
+              ] as [View2d, string, string][]
+            ).map(([view, label, title]) => (
               <button
-                key={mode}
+                key={view}
                 type="button"
                 title={title}
-                onClick={() => store().setViewMode(mode)}
-                className={`px-2 py-1 text-xs font-medium first:rounded-l last:rounded-r ${
-                  viewMode === mode
-                    ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
-                    : 'hover:bg-zinc-200 dark:hover:bg-zinc-800'
-                }`}
+                onClick={() => store().setView2d(view)}
+                className={pillSegment(view2d === view)}
               >
                 {label}
               </button>
             ))}
           </div>
-          <button
-            type="button"
-            title="Hoàn tác (Ctrl+Z)"
-            onClick={() => store().undo()}
-            disabled={!canUndo}
-            className="rounded p-1.5 hover:bg-zinc-200 disabled:opacity-40 dark:hover:bg-zinc-800"
-          >
-            <Undo2 size={16} />
-          </button>
-          <button
-            type="button"
-            title="Làm lại (Ctrl+Shift+Z)"
-            onClick={() => store().redo()}
-            disabled={!canRedo}
-            className="rounded p-1.5 hover:bg-zinc-200 disabled:opacity-40 dark:hover:bg-zinc-800"
-          >
-            <Redo2 size={16} />
-          </button>
-          <button
-            type="button"
-            title="Đổi đơn vị hiển thị"
-            onClick={() => store().setUnit(unit === 'mm' ? 'm' : 'mm')}
-            className="ml-2 rounded border border-zinc-300 px-2 py-1 text-xs font-medium hover:bg-zinc-200 dark:border-zinc-700 dark:hover:bg-zinc-800"
-          >
-            {unit}
-          </button>
-          <button
-            type="button"
-            title="Đổi giao diện sáng/tối"
-            onClick={() => store().setTheme(theme === 'light' ? 'dark' : 'light')}
-            className="rounded p-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800"
-          >
-            {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
-          </button>
+        )}
+        <div role="group" aria-label="Chế độ xem" className={pillGroup}>
+          {(
+            [
+              ['2d', '2D', 'Mặt bằng 2D'],
+              ['3d', '3D', 'Xem 3D'],
+              ['split', '2D | 3D', 'Chia đôi: 2D trái, 3D phải'],
+            ] as [ViewMode, string, string][]
+          ).map(([mode, label, title]) => (
+            <button
+              key={mode}
+              type="button"
+              title={title}
+              onClick={() => store().setViewMode(mode)}
+              className={pillSegment(viewMode === mode)}
+            >
+              {label}
+            </button>
+          ))}
         </div>
-      </header>
-
-      <div className="flex min-h-0 flex-1">
-        {/* Toolbar trái */}
-        <nav className="flex w-12 shrink-0 flex-col items-center gap-1 border-r border-zinc-200 py-2 dark:border-zinc-800">
-          <button
-            type="button"
-            title="Chọn (V)"
-            onClick={() => store().setTool('select')}
-            className={`rounded p-2 ${tool === 'select' ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800'}`}
-          >
-            <MousePointer2 size={18} />
-          </button>
-          <button
-            type="button"
-            title={view2d === 'top' ? 'Vẽ tường (W) — click đặt điểm, Esc để dừng, gõ số + Enter để nhập chiều dài' : 'Chỉ vẽ ở mặt bằng Top'}
-            onClick={() => store().setTool('wall')}
-            disabled={view2d !== 'top'}
-            className={`rounded p-2 disabled:opacity-40 ${tool === 'wall' ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800'}`}
-          >
-            <Slash size={18} />
-          </button>
-          <button
-            type="button"
-            title={view2d === 'top' ? 'Đặt cửa đi (D) — click lên tường gần nhất' : 'Chỉ vẽ ở mặt bằng Top'}
-            onClick={() => store().setTool('door')}
-            disabled={view2d !== 'top'}
-            className={`rounded p-2 disabled:opacity-40 ${tool === 'door' ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800'}`}
-          >
-            <DoorOpen size={18} />
-          </button>
-          <button
-            type="button"
-            title={view2d === 'top' ? 'Đặt cửa sổ (N) — click lên tường gần nhất' : 'Chỉ vẽ ở mặt bằng Top'}
-            onClick={() => store().setTool('window')}
-            disabled={view2d !== 'top'}
-            className={`rounded p-2 disabled:opacity-40 ${tool === 'window' ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800'}`}
-          >
-            <AppWindow size={18} />
-          </button>
-        </nav>
-
-        {/* Canvas: 2D, 3D, hoặc chia đôi dọc (2D trái, 3D phải, mỗi bên 50%). */}
-        <main className="flex min-w-0 flex-1">
-          {(viewMode === '2d' || viewMode === 'split') && (
-            <div className={viewMode === 'split' ? 'h-full w-1/2 border-r border-zinc-200 dark:border-zinc-800' : 'h-full w-full'}>
-              <View2D />
-            </div>
-          )}
-          {(viewMode === '3d' || viewMode === 'split') && (
-            <div className={viewMode === 'split' ? 'h-full w-1/2' : 'h-full w-full'}>
-              <Suspense
-                fallback={
-                  <div className="flex h-full w-full items-center justify-center text-sm text-zinc-500">
-                    Đang tải 3D…
-                  </div>
-                }
-              >
-                <View3D />
-              </Suspense>
-            </div>
-          )}
-        </main>
-
-        {/* Panel thuộc tính phải */}
-        <PropertiesPanel />
       </div>
 
-      {/* Status bar */}
-      <footer className="flex h-8 shrink-0 items-center gap-4 border-t border-zinc-200 px-3 text-xs text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
-        <span className="tabular-nums">
-          {cursor
-            ? view2d === 'top'
-              ? `X ${fmt(cursor.x, unit)} · Y ${fmt(cursor.y, unit)}`
-              : `U ${fmt(cursor.x, unit)} · Z ${fmt(cursor.y, unit)}`
-            : '—'}
+      {/* Hành động nổi góc phải trên */}
+      <div className="absolute right-3 top-3 z-20">
+        <TopActions
+          canUndo={canUndo}
+          canRedo={canRedo}
+          onUndo={() => store().undo()}
+          onRedo={() => store().redo()}
+          onOpen={() => fileInputRef.current?.click()}
+          onExport={() => setExportOpen(true)}
+          onSave={handleSave}
+          onNew={handleNew}
+        />
+      </div>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json,application/json"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          e.target.value = '';
+          if (file) void handleOpenFile(file);
+        }}
+      />
+
+      {/* Zoom + đơn vị, nổi góc phải dưới (độ dài đang vẽ đã hiện ở pill nổi cạnh con trỏ). */}
+      <div className="absolute bottom-3 right-3 z-20 flex items-center gap-2">
+        <button
+          type="button"
+          title="Đổi đơn vị hiển thị"
+          onClick={() => store().setUnit(unit === 'mm' ? 'm' : 'mm')}
+          className="rounded-full border border-syn-border bg-white px-3 py-1.5 text-xs font-medium text-syn-ink shadow-sm hover:bg-syn-field"
+        >
+          {unit}
+        </button>
+        <span className="rounded-full border border-syn-border bg-white px-3 py-1.5 text-xs font-medium tabular-nums text-syn-ink shadow-sm">
+          Zoom {Math.round(camera.scale * 100)}%
         </span>
-        <span className="tabular-nums">Zoom {Math.round(camera.scale * 100)}%</span>
-        <span>Snap: {snapKind ?? '—'}</span>
-        {draftLen !== null && (
-          <span className="tabular-nums font-medium text-zinc-900 dark:text-zinc-100">
-            Đoạn đang vẽ: {fmt(draftLen, unit)}
-          </span>
-        )}
-        {lengthInput && (
-          <span className="rounded bg-blue-100 px-2 py-0.5 font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-            Chiều dài: {lengthInput} mm — Enter để chốt, Esc để hủy
-          </span>
-        )}
-        {statusMsg && <span className="truncate font-medium text-zinc-900 dark:text-zinc-100">{statusMsg}</span>}
-        <span className="ml-auto hidden sm:inline">
-          Chuột giữa / Space+kéo: pan · Lăn chuột: zoom · Esc: dừng vẽ
-        </span>
-      </footer>
+      </div>
+
+      {/* Toast trạng thái, nổi giữa dưới */}
+      {statusMsg && (
+        <div className="absolute bottom-3 left-1/2 z-30 -translate-x-1/2 rounded-full bg-syn-ink px-4 py-2 text-sm text-white shadow-lg">
+          {statusMsg}
+        </div>
+      )}
+
+      {/* Dialog xuất */}
+      {exportOpen && (
+        <ExportDialog
+          wallCount={wallCount}
+          openingCount={openingCount}
+          onClose={() => setExportOpen(false)}
+          onExport={handleExportDxf}
+        />
+      )}
     </div>
   );
 }

@@ -12,7 +12,7 @@ import { useBuildingStore } from '../store/useBuildingStore';
 
 const COLORS = {
   light: {
-    bg: '#e8e8e6',
+    bg: '#FCFCFC',
     floor: '#dcdcd8',
     gridCell: '#c9c9c4',
     gridSection: '#a8a8a2',

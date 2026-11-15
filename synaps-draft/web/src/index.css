@@ -1,6 +1,17 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --color-syn-canvas: #fcfcfc;
+  --color-syn-ink: #111111;
+  --color-syn-grey: #6b7280;
+  --color-syn-border: #e5e7eb;
+  --color-syn-field: #f2f2f3;
+  --color-syn-accent: #3b9bd6;
+}
 
 html,
 body,
@@ -10,6 +21,6 @@ body,
 }
 
 body {
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: var(--font-sans);
   overscroll-behavior: none;
 }

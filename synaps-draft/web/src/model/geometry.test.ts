@@ -3,6 +3,7 @@ import {
   clampOpeningOffset,
   distance,
   mergeWallPolygons,
+  mergeWallPolygonsWithHoles,
   midpoint,
   projectPointOnWall,
   snapAngle,
@@ -118,6 +119,47 @@ describe('mergeWallPolygons', () => {
   });
   it('mảng rỗng trả về mảng rỗng', () => {
     expect(mergeWallPolygons([])).toEqual([]);
+  });
+});
+
+describe('mergeWallPolygonsWithHoles', () => {
+  it('vòng tường khép kín giữ lỗ phòng bên trong', () => {
+    const merged = mergeWallPolygonsWithHoles([
+      wall({ x: 0, y: 0 }, { x: 8000, y: 0 }),
+      wall({ x: 8000, y: 0 }, { x: 8000, y: 6000 }),
+      wall({ x: 8000, y: 6000 }, { x: 0, y: 6000 }),
+      wall({ x: 0, y: 6000 }, { x: 0, y: 0 }),
+    ]);
+    expect(merged).toHaveLength(1);
+    expect(merged[0].holes).toHaveLength(1);
+    // Lỗ phòng: 7800×5800 (8000/6000 trừ 2×100 mỗi phía, dày 200).
+    const hole = merged[0].holes[0];
+    const xs = hole.filter((_, i) => i % 2 === 0);
+    const ys = hole.filter((_, i) => i % 2 === 1);
+    expect(Math.max(...xs) - Math.min(...xs)).toBe(7800);
+    expect(Math.max(...ys) - Math.min(...ys)).toBe(5800);
+  });
+  it('vách ngăn giữa chia lỗ thành 2 phòng', () => {
+    const merged = mergeWallPolygonsWithHoles([
+      wall({ x: 0, y: 0 }, { x: 8000, y: 0 }),
+      wall({ x: 8000, y: 0 }, { x: 8000, y: 6000 }),
+      wall({ x: 8000, y: 6000 }, { x: 0, y: 6000 }),
+      wall({ x: 0, y: 6000 }, { x: 0, y: 0 }),
+      wall({ x: 4000, y: 0 }, { x: 4000, y: 6000 }),
+    ]);
+    expect(merged).toHaveLength(1);
+    expect(merged[0].holes).toHaveLength(2);
+  });
+  it('chữ L không có lỗ', () => {
+    const merged = mergeWallPolygonsWithHoles([
+      wall({ x: 0, y: 0 }, { x: 4000, y: 0 }),
+      wall({ x: 0, y: 0 }, { x: 0, y: 4000 }),
+    ]);
+    expect(merged).toHaveLength(1);
+    expect(merged[0].holes).toHaveLength(0);
+  });
+  it('mảng rỗng trả về mảng rỗng', () => {
+    expect(mergeWallPolygonsWithHoles([])).toEqual([]);
   });
 });
 
