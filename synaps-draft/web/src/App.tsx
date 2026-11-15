@@ -5,6 +5,7 @@ import { exportDxf } from './export/dxfClient';
 import { downloadBuilding, loadBuildingFromFile } from './export/jsonFile';
 import { distance } from './model/geometry';
 import { seedBuilding } from './model/seed';
+import type { View2d } from './model/elevation';
 import { selectActiveLevel, useBuildingStore, type Unit, type ViewMode } from './store/useBuildingStore';
 import { createWall, pointAtLength } from './tools/wallTool';
 import View2D from './views/View2D';
@@ -21,9 +22,10 @@ export default function App() {
   const unit = useBuildingStore((s) => s.unit);
   const theme = useBuildingStore((s) => s.theme);
   const viewMode = useBuildingStore((s) => s.viewMode);
+  const view2d = useBuildingStore((s) => s.view2d);
   const cursor = useBuildingStore((s) => s.cursorWorld);
   const snapKind = useBuildingStore((s) => s.snapKind);
-  const camera = useBuildingStore((s) => s.camera);
+  const camera = useBuildingStore((s) => s.cameras[s.view2d]);
   const draft = useBuildingStore((s) => s.draft);
   const lengthInput = useBuildingStore((s) => s.lengthInput);
   const canUndo = useBuildingStore((s) => s.past.length > 0);
@@ -104,9 +106,17 @@ export default function App() {
         return;
       }
       if (e.key.toLowerCase() === 'v') s.setTool('select');
-      if (e.key.toLowerCase() === 'w') s.setTool('wall');
-      if (e.key.toLowerCase() === 'd') s.setTool('door');
-      if (e.key.toLowerCase() === 'n') s.setTool('window');
+      // Tool vẽ chỉ chạy ở mặt bằng Top (mặt đứng chỉ chọn/xem).
+      if (s.view2d === 'top') {
+        if (e.key.toLowerCase() === 'w') s.setTool('wall');
+        if (e.key.toLowerCase() === 'd') s.setTool('door');
+        if (e.key.toLowerCase() === 'n') s.setTool('window');
+      }
+      // Chuyển view 2D: 1 = mặt bằng Top, 2/3 = mặt đứng Left/Right.
+      // (Đặt sau khối nhập số khi draft nên số vẫn vào chiều dài khi đang vẽ.)
+      if (e.key === '1') s.setView2d('top');
+      if (e.key === '2') s.setView2d('left');
+      if (e.key === '3') s.setView2d('right');
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
@@ -208,6 +218,36 @@ export default function App() {
           >
             Xuất DXF
           </button>
+          {/* Chuyển view 2D: mặt bằng Top / mặt đứng Left / Right */}
+          {(viewMode === '2d' || viewMode === 'split') && (
+            <div
+              role="group"
+              aria-label="View 2D"
+              className="mr-2 flex rounded border border-zinc-300 dark:border-zinc-700"
+            >
+              {(
+                [
+                  ['top', 'Top', 'Mặt bằng (1)'],
+                  ['left', 'Left', 'Mặt đứng nhìn từ tây (2)'],
+                  ['right', 'Right', 'Mặt đứng nhìn từ đông (3)'],
+                ] as [View2d, string, string][]
+              ).map(([view, label, title]) => (
+                <button
+                  key={view}
+                  type="button"
+                  title={title}
+                  onClick={() => store().setView2d(view)}
+                  className={`px-2 py-1 text-xs font-medium first:rounded-l last:rounded-r ${
+                    view2d === view
+                      ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
+                      : 'hover:bg-zinc-200 dark:hover:bg-zinc-800'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
           {/* Chuyển chế độ xem 2D / 3D / chia đôi */}
           <div
             role="group"
@@ -286,25 +326,28 @@ export default function App() {
           </button>
           <button
             type="button"
-            title="Vẽ tường (W) — click đặt điểm, Esc để dừng, gõ số + Enter để nhập chiều dài"
+            title={view2d === 'top' ? 'Vẽ tường (W) — click đặt điểm, Esc để dừng, gõ số + Enter để nhập chiều dài' : 'Chỉ vẽ ở mặt bằng Top'}
             onClick={() => store().setTool('wall')}
-            className={`rounded p-2 ${tool === 'wall' ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800'}`}
+            disabled={view2d !== 'top'}
+            className={`rounded p-2 disabled:opacity-40 ${tool === 'wall' ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800'}`}
           >
             <Slash size={18} />
           </button>
           <button
             type="button"
-            title="Đặt cửa đi (D) — click lên tường gần nhất"
+            title={view2d === 'top' ? 'Đặt cửa đi (D) — click lên tường gần nhất' : 'Chỉ vẽ ở mặt bằng Top'}
             onClick={() => store().setTool('door')}
-            className={`rounded p-2 ${tool === 'door' ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800'}`}
+            disabled={view2d !== 'top'}
+            className={`rounded p-2 disabled:opacity-40 ${tool === 'door' ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800'}`}
           >
             <DoorOpen size={18} />
           </button>
           <button
             type="button"
-            title="Đặt cửa sổ (N) — click lên tường gần nhất"
+            title={view2d === 'top' ? 'Đặt cửa sổ (N) — click lên tường gần nhất' : 'Chỉ vẽ ở mặt bằng Top'}
             onClick={() => store().setTool('window')}
-            className={`rounded p-2 ${tool === 'window' ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800'}`}
+            disabled={view2d !== 'top'}
+            className={`rounded p-2 disabled:opacity-40 ${tool === 'window' ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800'}`}
           >
             <AppWindow size={18} />
           </button>
@@ -339,7 +382,11 @@ export default function App() {
       {/* Status bar */}
       <footer className="flex h-8 shrink-0 items-center gap-4 border-t border-zinc-200 px-3 text-xs text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
         <span className="tabular-nums">
-          {cursor ? `X ${fmt(cursor.x, unit)} · Y ${fmt(cursor.y, unit)}` : '—'}
+          {cursor
+            ? view2d === 'top'
+              ? `X ${fmt(cursor.x, unit)} · Y ${fmt(cursor.y, unit)}`
+              : `U ${fmt(cursor.x, unit)} · Z ${fmt(cursor.y, unit)}`
+            : '—'}
         </span>
         <span className="tabular-nums">Zoom {Math.round(camera.scale * 100)}%</span>
         <span>Snap: {snapKind ?? '—'}</span>

@@ -1,8 +1,10 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { Arc, Layer, Line, Circle, Stage, Text } from 'react-konva';
-import { distance, mergeWallPolygons, midpoint, wallLength, wallPolygon } from '../model/geometry';
+import { Arc, Layer, Line, Circle, Rect, Stage, Text } from 'react-konva';
+import { elevationBounds, elevationUToOffset, projectOpeningToElevation, projectWallToElevation, sortWallsByDepth, type ElevationView } from '../model/elevation';
+import { distance, mergeWallPolygons, midpoint, projectPointOnWall, wallLength, wallPolygon } from '../model/geometry';
+import { clampOffset, clampSill } from '../model/openingDrag';
 import type { Opening, Point, Wall } from '../model/schema';
 import { selectActiveLevel, useBuildingStore, type Unit } from '../store/useBuildingStore';
 import { computeSnap, createWall } from '../tools/wallTool';
@@ -19,6 +21,8 @@ const MAX_SCALE = 10;
 const GRID_STEPS = [100, 500, 1000, 5000];
 const OPENING_PICK_RADIUS_PX = 15;
 const DIM_OFFSET = 600; // mm, khoảng cách đường kích thước khỏi tường
+/** Ngưỡng màn hình (px) để phân biệt click chọn với kéo thả. */
+const DRAG_THRESHOLD_PX = 3;
 
 function gridStepFor(scale: number): number {
   for (const s of GRID_STEPS) if (s * scale >= 24) return s;
@@ -61,12 +65,43 @@ const COLORS = {
 /** Trạng thái kéo thả (transient, chỉ preview — commit vào store khi thả chuột). */
 type DragState =
   | { kind: 'endpoint'; wallId: string; end: 'start' | 'end'; fixed: Point }
-  | { kind: 'move'; wallId: string; grab: Point; origStart: Point; origEnd: Point };
+  | { kind: 'move'; wallId: string; grab: Point; origStart: Point; origEnd: Point }
+  | {
+      kind: 'opening-top';
+      openingId: string;
+      wallId: string;
+      /** Offset dọc tường tại điểm bấm (để kéo giữ đúng vị trí tay nắm). */
+      grabOffset: number;
+      origOffset: number;
+      origSill: number;
+      startScreen: Point;
+      active: boolean;
+    }
+  | {
+      kind: 'opening-elev';
+      openingId: string;
+      wallId: string;
+      view: ElevationView;
+      grabU: number;
+      grabV: number;
+      origOffset: number;
+      origSill: number;
+      /** Tường chiếu thành hình rộng thì kéo ngang đổi offset; mép mỏng thì chỉ kéo dọc đổi sill. */
+      canMoveU: boolean;
+      startScreen: Point;
+      active: boolean;
+    };
 
 interface DragPreview {
   wallId: string;
   start: Point;
   end: Point;
+}
+
+interface OpeningPreview {
+  openingId: string;
+  offset: number;
+  sillHeight: number;
 }
 
 /** Các điểm của opening dọc tường: a = mép đầu, b = mép cuối, n = pháp tuyến. */
@@ -100,14 +135,20 @@ export default function View2D() {
   const [size, setSize] = useState({ w: 800, h: 600 });
   const spaceRef = useRef(false);
   const panRef = useRef<{ sx: number; sy: number; cx: number; cy: number } | null>(null);
-  const fittedRef = useRef(false);
+  const fittedRef = useRef<Record<string, boolean>>({ top: false, left: false, right: false });
   const dragRef = useRef<DragState | null>(null);
   const [dragPreview, setDragPreview] = useState<DragPreview | null>(null);
+  const [openingPreview, setOpeningPreview] = useState<OpeningPreview | null>(null);
 
   const walls = useBuildingStore((s) => selectActiveLevel(s)?.walls ?? []);
   const openings = useBuildingStore((s) => selectActiveLevel(s)?.openings ?? []);
+  const level = useBuildingStore(selectActiveLevel);
   const tool = useBuildingStore((s) => s.tool);
-  const camera = useBuildingStore((s) => s.camera);
+  const view2d = useBuildingStore((s) => s.view2d);
+  const camera = useBuildingStore((s) => s.cameras[s.view2d]);
+  /** View mặt đứng đang xem (null khi ở mặt bằng Top). */
+  const elevView: ElevationView | null = view2d === 'top' ? null : view2d;
+  const isTop = elevView === null;
   const theme = useBuildingStore((s) => s.theme);
   const unit = useBuildingStore((s) => s.unit);
   const draft = useBuildingStore((s) => s.draft);
@@ -132,6 +173,16 @@ export default function View2D() {
     [effectiveWalls],
   );
 
+  // Opening hiệu dụng: áp preview kéo thả lên trên dữ liệu store.
+  const effectiveOpenings = useMemo(() => {
+    if (!openingPreview) return openings;
+    return openings.map((o) =>
+      o.id === openingPreview.openingId
+        ? { ...o, offset: openingPreview.offset, sillHeight: openingPreview.sillHeight }
+        : o,
+    );
+  }, [openings, openingPreview]);
+
   // Đo kích thước khung canvas.
   useEffect(() => {
     const el = containerRef.current;
@@ -144,20 +195,41 @@ export default function View2D() {
     return () => ro.disconnect();
   }, []);
 
-  // Lần đầu: căn giữa building trong khung.
+  // Lần đầu mở mỗi view: căn khung hình vào toàn bộ building.
   useEffect(() => {
-    if (fittedRef.current || size.w < 10 || size.h < 10) return;
-    fittedRef.current = true;
+    if (fittedRef.current[view2d] || size.w < 10 || size.h < 10) return;
+    fittedRef.current[view2d] = true;
+    const state = useBuildingStore.getState();
+    if (view2d === 'top') {
+      const scale = Math.min(
+        MAX_SCALE,
+        Math.max(MIN_SCALE, Math.min((size.w - 80) / 9000, (size.h - 80) / 7000)),
+      );
+      state.setCamera({
+        scale,
+        x: size.w / 2 - 4000 * scale,
+        y: size.h / 2 - 3000 * scale,
+      });
+      return;
+    }
+    // Mặt đứng: fit theo bounding box hình chiếu (Konva y = −v nên cộng v vào y).
+    const lvl = selectActiveLevel(state);
+    const bounds = lvl ? elevationBounds(lvl.walls, lvl, view2d) : null;
+    if (!bounds) return;
+    const w = Math.max(bounds.u1 - bounds.u0, 1000);
+    const h = Math.max(bounds.vTop - bounds.vBottom, 1000);
     const scale = Math.min(
       MAX_SCALE,
-      Math.max(MIN_SCALE, Math.min((size.w - 80) / 9000, (size.h - 80) / 7000)),
+      Math.max(MIN_SCALE, Math.min((size.w - 80) / w, (size.h - 80) / h)),
     );
-    useBuildingStore.getState().setCamera({
+    const uc = (bounds.u0 + bounds.u1) / 2;
+    const vc = (bounds.vBottom + bounds.vTop) / 2;
+    state.setCamera({
       scale,
-      x: size.w / 2 - 4000 * scale,
-      y: size.h / 2 - 3000 * scale,
+      x: size.w / 2 - uc * scale,
+      y: size.h / 2 + vc * scale,
     });
-  }, [size]);
+  }, [size, view2d]);
 
   // Theo dõi phím Space để pan.
   useEffect(() => {
@@ -178,9 +250,28 @@ export default function View2D() {
     };
   }, []);
 
+  // Esc hủy lần kéo thả đang dở (không commit).
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || !dragRef.current) return;
+      dragRef.current = null;
+      setDragPreview(null);
+      setOpeningPreview(null);
+      stageRef.current?.container().style.removeProperty('cursor');
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
+
   const toWorld = (sx: number, sy: number): Point => ({
     x: Math.round((sx - camera.x) / camera.scale),
     y: Math.round((sy - camera.y) / camera.scale),
+  });
+
+  /** Mặt đứng: (u = vị trí dọc mặt đứng, z = cao độ); Konva y = −v. */
+  const toElevation = (sx: number, sy: number): { u: number; z: number } => ({
+    u: Math.round((sx - camera.x) / camera.scale),
+    z: Math.round(-(sy - camera.y) / camera.scale),
   });
 
   const handleWheel = (e: KonvaEventObject<WheelEvent>) => {
@@ -210,10 +301,85 @@ export default function View2D() {
 
     const state = useBuildingStore.getState();
 
-    // Kéo đầu mút / thân tường: cập nhật preview (chưa commit).
+    // Mặt đứng: kéo cửa (ngang đổi offset, dọc đổi sill) + pan + tọa độ (U/Z).
+    if (!isTop) {
+      const elevDrag = dragRef.current;
+      if (elevDrag && elevDrag.kind === 'opening-elev') {
+        const { u, z } = toElevation(pointer.x, pointer.y);
+        if (!elevDrag.active) {
+          if (
+            Math.hypot(pointer.x - elevDrag.startScreen.x, pointer.y - elevDrag.startScreen.y) <
+            DRAG_THRESHOLD_PX
+          ) {
+            return;
+          }
+          elevDrag.active = true;
+        }
+        const wall = walls.find((w) => w.id === elevDrag.wallId);
+        const opening = openings.find((o) => o.id === elevDrag.openingId);
+        if (!wall || !opening || !level) return;
+        const siblings = openings.filter((o) => o.wallId === wall.id);
+        const newOffset = elevDrag.canMoveU
+          ? clampOffset(
+              wall,
+              siblings,
+              opening.id,
+              elevDrag.origOffset +
+                (elevationUToOffset(wall, elevDrag.view, u) -
+                  elevationUToOffset(wall, elevDrag.view, elevDrag.grabU)),
+            )
+          : elevDrag.origOffset;
+        const newSill = clampSill(
+          wall.height ?? level.height,
+          opening,
+          elevDrag.origSill + (z - elevDrag.grabV),
+        );
+        setOpeningPreview({ openingId: opening.id, offset: newOffset, sillHeight: newSill });
+        state.setCursor({ x: u, y: z }, null);
+        return;
+      }
+      if (panRef.current) {
+        const { sx, sy, cx, cy } = panRef.current;
+        state.setCamera({
+          x: cx + (pointer.x - sx),
+          y: cy + (pointer.y - sy),
+        });
+        return;
+      }
+      const { u, z } = toElevation(pointer.x, pointer.y);
+      state.setCursor({ x: u, y: z }, null);
+      return;
+    }
+
+    // Kéo đầu mút / thân tường / cửa: cập nhật preview (chưa commit).
     const drag = dragRef.current;
     if (drag) {
       const raw = toWorld(pointer.x, pointer.y);
+      if (drag.kind === 'opening-top') {
+        if (!drag.active) {
+          if (
+            Math.hypot(pointer.x - drag.startScreen.x, pointer.y - drag.startScreen.y) <
+            DRAG_THRESHOLD_PX
+          ) {
+            return;
+          }
+          drag.active = true;
+        }
+        const wall = walls.find((w) => w.id === drag.wallId);
+        const opening = openings.find((o) => o.id === drag.openingId);
+        if (!wall || !opening) return;
+        const cursorOffset = projectPointOnWall(raw, wall).offset;
+        const siblings = openings.filter((o) => o.wallId === wall.id);
+        const newOffset = clampOffset(
+          wall,
+          siblings,
+          opening.id,
+          drag.origOffset + (cursorOffset - drag.grabOffset),
+        );
+        setOpeningPreview({ openingId: opening.id, offset: newOffset, sillHeight: drag.origSill });
+        state.setCursor(raw, null);
+        return;
+      }
       const others = walls.filter((w) => w.id !== drag.wallId);
       if (drag.kind === 'endpoint') {
         const snap = computeSnap(raw, others, camera.scale, drag.fixed);
@@ -227,7 +393,7 @@ export default function View2D() {
           return next;
         });
         state.setCursor(snap.point, snap.kind);
-      } else {
+      } else if (drag.kind === 'move') {
         const snap = computeSnap(raw, others, camera.scale, null);
         const dx = snap.point.x - drag.grab.x;
         const dy = snap.point.y - drag.grab.y;
@@ -271,6 +437,8 @@ export default function View2D() {
       return;
     }
     if (e.evt.button !== 0) return;
+    // Mặt đứng: không đặt tường/cửa (tool vẽ chỉ chạy ở Top).
+    if (!isTop) return;
     const state = useBuildingStore.getState();
     const raw = toWorld(pointer.x, pointer.y);
 
@@ -316,7 +484,27 @@ export default function View2D() {
           .updateWall(drag.wallId, { start: dragPreview.start, end: dragPreview.end });
       }
     }
+    if (
+      drag &&
+      (drag.kind === 'opening-top' || drag.kind === 'opening-elev') &&
+      drag.active &&
+      openingPreview
+    ) {
+      const original = openings.find((o) => o.id === drag.openingId);
+      if (
+        original &&
+        (original.offset !== openingPreview.offset ||
+          original.sillHeight !== openingPreview.sillHeight)
+      ) {
+        useBuildingStore.getState().updateOpening(drag.openingId, {
+          offset: openingPreview.offset,
+          sillHeight: openingPreview.sillHeight,
+        });
+      }
+    }
     setDragPreview(null);
+    setOpeningPreview(null);
+    stageRef.current?.container().style.removeProperty('cursor');
   };
 
   const handleWallClick = (wall: Wall) => (e: KonvaEventObject<MouseEvent>) => {
@@ -359,34 +547,114 @@ export default function View2D() {
     if (tool === 'select') useBuildingStore.getState().setOpeningSelection(opening.id);
   };
 
+  const setStageCursor = (cursor: string | null) => {
+    const container = stageRef.current?.container();
+    if (!container) return;
+    if (cursor) container.style.setProperty('cursor', cursor);
+    else container.style.removeProperty('cursor');
+  };
+
+  /** Bắt đầu kéo cửa ở mặt bằng: kéo dọc tường đổi offset (không sang tường khác). */
+  const handleOpeningMouseDownTop =
+    (opening: Opening, wall: Wall) => (e: KonvaEventObject<MouseEvent>) => {
+      if (tool !== 'select' || e.evt.button !== 0 || spaceRef.current) return;
+      e.cancelBubble = true;
+      const stage = stageRef.current;
+      const pointer = stage?.getPointerPosition();
+      if (!pointer) return;
+      useBuildingStore.getState().setOpeningSelection(opening.id);
+      const grabOffset = projectPointOnWall(toWorld(pointer.x, pointer.y), wall).offset;
+      dragRef.current = {
+        kind: 'opening-top',
+        openingId: opening.id,
+        wallId: wall.id,
+        grabOffset,
+        origOffset: opening.offset,
+        origSill: opening.sillHeight,
+        startScreen: { x: pointer.x, y: pointer.y },
+        active: false,
+      };
+      setStageCursor('grabbing');
+    };
+
+  /** Bắt đầu kéo cửa ở mặt đứng: ngang đổi offset (nếu tường chiếu rộng), dọc đổi sill. */
+  const handleOpeningMouseDownElev =
+    (opening: Opening, wall: Wall) => (e: KonvaEventObject<MouseEvent>) => {
+      if (tool !== 'select' || e.evt.button !== 0 || spaceRef.current || !elevView || !level) return;
+      e.cancelBubble = true;
+      const stage = stageRef.current;
+      const pointer = stage?.getPointerPosition();
+      if (!pointer) return;
+      useBuildingStore.getState().setOpeningSelection(opening.id);
+      const { u, z } = toElevation(pointer.x, pointer.y);
+      const rect = projectWallToElevation(wall, level, elevView);
+      dragRef.current = {
+        kind: 'opening-elev',
+        openingId: opening.id,
+        wallId: wall.id,
+        view: elevView,
+        grabU: u,
+        grabV: z,
+        origOffset: opening.offset,
+        origSill: opening.sillHeight,
+        canMoveU: rect.u1 - rect.u0 > wall.thickness,
+        startScreen: { x: pointer.x, y: pointer.y },
+        active: false,
+      };
+      setStageCursor('grabbing');
+    };
+
   const handleStageClick = (e: KonvaEventObject<MouseEvent>) => {
     if (e.target === e.currentTarget && tool === 'select') {
       useBuildingStore.getState().setSelection(null);
     }
   };
 
-  // Lưới thích ứng theo zoom.
+  // Lưới thích ứng theo zoom. Mặt đứng: trục ngang u, trục đứng v (Konva y = −v).
   const step = gridStepFor(camera.scale);
   const left = -camera.x / camera.scale;
   const top = -camera.y / camera.scale;
   const right = (size.w - camera.x) / camera.scale;
   const bottom = (size.h - camera.y) / camera.scale;
   const gridLines: number[] = [];
-  for (let x = Math.floor(left / step) * step; x <= right; x += step) {
-    gridLines.push(x, top, x, bottom);
+  if (isTop) {
+    for (let x = Math.floor(left / step) * step; x <= right; x += step) {
+      gridLines.push(x, top, x, bottom);
+    }
+    for (let y = Math.floor(top / step) * step; y <= bottom; y += step) {
+      gridLines.push(left, y, right, y);
+    }
+  } else {
+    const vMin = -bottom;
+    const vMax = -top;
+    for (let u = Math.floor(left / step) * step; u <= right; u += step) {
+      gridLines.push(u, -vMax, u, -vMin);
+    }
+    for (let v = Math.floor(vMin / step) * step; v <= vMax; v += step) {
+      gridLines.push(left, -v, right, -v);
+    }
   }
-  for (let y = Math.floor(top / step) * step; y <= bottom; y += step) {
-    gridLines.push(left, y, right, y);
-  }
+
+  // Dữ liệu mặt đứng: tường sắp xa → gần, mỗi tường kèm các lỗ cửa của nó.
+  const elevData = useMemo(() => {
+    if (elevView === null || !level) return null;
+    return sortWallsByDepth(effectiveWalls, level, elevView).map((w) => ({
+      wall: w,
+      rect: projectWallToElevation(w, level, elevView),
+      openings: effectiveOpenings
+        .filter((o) => o.wallId === w.id)
+        .map((o) => ({ opening: o, rect: projectOpeningToElevation(w, o, level, elevView) })),
+    }));
+  }, [elevView, level, effectiveWalls, effectiveOpenings]);
 
   const draftLen = draft ? Math.round(distance(draft.start, draft.current)) : 0;
   const draftMid = draft ? midpoint(draft.start, draft.current) : null;
   const selected = effectiveWalls.find((w) => w.id === selectedWallId) ?? null;
 
-  // Dimension cho tường đang chọn: đường song song, offset 600mm về phía
-  // xa tâm building (phía trống), kèm tick 2 đầu + nhãn độ dài.
+  // Dimension cho tường đang chọn (chỉ mặt bằng Top): đường song song,
+  // offset 600mm về phía xa tâm building (phía trống), tick 2 đầu + nhãn.
   let dim: { line: number[]; ext: number[]; ticks: number[]; label: string; lx: number; ly: number; rot: number } | null = null;
-  if (selected) {
+  if (isTop && selected) {
     const len = wallLength(selected);
     if (len > 0) {
       const ux = (selected.end.x - selected.start.x) / len;
@@ -439,6 +707,30 @@ export default function View2D() {
     }
   }
 
+  // Nhãn trực tiếp khi kéo cửa: offset (mặt bằng) / offset + sill (mặt đứng).
+  let dragLabel: { x: number; y: number; text: string } | null = null;
+  if (openingPreview) {
+    const o = effectiveOpenings.find((x) => x.id === openingPreview.openingId);
+    const w = o && effectiveWalls.find((x) => x.id === o.wallId);
+    if (o && w) {
+      if (isTop) {
+        const { a, b } = openingFrame(o, w);
+        dragLabel = {
+          x: (a.x + b.x) / 2,
+          y: (a.y + b.y) / 2 - 24 / camera.scale,
+          text: `offset ${fmt(o.offset, unit)}`,
+        };
+      } else if (elevView && level) {
+        const r = projectOpeningToElevation(w, o, level, elevView);
+        dragLabel = {
+          x: (r.u0 + r.u1) / 2,
+          y: -r.vTop - 24 / camera.scale,
+          text: `offset ${fmt(o.offset, unit)} · sill ${fmt(o.sillHeight, unit)}`,
+        };
+      }
+    }
+  }
+
   return (
     <div ref={containerRef} className="h-full w-full overflow-hidden" style={{ background: c.bg }}>
       <Stage
@@ -453,20 +745,48 @@ export default function View2D() {
         onClick={handleStageClick}
         style={{
           cursor:
-            spaceRef.current ? 'grab' : tool === 'wall' || tool === 'door' || tool === 'window'
-              ? 'crosshair'
-              : 'default',
+            spaceRef.current
+              ? 'grab'
+              : isTop && (tool === 'wall' || tool === 'door' || tool === 'window')
+                ? 'crosshair'
+                : 'default',
         }}
       >
         <Layer x={camera.x} y={camera.y} scaleX={camera.scale} scaleY={camera.scale}>
           <Line points={gridLines} stroke={c.grid} strokeWidth={1 / camera.scale} listening={false} />
-          <Line
-            points={[0, top, 0, bottom, left, 0, right, 0]}
-            stroke={c.axis}
-            strokeWidth={1 / camera.scale}
-            listening={false}
-          />
+          {isTop ? (
+            <Line
+              points={[0, top, 0, bottom, left, 0, right, 0]}
+              stroke={c.axis}
+              strokeWidth={1 / camera.scale}
+              listening={false}
+            />
+          ) : (
+            <>
+              {/* Mặt đất z=0 (đậm) + cao độ đỉnh tầng (nét đứt). */}
+              <Line
+                points={[left, 0, right, 0]}
+                stroke={c.axis}
+                strokeWidth={2 / camera.scale}
+                listening={false}
+              />
+              {level && (
+                <Line
+                  points={[
+                    left, -(level.elevation + level.height),
+                    right, -(level.elevation + level.height),
+                  ]}
+                  stroke={c.axis}
+                  strokeWidth={1 / camera.scale}
+                  dash={[8 / camera.scale, 6 / camera.scale]}
+                  listening={false}
+                />
+              )}
+            </>
+          )}
 
+          {isTop ? (
+            <>
           {/* Thân tường: tô từ union (nối góc sạch), không nhận click. */}
           {mergedPolygons.map((poly, i) => (
             <Line
@@ -509,7 +829,7 @@ export default function View2D() {
           )}
 
           {/* Openings: cửa đi (khoảng trống + cánh + cung mở), cửa sổ (2 đường song song). */}
-          {openings.map((o) => {
+          {effectiveOpenings.map((o) => {
             const wall = effectiveWalls.find((w) => w.id === o.wallId);
             if (!wall) return null;
             const isSel = o.id === selectedOpeningId;
@@ -546,7 +866,7 @@ export default function View2D() {
                     strokeWidth={1.5 / camera.scale}
                     listening={false}
                   />
-                  {/* Vùng click chọn opening. */}
+                  {/* Vùng click chọn + kéo thả opening (phủ đúng lỗ cửa). */}
                   <Line
                     points={openingPolygon(o, wall, half)}
                     closed
@@ -554,6 +874,11 @@ export default function View2D() {
                     stroke={isSel ? c.selected : 'rgba(0,0,0,0)'}
                     strokeWidth={2 / camera.scale}
                     onClick={handleOpeningClick(o)}
+                    onMouseDown={handleOpeningMouseDownTop(o, wall)}
+                    onMouseEnter={() => {
+                      if (tool === 'select') setStageCursor('grab');
+                    }}
+                    onMouseLeave={() => setStageCursor(null)}
                   />
                 </Fragment>
               );
@@ -581,6 +906,11 @@ export default function View2D() {
                   stroke={isSel ? c.selected : 'rgba(0,0,0,0)'}
                   strokeWidth={2 / camera.scale}
                   onClick={handleOpeningClick(o)}
+                  onMouseDown={handleOpeningMouseDownTop(o, wall)}
+                  onMouseEnter={() => {
+                    if (tool === 'select') setStageCursor('grab');
+                  }}
+                  onMouseLeave={() => setStageCursor(null)}
                 />
               </Fragment>
             );
@@ -681,6 +1011,84 @@ export default function View2D() {
               radius={5 / camera.scale}
               stroke={c.snap}
               strokeWidth={1.5 / camera.scale}
+              listening={false}
+            />
+          )}
+            </>
+          ) : (
+            <>
+              {/* Mặt đứng: tường vẽ xa → gần (tường gần đè lên), mỗi tường
+                  kèm lỗ cửa của nó để tường gần che đúng lỗ của tường xa. */}
+              {elevData?.map(({ wall, rect, openings: ops }) => {
+                const isSel = wall.id === selectedWallId;
+                return (
+                  <Fragment key={wall.id}>
+                    <Rect
+                      x={rect.u0}
+                      y={-rect.vTop}
+                      width={Math.max(rect.u1 - rect.u0, 1)}
+                      height={Math.max(rect.vTop - rect.vBottom, 1)}
+                      fill={isSel ? c.selected : c.wallFill}
+                      stroke={isSel ? c.selected : c.wallStroke}
+                      strokeWidth={1 / camera.scale}
+                      opacity={isSel ? 0.85 : 1}
+                      onClick={handleWallClick(wall)}
+                    />
+                    {ops.map(({ opening, rect: o }) => {
+                      const oSel = opening.id === selectedOpeningId;
+                      const stroke = oSel ? c.selected : c.wallStroke;
+                      // Tường chiếu rộng: kéo 2 chiều (grab); mép mỏng: chỉ kéo dọc đổi sill (ns-resize).
+                      const canMoveU = rect.u1 - rect.u0 > wall.thickness;
+                      return (
+                        <Fragment key={opening.id}>
+                          <Rect
+                            x={o.u0}
+                            y={-o.vTop}
+                            width={Math.max(o.u1 - o.u0, 1)}
+                            height={Math.max(o.vTop - o.vBottom, 1)}
+                            fill={c.bg}
+                            stroke={stroke}
+                            strokeWidth={1.5 / camera.scale}
+                            onClick={handleOpeningClick(opening)}
+                            onMouseDown={handleOpeningMouseDownElev(opening, wall)}
+                            onMouseEnter={() => {
+                              if (tool === 'select') setStageCursor(canMoveU ? 'grab' : 'ns-resize');
+                            }}
+                            onMouseLeave={() => setStageCursor(null)}
+                          />
+                          {opening.type === 'door' ? (
+                            <Line
+                              points={[o.u0, -o.vBottom, o.u0, -o.vTop]}
+                              stroke={stroke}
+                              strokeWidth={1.5 / camera.scale}
+                              listening={false}
+                            />
+                          ) : (
+                            <Line
+                              points={[o.u0, -(o.vBottom + o.vTop) / 2, o.u1, -(o.vBottom + o.vTop) / 2]}
+                              stroke={stroke}
+                              strokeWidth={1.5 / camera.scale}
+                              listening={false}
+                            />
+                          )}
+                        </Fragment>
+                      );
+                    })}
+                  </Fragment>
+                );
+              })}
+            </>
+          )}
+
+          {/* Nhãn offset/sill khi đang kéo cửa. */}
+          {dragLabel && (
+            <Text
+              x={dragLabel.x}
+              y={dragLabel.y}
+              text={dragLabel.text}
+              fontSize={13 / camera.scale}
+              fill={c.selected}
+              offsetX={(dragLabel.text.length * 8) / camera.scale / 2}
               listening={false}
             />
           )}

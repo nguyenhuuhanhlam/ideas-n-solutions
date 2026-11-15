@@ -1,6 +1,7 @@
 import { applyPatches, enablePatches, produceWithPatches, type Patch } from 'immer';
 import { create } from 'zustand';
 import { initialBuilding } from '../export/jsonFile';
+import type { View2d } from '../model/elevation';
 import type { SnapKind } from '../model/geometry';
 import type { Building, Level, Opening, Point, Wall } from '../model/schema';
 
@@ -37,11 +38,14 @@ interface BuildingState {
   selectedWallId: string | null;
   /** Chọn tường và opening là loại trừ nhau: chỉ một trong hai khác null. */
   selectedOpeningId: string | null;
-  camera: Camera;
+  /** Camera riêng cho từng view 2D (mặt bằng dùng key 'top'). */
+  cameras: Record<View2d, Camera>;
   unit: Unit;
   theme: Theme;
   /** Chế độ xem 2D/3D/split — trạng thái UI, không vào history undo. */
   viewMode: ViewMode;
+  /** View 2D đang xem: mặt bằng (top) hay mặt đứng (left/right). UI, không undo. */
+  view2d: View2d;
   draft: Draft | null;
   past: HistoryEntry[];
   future: HistoryEntry[];
@@ -63,10 +67,12 @@ interface BuildingState {
   setTool: (tool: Tool) => void;
   setSelection: (id: string | null) => void;
   setOpeningSelection: (id: string | null) => void;
+  /** Cập nhật camera của view 2D đang xem. */
   setCamera: (camera: Partial<Camera>) => void;
   setUnit: (unit: Unit) => void;
   setTheme: (theme: Theme) => void;
   setViewMode: (mode: ViewMode) => void;
+  setView2d: (view: View2d) => void;
   setDraft: (draft: Draft | null) => void;
   setCursor: (p: Point | null, snap: SnapKind) => void;
   setLengthInput: (s: string) => void;
@@ -94,10 +100,15 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
   tool: 'select',
   selectedWallId: null,
   selectedOpeningId: null,
-  camera: { x: 0, y: 0, scale: 0.1 },
+  cameras: {
+    top: { x: 0, y: 0, scale: 0.1 },
+    left: { x: 0, y: 0, scale: 0.1 },
+    right: { x: 0, y: 0, scale: 0.1 },
+  },
   unit: 'mm',
   theme: 'light',
   viewMode: '2d',
+  view2d: 'top',
   draft: null,
   past: [],
   future: [],
@@ -159,10 +170,24 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
   setTool: (tool) => set({ tool, draft: null, lengthInput: '' }),
   setSelection: (id) => set({ selectedWallId: id, selectedOpeningId: null }),
   setOpeningSelection: (id) => set({ selectedOpeningId: id, selectedWallId: null }),
-  setCamera: (camera) => set((s) => ({ camera: { ...s.camera, ...camera } })),
+  setCamera: (camera) =>
+    set((s) => ({
+      cameras: {
+        ...s.cameras,
+        [s.view2d]: { ...s.cameras[s.view2d], ...camera },
+      },
+    })),
   setUnit: (unit) => set({ unit }),
   setTheme: (theme) => set({ theme }),
   setViewMode: (viewMode) => set({ viewMode }),
+  setView2d: (view2d) =>
+    set({
+      view2d,
+      // Chỉ vẽ ở mặt bằng Top: rời Top thì về tool select, hủy draft dở dang.
+      ...(view2d === 'top'
+        ? {}
+        : { tool: 'select' as const, draft: null, lengthInput: '', cursorWorld: null }),
+    }),
   setDraft: (draft) => set({ draft }),
   setCursor: (cursorWorld, snapKind) => set({ cursorWorld, snapKind }),
   setLengthInput: (lengthInput) => set({ lengthInput }),
