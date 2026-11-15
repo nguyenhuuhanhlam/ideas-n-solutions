@@ -756,6 +756,16 @@ pub fn format_human(summary: &Summary, identity: &Identity) -> String {
 /// chỉ có khi stat được; `"delta"` là chênh lệch byte (có dấu),
 /// chỉ có khi cả size cũ và mới đều biết.
 pub fn format_json(summary: &Summary, identity: &Identity) -> String {
+    format_json_inner(summary, identity, None)
+}
+
+/// JSON gửi tới webhook n8n: đúng JSON event hiện tại + thêm
+/// `"action"` (ngay sau khối rename, trước user/pc).
+pub fn format_webhook_json(summary: &Summary, identity: &Identity, action: &str) -> String {
+    format_json_inner(summary, identity, Some(action))
+}
+
+fn format_json_inner(summary: &Summary, identity: &Identity, action: Option<&str>) -> String {
     let mut out = format!(
         "{{\"time\":\"{}\",\"event\":\"{}\",\"path\":\"{}\"",
         json_escape(&summary.time),
@@ -776,6 +786,9 @@ pub fn format_json(summary: &Summary, identity: &Identity) -> String {
             }
         }
     }
+    if let Some(a) = action {
+        out.push_str(&format!(",\"action\":\"{}\"", json_escape(a)));
+    }
     out.push_str(&format!(
         ",\"user\":\"{}\",\"pc\":\"{}\"",
         json_escape(&identity.user),
@@ -789,6 +802,59 @@ pub fn format_json(summary: &Summary, identity: &Identity) -> String {
     }
     out.push('}');
     out
+}
+
+/// Tách ACTION khỏi tên file dạng `tên--ACTION.ext`: ACTION nằm
+/// trước đuôi mở rộng (file không đuôi thì xét cả tên). Lấy phần
+/// sau `--` cuối cùng trong stem, cắt ở dấu `.` đầu tiên sau đó
+/// (để `a--SEND.tar.gz` vẫn ra `SEND`, không phải `SEND.tar`).
+/// Tập ACTION mở: bất cứ chuỗi không rỗng nào (sau khi trim) cũng
+/// nhận; không có `--` hoặc phần sau rỗng thì None.
+pub fn extract_action(file_name: &str) -> Option<String> {
+    let stem = std::path::Path::new(file_name)
+        .file_stem()?
+        .to_string_lossy();
+    let (base, after) = stem.rsplit_once("--")?;
+    // Mẫu là `tên--ACTION`: phần tên trước -- phải có thật
+    // (file chỉ là `--SEND` thì không khớp).
+    if base.trim().is_empty() {
+        return None;
+    }
+    let action = after.split('.').next().unwrap_or("").trim();
+    if action.is_empty() {
+        None
+    } else {
+        Some(action.to_string())
+    }
+}
+
+/// ACTION của 1 event rename, để quyết định có gửi webhook không:
+/// chỉ khi kind là Renamed và biết tên mới (không phải rename-out
+/// — lúc đó tên mới ở ngoài vùng theo dõi, không khớp được mẫu).
+/// Tên mới lấy từ `summary.path` (Both/To/Any đều để tên mới ở đó).
+pub fn webhook_action(summary: &Summary) -> Option<String> {
+    if summary.kind != Kind::Renamed {
+        return None;
+    }
+    if summary.side == Some(RenameSide::From) {
+        return None;
+    }
+    let name = summary.path.file_name()?.to_string_lossy();
+    extract_action(&name)
+}
+
+/// Kiểm tra URL webhook n8n: rỗng = tắt tính năng (hợp lệ); không
+/// rỗng thì phải bắt đầu bằng http:// hoặc https://.
+pub fn validate_webhook_url(url: &str) -> Result<(), String> {
+    let url = url.trim();
+    if url.is_empty() {
+        return Ok(());
+    }
+    if url.starts_with("http://") || url.starts_with("https://") {
+        Ok(())
+    } else {
+        Err("webhook URL must start with http:// or https://".to_string())
+    }
 }
 
 /// Tùy chọn dòng lệnh đã parse xong.
@@ -821,6 +887,8 @@ pub struct Args {
     pub no_serve: bool,
     /// Cổng của giao diện web (mặc định 8787).
     pub port: u16,
+    /// URL webhook n8n (ghi đè URL trong file cấu hình).
+    pub webhook: Option<String>,
     pub help: bool,
     pub version: bool,
     /// Các flag dưới đây ghi lại "user có gõ rõ flag này không", để
@@ -831,6 +899,7 @@ pub struct Args {
     pub debounce_set: bool,
     pub recursive_set: bool,
     pub port_set: bool,
+    pub webhook_set: bool,
 }
 
 impl Args {
@@ -868,6 +937,7 @@ pub fn usage() -> String {
         \x20 --exec \"<command>\"    run a command on every event ({{path}} {{event}} {{time}} {{from}} {{user}} {{pc}} {{size}} {{delta}})\n\
         \x20 --pc-id <id>          override the PC ID in the log (default: machine hostname)\n\
         \x20 --port <n>            web UI port (default 8787; overrides the port in the config file)\n\
+        \x20 --webhook <url>        n8n webhook URL for rename events (overrides the URL in the config file)\n\
         \x20 --no-serve            run without the web UI (CLI only)\n\
         \x20 -h, --help            show this help\n\
         \x20 -V, --version         show the version\n\
@@ -884,7 +954,13 @@ pub fn usage() -> String {
         (or the chosen port). The port can be changed in the UI (Settings)\n\
         and is saved to the config file. With no --config, the app uses\n\
         watch.json in the current folder (if any) and saves UI changes\n\
-        to it.\n"
+        to it.\n\
+        \n\
+        Rename webhook: when a file is renamed to name--ACTION.ext, the\n\
+        event is POSTed as JSON to the n8n webhook URL (set it in the UI\n\
+        under Settings, or with --webhook). The JSON is the usual event\n\
+        JSON plus \"action\". Sending uses the curl binary on this machine\n\
+        (10s timeout); failures are only reported to stderr.\n"
     )
 }
 
@@ -967,6 +1043,12 @@ where
             "--log" => args.log = Some(take_value(&mut iter)?),
             "--exec" => args.exec = Some(take_value(&mut iter)?),
             "--pc-id" => args.pc_id = Some(take_value(&mut iter)?),
+            "--webhook" => {
+                let v = take_value(&mut iter)?;
+                validate_webhook_url(&v)?;
+                args.webhook = Some(v);
+                args.webhook_set = true;
+            }
             "--port" => {
                 let v = take_value(&mut iter)?;
                 let port = v
@@ -1037,6 +1119,10 @@ pub struct Settings {
     /// Cổng giao diện web (lưu trong file cấu hình, chỉnh được từ
     /// giao diện; `--port` gõ rõ lúc khởi động thắng giá trị này).
     pub port: u16,
+    /// URL webhook n8n (lưu trong file cấu hình, chỉnh được từ
+    /// giao diện; `--webhook` gõ rõ lúc khởi động thắng giá trị
+    /// này). Rỗng = tắt tính năng webhook.
+    pub webhook_url: String,
 }
 
 impl Default for Settings {
@@ -1048,6 +1134,7 @@ impl Default for Settings {
             recursive: true,
             pins: Vec::new(),
             port: DEFAULT_PORT,
+            webhook_url: String::new(),
         }
     }
 }
@@ -1437,6 +1524,12 @@ fn parse_config_legacy(
                     }
                     settings.port = p as u16;
                 }
+                "webhook" => {
+                    validate_webhook_url(value).map_err(|e| {
+                        format!("{config_path} line {}: @webhook: {e}", lineno + 1)
+                    })?;
+                    settings.webhook_url = value.trim().to_string();
+                }
                 "pin" => {
                     // value là toàn bộ phần còn lại của dòng (đường
                     // dẫn có thể chứa khoảng trắng). Trùng nhau thì
@@ -1460,7 +1553,7 @@ fn parse_config_legacy(
                 }
                 _ => {
                     return Err(format!(
-                        "{config_path} line {}: unknown setting: @{key} (only @exts, @ignore, @debounce, @recursive, @pin, @port)",
+                        "{config_path} line {}: unknown setting: @{key} (only @exts, @ignore, @debounce, @recursive, @pin, @port, @webhook)",
                         lineno + 1
                     ));
                 }
@@ -1536,6 +1629,15 @@ fn config_from_json(
                 }
                 settings.port = p as u16;
             }
+            "webhook_url" => {
+                let JsonValue::Str(s) = v else {
+                    return Err(format!(
+                        "{config_path}: \"webhook_url\" must be a string"
+                    ));
+                };
+                validate_webhook_url(s).map_err(|e| format!("{config_path}: \"webhook_url\": {e}"))?;
+                settings.webhook_url = s.trim().to_string();
+            }
             "exts" => {
                 // Chuẩn hóa giống dạng cũ: trim, bỏ dấu chấm đầu, viết thường.
                 settings.exts = json_string_list(v, config_path, "exts")?
@@ -1601,7 +1703,7 @@ fn config_from_json(
             }
             _ => {
                 return Err(format!(
-                    "{config_path}: unknown key: \"{key}\" (only \"dirs\", \"recursive\", \"debounce_ms\", \"exts\", \"ignores\", \"pins\", \"port\")"
+                    "{config_path}: unknown key: \"{key}\" (only \"dirs\", \"recursive\", \"debounce_ms\", \"exts\", \"ignores\", \"pins\", \"port\", \"webhook_url\")"
                 ));
             }
         }
@@ -1658,6 +1760,10 @@ fn config_to_json(dirs: &[PathBuf], settings: &Settings) -> String {
     out.push_str(&format!("  \"recursive\": {},\n", settings.recursive));
     out.push_str(&format!("  \"debounce_ms\": {},\n", settings.debounce_ms));
     out.push_str(&format!("  \"port\": {},\n", settings.port));
+    out.push_str(&format!(
+        "  \"webhook_url\": \"{}\",\n",
+        json_escape(&settings.webhook_url)
+    ));
     let short_list = |items: &[String]| -> String {
         items
             .iter()
@@ -1825,6 +1931,97 @@ mod tests {
         assert!(summarize(&ev(Other, &["/a/f.txt"]), "t".into()).is_none());
         // Không có đường dẫn -> bỏ qua.
         assert!(summarize(&ev(Create(CreateKind::File), &[]), "t".into()).is_none());
+    }
+
+    #[test]
+    fn extract_action_cases() {
+        assert_eq!(extract_action("baocao--SEND.pdf").as_deref(), Some("SEND"));
+        assert_eq!(extract_action("baocao--SEND").as_deref(), Some("SEND"));
+        assert_eq!(extract_action("my--file--PRINT.docx").as_deref(), Some("PRINT"));
+        // Đuôi kép: action vẫn là SEND, không phải SEND.tar.
+        assert_eq!(extract_action("a--SEND.tar.gz").as_deref(), Some("SEND"));
+        // File ẩn (không có đuôi): vẫn tách được.
+        assert_eq!(extract_action(".hidden--SEND").as_deref(), Some("SEND"));
+        // Tập mở: chữ thường, số, khoảng trắng trong action đều nhận.
+        assert_eq!(extract_action("a--send.pdf").as_deref(), Some("send"));
+        assert_eq!(extract_action("a--v2.pdf").as_deref(), Some("v2"));
+        // Không khớp: không có --, action rỗng, -- nằm sau đuôi.
+        assert_eq!(extract_action("baocao.pdf"), None);
+        assert_eq!(extract_action("a--.pdf"), None);
+        assert_eq!(extract_action("a--"), None);
+        assert_eq!(extract_action("a.pdf--SEND"), None);
+        assert_eq!(extract_action("--SEND"), None);
+    }
+
+    #[test]
+    fn webhook_action_only_for_renames_with_new_name() {
+        let id = Identity {
+            user: "u".to_string(),
+            pc: "p".to_string(),
+        };
+        // Rename đủ 2 đầu, tên mới khớp -> SEND.
+        let both = summarize(
+            &ev(
+                Modify(ModifyKind::Name(RenameMode::Both)),
+                &["/a/cu.pdf", "/a/cu--SEND.pdf"],
+            ),
+            "t".into(),
+        )
+        .unwrap();
+        assert_eq!(webhook_action(&both).as_deref(), Some("SEND"));
+        // Payload webhook = JSON event + "action".
+        let payload = format_webhook_json(&both, &id, "SEND");
+        assert!(payload.contains("\"event\":\"renamed\""));
+        assert!(payload.contains("\"action\":\"SEND\""));
+        assert!(payload.contains("\"direction\":\"both\""));
+        assert!(payload.contains("\"from\":\"/a/cu.pdf\""));
+        // JSON thường không có "action".
+        assert!(!format_json(&both, &id).contains("\"action\""));
+        // Rename-in (chỉ tên mới): khớp.
+        let to = summarize(
+            &ev(Modify(ModifyKind::Name(RenameMode::To)), &["/a/x--PRINT.pdf"]),
+            "t".into(),
+        )
+        .unwrap();
+        assert_eq!(webhook_action(&to).as_deref(), Some("PRINT"));
+        // Rename macOS (Any): khớp theo path duy nhất.
+        let any = summarize(
+            &ev(Modify(ModifyKind::Name(RenameMode::Any)), &["/a/x--SEND.pdf"]),
+            "t".into(),
+        )
+        .unwrap();
+        assert_eq!(webhook_action(&any).as_deref(), Some("SEND"));
+        // Rename-out (chỉ tên cũ): KHÔNG gửi dù tên cũ khớp mẫu.
+        let from = summarize(
+            &ev(Modify(ModifyKind::Name(RenameMode::From)), &["/a/x--SEND.pdf"]),
+            "t".into(),
+        )
+        .unwrap();
+        assert_eq!(webhook_action(&from), None);
+        // Rename nhưng tên mới không khớp mẫu: không gửi.
+        let plain = summarize(
+            &ev(
+                Modify(ModifyKind::Name(RenameMode::Both)),
+                &["/a/cu.pdf", "/a/moi.pdf"],
+            ),
+            "t".into(),
+        )
+        .unwrap();
+        assert_eq!(webhook_action(&plain), None);
+        // Không phải rename: không gửi dù tên khớp mẫu.
+        let created = summarize(&ev(Create(CreateKind::File), &["/a/x--SEND.pdf"]), "t".into())
+            .unwrap();
+        assert_eq!(webhook_action(&created), None);
+    }
+
+    #[test]
+    fn validate_webhook_url_cases() {
+        assert!(validate_webhook_url("").is_ok());
+        assert!(validate_webhook_url("   ").is_ok());
+        assert!(validate_webhook_url("https://n8n.local/webhook/fw").is_ok());
+        assert!(validate_webhook_url("http://127.0.0.1:5678/webhook-test/x").is_ok());
+        assert!(validate_webhook_url("ftp://x/y").is_err());
+        assert!(validate_webhook_url("n8n.local/webhook").is_err());
     }
 
     #[test]
@@ -2063,6 +2260,12 @@ mod tests {
         assert!(parse_args(["--port", "70000"]).is_err());
         let a = parse_args(["--no-serve"]).unwrap();
         assert!(a.no_serve);
+        // --webhook: ghi đè URL, phải là http(s).
+        let a = parse_args(["--webhook", "https://n8n.local/webhook/fw"]).unwrap();
+        assert!(a.webhook_set);
+        assert_eq!(a.webhook.as_deref(), Some("https://n8n.local/webhook/fw"));
+        assert!(parse_args(["--webhook", "ftp://x/y"]).is_err());
+        assert!(parse_args(["--webhook", "n8n.local/webhook"]).is_err());
         // Cờ *_set chỉ bật khi user gõ rõ.
         let a = parse_args(["--ext", "rs"]).unwrap();
         assert!(a.exts_set);
@@ -2105,7 +2308,7 @@ mod tests {
         // File có dòng @: parse đủ cài đặt + @pin, lỗi rõ khi sai.
         std::fs::write(
             &path,
-            "@exts rs,MD\n@ignore target, .tmp\n@debounce 50\n@recursive false\n@port 9002\n@pin /a/quan trong.txt\n@pin rel/file.txt\n@pin /a/quan trong.txt\n/a/x\n",
+            "@exts rs,MD\n@ignore target, .tmp\n@debounce 50\n@recursive false\n@port 9002\n@webhook https://n8n.local/webhook/fw\n@pin /a/quan trong.txt\n@pin rel/file.txt\n@pin /a/quan trong.txt\n/a/x\n",
         )
         .unwrap();
         let (dirs, settings) = load_config(path.to_str().unwrap()).unwrap();
@@ -2115,6 +2318,7 @@ mod tests {
         assert_eq!(settings.debounce_ms, 50);
         assert!(!settings.recursive);
         assert_eq!(settings.port, 9002);
+        assert_eq!(settings.webhook_url, "https://n8n.local/webhook/fw");
         // @pin: đường dẫn có khoảng trắng giữ nguyên, trùng nhau loại
         // bỏ, tương đối hiểu theo thư mục chứa file cấu hình.
         assert_eq!(settings.pins.len(), 2);
@@ -2131,6 +2335,8 @@ mod tests {
         assert!(load_config(path.to_str().unwrap()).is_err());
         std::fs::write(&path, "@port 70000\n").unwrap();
         assert!(load_config(path.to_str().unwrap()).is_err());
+        std::fs::write(&path, "@webhook ftp://x/y\n").unwrap();
+        assert!(load_config(path.to_str().unwrap()).is_err());
         std::fs::write(&path, "@la-mot-cai-gi-do 1\n").unwrap();
         assert!(load_config(path.to_str().unwrap()).is_err());
         // Ghi lại (dạng JSON từ 0.8.0) rồi đọc lại: khớp (kể cả pin).
@@ -2141,6 +2347,7 @@ mod tests {
             recursive: true,
             pins: vec![Pin::new(PathBuf::from("/a/ghim.txt"))],
             port: 9001,
+            webhook_url: "https://n8n.local/webhook/fw".to_string(),
         };
         save_config(
             &path,
@@ -2180,6 +2387,7 @@ mod tests {
   "recursive": false,
   "debounce_ms": 50,
   "port": 9000,
+  "webhook_url": "https://n8n.local/webhook/fw",
   "exts": ["RS", ".md"],
   "ignores": ["Target", " .tmp "],
   "pins": [
@@ -2196,6 +2404,7 @@ mod tests {
         assert!(!settings.recursive);
         assert_eq!(settings.debounce_ms, 50);
         assert_eq!(settings.port, 9000);
+        assert_eq!(settings.webhook_url, "https://n8n.local/webhook/fw");
         assert_eq!(settings.exts, vec!["rs", "md"]);
         assert_eq!(settings.ignores, vec!["target", "tmp"]);
         assert_eq!(settings.pins.len(), 2);
@@ -2213,6 +2422,7 @@ mod tests {
         let saved = std::fs::read_to_string(&path).unwrap();
         assert!(saved.starts_with("{\n  \"dirs\": [\n"));
         assert!(saved.contains("\"port\": 9000"));
+        assert!(saved.contains("\"webhook_url\": \"https://n8n.local/webhook/fw\""));
         assert!(saved.contains("\"command\": \"echo xong\""));
         assert!(saved.contains("\"command\": null"));
         let (dirs, back) = load_config(path.to_str().unwrap()).unwrap();
@@ -2236,6 +2446,9 @@ mod tests {
             r#"{"port": 70000}"#,
             r#"{"port": "9000"}"#,
             r#"{"port": 12.5}"#,
+            r#"{"webhook_url": 1}"#,
+            r#"{"webhook_url": "ftp://x/y"}"#,
+            r#"{"webhook_url": "n8n.local/webhook"}"#,
             r#"{"recursive": "true"}"#,
             r#"{"exts": ["rs", 1]}"#,
             // Khóa lạ.

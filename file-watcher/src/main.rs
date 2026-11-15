@@ -21,9 +21,9 @@ use std::sync::mpsc::{self, RecvTimeoutError};
 use std::time::Duration;
 
 use file_watcher::{
-    bind_first_free, detect_identity, format_human, format_json, load_config, now_string,
-    parse_args, strip_verbatim_prefix, summarize, usage, Coalescer, Filter, Identity, Kind,
-    RenameSide, Settings, SizeTracker, Summary, VERSION,
+    bind_first_free, detect_identity, format_human, format_json, format_webhook_json,
+    load_config, now_string, parse_args, strip_verbatim_prefix, summarize, usage, webhook_action,
+    Coalescer, Filter, Identity, Kind, RenameSide, Settings, SizeTracker, Summary, VERSION,
 };
 use file_watcher::web::{serve, Shared};
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
@@ -115,6 +115,9 @@ fn real_main() -> i32 {
     }
     if args.port_set {
         settings.port = args.port;
+    }
+    if args.webhook_set {
+        settings.webhook_url = args.webhook.clone().unwrap();
     }
 
     if raw_dirs.is_empty() && !web_enabled {
@@ -221,6 +224,7 @@ fn real_main() -> i32 {
         identity.clone(),
         settings.pins.clone(),
         web_port,
+        settings.webhook_url.clone(),
     );
 
     if let Some(listener) = web_listener {
@@ -256,6 +260,12 @@ fn real_main() -> i32 {
     }
     if args.exec.is_some() {
         eprintln!("  running a command on every event (--exec)");
+    }
+    if !settings.webhook_url.is_empty() {
+        eprintln!(
+            "  webhook on rename to name--ACTION.ext: {}",
+            settings.webhook_url
+        );
     }
     if web_enabled {
         eprintln!(
@@ -415,6 +425,75 @@ fn flush(
             run_hook(template, s, identity);
         }
     }
+    // Webhook n8n: chỉ gửi khi rename và tên mới khớp mẫu
+    // `tên--ACTION.ext`. URL đọc lại từ trạng thái dùng chung mỗi
+    // lần flush để đổi từ giao diện áp dụng ngay.
+    if summaries.iter().any(|s| s.kind == Kind::Renamed) {
+        let url = shared.webhook_url();
+        if !url.is_empty() {
+            for s in &summaries {
+                if let Some(action) = webhook_action(s) {
+                    send_webhook(&url, &format_webhook_json(s, identity, &action));
+                }
+            }
+        }
+    }
+}
+
+/// Gửi 1 event rename tới webhook n8n (POST JSON). Chạy ở thread
+/// nền, không chặn vòng lặp watcher. Dùng `curl` có sẵn trên máy
+/// (Windows/macOS/Linux đều có) để hỗ trợ cả http và https mà
+/// không cần thêm dependency/TLS vào binary. Timeout 10s; lỗi
+/// (không có curl, không nối được, HTTP không 2xx) chỉ ghi stderr.
+fn send_webhook(url: &str, payload: &str) {
+    let url = url.to_string();
+    let payload = payload.to_string();
+    std::thread::spawn(move || {
+        // /dev/null trên Unix, NUL trên Windows (bỏ body trả về,
+        // chỉ giữ mã HTTP qua -w).
+        let null = if cfg!(windows) { "NUL" } else { "/dev/null" };
+        let mut child = match std::process::Command::new("curl")
+            .args([
+                "-s", "-m", "10",
+                "-o", null,
+                "-w", "%{http_code}",
+                "-X", "POST",
+                "-H", "Content-Type: application/json",
+                "--data", "@-",
+                &url,
+            ])
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::null())
+            .spawn()
+        {
+            Ok(c) => c,
+            Err(e) => {
+                eprintln!("webhook failed: cannot run curl: {e}");
+                return;
+            }
+        };
+        if let Some(mut stdin) = child.stdin.take() {
+            use std::io::Write;
+            if stdin.write_all(payload.as_bytes()).is_err() {
+                eprintln!("webhook failed: cannot write request body to curl");
+                return;
+            }
+        }
+        match child.wait_with_output() {
+            Ok(out) => {
+                let code = String::from_utf8_lossy(&out.stdout).trim().to_string();
+                if !(out.status.success() && code.starts_with('2')) {
+                    eprintln!(
+                        "webhook failed: {url} (curl exit: {}, HTTP: {})",
+                        out.status,
+                        if code.is_empty() { "?" } else { &code }
+                    );
+                }
+            }
+            Err(e) => eprintln!("webhook failed: {url}: {e}"),
+        }
+    });
 }
 
 /// Kích thước file (byte) nếu đường dẫn là file thường còn tồn tại.

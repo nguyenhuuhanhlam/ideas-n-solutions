@@ -456,6 +456,11 @@
         <label for="ignores">Ignore paths containing</label>
         <input id="ignores" type="text" placeholder="target,node_modules,.tmp" autocomplete="off">
       </div>
+      <div class="field">
+        <label for="webhook">n8n webhook URL</label>
+        <input id="webhook" type="text" placeholder="https://.../webhook/..." autocomplete="off">
+      </div>
+      <p class="hint">Called on rename when the new file name matches name--ACTION.ext. Leave empty to disable.</p>
       <button id="applyBtn" class="btn-icon"><svg class="hl-icon"><use href="#hl-check"/></svg>Apply</button>
       <p id="cfgMsg" class="ok"></p>
     </div>
@@ -1371,6 +1376,7 @@
     document.getElementById("port").value = cfg.port || 8787;
     document.getElementById("exts").value = (cfg.exts || []).join(",");
     document.getElementById("ignores").value = (cfg.ignores || []).join(",");
+    document.getElementById("webhook").value = cfg.webhook_url || "";
     cfgFileEl.textContent = cfg.config_file || "not saved to a file (this session only)";
     render();
   }
@@ -1428,7 +1434,8 @@
       debounce_ms: document.getElementById("debounce").value,
       port: document.getElementById("port").value,
       exts: document.getElementById("exts").value,
-      ignores: document.getElementById("ignores").value
+      ignores: document.getElementById("ignores").value,
+      webhook_url: document.getElementById("webhook").value
     }).then(function (res) {
       if (res.ok) {
         // Đổi cổng: server đã bind lại, chuyển trình duyệt sang cổng

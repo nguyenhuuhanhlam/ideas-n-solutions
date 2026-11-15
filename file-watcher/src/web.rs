@@ -9,7 +9,8 @@
 //! - `GET /events?after=N` — SSE: stream event realtime (JSON 1 dòng,
 //!   cùng định dạng với `--json`), kèm heartbeat mỗi ~15 giây.
 //! - `GET /api/config` — cấu hình hiện tại (thư mục, đệ quy,
-//!   debounce, cổng, exts, ignores, file cấu hình, danh sách ghim).
+//!   debounce, cổng, URL webhook, exts, ignores, file cấu hình,
+//!   danh sách ghim).
 //! - `GET /api/log?after=N` — log gần đây (tối đa 1000 dòng, có số
 //!   thứ tự tăng dần để client nối tiếp qua SSE mà không sót/trùng).
 //! - `POST /api/dirs` — thêm/xóa thư mục theo dõi (áp dụng ngay,
@@ -32,7 +33,8 @@ use std::time::Duration;
 use notify::{RecursiveMode, Watcher};
 
 use crate::{
-    json_escape, save_config, split_list, strip_verbatim_prefix, Filter, Identity, Pin, Settings,
+    json_escape, save_config, split_list, strip_verbatim_prefix, validate_webhook_url, Filter,
+    Identity, Pin, Settings,
 };
 
 /// Trang giao diện duy nhất, nhúng vào binary lúc build.
@@ -57,6 +59,9 @@ pub struct SharedState {
     config_path: Option<PathBuf>,
     /// Cổng web UI hiện tại (đổi được từ giao diện, lưu vào file).
     port: u16,
+    /// URL webhook n8n (đổi được từ giao diện, lưu vào file).
+    /// Rỗng = tắt tính năng webhook.
+    webhook_url: String,
     /// Listener mới đã bind sẵn, chờ vòng lặp serve đổi sang (khi
     /// giao diện đổi port). Vòng lặp lấy ra rồi drop listener cũ.
     pending_listener: Option<(TcpListener, u16)>,
@@ -90,6 +95,7 @@ impl Shared {
         identity: Identity,
         pins: Vec<Pin>,
         port: u16,
+        webhook_url: String,
     ) -> Self {
         Shared(Arc::new(Mutex::new(SharedState {
             watcher,
@@ -101,6 +107,7 @@ impl Shared {
             identity,
             pins,
             port,
+            webhook_url,
             pending_listener: None,
             log: VecDeque::new(),
             seq: 0,
@@ -110,6 +117,12 @@ impl Shared {
     /// Cổng web UI hiện tại.
     pub fn port(&self) -> u16 {
         lock(&self.0).port
+    }
+
+    /// URL webhook n8n hiện tại (rỗng = tắt). Vòng lặp watcher đọc
+    /// lại mỗi lần flush để đổi từ giao diện áp dụng ngay.
+    pub fn webhook_url(&self) -> String {
+        lock(&self.0).webhook_url.clone()
     }
 
     /// Vòng lặp serve lấy listener đang chờ đổi cổng (nếu có).
@@ -178,11 +191,12 @@ impl Shared {
             })
             .collect();
         format!(
-            "{{\"dirs\":[{}],\"recursive\":{},\"debounce_ms\":{},\"port\":{},\"exts\":[{}],\"ignores\":[{}],\"config_file\":{},\"events\":{},\"user\":\"{}\",\"pc\":\"{}\",\"pins\":[{}]}}",
+            "{{\"dirs\":[{}],\"recursive\":{},\"debounce_ms\":{},\"port\":{},\"webhook_url\":\"{}\",\"exts\":[{}],\"ignores\":[{}],\"config_file\":{},\"events\":{},\"user\":\"{}\",\"pc\":\"{}\",\"pins\":[{}]}}",
             list(&dirs),
             st.recursive,
             st.debounce_ms,
             st.port,
+            json_escape(&st.webhook_url),
             list(&st.filter.exts),
             list(&st.filter.ignores),
             config_file,
@@ -205,6 +219,7 @@ impl Shared {
             recursive: st.recursive,
             pins: st.pins.clone(),
             port: st.port,
+            webhook_url: st.webhook_url.clone(),
         };
         save_config(path, &st.roots, &settings)
     }
@@ -313,6 +328,9 @@ impl Shared {
     /// mới đổi state + lưu file; lưu lỗi thì rollback toàn bộ và
     /// hủy listener mới. Thành công thì listener mới chờ vòng lặp
     /// serve đổi sang (trong ~50ms).
+    /// Đổi `webhook_url`: URL rỗng = tắt webhook; không rỗng thì
+    /// phải bắt đầu bằng http:// hoặc https:// (kiểm tra trước
+    /// khi đổi bất cứ gì).
     pub fn apply_settings(
         &self,
         recursive: Option<bool>,
@@ -320,12 +338,23 @@ impl Shared {
         exts: Option<Vec<String>>,
         ignores: Option<Vec<String>>,
         port: Option<u16>,
+        webhook_url: Option<String>,
     ) -> Result<u16, String> {
+        // Kiểm tra URL webhook trước khi động vào state.
+        let new_webhook_url = match webhook_url {
+            Some(u) => {
+                let u = u.trim().to_string();
+                validate_webhook_url(&u)?;
+                Some(u)
+            }
+            None => None,
+        };
         let mut st = lock(&self.0);
         let old_recursive = st.recursive;
         let old_debounce = st.debounce_ms;
         let old_filter = st.filter.clone();
         let old_port = st.port;
+        let old_webhook_url = st.webhook_url.clone();
         let new_recursive = recursive.unwrap_or(old_recursive);
         let new_port = port.unwrap_or(old_port);
 
@@ -376,6 +405,9 @@ impl Shared {
             st.filter.ignores = i;
         }
         st.port = new_port;
+        if let Some(u) = new_webhook_url {
+            st.webhook_url = u;
+        }
         if let Err(e) = Self::save_locked(&st) {
             // Rollback state + chế độ watch + cổng (listener mới
             // bị drop cùng new_listener, cổng mới được trả lại).
@@ -390,6 +422,7 @@ impl Shared {
             st.debounce_ms = old_debounce;
             st.filter = old_filter;
             st.port = old_port;
+            st.webhook_url = old_webhook_url;
             return Err(e);
         }
         if let Some(l) = new_listener {
@@ -679,7 +712,8 @@ fn handle_connection(mut stream: TcpStream, shared: &Shared) {
                 },
                 None => None,
             };
-            match shared.apply_settings(recursive, debounce_ms, exts, ignores, port) {
+            let webhook_url = form.get("webhook_url").cloned();
+            match shared.apply_settings(recursive, debounce_ms, exts, ignores, port, webhook_url) {
                 Ok(new_port) => json_ok_port(&mut stream, new_port),
                 Err(e) => json_err(&mut stream, &e),
             }
@@ -818,6 +852,7 @@ mod tests {
             },
             vec![],
             port,
+            String::new(),
         )
     }
 
@@ -862,7 +897,7 @@ mod tests {
         // Cùng cổng: Ok, không có listener chờ đổi.
         assert_eq!(
             shared
-                .apply_settings(None, None, None, None, Some(8787))
+                .apply_settings(None, None, None, None, Some(8787), None)
                 .unwrap(),
             8787
         );
@@ -871,7 +906,7 @@ mod tests {
         let free = free_port();
         assert_eq!(
             shared
-                .apply_settings(None, None, None, None, Some(free))
+                .apply_settings(None, None, None, None, Some(free), None)
                 .unwrap(),
             free
         );
@@ -882,10 +917,37 @@ mod tests {
         // Cổng bị chiếm: lỗi, cổng hiện tại giữ nguyên.
         let busy = TcpListener::bind(("127.0.0.1", 0)).unwrap();
         let busy_port = busy.local_addr().unwrap().port();
-        let res = shared.apply_settings(None, None, None, None, Some(busy_port));
+        let res = shared.apply_settings(None, None, None, None, Some(busy_port), None);
         assert!(res.is_err());
         assert_eq!(shared.port(), free);
         assert!(shared.take_pending_listener().is_none());
+    }
+
+    #[test]
+    fn apply_settings_webhook_url() {
+        let shared = test_shared(8787);
+        assert_eq!(shared.webhook_url(), "");
+        // URL hợp lệ: lưu vào state, GET /api/config thấy được.
+        let url = "https://n8n.local/webhook/fw";
+        shared
+            .apply_settings(None, None, None, None, None, Some(url.to_string()))
+            .unwrap();
+        assert_eq!(shared.webhook_url(), url);
+        assert!(shared.config_json().contains("\"webhook_url\":\"https://n8n.local/webhook/fw\""));
+        // URL sai scheme: lỗi, giữ nguyên URL cũ.
+        let res = shared.apply_settings(None, None, None, None, None, Some("ftp://x/y".to_string()));
+        assert!(res.is_err());
+        assert_eq!(shared.webhook_url(), url);
+        // Rỗng: tắt webhook.
+        shared
+            .apply_settings(None, None, None, None, None, Some("  ".to_string()))
+            .unwrap();
+        assert_eq!(shared.webhook_url(), "");
+        // Không truyền: giữ nguyên.
+        shared
+            .apply_settings(None, None, None, None, None, None)
+            .unwrap();
+        assert_eq!(shared.webhook_url(), "");
     }
 
     #[test]

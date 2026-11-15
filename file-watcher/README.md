@@ -92,6 +92,7 @@ luôn sạch — pipe sang file hay tool khác chỉ nhận event.
 | `--config <file>` | — | Đọc cấu hình từ file JSON (xem "File cấu hình"). Đường dẫn tương đối hiểu theo thư mục chứa file. Gộp chung với thư mục gõ trên CLI, trùng nhau tự loại. File text cũ (1 dòng = 1 thư mục, dòng `@...` là cài đặt) vẫn đọc bình thường. |
 | `--no-serve` | tắt | Không mở giao diện web (chạy thuần CLI). Mặc định giao diện web luôn bật trên http://127.0.0.1:8787 (xem "Giao diện web"). Khi không có `--config`, app dùng file `watch.json` ở thư mục hiện tại (nếu có) và lưu thay đổi vào đó. Cho phép khởi động với 0 thư mục rồi thêm sau trên giao diện. |
 | `--port <n>` | 8787 | Cổng giao diện web (1–65535; thắng cổng trong file cấu hình). Cổng bị chiếm lúc khởi động thì app tự lấy cổng trống tiếp theo và in rõ cổng thực tế trên banner. Đổi được từ giao diện (mục Settings) — đổi là áp dụng ngay, trình duyệt tự chuyển sang cổng mới. |
+| `--webhook <url>` | — | URL webhook n8n cho event đổi tên (thắng URL trong file cấu hình). Chưa có URL thì tính năng tắt. Xem "Webhook n8n khi đổi tên file". |
 | `--no-recursive` | đệ quy | Chỉ theo dõi tầng trên cùng của mỗi thư mục. |
 | `--debounce-ms <n>` | 200 | Gộp các event dồn dập trong n mili-giây thành 1 dòng (xem "Quy tắc gộp"). `0` = in ngay từng event, không gộp. |
 | `--ext <a,b,c>` | tất cả | Chỉ hiện file có đuôi này (không phân biệt hoa/thường, vd: `rs,md,txt`). |
@@ -123,11 +124,13 @@ không truy cập được từ máy khác trong mạng.
   tiền tố verbatim `\\?\` do hệ thống sinh ra được bỏ đi ngay khi
   nhận — kể cả đường dẫn trong file cấu hình cũ.
 - **Settings:** đệ quy (bật/tắt), debounce (ms), cổng giao diện web,
-  chỉ đuôi file, bỏ qua chuỗi — nút Apply lưu ngay vào file cấu
-  hình. Đổi đệ quy thì app watch lại toàn bộ thư mục với chế độ
-  mới; đổi bộ lọc áp dụng ngay cho event tiếp theo; đổi cổng thì
-  server bind lại ngay và trình duyệt tự chuyển sang cổng mới
-  (cổng bị chiếm thì báo lỗi, giữ nguyên cổng cũ).
+  chỉ đuôi file, bỏ qua chuỗi, URL webhook n8n — nút Apply lưu ngay
+  vào file cấu hình. Đổi đệ quy thì app watch lại toàn bộ thư mục
+  với chế độ mới; đổi bộ lọc áp dụng ngay cho event tiếp theo; đổi
+  cổng thì server bind lại ngay và trình duyệt tự chuyển sang cổng
+  mới (cổng bị chiếm thì báo lỗi, giữ nguyên cổng cũ); đổi URL
+  webhook thì event đổi tên tiếp theo gửi tới URL mới ngay (URL
+  sai định dạng thì báo lỗi, giữ nguyên URL cũ).
 - **Log realtime:** event mới hiện ngay qua SSE (Server-Sent Events),
   màu theo loại (tạo/sửa/xóa/đổi tên), có lọc theo loại + tìm theo
   tên file, tạm dừng, tự cuộn, xóa log hiển thị. Trang tải lần đầu
@@ -209,8 +212,50 @@ API dùng nội bộ (không cần nhớ để xài giao diện):
 | `GET /api/config` | Cấu hình hiện tại (JSON). |
 | `GET /api/log?after=N` | Log gần đây, các event có số thứ tự > N. |
 | `POST /api/dirs` | Thêm/xóa thư mục (`action=add\|remove&dir=...`). |
-| `POST /api/config` | Đổi cài đặt (`recursive` / `debounce_ms` / `port` / `exts` / `ignores`); trả về cổng hiện tại (`{"ok":true,"port":N}`). |
+| `POST /api/config` | Đổi cài đặt (`recursive` / `debounce_ms` / `port` / `exts` / `ignores` / `webhook_url`); trả về cổng hiện tại (`{"ok":true,"port":N}`). |
 | `POST /api/pins` | Ghim/bỏ ghim file (`action=add\|remove&path=...`). |
+
+## Webhook n8n khi đổi tên file
+
+Khi 1 file bị **đổi tên** thành dạng `tên--ACTION.ext` (vd:
+`baocao.pdf` → `baocao--SEND.pdf`), app gửi thông tin event đó
+tới webhook n8n bằng POST JSON. Bên n8n dựa vào `action` để
+route (SEND thì gửi đi, PRINT thì in...). App chỉ gửi thông tin
+sự kiện, không gửi nội dung file — n8n đọc file trực tiếp từ
+đường dẫn trong payload.
+
+Điều kiện kích hoạt, cả 3 phải đúng cùng lúc:
+
+1. Event là **rename** (tạo/sửa/xóa không tính — kể cả file được
+   tạo ra đã mang sẵn tên `--ACTION`).
+2. **Tên mới** khớp mẫu `tên--ACTION` (ACTION nằm trước đuôi mở
+   rộng; file không đuôi thì xét cả tên). Lấy phần sau `--` cuối
+   cùng trong stem, cắt ở dấu `.` đầu tiên sau đó — nên
+   `a--SEND.tar.gz` vẫn ra `SEND`. Tên phải có thật trước `--`
+   (file chỉ là `--SEND` thì không khớp). Tập ACTION mở: bất cứ
+   chuỗi không rỗng nào cũng gửi, n8n tự route.
+3. Đã cấu hình URL webhook (ô **n8n webhook URL** trong Settings,
+   hoặc flag `--webhook`; chưa có URL thì tính năng tắt).
+
+Payload là JSON event hiện tại + thêm `"action"`:
+
+```json
+{"time":"2026-11-14 23:30:00","event":"renamed","path":"D:\\in\\baocao--SEND.pdf","direction":"both","from":"D:\\in\\baocao.pdf","action":"SEND","user":"lam","pc":"nhhlx1carbon","size":12345}
+```
+
+- File bị đổi tên **ra khỏi** thư mục theo dõi thì app chỉ biết
+  tên cũ nên không gửi. File đổi tên **từ ngoài vào** thì gửi
+  bình thường (tên mới khớp mẫu). Trên macOS, rename chỉ có 1
+  path (FSEvents không phân biệt cũ/mới, thường là tên mới) nên
+  app khớp theo path đó.
+- Gửi bằng `curl` có sẵn trên máy (Windows/macOS/Linux đều có
+  sẵn), hỗ trợ cả `http://` và `https://`, timeout 10s, chạy ở
+  thread nền nên không chặn watcher. Gửi lỗi (không có curl,
+  không nối được, HTTP không 2xx) chỉ ghi ra stderr, không
+  retry, event vẫn vào log bình thường.
+- URL phải bắt đầu bằng `http://` hoặc `https://` (kiểm tra cả
+  ở CLI, file cấu hình và giao diện). Đổi URL từ giao diện áp
+  dụng ngay cho event tiếp theo; để trống là tắt webhook.
 
 ## File cấu hình
 
@@ -222,6 +267,7 @@ File cấu hình là JSON (xem `watch.example.json`):
   "recursive": true,
   "debounce_ms": 200,
   "port": 8787,
+  "webhook_url": "https://n8n.local/webhook/fw",
   "exts": ["rs", "md"],
   "ignores": ["target", "node_modules"],
   "pins": [{ "path": "D:\\code\\project\\quan-trong.txt", "command": null }]
@@ -229,21 +275,22 @@ File cấu hình là JSON (xem `watch.example.json`):
 ```
 
 - Mọi trường đều không bắt buộc (thiếu thì dùng mặc định: đệ quy
-  bật, debounce 200ms, cổng 8787, không lọc đuôi, không bỏ qua,
-  không ghim).
+  bật, debounce 200ms, cổng 8787, webhook tắt, không lọc đuôi,
+  không bỏ qua, không ghim).
 - `"pins"` ghim file để theo dõi riêng trong giao diện web (tab Đã
   ghim). `"command"` để dành cho lệnh xử lý riêng theo file (chưa
   dùng — luôn `null`). Ghim trùng nhau tự loại bỏ.
 - Khóa lạ, sai kiểu hoặc JSON sai cú pháp thì app báo lỗi rõ ràng
   và dừng, không chạy với cài đặt đoán mò.
 - File cũ dạng text (1 dòng = 1 thư mục, dòng `@exts`/`@ignore`/
-  `@debounce`/`@recursive`/`@pin`/`@port` là cài đặt) vẫn đọc bình
-  thường. Khi lưu từ giao diện web, file được ghi lại dạng JSON.
+  `@debounce`/`@recursive`/`@pin`/`@port`/`@webhook` là cài đặt)
+  vẫn đọc bình thường. Khi lưu từ giao diện web, file được ghi lại
+  dạng JSON.
 - Đường dẫn tương đối hiểu theo thư mục chứa file cấu hình.
 - **Thứ tự ưu tiên:** flag CLI thắng file cấu hình — nhưng chỉ khi
   user gõ rõ flag đó (`--ext`, `--ignore`, `--debounce-ms`,
-  `--no-recursive`, `--port`). Không gõ thì cài đặt trong file
-  được giữ.
+  `--no-recursive`, `--port`, `--webhook`). Không gõ thì cài đặt
+  trong file được giữ.
 - Giao diện web lưu file qua file tạm rồi đổi tên, nên app bị ngắt
   giữa lúc lưu cũng không hỏng file gốc.
 

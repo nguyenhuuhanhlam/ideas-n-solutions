@@ -7,7 +7,7 @@
 > component, hành vi — để sau này tách ra thành thư viện dùng chung
 > mà không phải đoán lại từ đầu.
 >
-> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.9.9.
+> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.10.0.
 
 ## Nguồn gốc
 
@@ -464,6 +464,7 @@ sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
 | 0.9.7 | 2026-11-14 | Icon Lucide thay emoji/ký tự trang trí: nút ghim (📌 → icon pin), caret nhóm (▸/▾ → chevron), nút bỏ theo dõi/bỏ ghim (× → icon x), nút thu gọn sidebar (‹/› → chevron); tab và nút toolbar có icon kèm nhãn; nút Pause đổi cả icon (pause/play). Sprite 21 icon nhúng thẳng vào `ui.html` (lấy từ kit `hairline-ui/icons/`, nét 1px vật lý). |
 | 0.9.8 | 2026-11-14 | Hover trong vùng nhuộm ăn theo màu tint: ghi đè `--hover` riêng trên 6 vùng đã nhuộm, lệch độ sáng theo tham số Hover lift (0–12 điểm, mặc định 5; tối đi ở theme sáng, sáng lên ở theme tối, cùng hướng với line); thanh trượt Hover lift trong khối chọn tint, lưu `file-watcher-hover-lift`; hover dòng log vẫn xám trung tính. Mặc định mới: độ đậm tint 10% (trước 8%). |
 | 0.9.9 | 2026-11-14 | Section thu gọn trong sidebar (component dùng lại từ kit `Hairline.initCollapsibleSections`): bấm tiêu đề để thu gọn/mở ra (chevron Lucide right/down, Enter/Space khi focus, `aria-expanded`); mặc định đóng trừ Watched folders; trạng thái từng section lưu `file-watcher-section-<id>`; body của section là mọi sibling tới `<h6>` tiếp theo nên Watched folders gồm cả danh sách lẫn khối thêm thư mục. |
+| 0.10.0 | 2026-11-14 | Webhook n8n khi đổi tên file: thêm ô `n8n webhook URL` (field + hint chuẩn trong section Settings, không thêm component mới); đổi tên file thành `tên--ACTION.ext` thì app POST JSON event (+ `"action"`) tới webhook, gửi bằng `curl` ở thread nền. |
 
 ## Tham chiếu
 
