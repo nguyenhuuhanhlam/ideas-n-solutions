@@ -1,0 +1,44 @@
+{
+  "name": "web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "test": "vitest",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "immer": "^11.2.10",
+    "konva": "^10.9.1",
+    "lucide-react": "^1.73.0",
+    "polygon-clipping": "^0.15.7",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-konva": "^19.3.2",
+    "three": "^0.187.0",
+    "zod": "^4.6.7",
+    "zustand": "^5.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/vite": "^4.3.5",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.187.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0",
+    "oxlint": "^1.90.0",
+    "tailwindcss": "^4.3.5",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.72.2",
+    "vite": "^8.3.6",
+    "vitest": "^5.1.0"
+  }
+}
