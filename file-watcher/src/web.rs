@@ -12,18 +12,28 @@
 //!   debounce, cổng, URL webhook, exts, ignores, file cấu hình,
 //!   danh sách ghim).
 //! - `GET /api/log?after=N` — log gần đây (tối đa 1000 dòng, có số
-//!   thứ tự tăng dần để client nối tiếp qua SSE mà không sót/trùng).
+//!   thứ tự tăng dần để client nối tiếp qua SSE mà không sót/trùng;
+//!   kèm `event_count` = tổng số event file, không tính entry
+//!   trạng thái webhook).
 //! - `POST /api/dirs` — thêm/xóa thư mục theo dõi (áp dụng ngay,
 //!   lưu vào file cấu hình).
 //! - `POST /api/config` — đổi cài đặt (áp dụng ngay, lưu vào file);
 //!   đổi cổng thì server bind lại ngay, trả về cổng mới.
 //! - `POST /api/pins` — ghim/bỏ ghim 1 file (lưu vào file cấu hình
 //!   lưu vào file cấu hình JSON; không đổi watcher).
+//! - `POST /api/webhook/resend` — gửi lại webhook cho 1 event
+//!   (tham số `seq`); dùng payload đã lưu, URL webhook hiện tại.
+//!
+//! Trạng thái webhook (sending/sent/failed) đi qua cùng kênh log
+//! với event, dưới dạng entry riêng
+//! `{"type":"webhook_status","event_seq":N,...}` — giao diện nhận
+//! được thì cập nhật đúng dòng event đó. Entry trạng thái KHÔNG
+//! tính vào số đếm event (xem `event_count`).
 //!
 //! Mọi thay đổi từ giao diện đều: áp dụng live trước, lưu file sau;
 //! lưu lỗi thì rollback thay đổi live và trả lỗi cho giao diện.
 
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::path::{Path, PathBuf};
@@ -33,8 +43,8 @@ use std::time::Duration;
 use notify::{RecursiveMode, Watcher};
 
 use crate::{
-    json_escape, save_config, split_list, strip_verbatim_prefix, validate_webhook_url, Filter,
-    Identity, Pin, Settings,
+    json_escape, save_config, split_list, strip_verbatim_prefix, truncate_detail,
+    validate_webhook_url, webhook_error_detail, Filter, Identity, Pin, Settings,
 };
 
 /// Trang giao diện duy nhất, nhúng vào binary lúc build.
@@ -62,6 +72,16 @@ pub struct SharedState {
     /// URL webhook n8n (đổi được từ giao diện, lưu vào file).
     /// Rỗng = tắt tính năng webhook.
     webhook_url: String,
+    /// Số event file thực tế từ khi chạy (chỉ push_event tăng;
+    /// entry trạng thái webhook không tính — để số đếm "events"
+    /// trong /api/config luôn đúng).
+    event_count: u64,
+    /// Payload webhook đã gửi theo seq của event (để nút Re-send
+    /// gửi lại đúng payload đó). Xóa khi event rời khỏi vòng log.
+    webhook_attempts: HashMap<u64, String>,
+    /// Seq các event đang gửi webhook dở (chặn gửi trùng khi bấm
+    /// Re-send 2 lần liên tiếp hoặc resend trong lúc đang gửi).
+    webhook_inflight: HashSet<u64>,
     /// Listener mới đã bind sẵn, chờ vòng lặp serve đổi sang (khi
     /// giao diện đổi port). Vòng lặp lấy ra rồi drop listener cũ.
     pending_listener: Option<(TcpListener, u16)>,
@@ -108,6 +128,9 @@ impl Shared {
             pins,
             port,
             webhook_url,
+            event_count: 0,
+            webhook_attempts: HashMap::new(),
+            webhook_inflight: HashSet::new(),
             pending_listener: None,
             log: VecDeque::new(),
             seq: 0,
@@ -125,6 +148,12 @@ impl Shared {
         lock(&self.0).webhook_url.clone()
     }
 
+    /// Tổng số event file từ khi chạy (không tính entry trạng thái
+    /// webhook).
+    pub fn event_count(&self) -> u64 {
+        lock(&self.0).event_count
+    }
+
     /// Vòng lặp serve lấy listener đang chờ đổi cổng (nếu có).
     fn take_pending_listener(&self) -> Option<(TcpListener, u16)> {
         lock(&self.0).pending_listener.take()
@@ -132,14 +161,107 @@ impl Shared {
 
     /// Đẩy 1 event (đã format JSON) vào log cho giao diện web.
     /// Gọi từ vòng lặp watcher sau mỗi lần flush.
-    pub fn push_event(&self, json_line: String) {
+    /// Đẩy 1 dòng JSON vào vòng log, trả về seq của nó. Entry cũ
+    /// nhất rời khỏi vòng thì payload webhook của nó (nếu có) cũng
+    /// bị xóa để không giữ mãi.
+    fn push_log(&self, json_line: String) -> u64 {
         let mut st = lock(&self.0);
         st.seq += 1;
         let seq = st.seq;
         st.log.push_back((seq, json_line));
         while st.log.len() > MAX_LOG {
-            st.log.pop_front();
+            if let Some((old_seq, _)) = st.log.pop_front() {
+                st.webhook_attempts.remove(&old_seq);
+            }
         }
+        seq
+    }
+
+    /// Đẩy 1 event file vào log (SSE + /api/log), trả về seq của
+    /// event (dùng để gắn trạng thái webhook cho đúng dòng).
+    pub fn push_event(&self, json_line: String) -> u64 {
+        {
+            let mut st = lock(&self.0);
+            st.event_count += 1;
+        }
+        self.push_log(json_line)
+    }
+
+    /// Đẩy 1 entry trạng thái webhook vào log (cùng kênh SSE như
+    /// event, để giao diện cập nhật đúng dòng event đó theo
+    /// `event_seq`). `status`: "sending" | "sent" | "failed";
+    /// `detail`: "" khi sending, "HTTP 200" khi sent, chi tiết lỗi
+    /// khi failed. Entry này KHÔNG tăng event_count.
+    pub fn push_webhook_status(&self, event_seq: u64, status: &str, detail: &str) {
+        let json = format!(
+            "{{\"type\":\"webhook_status\",\"event_seq\":{event_seq},\"status\":\"{status}\",\"detail\":\"{}\"}}",
+            json_escape(detail)
+        );
+        self.push_log(json);
+    }
+
+    /// Gửi 1 event tới webhook n8n (POST JSON). Đẩy trạng thái
+    /// "sending" ngay, gửi ở thread nền bằng `curl` (hỗ trợ cả
+    /// http/https, timeout 10s, body trả về tối đa 64KB), xong đẩy
+    /// "sent" hoặc "failed" kèm chi tiết (đồng thời ghi stderr khi
+    /// lỗi, cho người dùng CLI). Lưu payload để nút Re-send gửi
+    /// lại được. Lỗi chỉ khi event này đang gửi dở.
+    pub fn send_webhook(&self, event_seq: u64, url: String, payload: String) -> Result<(), String> {
+        {
+            let mut st = lock(&self.0);
+            if !st.webhook_inflight.insert(event_seq) {
+                return Err("webhook send already in progress for this event".to_string());
+            }
+            st.webhook_attempts.insert(event_seq, payload.clone());
+        }
+        self.push_webhook_status(event_seq, "sending", "");
+        let shared = self.clone();
+        std::thread::spawn(move || {
+            match post_with_curl(&url, &payload) {
+                Ok((code, _)) if (200..300).contains(&code) => {
+                    shared.push_webhook_status(event_seq, "sent", &format!("HTTP {code}"));
+                }
+                Ok((code, body)) => {
+                    let detail = webhook_error_detail(&body);
+                    let detail = if detail.is_empty() {
+                        format!("HTTP {code}")
+                    } else {
+                        format!("HTTP {code} · {detail}")
+                    };
+                    eprintln!("webhook failed: {url} ({detail})");
+                    shared.push_webhook_status(event_seq, "failed", &detail);
+                }
+                Err(detail) => {
+                    eprintln!("webhook failed: {url} ({detail})");
+                    shared.push_webhook_status(event_seq, "failed", &detail);
+                }
+            }
+            lock(&shared.0).webhook_inflight.remove(&event_seq);
+        });
+        Ok(())
+    }
+
+    /// Gửi lại webhook cho 1 event (nút Re-send): dùng payload đã
+    /// lưu, nhưng URL webhook HIỆN TẠI (để sửa URL rồi gửi lại
+    /// được). Lỗi khi webhook đã tắt, payload đã hết hạn khỏi log,
+    /// hoặc event đang gửi dở.
+    pub fn resend_webhook(&self, event_seq: u64) -> Result<(), String> {
+        let (url, payload) = {
+            let st = lock(&self.0);
+            if st.webhook_url.is_empty() {
+                return Err("webhook is disabled (no webhook URL configured)".to_string());
+            }
+            match st.webhook_attempts.get(&event_seq) {
+                Some(p) => (st.webhook_url.clone(), p.clone()),
+                None => {
+                    return Err(
+                        "no webhook payload for this event (it may have expired from the log)"
+                            .to_string(),
+                    )
+                }
+            }
+        };
+        self.send_webhook(event_seq, url, payload)
     }
 
     /// Ảnh chụp cấu hình hiện tại cho vòng lặp watcher (lọc + debounce)
@@ -200,7 +322,7 @@ impl Shared {
             list(&st.filter.exts),
             list(&st.filter.ignores),
             config_file,
-            st.seq,
+            st.event_count,
             json_escape(&st.identity.user),
             json_escape(&st.identity.pc),
             pins.join(",")
@@ -623,6 +745,69 @@ fn json_err(stream: &mut TcpStream, message: &str) {
     respond(stream, 400, "application/json", body.as_bytes());
 }
 
+/// POST JSON bằng `curl` (có sẵn trên Windows/macOS/Linux).
+/// Trả (mã HTTP, body) khi nối được tới server; Err(chi tiết) khi
+/// không chạy được curl / không nối được / timeout. Body trả về
+/// tối đa 64KB (`--max-filesize`); quá thì curl dừng với exit 63.
+/// `-w` thêm "\n<code>" sau body nên dòng cuối của stdout luôn là
+/// mã HTTP (kể cả khi body rỗng hoặc không kết thúc bằng newline).
+fn post_with_curl(url: &str, payload: &str) -> Result<(u16, String), String> {
+    let mut child = std::process::Command::new("curl")
+        .args([
+            "-sS",
+            "-m",
+            "10",
+            "--max-filesize",
+            "65536",
+            "-w",
+            "\n%{http_code}",
+            "-X",
+            "POST",
+            "-H",
+            "Content-Type: application/json",
+            "--data",
+            "@-",
+            url,
+        ])
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .map_err(|e| format!("cannot run curl: {e}"))?;
+    if let Some(mut stdin) = child.stdin.take() {
+        use std::io::Write;
+        if stdin.write_all(payload.as_bytes()).is_err() {
+            return Err("cannot write request body to curl".to_string());
+        }
+    }
+    let output = child
+        .wait_with_output()
+        .map_err(|e| format!("cannot run curl: {e}"))?;
+    if !output.status.success() {
+        // Exit 63 = body vượt --max-filesize.
+        if output.status.code() == Some(63) {
+            return Err("response too large (> 64 KB)".to_string());
+        }
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        if !stderr.trim().is_empty() {
+            // Bỏ tiền tố "curl: (7) " để chi tiết gọn hơn.
+            let msg = stderr.trim().strip_prefix("curl: ").unwrap_or(stderr.trim());
+            let msg = msg.split_once(") ").map(|(_, m)| m).unwrap_or(msg);
+            return Err(truncate_detail(msg));
+        }
+        return Err(format!("curl exited with {}", output.status));
+    }
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let (body, code) = match stdout.rsplit_once('\n') {
+        Some((b, c)) => (b, c.trim()),
+        None => ("", stdout.trim()),
+    };
+    match code.parse::<u16>() {
+        Ok(code) => Ok((code, body.to_string())),
+        Err(_) => Err("unexpected curl output".to_string()),
+    }
+}
+
 fn handle_connection(mut stream: TcpStream, shared: &Shared) {
     let _ = stream.set_read_timeout(Some(Duration::from_secs(10)));
     let Some(req) = read_request(&mut stream) else {
@@ -638,6 +823,7 @@ fn handle_connection(mut stream: TcpStream, shared: &Shared) {
         }
         ("GET", "/api/log") => {
             let items = shared.log_since(req.query_after());
+            let event_count = shared.event_count();
             let mut out = String::from("{\"events\":[");
             for (i, (seq, json)) in items.iter().enumerate() {
                 if i > 0 {
@@ -650,7 +836,9 @@ fn handle_connection(mut stream: TcpStream, shared: &Shared) {
                     out.push_str(json);
                 }
             }
-            out.push_str("]}");
+            // Tổng số event file (không tính entry trạng thái
+            // webhook): giao diện lấy làm mốc đếm "events".
+            out.push_str(&format!("],\"event_count\":{event_count}}}"));
             respond(&mut stream, 200, "application/json", out.as_bytes());
         }
         ("POST", "/api/dirs") => {
@@ -675,6 +863,20 @@ fn handle_connection(mut stream: TcpStream, shared: &Shared) {
                 _ => Err("action must be add or remove".to_string()),
             };
             match result {
+                Ok(()) => json_ok(&mut stream),
+                Err(e) => json_err(&mut stream, &e),
+            }
+        }
+        ("POST", "/api/webhook/resend") => {
+            let form = parse_form(&req.body);
+            let seq = match form.get("seq").and_then(|v| v.parse::<u64>().ok()) {
+                Some(n) => n,
+                None => {
+                    json_err(&mut stream, "seq must be an integer");
+                    return;
+                }
+            };
+            match shared.resend_webhook(seq) {
                 Ok(()) => json_ok(&mut stream),
                 Err(e) => json_err(&mut stream, &e),
             }
@@ -951,6 +1153,176 @@ mod tests {
     }
 
     #[test]
+    fn push_event_returns_seq_and_counts_events_only() {
+        let shared = test_shared(8787);
+        let s1 = shared.push_event("{\"event\":\"created\"}".to_string());
+        let s2 = shared.push_event("{\"event\":\"modified\"}".to_string());
+        assert_eq!((s1, s2), (1, 2));
+        shared.push_webhook_status(1, "sending", "");
+        let s3 = shared.push_event("{\"event\":\"removed\"}".to_string());
+        assert_eq!(s3, 4); // status entry cũng chiếm 1 seq
+        // Chỉ 3 event, không tính entry trạng thái.
+        assert!(shared.config_json().contains("\"events\":3"));
+        let items = shared.log_since(0);
+        assert_eq!(items.len(), 4);
+        assert!(items[2].1.contains("\"type\":\"webhook_status\""));
+        assert!(items[2].1.contains("\"event_seq\":1"));
+    }
+
+    /// Fake webhook receiver: nhận POST rồi trả (status, body) sau
+    /// `delay_ms`. Trả (cổng, kênh nhận request text). Nhận nhiều
+    /// kết nối (cho re-send); thread chạy nền tới hết test.
+    fn fake_webhook(
+        status: u16,
+        body: &str,
+        delay_ms: u64,
+    ) -> (u16, std::sync::mpsc::Receiver<String>) {
+        let listener = TcpListener::bind(("127.0.0.1", 0)).unwrap();
+        let port = listener.local_addr().unwrap().port();
+        let (tx, rx) = std::sync::mpsc::channel();
+        let body = body.to_string();
+        let reason = match status {
+            200 => "OK",
+            404 => "Not Found",
+            _ => "Error",
+        };
+        std::thread::spawn(move || {
+            for conn in listener.incoming() {
+                let mut stream = match conn {
+                    Ok(s) => s,
+                    Err(_) => break,
+                };
+                stream.set_read_timeout(Some(Duration::from_secs(5))).ok();
+                let mut req = Vec::new();
+                let mut buf = [0u8; 8192];
+                // Đọc tới khi đủ body theo Content-Length.
+                loop {
+                    match stream.read(&mut buf) {
+                        Ok(0) => break,
+                        Ok(n) => {
+                            req.extend_from_slice(&buf[..n]);
+                            let text = String::from_utf8_lossy(&req);
+                            if let Some(head_end) = text.find("\r\n\r\n") {
+                                let cl = text.lines().find_map(|l| {
+                                    l.strip_prefix("Content-Length:")
+                                        .and_then(|v| v.trim().parse::<usize>().ok())
+                                });
+                                if cl.map(|c| req.len() >= head_end + 4 + c).unwrap_or(true) {
+                                    break;
+                                }
+                            }
+                        }
+                        Err(_) => break,
+                    }
+                }
+                let _ = tx.send(String::from_utf8_lossy(&req).into_owned());
+                if delay_ms > 0 {
+                    std::thread::sleep(Duration::from_millis(delay_ms));
+                }
+                let resp = format!(
+                    "HTTP/1.1 {status} {reason}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                    body.len()
+                );
+                let _ = stream.write_all(resp.as_bytes());
+            }
+        });
+        (port, rx)
+    }
+
+    /// Đợi tới khi log có entry trạng thái webhook cho `event_seq`
+    /// với `status` mong muốn (tối đa 5s). Trả entry JSON đó.
+    fn wait_webhook_status(shared: &Shared, event_seq: u64, status: &str) -> Option<String> {
+        for _ in 0..100 {
+            for (_, json) in shared.log_since(0) {
+                if json.contains(&format!("\"event_seq\":{event_seq}"))
+                    && json.contains(&format!("\"status\":\"{status}\""))
+                {
+                    return Some(json);
+                }
+            }
+            std::thread::sleep(Duration::from_millis(50));
+        }
+        None
+    }
+
+    fn has_webhook_status(shared: &Shared, event_seq: u64, status: &str) -> bool {
+        shared.log_since(0).iter().any(|(_, json)| {
+            json.contains(&format!("\"event_seq\":{event_seq}"))
+                && json.contains(&format!("\"status\":\"{status}\""))
+        })
+    }
+
+    #[test]
+    fn send_webhook_reports_sent_failed_and_resend() {
+        let shared = test_shared(8787);
+        // Receiver trả 200 -> sent.
+        let (port_ok, req_rx) = fake_webhook(200, "{\"ok\":true}", 0);
+        let url_ok = format!("http://127.0.0.1:{port_ok}/webhook/fw");
+        let payload = "{\"event\":\"renamed\",\"action\":\"SEND\"}".to_string();
+        shared.send_webhook(1, url_ok.clone(), payload.clone()).unwrap();
+        // "sending" có ngay, trước khi curl xong.
+        assert!(has_webhook_status(&shared, 1, "sending"));
+        let sent = wait_webhook_status(&shared, 1, "sent").expect("sent status");
+        assert!(sent.contains("HTTP 200"), "{sent}");
+        // Receiver nhận đúng POST JSON.
+        let req = req_rx.recv_timeout(Duration::from_secs(5)).unwrap();
+        assert!(req.starts_with("POST /webhook/fw HTTP/1.1"), "{req}");
+        assert!(req.contains("Content-Type: application/json"), "{req}");
+        assert!(req.contains("\"action\":\"SEND\""), "{req}");
+
+        // Receiver trả 404 kiểu n8n -> failed, detail có message n8n.
+        let n8n_body =
+            r#"{"code":404,"message":"The requested webhook \"POST fw\" is not registered."}"#;
+        let (port_404, _) = fake_webhook(404, n8n_body, 0);
+        let url_404 = format!("http://127.0.0.1:{port_404}/webhook/fw");
+        shared.send_webhook(2, url_404, payload.clone()).unwrap();
+        let failed = wait_webhook_status(&shared, 2, "failed").expect("failed status");
+        assert!(failed.contains("HTTP 404"), "{failed}");
+        assert!(failed.contains("is not registered"), "{failed}");
+
+        // Không nối được -> failed, detail là message của curl
+        // ("Connection refused" hoặc "Couldn't connect to server",
+        // tùy bản curl).
+        let dead = free_port();
+        shared
+            .send_webhook(3, format!("http://127.0.0.1:{dead}/webhook/fw"), payload.clone())
+            .unwrap();
+        let failed3 = wait_webhook_status(&shared, 3, "failed").expect("failed status 3");
+        let lower = failed3.to_lowercase();
+        assert!(
+            lower.contains("refused") || lower.contains("connect") || lower.contains("curl"),
+            "{failed3}"
+        );
+
+        // Re-send: URL hiện tại chưa có -> lỗi (webhook tắt).
+        assert!(shared.resend_webhook(2).is_err());
+        // Đặt URL tốt qua apply_settings -> resend gửi tới URL mới, sent.
+        shared
+            .apply_settings(None, None, None, None, None, Some(url_ok.clone()))
+            .unwrap();
+        shared.resend_webhook(2).unwrap();
+        let resent = wait_webhook_status(&shared, 2, "sent").expect("resent status");
+        assert!(resent.contains("HTTP 200"), "{resent}");
+        // Seq lạ -> lỗi.
+        assert!(shared.resend_webhook(999).is_err());
+    }
+
+    #[test]
+    fn send_webhook_rejects_duplicate_while_inflight() {
+        let shared = test_shared(8787);
+        let (port, _) = fake_webhook(200, "{}", 800);
+        let url = format!("http://127.0.0.1:{port}/webhook/fw");
+        shared.send_webhook(1, url.clone(), "{}".to_string()).unwrap();
+        // Gửi lại cùng event trong lúc đang gửi -> lỗi.
+        let res = shared.send_webhook(1, url.clone(), "{}".to_string());
+        assert!(res.is_err());
+        assert!(res.unwrap_err().contains("already in progress"));
+        // Đợi gửi xong -> gửi lại được.
+        wait_webhook_status(&shared, 1, "sent").expect("sent status");
+        shared.send_webhook(1, url, "{}".to_string()).unwrap();
+    }
+
+    #[test]
     fn port_change_rebinds_live() {
         let port1 = free_port();
         let mut port2 = free_port();
@@ -963,9 +1335,10 @@ mod tests {
         std::thread::spawn(move || {
             let _ = serve(listener, s2);
         });
-        // Chờ server lên trên cổng đầu.
+        // Chờ server lên trên cổng đầu (2s; máy tải nặng khi chạy
+        // cả bộ test song song có thể chậm hơn 1s).
         let mut up = false;
-        for _ in 0..50 {
+        for _ in 0..100 {
             if let Some((200, body)) = http_get(port1, "/api/config") {
                 assert!(body.contains(&format!("\"port\":{port1}")));
                 up = true;
@@ -979,9 +1352,9 @@ mod tests {
         assert_eq!(status, 200);
         assert!(body.contains(&format!("\"port\":{port2}")), "{body}");
         assert_eq!(shared.port(), port2);
-        // Cổng mới phục vụ trong vòng ~2s; cổng cũ không còn nghe.
+        // Cổng mới phục vụ trong vòng ~3s; cổng cũ không còn nghe.
         let mut moved = false;
-        for _ in 0..100 {
+        for _ in 0..150 {
             if let Some((200, body)) = http_get(port2, "/api/config") {
                 assert!(body.contains(&format!("\"port\":{port2}")));
                 moved = true;

@@ -7,7 +7,7 @@
 > component, hành vi — để sau này tách ra thành thư viện dùng chung
 > mà không phải đoán lại từ đầu.
 >
-> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.10.0.
+> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.11.0.
 
 ## Nguồn gốc
 
@@ -334,7 +334,7 @@ trong sidebar thu gọn/mở ra bằng chính tiêu đề của nó.
 
 Bộ icon duy nhất của hệ là **Lucide** (lưới 24×24, SVG stroke,
 giấy phép ISC), dùng dưới dạng sprite rút gọn
-`icons/lucide-sprite.svg` — 21 icon, ghim bản `lucide-static`
+`icons/lucide-sprite.svg` — 22 icon, ghim bản `lucide-static`
 **1.73.0**, build bằng `node icons/build-sprite.mjs`. Không
 dùng emoji làm icon (📌, ×, ▸/▾ đều có icon thay thế trong
 sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
@@ -414,9 +414,10 @@ sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
 
 > Đã làm (2026-11-13–14): bước 1, 2, 3, 5 — starter kit
 > `hairline.css` + `hairline.js` + `demo.html` trong thư mục này,
-> đồng bộ tới File Watcher 0.9.9 (kể cả bộ icon Lucide, hover
-> nhuộm tint có Hover lift và section thu gọn trong sidebar,
-> File Watcher nhúng sprite của kit vào `ui.html`). Còn lại:
+> đồng bộ tới File Watcher 0.11.0 (kể cả bộ icon Lucide 22 icon
+> với `loader-circle` cho trạng thái đang chạy, hover nhuộm tint
+> có Hover lift và section thu gọn trong sidebar, File Watcher
+> nhúng sprite của kit vào `ui.html`). Còn lại:
 > bước 4 (quy ước đặt
 > tên, quyết sau khi có ứng dụng thứ hai), bước 6 (repo/package
 > riêng khi có từ 2 ứng dụng dùng trở lên).
@@ -465,6 +466,7 @@ sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
 | 0.9.8 | 2026-11-14 | Hover trong vùng nhuộm ăn theo màu tint: ghi đè `--hover` riêng trên 6 vùng đã nhuộm, lệch độ sáng theo tham số Hover lift (0–12 điểm, mặc định 5; tối đi ở theme sáng, sáng lên ở theme tối, cùng hướng với line); thanh trượt Hover lift trong khối chọn tint, lưu `file-watcher-hover-lift`; hover dòng log vẫn xám trung tính. Mặc định mới: độ đậm tint 10% (trước 8%). |
 | 0.9.9 | 2026-11-14 | Section thu gọn trong sidebar (component dùng lại từ kit `Hairline.initCollapsibleSections`): bấm tiêu đề để thu gọn/mở ra (chevron Lucide right/down, Enter/Space khi focus, `aria-expanded`); mặc định đóng trừ Watched folders; trạng thái từng section lưu `file-watcher-section-<id>`; body của section là mọi sibling tới `<h6>` tiếp theo nên Watched folders gồm cả danh sách lẫn khối thêm thư mục. |
 | 0.10.0 | 2026-11-14 | Webhook n8n khi đổi tên file: thêm ô `n8n webhook URL` (field + hint chuẩn trong section Settings, không thêm component mới); đổi tên file thành `tên--ACTION.ext` thì app POST JSON event (+ `"action"`) tới webhook, gửi bằng `curl` ở thread nền. |
+| 0.11.0 | 2026-11-15 | Trạng thái webhook trên dòng event (sending/sent/failed + nút Re-send khi lỗi, tiêu đề nhóm gom trạng thái tệ nhất): icon `loader-circle` mới trong sprite (22 icon) cho trạng thái đang gửi (xoay bằng CSS), `circle-check`/`circle-alert` cho sent/failed, `refresh-cw` cho nút Re-send; trạng thái đi qua cùng kênh log/SSE dưới dạng entry riêng, không tính vào số đếm event. |
 
 ## Tham chiếu
 

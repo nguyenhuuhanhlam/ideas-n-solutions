@@ -37,6 +37,7 @@ const ICONS = [
   ["layout-grid", "Icons tab (gallery)"],
   ["circle-alert", "error messages"],
   ["circle-check", "success messages"],
+  ["loader-circle", "in-progress states (webhook sending, spins via CSS)"],
   ["info", "hints"],
 ];
 

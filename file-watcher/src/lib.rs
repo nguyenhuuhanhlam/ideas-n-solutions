@@ -857,6 +857,37 @@ pub fn validate_webhook_url(url: &str) -> Result<(), String> {
     }
 }
 
+/// Cắt 1 chuỗi chi tiết về tối đa 200 ký tự (kèm … nếu bị cắt).
+pub fn truncate_detail(s: &str) -> String {
+    const MAX: usize = 200;
+    let s = s.trim();
+    if s.chars().count() <= MAX {
+        s.to_string()
+    } else {
+        let mut out: String = s.chars().take(MAX).collect();
+        out.push('…');
+        out
+    }
+}
+
+/// Rút gọn body trả về của webhook thành 1 dòng chi tiết lỗi: nếu
+/// body là JSON object có trường "message" (dạng lỗi của n8n, vd
+/// `{"code":404,"message":"The requested webhook ... is not
+/// registered."}`) thì lấy message; không thì lấy body đã gộp
+/// khoảng trắng. Body rỗng -> "".
+pub fn webhook_error_detail(body: &str) -> String {
+    if let Ok(JsonValue::Object(fields)) = JsonParser::new(body).parse() {
+        for (k, v) in &fields {
+            if k == "message" {
+                if let JsonValue::Str(m) = v {
+                    return truncate_detail(m);
+                }
+            }
+        }
+    }
+    truncate_detail(&body.split_whitespace().collect::<Vec<_>>().join(" "))
+}
+
 /// Tùy chọn dòng lệnh đã parse xong.
 #[derive(Debug, Default)]
 pub struct Args {
@@ -2022,6 +2053,28 @@ mod tests {
         assert!(validate_webhook_url("http://127.0.0.1:5678/webhook-test/x").is_ok());
         assert!(validate_webhook_url("ftp://x/y").is_err());
         assert!(validate_webhook_url("n8n.local/webhook").is_err());
+    }
+
+    #[test]
+    fn webhook_error_detail_cases() {
+        // n8n-style JSON: lấy message, bỏ code.
+        assert_eq!(
+            webhook_error_detail(
+                r#"{"code":404,"message":"The requested webhook \"POST foo\" is not registered."}"#
+            ),
+            "The requested webhook \"POST foo\" is not registered."
+        );
+        // Không phải JSON: gộp khoảng trắng.
+        assert_eq!(webhook_error_detail("  Not\nFound\t here "), "Not Found here");
+        // Rỗng.
+        assert_eq!(webhook_error_detail("   "), "");
+        // Dài: cắt ở 200 ký tự + ….
+        let long = "x".repeat(300);
+        let d = webhook_error_detail(&long);
+        assert_eq!(d.chars().count(), 201);
+        assert!(d.ends_with('…'));
+        // message không phải string: dùng cả body.
+        assert_eq!(webhook_error_detail(r#"{"message":404}"#), r#"{"message":404}"#);
     }
 
     #[test]

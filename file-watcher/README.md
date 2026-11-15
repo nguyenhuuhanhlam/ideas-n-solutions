@@ -210,10 +210,11 @@ API dùng nội bộ (không cần nhớ để xài giao diện):
 | `GET /` | Trang giao diện (1 file HTML nhúng sẵn). |
 | `GET /events?after=N` | SSE stream event realtime (JSON, số thứ tự tăng dần). |
 | `GET /api/config` | Cấu hình hiện tại (JSON). |
-| `GET /api/log?after=N` | Log gần đây, các event có số thứ tự > N. |
+| `GET /api/log?after=N` | Log gần đây, các entry có số thứ tự > N (gồm cả entry trạng thái webhook); kèm `event_count` = tổng số event file. |
 | `POST /api/dirs` | Thêm/xóa thư mục (`action=add\|remove&dir=...`). |
 | `POST /api/config` | Đổi cài đặt (`recursive` / `debounce_ms` / `port` / `exts` / `ignores` / `webhook_url`); trả về cổng hiện tại (`{"ok":true,"port":N}`). |
 | `POST /api/pins` | Ghim/bỏ ghim file (`action=add\|remove&path=...`). |
+| `POST /api/webhook/resend` | Gửi lại webhook cho 1 event (`seq=N`); dùng payload đã lưu + URL webhook hiện tại. |
 
 ## Webhook n8n khi đổi tên file
 
@@ -251,11 +252,44 @@ Payload là JSON event hiện tại + thêm `"action"`:
 - Gửi bằng `curl` có sẵn trên máy (Windows/macOS/Linux đều có
   sẵn), hỗ trợ cả `http://` và `https://`, timeout 10s, chạy ở
   thread nền nên không chặn watcher. Gửi lỗi (không có curl,
-  không nối được, HTTP không 2xx) chỉ ghi ra stderr, không
-  retry, event vẫn vào log bình thường.
+  không nối được, HTTP không 2xx) ghi ra stderr, đồng thời hiện
+  trên dòng event đó (xem bên dưới); không retry tự động, event
+  vẫn vào log bình thường.
 - URL phải bắt đầu bằng `http://` hoặc `https://` (kiểm tra cả
   ở CLI, file cấu hình và giao diện). Đổi URL từ giao diện áp
   dụng ngay cho event tiếp theo; để trống là tắt webhook.
+
+### Trạng thái webhook trên dòng event + gửi lại (0.11.0)
+
+Mỗi dòng log đã gọi webhook hiện 1 trong 3 trạng thái:
+
+- **Sending…** (icon xoay) — đang gửi.
+- **Sent** (dấu check xanh) — n8n đã nhận (tooltip: mã HTTP,
+  vd `HTTP 200`).
+- **Lỗi** (đỏ) — không gửi được: hiện gọn mã HTTP + message n8n
+  trả về (vd `HTTP 404 · webhook is not registered`), đầy đủ
+  trong tooltip; kèm nút **Re-send**.
+
+Nút **Re-send** (chỉ hiện khi lỗi) gửi lại đúng payload cũ tới
+URL webhook **hiện tại** — nên sửa URL trong Settings rồi bấm
+gửi lại là được, không cần đổi tên file lần nữa. Trong lúc gửi
+lại, nút biến mất (tránh bấm trùng); gửi xong trạng thái trên
+dòng cập nhật lại như lần đầu. Payload gửi lại chỉ giữ trong
+RAM, mất khi app tắt (cùng vòng đời với log). Lỗi gửi lại (webhook
+đã tắt, payload hết hạn khỏi log, đang gửi dở) hiện bằng toast.
+
+Lưu ý: app chỉ biết được lỗi **giao hàng** (không tới được n8n,
+hoặc n8n từ chối nhận — vd workflow chưa active thì n8n trả
+404). Lỗi **bên trong** workflow n8n thì n8n vẫn trả 200 ngay
+khi nhận webhook, nên app không thấy được (trừ khi cấu hình
+n8n trả response sau khi workflow chạy xong).
+
+Kỹ thuật: trạng thái đi qua cùng kênh log/SSE với event, dưới
+dạng entry riêng `{"type":"webhook_status","event_seq":N,...}`
+— giao diện cập nhật đúng dòng theo `event_seq`. Entry trạng
+thái không tính vào số đếm event (dòng "N events (since start)"
+và trường `event_count` của `/api/log` chỉ đếm event file).
+Endpoint gửi lại: `POST /api/webhook/resend` (tham số `seq`).
 
 ## File cấu hình
 

@@ -270,6 +270,24 @@
   }
   .pinbtn:hover { opacity: 1; background: none; border: none; }
   .pinbtn.on { opacity: 1; }
+  /* Trạng thái webhook trên dòng log: chỉ dòng rename đã gọi
+     webhook mới có. sent xanh lá, failed đỏ, sending xám + xoay. */
+  .wh { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; font-size: 12px; color: var(--muted); }
+  .wh i { font-style: normal; }
+  .wh.sent { color: var(--green); }
+  .wh.failed { color: var(--red); }
+  .wh .hl-icon { width: 14px; height: 14px; stroke-width: 1.7; }
+  @keyframes hl-spin { to { transform: rotate(360deg); } }
+  .hl-icon.spin { animation: hl-spin 1s linear infinite; }
+  .wh-resend {
+    flex-shrink: 0;
+    background: transparent; border: 1px solid var(--line);
+    color: var(--fg); border-radius: 0;
+    padding: 1px 7px; font-size: 12px;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .wh-resend:hover { border-color: var(--muted); background: transparent; }
+  .wh-resend .hl-icon { width: 14px; height: 14px; stroke-width: 1.7; }
   /* Icons (Lucide sprite, inlined at top of <body>): the line always
      renders exactly 1 physical px — stroke-width = 24 / display size.
      Default 16px -> 1.5; --20 -> 1.2; --24 -> 1. Same rule as the
@@ -319,7 +337,7 @@
 </head>
 <body>
 <!-- Lucide icon sprite, inlined from hairline-ui/icons/lucide-sprite.svg
-     (21 icons, lucide-static 1.73.0, ISC). Keep in sync: copy the
+     (22 icons, lucide-static 1.73.0, ISC). Keep in sync: copy the
      <symbol> elements from that file. No stroke-width here either:
      line weight comes from .hl-icon CSS (1 physical px). -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -408,6 +426,9 @@
   <symbol id="hl-circle-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="10" />
     <path d="m16 9-5.5 5.5L8 12" />
+  </symbol>
+  <symbol id="hl-loader-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
   </symbol>
   <symbol id="hl-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="10" />
@@ -542,7 +563,10 @@
   var cfgFileEl = document.getElementById("cfgFile");
 
   var entries = [];      // [{seq, time, event, path, direction, from, user, pc, size, delta}]
-  var lastSeq = 0;       // = tổng số event từ khi app chạy (seq tăng dần, không reset)
+  var lastSeq = 0;       // = tổng số entry log từ khi app chạy (seq tăng dần, không reset; gồm cả entry trạng thái webhook)
+  var eventCount = 0;    // = tổng số event file từ khi app chạy (không tính entry trạng thái webhook; lấy mốc từ /api/log rồi đếm thêm entry mới)
+  var webhookStatus = {}; // event seq -> {status: "sending"|"sent"|"failed", detail: "..."}
+  var loadingBatch = false; // đang nạp loạt entry đầu từ /api/log (không đếm eventCount, mốc đã có sẵn)
   var paused = false;
   var es = null;
   var reconnectTimer = null;
@@ -1138,9 +1162,45 @@
     return badgeHtml(e.path) + ' <span class="fname">' + esc(splitPath(e.path).name) + "</span>";
   }
 
+  // Trạng thái webhook của 1 dòng event (chỉ dòng rename đã gọi
+  // webhook mới có): đang gửi / đã gửi / lỗi + nút Re-send.
+  // Lỗi hiện gọn trên dòng (tối đa 48 ký tự), đầy đủ trong tooltip.
+  function webhookHtml(e) {
+    var st = webhookStatus[e.seq];
+    if (!st) return "";
+    if (st.status === "sending") {
+      return '<span class="wh sending" title="Sending to n8n…"><svg class="hl-icon spin"><use href="#hl-loader-circle"/></svg><i>Sending…</i></span>';
+    }
+    if (st.status === "sent") {
+      return '<span class="wh sent" title="' + esc(st.detail || "Sent to n8n") + '"><svg class="hl-icon"><use href="#hl-circle-check"/></svg><i>Sent</i></span>';
+    }
+    var short = st.detail ? (st.detail.length > 48 ? st.detail.slice(0, 48) + "…" : st.detail) : "Webhook failed";
+    return '<span class="wh failed" title="' + esc(st.detail || "Webhook failed") + '"><svg class="hl-icon"><use href="#hl-circle-alert"/></svg><i>' + esc(short) + '</i></span>'
+      + '<button class="wh-resend" data-resend="' + e.seq + '" title="Send this event to the webhook again"><svg class="hl-icon"><use href="#hl-refresh-cw"/></svg>Re-send</button>';
+  }
+
+  // Trạng thái webhook trên tiêu đề nhóm (để lỗi không bị giấu
+  // trong nhóm đang thu gọn): lấy trạng thái "tệ nhất" trong nhóm
+  // (failed > sending > sent), chỉ icon, không có nút Re-send
+  // (mở nhóm ra để gửi lại từng dòng).
+  function groupWebhookHtml(g) {
+    var worst = null, failed = 0;
+    for (var i = 0; i < g.events.length; i++) {
+      var st = webhookStatus[g.events[i].seq];
+      if (!st) continue;
+      if (st.status === "failed") { failed++; worst = "failed"; }
+      else if (st.status === "sending" && worst !== "failed") worst = "sending";
+      else if (st.status === "sent" && !worst) worst = "sent";
+    }
+    if (!worst) return "";
+    if (worst === "failed") return '<span class="wh failed" title="' + failed + (failed === 1 ? " webhook failed" : " webhooks failed") + ' in this group"><svg class="hl-icon"><use href="#hl-circle-alert"/></svg></span>';
+    if (worst === "sending") return '<span class="wh sending" title="Sending to n8n…"><svg class="hl-icon spin"><use href="#hl-loader-circle"/></svg></span>';
+    return '<span class="wh sent" title="Webhook sent"><svg class="hl-icon"><use href="#hl-circle-check"/></svg></span>';
+  }
+
   function rowHtml(e, child) {
     var who = (e.user || "?") + "@" + (e.pc || "?");
-    return '<div class="row ' + esc(e.event) + (child ? " child" : "") + '"><span class="time">' + esc(e.time) + '</span><span class="kind"><i>' + KIND_LABEL[e.event] + '</i></span><span class="who">' + esc(who) + '</span><span class="size">' + esc(sizeText(e)) + "</span><span>" + pathHtml(e) + "</span>" + pinBtnHtml(e.path) + "</div>";
+    return '<div class="row ' + esc(e.event) + (child ? " child" : "") + '"><span class="time">' + esc(e.time) + '</span><span class="kind"><i>' + KIND_LABEL[e.event] + '</i></span><span class="who">' + esc(who) + '</span><span class="size">' + esc(sizeText(e)) + "</span><span>" + pathHtml(e) + "</span>" + webhookHtml(e) + pinBtnHtml(e.path) + "</div>";
   }
 
   function groupHeadHtml(g, expanded, grew) {
@@ -1154,6 +1214,7 @@
       + '<span class="gcount">×' + g.events.length + "</span>"
       + '<span class="glast">' + KIND_LABEL[last.event] + " " + esc(sizeText(last)) + "</span>"
       + (net !== null ? '<span class="gnet">' + esc(net) + "</span>" : "")
+      + groupWebhookHtml(g)
       + pinBtnHtml(g.path)
       + "</div>";
   }
@@ -1263,13 +1324,22 @@
     prevGroupCounts = newCounts;
     logEl.innerHTML = html;
     if (document.getElementById("autoscroll").checked) logEl.scrollTop = logEl.scrollHeight;
-    countsEl.textContent = entries.length + (entries.length === 1 ? " row" : " rows") + " · " + lastSeq + (lastSeq === 1 ? " event" : " events") + " (since start)";
+    countsEl.textContent = entries.length + (entries.length === 1 ? " row" : " rows") + " · " + eventCount + (eventCount === 1 ? " event" : " events") + " (since start)";
     updateFades();
   }
 
   function addEntry(e) {
     if (!e.seq || e.seq <= lastSeq) return; // trùng (do reconnect) hoặc thiếu seq, bỏ qua
     lastSeq = e.seq;
+    // Entry trạng thái webhook: không phải event file — cập nhật
+    // trạng thái của dòng event đó, không đưa vào danh sách log,
+    // không đếm vào eventCount.
+    if (e.type === "webhook_status") {
+      webhookStatus[e.event_seq] = { status: e.status, detail: e.detail || "" };
+      if (!paused) render();
+      return;
+    }
+    if (!loadingBatch) eventCount++;
     entries.push(e);
     if (entries.length > MAX_ROWS) entries.splice(0, entries.length - MAX_ROWS);
     if (!paused) render();
@@ -1326,6 +1396,26 @@
       } else {
         showToast(res.err || "Failed to pin.");
       }
+    });
+  }
+
+  // Gửi lại webhook cho 1 event (nút Re-send trên dòng lỗi):
+  // server dùng payload đã lưu + URL webhook hiện tại.
+  function resendWebhook(seq) {
+    var prev = webhookStatus[seq];
+    // Cập nhật lạc quan sang "sending" ngay để nút biến mất (chặn
+    // bấm trùng); server sẽ xác nhận lại qua SSE.
+    webhookStatus[seq] = { status: "sending", detail: "" };
+    render();
+    postForm("/api/webhook/resend", { seq: String(seq) }).then(function (res) {
+      if (!res.ok) {
+        // Server từ chối (webhook tắt / payload hết hạn / đang
+        // gửi): trả trạng thái cũ lại, báo lỗi bằng toast.
+        if (prev) webhookStatus[seq] = prev; else delete webhookStatus[seq];
+        render();
+        showToast(res.err || "Failed to re-send.");
+      }
+      // Thành công: trạng thái thật về qua SSE (sending -> sent/failed).
     });
   }
 
@@ -1392,7 +1482,12 @@
     fetch("/api/log?after=0")
       .then(function (r) { return r.json(); })
       .then(function (data) {
+        // Mốc đếm event lấy từ server (đúng tổng số event tới lúc
+        // fetch); loạt entry đầu không đếm lại (loadingBatch).
+        eventCount = data.event_count || 0;
+        loadingBatch = true;
         (data.events || []).forEach(addEntry);
+        loadingBatch = false;
         render();
         connect();
       })
@@ -1486,6 +1581,8 @@
     var closest = function (sel) { return t.closest ? t.closest(sel) : null; };
     var badge = closest(".pathbadge");
     if (badge) { copyPath(badge); return; }
+    var resendBtn = closest(".wh-resend");
+    if (resendBtn) { resendWebhook(parseInt(resendBtn.getAttribute("data-resend"), 10)); return; }
     var pinBtn = closest(".pinbtn");
     if (pinBtn) { togglePin(pinBtn.getAttribute("data-pin")); return; }
     var unpin = closest(".pinunpin");

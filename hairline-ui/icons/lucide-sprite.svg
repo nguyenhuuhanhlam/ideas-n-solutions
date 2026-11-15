@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Hairline UI icon sprite — Lucide 1.73.0 subset (21 icons), ISC licence.
+<!-- Hairline UI icon sprite — Lucide 1.73.0 subset (22 icons), ISC licence.
      Source: https://unpkg.com/lucide-static@1.73.0/icons/<name>.svg
      Rebuild: node icons/build-sprite.mjs (see that file for the icon list).
      No stroke-width anywhere in this file: weight comes from .hl-icon CSS. -->
@@ -89,6 +89,9 @@
   <symbol id="hl-circle-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="10" />
     <path d="m16 9-5.5 5.5L8 12" />
+  </symbol>
+  <symbol id="hl-loader-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
   </symbol>
   <symbol id="hl-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="10" />
