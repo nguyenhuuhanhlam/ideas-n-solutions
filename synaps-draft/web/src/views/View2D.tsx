@@ -2,8 +2,10 @@ import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { Arc, Layer, Line, Circle, Rect, Stage, Text } from 'react-konva';
+import Segments from '../components/Segments';
 import { elevationBounds, elevationUToOffset, projectOpeningToElevation, projectWallToElevation, sortWallsByDepth, type ElevationView } from '../model/elevation';
 import { distance, mergeWallPolygons, midpoint, projectPointOnWall, wallLength, wallPolygon } from '../model/geometry';
+import { computeGridSegments, gridStepFor } from '../model/grid';
 import { clampOffset, clampSill } from '../model/openingDrag';
 import type { Opening, Point, Wall } from '../model/schema';
 import { selectActiveLevel, useBuildingStore, type Unit } from '../store/useBuildingStore';
@@ -18,16 +20,10 @@ import { createOpening, findNearestWall } from '../tools/openingTool';
 
 const MIN_SCALE = 0.1;
 const MAX_SCALE = 10;
-const GRID_STEPS = [100, 500, 1000, 5000];
 const OPENING_PICK_RADIUS_PX = 15;
 const DIM_OFFSET = 600; // mm, khoảng cách đường kích thước khỏi tường
 /** Ngưỡng màn hình (px) để phân biệt click chọn với kéo thả. */
 const DRAG_THRESHOLD_PX = 3;
-
-function gridStepFor(scale: number): number {
-  for (const s of GRID_STEPS) if (s * scale >= 24) return s;
-  return 5000;
-}
 
 function fmt(valueMm: number, unit: Unit): string {
   return unit === 'mm' ? `${Math.round(valueMm)} mm` : `${(valueMm / 1000).toFixed(2)} m`;
@@ -611,29 +607,18 @@ export default function View2D() {
   };
 
   // Lưới thích ứng theo zoom. Mặt đứng: trục ngang u, trục đứng v (Konva y = −v).
+  // Các đoạn lưới vẽ bằng `Segments` (rời nhau), không dùng Konva `Line`
+  // vì Line nối các điểm thành đường liên tục → sinh đoạn chéo.
   const step = gridStepFor(camera.scale);
   const left = -camera.x / camera.scale;
   const top = -camera.y / camera.scale;
   const right = (size.w - camera.x) / camera.scale;
   const bottom = (size.h - camera.y) / camera.scale;
-  const gridLines: number[] = [];
-  if (isTop) {
-    for (let x = Math.floor(left / step) * step; x <= right; x += step) {
-      gridLines.push(x, top, x, bottom);
-    }
-    for (let y = Math.floor(top / step) * step; y <= bottom; y += step) {
-      gridLines.push(left, y, right, y);
-    }
-  } else {
-    const vMin = -bottom;
-    const vMax = -top;
-    for (let u = Math.floor(left / step) * step; u <= right; u += step) {
-      gridLines.push(u, -vMax, u, -vMin);
-    }
-    for (let v = Math.floor(vMin / step) * step; v <= vMax; v += step) {
-      gridLines.push(left, -v, right, -v);
-    }
-  }
+  const gridLines = computeGridSegments(
+    { left, top, right, bottom },
+    step,
+    isTop ? 'top' : 'elevation',
+  );
 
   // Dữ liệu mặt đứng: tường sắp xa → gần, mỗi tường kèm các lỗ cửa của nó.
   const elevData = useMemo(() => {
@@ -753,13 +738,12 @@ export default function View2D() {
         }}
       >
         <Layer x={camera.x} y={camera.y} scaleX={camera.scale} scaleY={camera.scale}>
-          <Line points={gridLines} stroke={c.grid} strokeWidth={1 / camera.scale} listening={false} />
+          <Segments points={gridLines} stroke={c.grid} strokeWidth={1 / camera.scale} />
           {isTop ? (
-            <Line
+            <Segments
               points={[0, top, 0, bottom, left, 0, right, 0]}
               stroke={c.axis}
               strokeWidth={1 / camera.scale}
-              listening={false}
             />
           ) : (
             <>
@@ -919,9 +903,9 @@ export default function View2D() {
           {/* Dimension cho tường đang chọn. */}
           {dim && (
             <>
-              <Line points={dim.ext} stroke={c.dim} strokeWidth={1 / camera.scale} listening={false} />
+              <Segments points={dim.ext} stroke={c.dim} strokeWidth={1 / camera.scale} />
               <Line points={dim.line} stroke={c.dim} strokeWidth={1.5 / camera.scale} listening={false} />
-              <Line points={dim.ticks} stroke={c.dim} strokeWidth={1.5 / camera.scale} listening={false} />
+              <Segments points={dim.ticks} stroke={c.dim} strokeWidth={1.5 / camera.scale} />
               <Text
                 x={dim.lx}
                 y={dim.ly}
