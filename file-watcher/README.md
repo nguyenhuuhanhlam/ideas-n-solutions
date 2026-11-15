@@ -246,9 +246,14 @@ Payload là JSON event hiện tại + thêm `"action"`:
 
 - File bị đổi tên **ra khỏi** thư mục theo dõi thì app chỉ biết
   tên cũ nên không gửi. File đổi tên **từ ngoài vào** thì gửi
-  bình thường (tên mới khớp mẫu). Trên macOS, rename chỉ có 1
-  path (FSEvents không phân biệt cũ/mới, thường là tên mới) nên
-  app khớp theo path đó.
+  bình thường (tên mới khớp mẫu). Trên macOS, FSEvents báo 1 lần
+  đổi tên thành 2 event riêng (1 ở tên cũ, 1 ở tên mới), không
+  cho biết chiều — app tự ghép 2 event kề nhau, cùng thư mục,
+  khi đúng 1 trong 2 tên còn tồn tại (tên còn tồn tại là tên
+  mới) thành 1 dòng `cũ -> mới`, webhook chỉ gửi 1 lần theo tên
+  mới. Đổi tên qua thư mục khác, hoặc 2 lần đổi tên dồn trong
+  cùng 1 cửa sổ 200ms, có thể vẫn hiện 2 dòng riêng (app thà
+  không ghép còn hơn ghép sai).
 - Gửi bằng `curl` có sẵn trên máy (Windows/macOS/Linux đều có
   sẵn), hỗ trợ cả `http://` và `https://`, timeout 10s, chạy ở
   thread nền nên không chặn watcher. Gửi lỗi (không có curl,

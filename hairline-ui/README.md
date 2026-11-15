@@ -7,7 +7,7 @@
 > component, hành vi — để sau này tách ra thành thư viện dùng chung
 > mà không phải đoán lại từ đầu.
 >
-> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.11.0.
+> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.11.1.
 
 ## Nguồn gốc
 
@@ -467,6 +467,7 @@ sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
 | 0.9.9 | 2026-11-14 | Section thu gọn trong sidebar (component dùng lại từ kit `Hairline.initCollapsibleSections`): bấm tiêu đề để thu gọn/mở ra (chevron Lucide right/down, Enter/Space khi focus, `aria-expanded`); mặc định đóng trừ Watched folders; trạng thái từng section lưu `file-watcher-section-<id>`; body của section là mọi sibling tới `<h6>` tiếp theo nên Watched folders gồm cả danh sách lẫn khối thêm thư mục. |
 | 0.10.0 | 2026-11-14 | Webhook n8n khi đổi tên file: thêm ô `n8n webhook URL` (field + hint chuẩn trong section Settings, không thêm component mới); đổi tên file thành `tên--ACTION.ext` thì app POST JSON event (+ `"action"`) tới webhook, gửi bằng `curl` ở thread nền. |
 | 0.11.0 | 2026-11-15 | Trạng thái webhook trên dòng event (sending/sent/failed + nút Re-send khi lỗi, tiêu đề nhóm gom trạng thái tệ nhất): icon `loader-circle` mới trong sprite (22 icon) cho trạng thái đang gửi (xoay bằng CSS), `circle-check`/`circle-alert` cho sent/failed, `refresh-cw` cho nút Re-send; trạng thái đi qua cùng kênh log/SSE dưới dạng entry riêng, không tính vào số đếm event. |
+| 0.11.1 | 2026-11-15 | Sửa rename bị double trên macOS: FSEvents báo 1 lần đổi tên thành 2 event Any kề nhau (tên cũ + tên mới) — app ghép thành 1 dòng `cũ -> mới` khi cùng thư mục và đúng 1 tên còn tồn tại (tên còn tồn tại là tên mới); webhook chỉ gửi 1 lần theo tên mới. Không đủ chắc chắn thì giữ 2 dòng. |
 
 ## Tham chiếu
 

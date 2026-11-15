@@ -292,8 +292,9 @@ struct Entry {
 
 /// Gom các event dồn dập trong một cửa sổ debounce thành các dòng
 /// log gọn. Giữ thứ tự xuất hiện lần đầu của mỗi đường dẫn.
-/// Ngoài gộp theo đường dẫn, còn ghép các nửa rename (From/To/Both)
-/// về đúng 1 dòng cho mỗi lần đổi tên (xem `RenameSide`).
+/// Ngoài gộp theo đường dẫn, còn ghép các nửa rename (From/To/Both
+/// và Any/Any kiểu macOS) về đúng 1 dòng cho mỗi lần đổi tên (xem
+/// `RenameSide`).
 #[derive(Default)]
 pub struct Coalescer {
     order: Vec<Entry>,
@@ -302,6 +303,10 @@ pub struct Coalescer {
     /// nó là event vừa push ngay trước đó (để ghép cặp với To-single
     /// kề sau, kiểu Windows). Mọi push khác đều xóa nó.
     last_from: Option<usize>,
+    /// Vị trí của Any-single vừa push gần nhất — chỉ có nghĩa khi
+    /// nó là event vừa push ngay trước đó (để ghép cặp với
+    /// Any-single kề sau, kiểu macOS). Mọi push khác đều xóa nó.
+    last_any: Option<usize>,
 }
 
 impl Coalescer {
@@ -372,6 +377,75 @@ impl Coalescer {
             self.last_from = None;
         }
 
+        // 1b. Ghép cặp Any -> Any kề nhau (kiểu macOS: FSEvents báo
+        //     1 lần đổi tên thành 2 record — 1 ở tên cũ, 1 ở tên mới
+        //     — cả hai đều là RenameMode::Any, không có chiều; xem
+        //     `notify` 8.2.2 fsevent.rs: "provides no mechanism to
+        //     associate the old and new sides"). Chỉ ghép khi 2
+        //     event kề nhau (không có event khác chen giữa), cùng
+        //     thư mục cha, và ĐÚNG 1 trong 2 đường dẫn còn tồn tại
+        //     (đường dẫn còn tồn tại là tên mới — tên cũ đã bị đổi
+        //     đi; thứ tự đến không đáng tin nên phải xét tồn tại).
+        //     Cả 2 cùng tồn tại hoặc cùng mất thì không dám chắc là
+        //     cùng 1 lần đổi tên (có thể là 2 lần đổi tên riêng biệt
+        //     trong cùng cửa sổ), thà in 2 dòng còn hơn ghép sai.
+        //     Ghép xong cũng nuốt Create của tên cũ như rule 2
+        //     (lưu atomic: tạo file tạm rồi rename).
+        if summary.side == Some(RenameSide::Any) {
+            if let Some(i) = self.last_any {
+                if let Some(entry) = self.order.get(i) {
+                    if !entry.dropped && entry.summary.side == Some(RenameSide::Any) {
+                        let first = entry.summary.path.clone();
+                        let second = summary.path.clone();
+                        let first_exists = first.exists();
+                        let second_exists = second.exists();
+                        if first.parent() == second.parent() && first_exists != second_exists {
+                            let (from_path, to_path) = if second_exists {
+                                (first, second)
+                            } else {
+                                (second, first)
+                            };
+                            let from_tracker = entry.summary.tracker;
+                            let from_time = entry.summary.time.clone();
+                            let old_key = format!("R:?>{}", entry.summary.path.display());
+                            let new_key =
+                                format!("R:{}>{}", from_path.display(), to_path.display());
+                            self.index.remove(&old_key);
+                            self.last_any = None;
+                            if self.index.contains_key(&new_key) {
+                                // Cặp này đã có Both rồi (bản sao thừa):
+                                // hủy nửa Any đầu, giữ Both đã có.
+                                self.order[i].dropped = true;
+                            } else {
+                                self.index.insert(new_key, i);
+                                self.order[i].summary = Summary {
+                                    kind: Kind::Renamed,
+                                    path: to_path,
+                                    from: Some(from_path.clone()),
+                                    side: Some(RenameSide::Both),
+                                    tracker: from_tracker,
+                                    time: from_time,
+                                    size: None,
+                                    delta: None,
+                                };
+                                // Nuốt Create của tên cũ (như rule 2).
+                                let src_key = format!("P:{}", from_path.display());
+                                if let Some(j) = self.index.get(&src_key).copied() {
+                                    if self.order[j].summary.kind == Kind::Created {
+                                        self.order[j].dropped = true;
+                                        self.index.remove(&src_key);
+                                    }
+                                }
+                            }
+                            return;
+                        }
+                    }
+                }
+            }
+            // Không ghép được: rơi xuống bước 4 như thường
+            // (last_any cập nhật ở đó).
+        }
+
         // 2. Rename "nuốt" Create của nguồn: file vừa tạo trong cửa sổ
         //    này rồi đổi tên ngay (kiểu lưu atomic của editor: ghi file
         //    tạm rồi rename đè lên file thật) thì chỉ còn dòng rename —
@@ -410,6 +484,7 @@ impl Coalescer {
         // 4. Gộp theo khóa như thường.
         let key = summary.key();
         let is_from_single = summary.side == Some(RenameSide::From);
+        let is_any_single = summary.side == Some(RenameSide::Any);
         if let Some(&i) = self.index.get(&key) {
             let entry = &mut self.order[i];
             match merge(entry.summary.kind, summary.kind) {
@@ -424,6 +499,7 @@ impl Coalescer {
                 }
             }
             self.last_from = if is_from_single { Some(i) } else { None };
+            self.last_any = if is_any_single { Some(i) } else { None };
         } else {
             self.index.insert(key, self.order.len());
             self.order.push(Entry {
@@ -431,6 +507,11 @@ impl Coalescer {
                 dropped: false,
             });
             self.last_from = if is_from_single {
+                Some(self.order.len() - 1)
+            } else {
+                None
+            };
+            self.last_any = if is_any_single {
                 Some(self.order.len() - 1)
             } else {
                 None
@@ -447,10 +528,12 @@ impl Coalescer {
     pub fn take(&mut self) -> Vec<Summary> {
         let items = std::mem::take(&mut self.order);
         self.index.clear();
-        // BẮT BUỘC: last_from trỏ vào order cũ — không xóa thì cửa sổ
-        // sau push To-single sẽ index ra ngoài vec và panic (lỗi thật,
-        // bắt được khi test rename-in ngày 2026-11-12).
+        // BẮT BUỘC: last_from/last_any trỏ vào order cũ — không xóa
+        // thì cửa sổ sau push To/Any-single sẽ index ra ngoài vec và
+        // panic (lỗi thật với last_from, bắt được khi test rename-in
+        // ngày 2026-11-12; last_any cùng họ lỗi).
         self.last_from = None;
+        self.last_any = None;
         items
             .into_iter()
             .filter(|e| !e.dropped)
@@ -2222,6 +2305,182 @@ mod tests {
         let out = c.take();
         assert_eq!(out.len(), 1);
         assert_eq!(out[0].side, Some(RenameSide::To));
+    }
+
+    /// Thư mục tạm riêng cho 1 test (tên riêng từng test để chạy
+    /// song song không đụng nhau; dọn tay sau test).
+    fn test_tmp(name: &str) -> PathBuf {
+        let dir = std::env::temp_dir().join(format!("fw-test-{name}"));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        dir
+    }
+
+    #[test]
+    fn coalescer_macos_any_pair_becomes_one_line() {
+        // macOS (lỗi thật 2026-11-15): 1 lần đổi tên -> 2 record Any
+        // kề nhau (tên cũ rồi tên mới). Chỉ tên mới còn tồn tại ->
+        // ghép thành 1 dòng Both; webhook chỉ kích hoạt theo tên mới
+        // (action của tên cũ không được gửi).
+        let dir = test_tmp("any-pair");
+        let old = dir.join("plan--SEND.png");
+        let new = dir.join("plan--mail.png");
+        std::fs::write(&new, b"x").unwrap();
+        let mut c = Coalescer::new();
+        c.push(ren(RenameSide::Any, old.to_str().unwrap(), None, None));
+        c.push(ren(RenameSide::Any, new.to_str().unwrap(), None, None));
+        let out = c.take();
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].side, Some(RenameSide::Both));
+        assert_eq!(out[0].path, new);
+        assert_eq!(out[0].from, Some(old.clone()));
+        assert_eq!(
+            format_human(&out[0], &ident()),
+            format!(
+                "2026-11-12 22:00:00  RENAMED   lam@may1  —  {} -> {}",
+                old.display(),
+                new.display()
+            )
+        );
+        assert!(format_json(&out[0], &ident()).contains("\"direction\":\"both\""));
+        assert_eq!(webhook_action(&out[0]), Some("mail".to_string()));
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn coalescer_macos_any_pair_reversed_order() {
+        // Thứ tự đến ngược (tên mới trước, tên cũ sau) vẫn ghép
+        // đúng chiều — chiều do sự tồn tại quyết định, không do
+        // thứ tự đến.
+        let dir = test_tmp("any-pair-rev");
+        let old = dir.join("cu.txt");
+        let new = dir.join("moi.txt");
+        std::fs::write(&new, b"x").unwrap();
+        let mut c = Coalescer::new();
+        c.push(ren(RenameSide::Any, new.to_str().unwrap(), None, None));
+        c.push(ren(RenameSide::Any, old.to_str().unwrap(), None, None));
+        let out = c.take();
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].side, Some(RenameSide::Both));
+        assert_eq!(out[0].path, new);
+        assert_eq!(out[0].from, Some(old));
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn coalescer_macos_any_pair_guards() {
+        // Không đủ chắc chắn thì thà in 2 dòng còn hơn ghép sai.
+        let dir = test_tmp("any-guards");
+        let a = dir.join("a.txt");
+        let b = dir.join("b.txt");
+        let other = test_tmp("any-guards-other");
+        let c_other = other.join("c.txt");
+
+        // Cả 2 cùng tồn tại: có thể là 2 lần đổi tên vào.
+        std::fs::write(&a, b"x").unwrap();
+        std::fs::write(&b, b"x").unwrap();
+        let mut c = Coalescer::new();
+        c.push(ren(RenameSide::Any, a.to_str().unwrap(), None, None));
+        c.push(ren(RenameSide::Any, b.to_str().unwrap(), None, None));
+        let out = c.take();
+        assert_eq!(out.len(), 2);
+        assert!(out.iter().all(|s| s.side == Some(RenameSide::Any)));
+
+        // Cả 2 cùng mất: có thể là 2 lần đổi tên ra.
+        std::fs::remove_file(&a).unwrap();
+        std::fs::remove_file(&b).unwrap();
+        let mut c = Coalescer::new();
+        c.push(ren(RenameSide::Any, a.to_str().unwrap(), None, None));
+        c.push(ren(RenameSide::Any, b.to_str().unwrap(), None, None));
+        let out = c.take();
+        assert_eq!(out.len(), 2);
+
+        // Khác thư mục cha: không ghép dù 1 bên còn tồn tại
+        // (a đã mất, c_other còn — chỉ khác thư mục ngăn ghép).
+        std::fs::write(&c_other, b"x").unwrap();
+        let mut c = Coalescer::new();
+        c.push(ren(RenameSide::Any, a.to_str().unwrap(), None, None));
+        c.push(ren(RenameSide::Any, c_other.to_str().unwrap(), None, None));
+        let out = c.take();
+        assert_eq!(out.len(), 2);
+
+        // Không kề nhau (có event chen giữa): không ghép.
+        std::fs::write(&a, b"x").unwrap();
+        let mut c = Coalescer::new();
+        c.push(ren(RenameSide::Any, a.to_str().unwrap(), None, None));
+        c.push(sum(Kind::Created, "/x/other.txt"));
+        c.push(ren(RenameSide::Any, b.to_str().unwrap(), None, None));
+        let out = c.take();
+        assert_eq!(out.len(), 3);
+        assert_eq!(out[0].side, Some(RenameSide::Any));
+        assert_eq!(out[2].side, Some(RenameSide::Any));
+        std::fs::remove_dir_all(&dir).unwrap();
+        std::fs::remove_dir_all(&other).unwrap();
+    }
+
+    #[test]
+    fn coalescer_macos_any_double_rename() {
+        // Đổi tên 2 lần trong 1 cửa sổ (A -> B -> C): cặp đầu
+        // không ghép được (A và B đều đã mất), cặp sau ghép được
+        // (B mất, C còn). Kết quả: Any(A) + Both(B -> C).
+        let dir = test_tmp("any-double");
+        let a = dir.join("a.txt");
+        let b = dir.join("b.txt");
+        let cc = dir.join("c.txt");
+        std::fs::write(&cc, b"x").unwrap();
+        let mut c = Coalescer::new();
+        c.push(ren(RenameSide::Any, a.to_str().unwrap(), None, None));
+        c.push(ren(RenameSide::Any, b.to_str().unwrap(), None, None));
+        c.push(ren(RenameSide::Any, b.to_str().unwrap(), None, None));
+        c.push(ren(RenameSide::Any, cc.to_str().unwrap(), None, None));
+        let out = c.take();
+        assert_eq!(out.len(), 2);
+        assert_eq!(out[0].side, Some(RenameSide::Any));
+        assert_eq!(out[0].path, a);
+        assert_eq!(out[1].side, Some(RenameSide::Both));
+        assert_eq!(out[1].from, Some(b));
+        assert_eq!(out[1].path, cc);
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn coalescer_macos_any_pair_swallows_source_create() {
+        // Lưu atomic trên macOS: tạo file tạm rồi rename -> chỉ
+        // còn dòng rename, Create của tên tạm bị nuốt như rule 2.
+        let dir = test_tmp("any-swallow");
+        let tmp = dir.join(".tmp123");
+        let real = dir.join("final.txt");
+        std::fs::write(&real, b"x").unwrap();
+        let mut c = Coalescer::new();
+        c.push(sum(Kind::Created, tmp.to_str().unwrap()));
+        c.push(ren(RenameSide::Any, tmp.to_str().unwrap(), None, None));
+        c.push(ren(RenameSide::Any, real.to_str().unwrap(), None, None));
+        let out = c.take();
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].side, Some(RenameSide::Both));
+        assert_eq!(out[0].path, real);
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn coalescer_no_any_pairing_across_windows() {
+        // take() phải xóa last_any như last_from: Any ở cửa sổ
+        // trước + Any ở cửa sổ sau không được ghép cặp (và không
+        // được panic khi index vào order cũ).
+        let dir = test_tmp("any-windows");
+        let old = dir.join("cu.txt");
+        let new = dir.join("moi.txt");
+        std::fs::write(&new, b"x").unwrap();
+        let mut c = Coalescer::new();
+        c.push(ren(RenameSide::Any, old.to_str().unwrap(), None, None));
+        let out = c.take();
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].side, Some(RenameSide::Any));
+        c.push(ren(RenameSide::Any, new.to_str().unwrap(), None, None));
+        let out = c.take();
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].side, Some(RenameSide::Any));
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 
     #[test]
