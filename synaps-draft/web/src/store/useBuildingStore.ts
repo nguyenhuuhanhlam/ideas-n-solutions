@@ -50,6 +50,10 @@ interface BuildingState {
   panelVisible: boolean;
   /** Hiện lưới 2D hay không. UI, không undo. */
   showGrid: boolean;
+  /** Tỉ lệ vừa khung hình của view 2D đang xem — mốc 100% của pill Zoom. UI, không undo. */
+  fitScale: number;
+  /** Bộ đếm yêu cầu vừa khung (Shift+1 / bấm pill Zoom): View2D fit khi số này tăng. UI, không undo. */
+  fitRequest: number;
   draft: Draft | null;
   past: HistoryEntry[];
   future: HistoryEntry[];
@@ -79,6 +83,8 @@ interface BuildingState {
   setView2d: (view: View2d) => void;
   setPanelVisible: (visible: boolean) => void;
   setShowGrid: (visible: boolean) => void;
+  setFitScale: (scale: number) => void;
+  requestFit: () => void;
   setDraft: (draft: Draft | null) => void;
   setCursor: (p: Point | null, snap: SnapKind) => void;
   setLengthInput: (s: string) => void;
@@ -117,6 +123,8 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
   view2d: 'top',
   panelVisible: true,
   showGrid: true,
+  fitScale: 0.1,
+  fitRequest: 0,
   draft: null,
   past: [],
   future: [],
@@ -190,6 +198,8 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
   setViewMode: (viewMode) => set({ viewMode }),
   setPanelVisible: (panelVisible) => set({ panelVisible }),
   setShowGrid: (showGrid) => set({ showGrid }),
+  setFitScale: (fitScale) => set({ fitScale }),
+  requestFit: () => set((s) => ({ fitRequest: s.fitRequest + 1 })),
   setView2d: (view2d) =>
     set({
       view2d,

@@ -28,6 +28,7 @@ export default function App() {
   const viewMode = useBuildingStore((s) => s.viewMode);
   const view2d = useBuildingStore((s) => s.view2d);
   const camera = useBuildingStore((s) => s.cameras[s.view2d]);
+  const fitScale = useBuildingStore((s) => s.fitScale);
   const canUndo = useBuildingStore((s) => s.past.length > 0);
   const canRedo = useBuildingStore((s) => s.future.length > 0);
   const wallCount = useBuildingStore((s) => selectActiveLevel(s)?.walls.length ?? 0);
@@ -113,6 +114,11 @@ export default function App() {
       }
       // Chuyển view 2D: 1 = mặt bằng Top, 2/3 = mặt đứng Left/Right.
       // (Đặt sau khối nhập số khi draft nên số vẫn vào chiều dài khi đang vẽ.)
+      // Shift+1 = vừa khung hình (về zoom 100%).
+      if (e.shiftKey && e.code === 'Digit1') {
+        s.requestFit();
+        return;
+      }
       if (e.key === '1') s.setView2d('top');
       if (e.key === '2') s.setView2d('left');
       if (e.key === '3') s.setView2d('right');
@@ -283,9 +289,15 @@ export default function App() {
         >
           {unit}
         </button>
-        <span className="rounded-full border border-syn-border bg-white px-3 py-1.5 text-xs font-medium tabular-nums text-syn-ink shadow-sm">
-          Zoom {Math.round(camera.scale * 100)}%
-        </span>
+        {/* Zoom tính theo mốc vừa khung hình (100%): bấm để về 100%. */}
+        <button
+          type="button"
+          title="Vừa khung hình (100%) — Shift+1"
+          onClick={() => store().requestFit()}
+          className="rounded-full border border-syn-border bg-white px-3 py-1.5 text-xs font-medium tabular-nums text-syn-ink shadow-sm hover:bg-syn-field"
+        >
+          Zoom {Math.round((camera.scale / fitScale) * 100)}%
+        </button>
       </div>
 
       {/* Toast trạng thái, nổi giữa dưới */}

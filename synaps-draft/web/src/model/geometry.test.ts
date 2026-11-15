@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   clampOpeningOffset,
   distance,
+  fitScaleFor,
   mergeWallPolygons,
   mergeWallPolygonsWithHoles,
   midpoint,
@@ -160,6 +161,18 @@ describe('mergeWallPolygonsWithHoles', () => {
   });
   it('mảng rỗng trả về mảng rỗng', () => {
     expect(mergeWallPolygonsWithHoles([])).toEqual([]);
+  });
+});
+
+describe('fitScaleFor', () => {
+  it('vật thể chiếm 80% khung theo chiều hẹp hơn', () => {
+    // Nhà mẫu 9000×7000 vào khung 1052×900: chiều ngang hẹp hơn.
+    expect(fitScaleFor(9000, 7000, 1052, 900)).toBeCloseTo((1052 * 0.8) / 9000, 6);
+    // Khung cao hẹp: chiều dọc quyết định.
+    expect(fitScaleFor(9000, 7000, 2000, 500)).toBeCloseTo((500 * 0.8) / 7000, 6);
+  });
+  it('fill = 1 cho vật thể chạm mép khung', () => {
+    expect(fitScaleFor(1000, 1000, 500, 500, 1)).toBe(0.5);
   });
 });
 

@@ -1,11 +1,11 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { Arc, Layer, Line, Circle, Rect, Stage, Text } from 'react-konva';
 import Segments from '../components/Segments';
 import WallFill from '../components/WallFill';
 import { elevationBounds, elevationUToOffset, projectOpeningToElevation, projectWallToElevation, sortWallsByDepth, type ElevationView } from '../model/elevation';
-import { distance, mergeWallPolygonsWithHoles, midpoint, projectPointOnWall, wallLength, wallPolygon } from '../model/geometry';
+import { distance, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, projectPointOnWall, wallLength, wallPolygon } from '../model/geometry';
 import { computeGridSegments, gridStepFor } from '../model/grid';
 import { clampOffset, clampSill } from '../model/openingDrag';
 import type { Opening, Point, Wall } from '../model/schema';
@@ -19,7 +19,8 @@ import { createOpening, findNearestWall } from '../tools/openingTool';
  * sẽ lật Y (y_dxf = -y).
  */
 
-const MIN_SCALE = 0.1;
+/** Zoom nhỏ nhất (tuyệt đối): đủ thấp để zoom ra bao quát hơn nhiều so với mốc 100% (≈0.09). */
+const MIN_SCALE = 0.02;
 const MAX_SCALE = 10;
 const OPENING_PICK_RADIUS_PX = 15;
 const DIM_OFFSET = 600; // mm, khoảng cách đường kích thước khỏi tường
@@ -179,54 +180,73 @@ export default function View2D() {
     return () => ro.disconnect();
   }, []);
 
-  // Lần đầu mở mỗi view: căn khung hình vào toàn bộ building, căn giữa theo
-  // vùng canvas nhìn thấy (trừ phần bị panel trái + toolbar che).
+  // Căn khung hình vào toàn bộ building, căn giữa theo vùng canvas nhìn thấy
+  // (trừ phần bị panel trái + toolbar che). Đây là mốc zoom 100%: vật thể
+  // chiếm 80% khung nhìn, còn lề xung quanh để bao quát.
   // Đọc kích thước thật từ container: state `size` khởi tạo 800×600 nên nếu
   // fit theo nó thì camera sẽ kẹt ở góc trên-trái màn hình lớn.
   const panelVisible = useBuildingStore((s) => s.panelVisible);
   const showGrid = useBuildingStore((s) => s.showGrid);
-  useEffect(() => {
-    if (fittedRef.current[view2d]) return;
+  const computeFit = useCallback((): { scale: number; x: number; y: number } | null => {
     const el = containerRef.current;
-    if (!el || el.clientWidth < 100 || el.clientHeight < 100) return;
-    fittedRef.current[view2d] = true;
+    if (!el || el.clientWidth < 100 || el.clientHeight < 100) return null;
     const w = el.clientWidth;
     const h = el.clientHeight;
     // Chiều rộng phần canvas bị che bên trái: panel 300 + toolbar 56 + các
     // khoảng cách; khi panel thu gọn chỉ còn toolbar.
     const overlay = panelVisible ? 388 : 80;
     const centerX = (overlay + w) / 2;
+    const visibleW = w - overlay;
     const state = useBuildingStore.getState();
+    const clamp = (s: number) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, s));
     if (view2d === 'top') {
-      const scale = Math.min(
-        MAX_SCALE,
-        Math.max(MIN_SCALE, Math.min((w - overlay - 80) / 9000, (h - 80) / 7000)),
-      );
-      state.setCamera({
-        scale,
-        x: centerX - 4000 * scale,
-        y: h / 2 - 3000 * scale,
-      });
-      return;
+      const scale = clamp(fitScaleFor(9000, 7000, visibleW, h));
+      return { scale, x: centerX - 4000 * scale, y: h / 2 - 3000 * scale };
     }
     // Mặt đứng: fit theo bounding box hình chiếu (Konva y = −v nên cộng v vào y).
     const lvl = selectActiveLevel(state);
     const bounds = lvl ? elevationBounds(lvl.walls, lvl, view2d) : null;
-    if (!bounds) return;
+    if (!bounds) return null;
     const bw = Math.max(bounds.u1 - bounds.u0, 1000);
     const bh = Math.max(bounds.vTop - bounds.vBottom, 1000);
-    const scale = Math.min(
-      MAX_SCALE,
-      Math.max(MIN_SCALE, Math.min((w - overlay - 80) / bw, (h - 80) / bh)),
-    );
+    const scale = clamp(fitScaleFor(bw, bh, visibleW, h));
     const uc = (bounds.u0 + bounds.u1) / 2;
     const vc = (bounds.vBottom + bounds.vTop) / 2;
-    state.setCamera({
-      scale,
-      x: centerX - uc * scale,
-      y: h / 2 + vc * scale,
-    });
-  }, [size, view2d, panelVisible]);
+    return { scale, x: centerX - uc * scale, y: h / 2 + vc * scale };
+  }, [view2d, panelVisible]);
+
+  // Lần đầu mở mỗi view: fit vào 100%.
+  useEffect(() => {
+    if (fittedRef.current[view2d]) return;
+    const fit = computeFit();
+    if (!fit) return;
+    fittedRef.current[view2d] = true;
+    const state = useBuildingStore.getState();
+    state.setCamera(fit);
+    state.setFitScale(fit.scale);
+  }, [size, view2d, computeFit]);
+
+  // Mốc 100% thay đổi theo khung nhìn (đổi cửa sổ, đóng/mở panel, đổi view):
+  // cập nhật fitScale để pill Zoom hiển thị đúng — KHÔNG di chuyển camera.
+  useEffect(() => {
+    const fit = computeFit();
+    if (!fit) return;
+    const state = useBuildingStore.getState();
+    if (Math.abs(state.fitScale - fit.scale) > 1e-9) state.setFitScale(fit.scale);
+  }, [size, computeFit]);
+
+  // Về 100% theo yêu cầu (Shift+1 / bấm pill Zoom): mỗi yêu cầu chỉ fit 1 lần.
+  const fitRequest = useBuildingStore((s) => s.fitRequest);
+  const handledFitRef = useRef(useBuildingStore.getState().fitRequest);
+  useEffect(() => {
+    if (fitRequest === handledFitRef.current) return;
+    handledFitRef.current = fitRequest;
+    const fit = computeFit();
+    if (!fit) return;
+    const state = useBuildingStore.getState();
+    state.setCamera(fit);
+    state.setFitScale(fit.scale);
+  }, [fitRequest, computeFit]);
 
   // Theo dõi phím Space để pan.
   useEffect(() => {

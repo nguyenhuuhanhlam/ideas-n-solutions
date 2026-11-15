@@ -153,6 +153,21 @@ export function mergeWallPolygonsWithHoles(walls: Wall[]): MergedWallPolygon[] {
 }
 
 /**
+ * Tỉ lệ vừa khung hình (mốc zoom 100%): vật thể bao `envW × envH` (mm) nằm
+ * gọn trong khung nhìn `visibleW × visibleH` (px), chiếm `fill` phần khung
+ * (mặc định 0.8 — còn 20% lề xung quanh để nhìn bao quát).
+ */
+export function fitScaleFor(
+  envW: number,
+  envH: number,
+  visibleW: number,
+  visibleH: number,
+  fill = 0.8,
+): number {
+  return Math.min((visibleW * fill) / envW, (visibleH * fill) / envH);
+}
+
+/**
  * Clamp offset của opening để nó nằm gọn trong tường:
  * offset ∈ [0, max(0, wallLength - width)].
  */
