@@ -39,6 +39,7 @@ const COLORS = {
   axis: '#D6D6D2',
   wallFill: '#8A8A8A',
   wallStroke: '#6E6E6E',
+  swing: '#A8A8A8', // ký hiệu hướng mở cửa (đứt khúc, nhạt hơn nét tường)
   center: '#A8A8A8',
   selected: '#3B9BD6',
   draft: '#3B9BD6',
@@ -1398,6 +1399,10 @@ export default function View2D() {
             if (o.type === 'door') {
               const swing = doorSwing(o, wall);
               const leafEnd = swing.leafEnd;
+              // Ký hiệu hướng mở: nét đứt khúc, màu nhạt hơn nét tường
+              // (khi chọn thì xanh như các nét chọn khác, vẫn đứt khúc).
+              const swingStroke = isSel ? c.selected : c.swing;
+              const swingDash = [8 / camera.scale, 5 / camera.scale];
               return (
                 <Fragment key={o.id}>
                   {/* Khoảng trống trên thân tường. */}
@@ -1410,8 +1415,9 @@ export default function View2D() {
                   {/* Cánh cửa + cung 90° thể hiện hướng mở (flip đảo phía). */}
                   <Line
                     points={[a.x, a.y, leafEnd.x, leafEnd.y]}
-                    stroke={stroke}
+                    stroke={swingStroke}
                     strokeWidth={1.5 / camera.scale}
+                    dash={swingDash}
                     listening={false}
                   />
                   <Arc
@@ -1421,8 +1427,9 @@ export default function View2D() {
                     outerRadius={o.width}
                     angle={swing.arcAngle}
                     rotation={swing.arcRotation}
-                    stroke={stroke}
+                    stroke={swingStroke}
                     strokeWidth={1.5 / camera.scale}
+                    dash={swingDash}
                     listening={false}
                   />
                   {/* Vùng click chọn + kéo thả opening (phủ đúng lỗ cửa). */}
