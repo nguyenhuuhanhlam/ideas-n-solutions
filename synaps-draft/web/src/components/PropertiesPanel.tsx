@@ -136,8 +136,8 @@ function AlignmentControl() {
 
 export default function PropertiesPanel() {
   const level = useBuildingStore(selectActiveLevel);
-  const selectedWallId = useBuildingStore((s) => s.selectedWallId);
-  const selectedOpeningId = useBuildingStore((s) => s.selectedOpeningId);
+  const selectedWallIds = useBuildingStore((s) => s.selectedWallIds);
+  const selectedOpeningIds = useBuildingStore((s) => s.selectedOpeningIds);
   const unit = useBuildingStore((s) => s.unit);
   const showGrid = useBuildingStore((s) => s.showGrid);
   const [openingError, setOpeningError] = useState<string | null>(null);
@@ -145,11 +145,17 @@ export default function PropertiesPanel() {
   // Đổi lựa chọn thì xóa lỗi cũ.
   useEffect(() => {
     setOpeningError(null);
-  }, [selectedOpeningId]);
+  }, [selectedOpeningIds]);
 
   const store = useBuildingStore.getState;
-  const wall = level?.walls.find((w) => w.id === selectedWallId) ?? null;
-  const opening = level?.openings.find((o) => o.id === selectedOpeningId) ?? null;
+  const selectedWalls = level?.walls.filter((w) => selectedWallIds.includes(w.id)) ?? [];
+  const selectedOpenings =
+    level?.openings.filter((o) => selectedOpeningIds.includes(o.id)) ?? [];
+  const totalSelected = selectedWalls.length + selectedOpenings.length;
+  /** Thuộc tính chi tiết chỉ hiện khi đúng 1 vật thể được chọn. */
+  const wall = totalSelected === 1 ? (selectedWalls[0] ?? null) : null;
+  const opening = totalSelected === 1 ? (selectedOpenings[0] ?? null) : null;
+  const isMulti = totalSelected > 1;
   const openingWall = opening
     ? (level?.walls.find((w) => w.id === opening.wallId) ?? null)
     : null;
@@ -293,7 +299,35 @@ export default function PropertiesPanel() {
         </section>
       )}
 
-      {!wall && !opening && level && (
+      {isMulti && level && (
+        <section className="flex flex-col gap-3">
+          <SectionTitle>Đã chọn</SectionTitle>
+          <p className="text-sm text-syn-ink">
+            {selectedWalls.length} tường · {selectedOpenings.length} cửa đã chọn
+          </p>
+          {selectedWalls.length > 0 && (
+            <p className="text-sm text-syn-ink">
+              Tổng dài tường{' '}
+              <span className="font-medium tabular-nums">
+                {fmt(
+                  selectedWalls.reduce((sum, w) => sum + wallLength(w), 0),
+                  unit,
+                )}
+              </span>
+            </p>
+          )}
+          <p className="text-sm text-syn-grey">Kéo 1 tường để di chuyển cả nhóm.</p>
+          <button
+            type="button"
+            onClick={() => store().deleteSelection()}
+            className="rounded-lg bg-syn-ink px-3 py-2 text-sm font-medium text-white hover:opacity-90"
+          >
+            Xóa vùng chọn
+          </button>
+        </section>
+      )}
+
+      {totalSelected === 0 && level && (
         <>
           <section className="flex flex-col gap-3">
             <SectionTitle>Canvas</SectionTitle>

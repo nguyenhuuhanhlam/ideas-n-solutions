@@ -35,9 +35,9 @@ interface HistoryEntry {
 interface BuildingState {
   building: Building;
   tool: Tool;
-  selectedWallId: string | null;
-  /** Chọn tường và opening là loại trừ nhau: chỉ một trong hai khác null. */
-  selectedOpeningId: string | null;
+  /** Vùng chọn nhiều vật thể (tường + cửa chọn chung được, không loại trừ nhau). */
+  selectedWallIds: string[];
+  selectedOpeningIds: string[];
   /** Camera riêng cho từng view 2D (mặt bằng dùng key 'top'). */
   cameras: Record<View2d, Camera>;
   unit: Unit;
@@ -72,16 +72,27 @@ interface BuildingState {
    * (kéo đỉnh/di chuyển tường có thể nối 2 tường thành polyline) —
    * tất cả trong 1 history entry. */
   commitWallPoints: (wallId: string, points: Point[]) => void;
+  /** Như commitWallPoints nhưng cho NHIỀU tường cùng lúc (kéo nhóm):
+   * đặt điểm cho tất cả rồi gộp 1 lần, trong 1 history entry. */
+  commitWallPointsMany: (updates: { wallId: string; points: Point[] }[]) => void;
   deleteWall: (id: string) => void;
   addOpening: (opening: Opening) => void;
   updateOpening: (id: string, patch: Partial<Opening>) => void;
   deleteOpening: (id: string) => void;
+  /** Xóa toàn bộ vùng chọn (tường + cửa trên chúng + cửa chọn riêng)
+   * trong ĐÚNG 1 history entry, rồi bỏ chọn. */
+  deleteSelection: () => void;
   updateLevel: (patch: Partial<Pick<Level, 'name' | 'height'>>) => void;
   /** Thay toàn bộ building (mở file / tạo mới); undo được về bản trước. */
   loadBuilding: (building: Building) => void;
   setTool: (tool: Tool) => void;
-  setSelection: (id: string | null) => void;
-  setOpeningSelection: (id: string | null) => void;
+  /** Bấm thường: chỉ chọn 1 vật thể, xóa hết chọn cũ (id null = bỏ chọn). */
+  selectSingle: (kind: 'wall' | 'opening', id: string | null) => void;
+  /** Shift+bấm: thêm/bớt 1 vật thể khỏi vùng chọn, giữ nguyên phần còn lại. */
+  toggleInSelection: (kind: 'wall' | 'opening', id: string) => void;
+  /** Đặt vùng chọn theo 2 danh sách (khung kéo / Ctrl+A). */
+  setSelection: (wallIds: string[], openingIds: string[]) => void;
+  clearSelection: () => void;
   /** Cập nhật camera của view 2D đang xem. */
   setCamera: (camera: Partial<Camera>) => void;
   setUnit: (unit: Unit) => void;
@@ -117,8 +128,8 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
   // Khởi động: autosave trong localStorage nếu có, ngược lại seed.
   building: initialBuilding(),
   tool: 'select',
-  selectedWallId: null,
-  selectedOpeningId: null,
+  selectedWallIds: [],
+  selectedOpeningIds: [],
   cameras: {
     top: { x: 0, y: 0, scale: 0.1 },
     left: { x: 0, y: 0, scale: 0.1 },
@@ -168,9 +179,20 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
     }),
 
   commitWallPoints: (wallId, points) => {
+    get().commitWallPointsMany([{ wallId, points }]);
+  },
+
+  commitWallPointsMany: (updates) => {
+    if (updates.length === 0) return;
     const level = get().building.levels[0];
     if (!level) return;
-    const walls = level.walls.map((w) => (w.id === wallId ? { ...w, points } : w));
+    const byId = new Map(updates.map((u) => [u.wallId, u.points]));
+    const walls = level.walls.map((w) =>
+      byId.has(w.id) ? { ...w, points: byId.get(w.id) as Point[] } : w,
+    );
+    // Điểm trước khi gộp của mọi tường (để tìm tường "sống sót" cho cả
+    // tường bị gộp theo mà không nằm trong updates).
+    const preMergePoints = new Map(walls.map((w) => [w.id, w.points]));
     const merged = mergeCoincidentWalls(walls, level.openings);
     // Đổi điểm + gộp tường + dời opening trong CÙNG 1 history entry.
     applyBuildingChange(set, get, (b) => {
@@ -181,18 +203,30 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
     });
     // Gộp có thể làm mất id tường đang kéo (giữ id tường đứng trước):
     // chuyển chọn sang tường đã gộp để panel không nhảy về Canvas.
-    if (get().selectedWallId === wallId && !merged.walls.some((w) => w.id === wallId)) {
-      const first = points[0];
-      const last = points[points.length - 1];
-      const survivor =
-        first && last
-          ? merged.walls.find(
-              (w) =>
-                w.points.some((p) => p.x === first.x && p.y === first.y) &&
-                w.points.some((p) => p.x === last.x && p.y === last.y),
-            )
-          : undefined;
-      set({ selectedWallId: survivor ? survivor.id : null });
+    const selected = get().selectedWallIds;
+    const lost = selected.filter((id) => !merged.walls.some((w) => w.id === id));
+    if (lost.length > 0) {
+      const survivors = new Set<string>();
+      for (const wallId of lost) {
+        const points = preMergePoints.get(wallId);
+        const first = points?.[0];
+        const last = points?.[points.length - 1];
+        const survivor =
+          first && last
+            ? merged.walls.find(
+                (w) =>
+                  w.points.some((p) => p.x === first.x && p.y === first.y) &&
+                  w.points.some((p) => p.x === last.x && p.y === last.y),
+              )
+            : undefined;
+        if (survivor) survivors.add(survivor.id);
+      }
+      set({
+        selectedWallIds: [
+          ...selected.filter((id) => !lost.includes(id)),
+          ...survivors,
+        ],
+      });
     }
   },
 
@@ -222,6 +256,23 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
       level.openings = level.openings.filter((o) => o.id !== id);
     }),
 
+  deleteSelection: () => {
+    const { selectedWallIds, selectedOpeningIds } = get();
+    if (selectedWallIds.length === 0 && selectedOpeningIds.length === 0) return;
+    const wallSet = new Set(selectedWallIds);
+    const openingSet = new Set(selectedOpeningIds);
+    applyBuildingChange(set, get, (b) => {
+      const level = b.levels[0];
+      if (!level) return;
+      level.walls = level.walls.filter((w) => !wallSet.has(w.id));
+      // Cửa trên tường bị xóa đi theo tường; cửa chọn riêng xóa trực tiếp.
+      level.openings = level.openings.filter(
+        (o) => !wallSet.has(o.wallId) && !openingSet.has(o.id),
+      );
+    });
+    set({ selectedWallIds: [], selectedOpeningIds: [] });
+  },
+
   updateLevel: (patch) =>
     applyBuildingChange(set, get, (b) => {
       const level = b.levels[0];
@@ -235,12 +286,35 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
       b.version = merged.version;
       b.levels = merged.levels;
     });
-    set({ selectedWallId: null, selectedOpeningId: null, draft: null, lengthInput: '' });
+    set({ selectedWallIds: [], selectedOpeningIds: [], draft: null, lengthInput: '' });
   },
 
   setTool: (tool) => set({ tool, draft: null, lengthInput: '' }),
-  setSelection: (id) => set({ selectedWallId: id, selectedOpeningId: null }),
-  setOpeningSelection: (id) => set({ selectedOpeningId: id, selectedWallId: null }),
+  selectSingle: (kind, id) => {
+    if (id === null) {
+      set({ selectedWallIds: [], selectedOpeningIds: [] });
+      return;
+    }
+    set(
+      kind === 'wall'
+        ? { selectedWallIds: [id], selectedOpeningIds: [] }
+        : { selectedWallIds: [], selectedOpeningIds: [id] },
+    );
+  },
+  toggleInSelection: (kind, id) =>
+    set((s) => {
+      if (kind === 'wall') {
+        return s.selectedWallIds.includes(id)
+          ? { selectedWallIds: s.selectedWallIds.filter((x) => x !== id) }
+          : { selectedWallIds: [...s.selectedWallIds, id] };
+      }
+      return s.selectedOpeningIds.includes(id)
+        ? { selectedOpeningIds: s.selectedOpeningIds.filter((x) => x !== id) }
+        : { selectedOpeningIds: [...s.selectedOpeningIds, id] };
+    }),
+  setSelection: (selectedWallIds, selectedOpeningIds) =>
+    set({ selectedWallIds, selectedOpeningIds }),
+  clearSelection: () => set({ selectedWallIds: [], selectedOpeningIds: [] }),
   setCamera: (camera) =>
     set((s) => ({
       cameras: {
@@ -275,8 +349,8 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
       building: applyPatches(building, entry.inversePatches),
       past: s.past.slice(0, -1),
       future: [entry, ...s.future].slice(0, MAX_HISTORY),
-      selectedWallId: null,
-      selectedOpeningId: null,
+      selectedWallIds: [],
+      selectedOpeningIds: [],
       draft: null,
     }));
   },
@@ -289,8 +363,8 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
       building: applyPatches(building, entry.patches),
       past: [...s.past, entry].slice(-MAX_HISTORY),
       future: s.future.slice(1),
-      selectedWallId: null,
-      selectedOpeningId: null,
+      selectedWallIds: [],
+      selectedOpeningIds: [],
       draft: null,
     }));
   },

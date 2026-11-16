@@ -35,7 +35,7 @@ export default function View3D() {
   // Selector hẹp: chỉ re-render khi building/theme/selection đổi.
   const building = useBuildingStore((s) => s.building);
   const theme = useBuildingStore((s) => s.theme);
-  const selectedWallId = useBuildingStore((s) => s.selectedWallId);
+  const selectedWallIds = useBuildingStore((s) => s.selectedWallIds);
   const c = COLORS[theme];
 
   const bounds = useMemo(() => buildingBounds(building), [building]);
@@ -116,7 +116,7 @@ export default function View3D() {
             >
               <boxGeometry args={box.size} />
               <meshStandardMaterial
-                color={wall.id === selectedWallId ? c.selected : c.wall}
+                color={selectedWallIds.includes(wall.id) ? c.selected : c.wall}
                 roughness={0.9}
               />
               <Edges color={c.edge} />

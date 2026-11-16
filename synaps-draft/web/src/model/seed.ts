@@ -1,6 +1,14 @@
 import type { Building } from './schema';
 
-/** Nhà mẫu 2 phòng: hình chữ nhật ngoài 8000x6000mm, 1 tường ngăn giữa. */
+/**
+ * Nhà demo 1 tầng theo bản vẽ schematic (5600x7900mm, hình chữ L):
+ * khối bắc đủ 5,6m (Hall + Bathroom), khối nam chỉ phía đông
+ * (Main room + Bedroom), góc tây-nam là Porch mở (không tường bao).
+ * Đo từ ảnh đính kèm, làm tròn về 50mm; diện tích phòng khớp nhãn
+ * trên bản vẽ (Hall 5,1 / Bathroom 5,1 / Main 10,7 / Bedroom 8,3 m²).
+ * Lối đi rộng 2100mm giữa w-bed-west và w-bed-east để trống (không
+ * cửa) — đúng bản vẽ. Gốc tọa độ: mặt ngoài tường bắc-tây.
+ */
 export function seedBuilding(): Building {
   const t = 200;
   return {
@@ -12,21 +20,31 @@ export function seedBuilding(): Building {
         elevation: 0,
         height: 3000,
         walls: [
-          { id: 'w-north', points: [{ x: 0, y: 0 }, { x: 8000, y: 0 }], thickness: t },
-          { id: 'w-east', points: [{ x: 8000, y: 0 }, { x: 8000, y: 6000 }], thickness: t },
-          { id: 'w-south', points: [{ x: 8000, y: 6000 }, { x: 0, y: 6000 }], thickness: t },
-          { id: 'w-west', points: [{ x: 0, y: 6000 }, { x: 0, y: 0 }], thickness: t },
-          { id: 'w-divider', points: [{ x: 4000, y: 0 }, { x: 4000, y: 6000 }], thickness: t },
+          { id: 'w-north', points: [{ x: 100, y: 100 }, { x: 5500, y: 100 }], thickness: t },
+          { id: 'w-east', points: [{ x: 5500, y: 100 }, { x: 5500, y: 7800 }], thickness: t },
+          { id: 'w-south', points: [{ x: 5500, y: 7800 }, { x: 1900, y: 7800 }], thickness: t },
+          { id: 'w-west', points: [{ x: 100, y: 100 }, { x: 100, y: 3500 }], thickness: t },
+          { id: 'w-hall-south', points: [{ x: 100, y: 3500 }, { x: 1900, y: 3500 }], thickness: t },
+          { id: 'w-vertical', points: [{ x: 1900, y: 7800 }, { x: 1900, y: 100 }], thickness: t },
+          { id: 'w-bath-south', points: [{ x: 1900, y: 1800 }, { x: 5500, y: 1800 }], thickness: t },
+          { id: 'w-bed-west', points: [{ x: 1900, y: 5150 }, { x: 2750, y: 5150 }], thickness: t },
+          { id: 'w-bed-east', points: [{ x: 4850, y: 5150 }, { x: 5500, y: 5150 }], thickness: t },
         ],
         openings: [
-          // Cửa chính 900 giữa tường nam (dài 8000): 3550–4450.
-          { id: 'o-main-door', wallId: 'w-south', type: 'door', offset: 3550, width: 900, height: 2100, sillHeight: 0 },
-          // Cửa thông phòng 800 trên tường ngăn (dài 6000): 2600–3400.
-          { id: 'o-inner-door', wallId: 'w-divider', type: 'door', offset: 2600, width: 800, height: 2100, sillHeight: 0 },
-          // Cửa sổ 1200 mặt bắc (tường dài 8000): 1400–2600.
-          { id: 'o-win-north', wallId: 'w-north', type: 'window', offset: 1400, width: 1200, height: 1200, sillHeight: 900 },
-          // Cửa sổ 1200 mặt đông (tường dài 6000): 2400–3600.
-          { id: 'o-win-east', wallId: 'w-east', type: 'window', offset: 2400, width: 1200, height: 1200, sillHeight: 900 },
+          // Cửa sổ 650 mặt bắc (phòng tắm, tường dài 5400): 3600–4250.
+          { id: 'o-win-north', wallId: 'w-north', type: 'window', offset: 3600, width: 650, height: 1200, sillHeight: 900 },
+          // Cửa sổ 1150 mặt tây (hall, tường dài 3400): 1250–2400.
+          { id: 'o-win-west', wallId: 'w-west', type: 'window', offset: 1250, width: 1150, height: 1200, sillHeight: 900 },
+          // Cửa sổ 1050 mặt đông (phòng chính, tường dài 7700): 3900–4950.
+          { id: 'o-win-east', wallId: 'w-east', type: 'window', offset: 3900, width: 1050, height: 1200, sillHeight: 900 },
+          // Cửa sổ 550 mặt nam (phòng ngủ, tường dài 3600, đo từ đông sang tây): 800–1350.
+          { id: 'o-win-south', wallId: 'w-south', type: 'window', offset: 800, width: 550, height: 1200, sillHeight: 900 },
+          // Cửa hall ra porch 600 (tường dài 1800): 400–1000.
+          { id: 'o-door-hall', wallId: 'w-hall-south', type: 'door', offset: 400, width: 600, height: 2100, sillHeight: 0 },
+          // Cửa hall sang phòng chính 650 (tường dài 7700, đo từ nam lên bắc): 5000–5650.
+          { id: 'o-door-main', wallId: 'w-vertical', type: 'door', offset: 5000, width: 650, height: 2100, sillHeight: 0 },
+          // Cửa phòng tắm 550 (tường dài 3600): 200–750.
+          { id: 'o-door-bath', wallId: 'w-bath-south', type: 'door', offset: 200, width: 550, height: 2100, sillHeight: 0 },
         ],
       },
     ],

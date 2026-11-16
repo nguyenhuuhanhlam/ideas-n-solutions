@@ -66,13 +66,24 @@ export default function App() {
         s.redo();
         return;
       }
+      if (mod && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        const lvl = selectActiveLevel(s);
+        if (lvl) {
+          s.setSelection(
+            lvl.walls.map((w) => w.id),
+            lvl.openings.map((o) => o.id),
+          );
+        }
+        return;
+      }
       if (mod) return;
 
       if (e.key === 'Escape') {
         if (s.lengthInput) s.setLengthInput('');
         else if (s.draft) s.setDraft(null);
-        else if (s.selectedWallId) s.setSelection(null);
-        else if (s.selectedOpeningId) s.setOpeningSelection(null);
+        else if (s.selectedWallIds.length > 0 || s.selectedOpeningIds.length > 0)
+          s.clearSelection();
         return;
       }
       if (e.key === 'Backspace' && s.lengthInput) {
@@ -80,13 +91,7 @@ export default function App() {
         return;
       }
       if (e.key === 'Delete' || e.key === 'Backspace') {
-        if (s.selectedOpeningId) {
-          s.deleteOpening(s.selectedOpeningId);
-          s.setOpeningSelection(null);
-        } else if (s.selectedWallId) {
-          s.deleteWall(s.selectedWallId);
-          s.setSelection(null);
-        }
+        s.deleteSelection();
         return;
       }
       // Nhập số chiều dài khi đang vẽ tường.

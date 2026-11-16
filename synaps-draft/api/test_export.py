@@ -43,13 +43,14 @@ def test_export_walls_closed_polyline():
 def test_export_openings_present():
     doc = ezdxf.read(io.StringIO(_export(SAMPLE).decode()))
     msp = doc.modelspace()
-    assert len(list(msp.query("LWPOLYLINE[layer=='DOORS']"))) == 2
-    assert len(list(msp.query("LWPOLYLINE[layer=='WINDOWS']"))) == 2
+    assert len(list(msp.query("LWPOLYLINE[layer=='DOORS']"))) == 3
+    assert len(list(msp.query("LWPOLYLINE[layer=='WINDOWS']"))) == 4
 
 
 def test_export_dimensions():
-    """Kích thước đúng: bbox tường ngoài 8200x6200 (8000x6000 + dày 200 mỗi bên),
-    và có DIMENSION đo đúng 8000 cho tường bắc."""
+    """Kích thước đúng: bbox tường ngoài 5600x7900 (nhà demo 1 tầng hình
+    chữ L: mặt ngoài tường bắc-tây ở 0, đông ở 5600, nam ở 7900),
+    và 1 DIMENSION cho mỗi đoạn tường."""
     doc = ezdxf.read(io.StringIO(_export(SAMPLE).decode()))
     msp = doc.modelspace()
     walls = list(msp.query("LWPOLYLINE[layer=='WALLS']"))
@@ -58,14 +59,15 @@ def test_export_dimensions():
         for x, y in e.get_points(format="xy"):
             xs.append(x)
             ys.append(y)
-    assert max(xs) - min(xs) == 8200
-    assert max(ys) - min(ys) == 6200
+    assert max(xs) - min(xs) == 5600
+    assert max(ys) - min(ys) == 7900
     dims = list(msp.query("DIMENSION[layer=='DIMS']"))
-    assert len(dims) == 5  # 1 dimension mỗi đoạn tường (nhà mẫu: 2 tường, 5 đoạn)
+    assert len(dims) == 9  # 1 dimension mỗi đoạn tường (nhà mẫu: 9 tường, 9 đoạn)
     # Mọi dimension đều phải đo đúng độ dài đoạn của nó:
-    # 2 đoạn ngang 8000 + 3 đoạn đứng 6000 (2 ngoài + 1 ngăn).
+    # bắc 5400, đông 7700, nam 3600, tây 3400, hall-nam 1800,
+    # đứng 7700, tắm-nam 3600, ngủ-tây 850, ngủ-đông 650.
     assert sorted(d.get_measurement() for d in dims) == [
-        6000, 6000, 6000, 8000, 8000,
+        650, 850, 1800, 3400, 3600, 3600, 5400, 7700, 7700,
     ]
 
 

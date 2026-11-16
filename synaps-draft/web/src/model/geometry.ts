@@ -302,6 +302,38 @@ export function mergeWallPolygonsWithHoles(walls: Wall[]): MergedWallPolygon[] {
     .filter((p) => p.outer.length >= 6);
 }
 
+export interface PlanBounds {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+}
+
+/**
+ * Bounding box mặt bằng của toàn bộ tường (để fit camera khi mở Top):
+ * bao các điểm tâm tường, nới mỗi phía 500mm (đủ chỗ cho nửa dày tường
+ * + lề nhìn bao quát). Nhà mẫu cũ 8000×6000 cho đúng khung 9000×7000
+ * tâm (4000, 3000) như trước đây; nhà khác tự fit theo kích thước thật.
+ * Không có tường thì null (caller dùng khung mặc định).
+ */
+export function planBounds(walls: Wall[]): PlanBounds | null {
+  if (walls.length === 0) return null;
+  let x0 = Infinity;
+  let y0 = Infinity;
+  let x1 = -Infinity;
+  let y1 = -Infinity;
+  for (const w of walls) {
+    for (const p of w.points) {
+      x0 = Math.min(x0, p.x);
+      y0 = Math.min(y0, p.y);
+      x1 = Math.max(x1, p.x);
+      y1 = Math.max(y1, p.y);
+    }
+  }
+  const m = 500;
+  return { x0: x0 - m, y0: y0 - m, x1: x1 + m, y1: y1 + m };
+}
+
 /**
  * Tỉ lệ vừa khung hình (mốc zoom 100%): vật thể bao `envW × envH` (mm) nằm
  * gọn trong khung nhìn `visibleW × visibleH` (px), chiếm `fill` phần khung

@@ -10,6 +10,7 @@ import {
   midpoint,
   nearestPointOnChain,
   openingsExceedLength,
+  planBounds,
   pointAtChainOffset,
   projectPointOnWall,
   resizeSegment,
@@ -826,5 +827,31 @@ describe('wallCornerPatches (miter góc)', () => {
     expect(wallCornerPatches(straight)).toEqual([]);
     const merged = mergeWallPolygonsWithHoles([straight]);
     expect(Math.abs(mergedArea(merged) - 1600000)).toBeLessThan(1);
+  });
+});
+
+describe('planBounds', () => {
+  it('nhà cũ 8000×6000: khung 9000×7000 tâm (4000, 3000) như trước đây', () => {
+    const walls: Wall[] = [
+      { id: 'n', points: [{ x: 0, y: 0 }, { x: 8000, y: 0 }], thickness: 200 },
+      { id: 'e', points: [{ x: 8000, y: 0 }, { x: 8000, y: 6000 }], thickness: 200 },
+      { id: 's', points: [{ x: 8000, y: 6000 }, { x: 0, y: 6000 }], thickness: 200 },
+      { id: 'w', points: [{ x: 0, y: 6000 }, { x: 0, y: 0 }], thickness: 200 },
+    ];
+    expect(planBounds(walls)).toEqual({ x0: -500, y0: -500, x1: 8500, y1: 6500 });
+  });
+
+  it('nhà demo 5600×7900: khung 6400×8700 tâm (2800, 3950)', () => {
+    const walls: Wall[] = [
+      { id: 'n', points: [{ x: 100, y: 100 }, { x: 5500, y: 100 }], thickness: 200 },
+      { id: 'e', points: [{ x: 5500, y: 100 }, { x: 5500, y: 7800 }], thickness: 200 },
+      { id: 's', points: [{ x: 5500, y: 7800 }, { x: 1900, y: 7800 }], thickness: 200 },
+      { id: 'v', points: [{ x: 1900, y: 7800 }, { x: 1900, y: 100 }], thickness: 200 },
+    ];
+    expect(planBounds(walls)).toEqual({ x0: -400, y0: -400, x1: 6000, y1: 8300 });
+  });
+
+  it('không có tường: null', () => {
+    expect(planBounds([])).toBeNull();
   });
 });

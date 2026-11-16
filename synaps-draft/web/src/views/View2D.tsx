@@ -5,10 +5,11 @@ import { Arc, Layer, Line, Circle, Rect, Stage, Text } from 'react-konva';
 import Segments from '../components/Segments';
 import WallFill from '../components/WallFill';
 import { elevationBounds, elevationUToOffset, projectOpeningToElevation, projectWallToElevation, sortWallsByDepth, type ElevationView } from '../model/elevation';
-import { distance, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, openingsExceedLength, pointAtChainOffset, pointsLength, projectPointOnWall, resizeSegment, wallCornerPatches, wallPolygon, wallSegmentPolygons } from '../model/geometry';
+import { distance, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, openingsExceedLength, planBounds, pointAtChainOffset, pointsLength, projectPointOnWall, resizeSegment, wallCornerPatches, wallPolygon, wallSegmentPolygons } from '../model/geometry';
 import { computeGridSegments, gridStepFor } from '../model/grid';
 import { clampOffset, clampSill } from '../model/openingDrag';
 import type { Opening, Point, Wall } from '../model/schema';
+import { marqueeSelect, type MarqueeRect } from '../model/selection';
 import { selectActiveLevel, useBuildingStore, type Unit } from '../store/useBuildingStore';
 import { computeSnap, createWall, snapPointsNear } from '../tools/wallTool';
 import { createOpening, findNearestWall } from '../tools/openingTool';
@@ -57,7 +58,15 @@ type DragState =
       indices: number[];
       fixed: Point;
     }
-  | { kind: 'move'; wallId: string; grab: Point; origPoints: Point[] }
+  | {
+      kind: 'move';
+      wallId: string;
+      /** Mọi tường cùng dịch chuyển (tường đang kéo + tường đã chọn khác). */
+      wallIds: string[];
+      grab: Point;
+      /** Điểm gốc của từng tường trong nhóm (theo id). */
+      origById: Record<string, Point[]>;
+    }
   | {
       kind: 'opening-top';
       openingId: string;
@@ -88,6 +97,9 @@ interface DragPreview {
   wallId: string;
   points: Point[];
 }
+
+/** Preview kéo thả có thể gồm nhiều tường (kéo nhóm). */
+type DragPreviews = DragPreview[];
 
 interface OpeningPreview {
   openingId: string;
@@ -190,8 +202,16 @@ export default function View2D() {
   /** Chặn click "dư" sau khi kéo thả: mouseup trên canvas trống sinh click
    * lên stage, làm mất chọn ngay sau khi kéo xong (lỗi cũ từ giai đoạn 1). */
   const suppressClickRef = useRef(false);
-  const [dragPreview, setDragPreview] = useState<DragPreview | null>(null);
+  const [dragPreview, setDragPreview] = useState<DragPreviews | null>(null);
   const [openingPreview, setOpeningPreview] = useState<OpeningPreview | null>(null);
+  /** Khung kéo chọn (marquee): điểm bắt đầu (world + màn hình) + có cộng thêm
+   * (Shift) hay thay thế vùng chọn. Hình chữ nhật hiện tại vẽ từ state. */
+  const marqueeRef = useRef<{
+    startWorld: Point;
+    startScreen: Point;
+    additive: boolean;
+  } | null>(null);
+  const [marqueeRect, setMarqueeRect] = useState<MarqueeRect | null>(null);
   /** Nhập độ dài trực tiếp ở nhãn thước dim (đoạn nào + chuỗi đang gõ). */
   const [dimEditing, setDimEditing] = useState<{ segmentIndex: number; value: string } | null>(null);
   const dimInputRef = useRef<HTMLInputElement>(null);
@@ -209,17 +229,22 @@ export default function View2D() {
   const draft = useBuildingStore((s) => s.draft);
   const lengthInput = useBuildingStore((s) => s.lengthInput);
   const cursorWorld = useBuildingStore((s) => s.cursorWorld);
-  const selectedWallId = useBuildingStore((s) => s.selectedWallId);
-  const selectedOpeningId = useBuildingStore((s) => s.selectedOpeningId);
+  const selectedWallIds = useBuildingStore((s) => s.selectedWallIds);
+  const selectedOpeningIds = useBuildingStore((s) => s.selectedOpeningIds);
+  /** Set tra cứu nhanh cho render (centerline/lớp phủ/handle/mặt đứng). */
+  const selectedWallSet = useMemo(() => new Set(selectedWallIds), [selectedWallIds]);
+  const selectedOpeningSet = useMemo(
+    () => new Set(selectedOpeningIds),
+    [selectedOpeningIds],
+  );
 
   const c = COLORS;
 
   // Tường hiệu dụng: áp preview kéo thả lên trên dữ liệu store.
   const effectiveWalls = useMemo(() => {
     if (!dragPreview) return walls;
-    return walls.map((w) =>
-      w.id === dragPreview.wallId ? { ...w, points: dragPreview.points } : w,
-    );
+    const byId = new Map(dragPreview.map((d) => [d.wallId, d.points]));
+    return walls.map((w) => (byId.has(w.id) ? { ...w, points: byId.get(w.id) as Point[] } : w));
   }, [walls, dragPreview]);
 
   // Thân tường nối góc sạch: union các polygon trước khi tô, GIỮ lỗ phòng
@@ -271,8 +296,16 @@ export default function View2D() {
     const state = useBuildingStore.getState();
     const clamp = (s: number) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, s));
     if (view2d === 'top') {
-      const scale = clamp(fitScaleFor(9000, 7000, visibleW, h));
-      return { scale, x: centerX - 4000 * scale, y: h / 2 - 3000 * scale };
+      // Fit theo khung thật của bản vẽ (không còn hardcode khung nhà cũ):
+      // chưa có tường thì giữ khung mặc định 9000×7000 tâm (4000, 3000).
+      const lvl = selectActiveLevel(state);
+      const b = lvl ? planBounds(lvl.walls) : null;
+      const bw = b ? b.x1 - b.x0 : 9000;
+      const bh = b ? b.y1 - b.y0 : 7000;
+      const cx = b ? (b.x0 + b.x1) / 2 : 4000;
+      const cy = b ? (b.y0 + b.y1) / 2 : 3000;
+      const scale = clamp(fitScaleFor(bw, bh, visibleW, h));
+      return { scale, x: centerX - cx * scale, y: h / 2 - cy * scale };
     }
     // Mặt đứng: fit theo bounding box hình chiếu (Konva y = −v nên cộng v vào y).
     const lvl = selectActiveLevel(state);
@@ -338,10 +371,15 @@ export default function View2D() {
     };
   }, []);
 
-  // Esc hủy lần kéo thả đang dở (không commit).
+  // Esc hủy lần kéo thả / khung kéo đang dở (không commit).
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape' || !dragRef.current) return;
+      if (e.key !== 'Escape') return;
+      if (marqueeRef.current) {
+        marqueeRef.current = null;
+        setMarqueeRect(null);
+      }
+      if (!dragRef.current) return;
       dragRef.current = null;
       setDragPreview(null);
       setOpeningPreview(null);
@@ -468,7 +506,8 @@ export default function View2D() {
         state.setCursor(raw, null);
         return;
       }
-      const others = walls.filter((w) => w.id !== drag.wallId);
+      const movingIds = drag.kind === 'move' ? drag.wallIds : [drag.wallId];
+      const others = walls.filter((w) => !movingIds.includes(w.id));
       if (drag.kind === 'endpoint') {
         const snap = computeSnap(raw, others, camera.scale, drag.fixed);
         // Không cho đoạn kề co về 0: điểm mới phải cách mọi đỉnh kề (của
@@ -485,21 +524,45 @@ export default function View2D() {
         if (blocked) return;
         setDragPreview((prevState) => {
           if (!prevState) return prevState;
-          const points = prevState.points.map((p, i) =>
-            drag.indices.includes(i) ? snap.point : p,
+          return prevState.map((entry) =>
+            entry.wallId === drag.wallId
+              ? {
+                  ...entry,
+                  points: entry.points.map((p, i) =>
+                    drag.indices.includes(i) ? snap.point : p,
+                  ),
+                }
+              : entry,
           );
-          return { ...prevState, points };
         });
         state.setCursor(snap.point, snap.kind);
       } else if (drag.kind === 'move') {
         const snap = computeSnap(raw, others, camera.scale, null);
         const dx = snap.point.x - drag.grab.x;
         const dy = snap.point.y - drag.grab.y;
-        setDragPreview({
-          wallId: drag.wallId,
-          points: drag.origPoints.map((p) => ({ x: p.x + dx, y: p.y + dy })),
-        });
+        // Cả nhóm cùng dịch theo đúng delta của tường đang kéo.
+        setDragPreview(
+          drag.wallIds.map((id) => ({
+            wallId: id,
+            points: (drag.origById[id] ?? []).map((p) => ({ x: p.x + dx, y: p.y + dy })),
+          })),
+        );
         state.setCursor(snap.point, snap.kind);
+      }
+      return;
+    }
+
+    // Khung kéo chọn (marquee): dưới ngưỡng 3px thì chưa hiện, tính là click.
+    if (marqueeRef.current) {
+      const m = marqueeRef.current;
+      if (Math.hypot(pointer.x - m.startScreen.x, pointer.y - m.startScreen.y) >= 3) {
+        const raw = toWorld(pointer.x, pointer.y);
+        setMarqueeRect({
+          x0: Math.min(m.startWorld.x, raw.x),
+          y0: Math.min(m.startWorld.y, raw.y),
+          x1: Math.max(m.startWorld.x, raw.x),
+          y1: Math.max(m.startWorld.y, raw.y),
+        });
       }
       return;
     }
@@ -547,7 +610,20 @@ export default function View2D() {
       if (hit) {
         const opening = createOpening(hit.wall, tool, Math.round(hit.offset));
         state.addOpening(opening);
-        state.setOpeningSelection(opening.id);
+        state.selectSingle('opening', opening.id);
+      }
+      return;
+    }
+
+    // Khung kéo chọn: tool Select, bấm trái trên VÙNG TRỐNG (target là Stage;
+    // bấm lên tường/cửa/handle đã bị cancelBubble ở handler của chúng).
+    if (tool === 'select') {
+      if (e.target === e.currentTarget) {
+        marqueeRef.current = {
+          startWorld: raw,
+          startScreen: { x: pointer.x, y: pointer.y },
+          additive: e.evt.shiftKey,
+        };
       }
       return;
     }
@@ -567,27 +643,44 @@ export default function View2D() {
   const handleMouseUp = () => {
     const wasPanning = panRef.current !== null;
     panRef.current = null;
+    // Chốt khung kéo chọn (nếu đã kéo quá ngưỡng 3px thì marqueeRect khác null).
+    const marquee = marqueeRef.current;
+    marqueeRef.current = null;
+    if (marquee && marqueeRect) {
+      const hit = marqueeSelect(walls, openings, marqueeRect);
+      const state = useBuildingStore.getState();
+      if (marquee.additive) {
+        state.setSelection(
+          [...new Set([...state.selectedWallIds, ...hit.wallIds])],
+          [...new Set([...state.selectedOpeningIds, ...hit.openingIds])],
+        );
+      } else {
+        state.setSelection(hit.wallIds, hit.openingIds);
+      }
+      // Click sinh ngay sau mouseup phải bị chặn (không xóa vùng chọn vừa kéo).
+      suppressClickRef.current = true;
+    }
+    setMarqueeRect(null);
     // Commit lần kéo thả thành 1 history entry (undo được).
     const drag = dragRef.current;
     dragRef.current = null;
-    // Kéo thả vừa kết thúc: click sinh ngay sau mouseup phải bị chặn
-    // (không bỏ chọn tường vừa kéo).
-    if (drag || wasPanning) suppressClickRef.current = true;
-    if (drag && dragPreview) {
-      const original = walls.find((w) => w.id === drag.wallId);
-      const changed =
-        original &&
-        (original.points.length !== dragPreview.points.length ||
-          original.points.some(
-            (p, i) =>
-              p.x !== dragPreview.points[i].x || p.y !== dragPreview.points[i].y,
-          ));
-      if (changed) {
+    let moved = false;
+    if (drag && dragPreview && (drag.kind === 'endpoint' || drag.kind === 'move')) {
+      const updates = dragPreview.filter((entry) => {
+        const original = walls.find((w) => w.id === entry.wallId);
+        return (
+          original &&
+          (original.points.length !== entry.points.length ||
+            original.points.some(
+              (p, i) => p.x !== entry.points[i].x || p.y !== entry.points[i].y,
+            ))
+        );
+      });
+      if (updates.length > 0) {
+        moved = true;
         // Commit + gộp tường trùng đầu mút (kéo đầu tường vào góc tường
-        // khác sẽ nối thành polyline) — 1 history entry.
-        useBuildingStore
-          .getState()
-          .commitWallPoints(drag.wallId, dragPreview.points);
+        // khác sẽ nối thành polyline) — 1 history entry cho cả nhóm.
+        useBuildingStore.getState().commitWallPointsMany(updates);
       }
     }
     if (
@@ -596,6 +689,7 @@ export default function View2D() {
       drag.active &&
       openingPreview
     ) {
+      moved = true;
       const original = openings.find((o) => o.id === drag.openingId);
       if (
         original &&
@@ -608,6 +702,9 @@ export default function View2D() {
         });
       }
     }
+    // Chỉ chặn click "dư" khi thật sự đã kéo (di chuyển) hoặc pan: bấm
+    // thường (không kéo) vẫn phải chạy handler click để chọn/bỏ chọn.
+    if (moved || wasPanning) suppressClickRef.current = true;
     setDragPreview(null);
     setOpeningPreview(null);
     stageRef.current?.container().style.removeProperty('cursor');
@@ -615,23 +712,46 @@ export default function View2D() {
 
   const handleWallClick = (wall: Wall) => (e: KonvaEventObject<MouseEvent>) => {
     e.cancelBubble = true;
-    if (tool === 'select') useBuildingStore.getState().setSelection(wall.id);
+    // Click sinh sau khi kéo thả/pan: bỏ qua, giữ nguyên vùng chọn.
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false;
+      return;
+    }
+    if (tool !== 'select') return;
+    const state = useBuildingStore.getState();
+    if (e.evt.shiftKey) state.toggleInSelection('wall', wall.id);
+    else state.selectSingle('wall', wall.id);
   };
 
   const handleWallMouseDown = (wall: Wall) => (e: KonvaEventObject<MouseEvent>) => {
     if (tool !== 'select' || e.evt.button !== 0 || spaceRef.current) return;
+    // Shift+bấm chỉ toggle ở click, không bắt đầu kéo.
+    if (e.evt.shiftKey) return;
     e.cancelBubble = true;
     const stage = stageRef.current;
     const pointer = stage?.getPointerPosition();
     if (!pointer) return;
-    useBuildingStore.getState().setSelection(wall.id);
+    const state = useBuildingStore.getState();
+    // Tường chưa chọn thì chọn riêng nó; tường đã nằm trong vùng chọn thì
+    // giữ nguyên nhóm để kéo cả nhóm cùng dịch chuyển.
+    let ids = state.selectedWallIds;
+    if (!ids.includes(wall.id)) {
+      state.selectSingle('wall', wall.id);
+      ids = [wall.id];
+    }
+    const group = walls.filter((w) => ids.includes(w.id));
     dragRef.current = {
       kind: 'move',
       wallId: wall.id,
+      wallIds: group.map((w) => w.id),
       grab: toWorld(pointer.x, pointer.y),
-      origPoints: wall.points.map((p) => ({ ...p })),
+      origById: Object.fromEntries(
+        group.map((w) => [w.id, w.points.map((p) => ({ ...p }))]),
+      ),
     };
-    setDragPreview({ wallId: wall.id, points: wall.points.map((p) => ({ ...p })) });
+    setDragPreview(
+      group.map((w) => ({ wallId: w.id, points: w.points.map((p) => ({ ...p })) })),
+    );
   };
 
   const handleHandleMouseDown =
@@ -657,12 +777,20 @@ export default function View2D() {
         indices,
         fixed: { ...fixed },
       };
-      setDragPreview({ wallId: wall.id, points: wall.points.map((p) => ({ ...p })) });
+      setDragPreview([{ wallId: wall.id, points: wall.points.map((p) => ({ ...p })) }]);
     };
 
   const handleOpeningClick = (opening: Opening) => (e: KonvaEventObject<MouseEvent>) => {
     e.cancelBubble = true;
-    if (tool === 'select') useBuildingStore.getState().setOpeningSelection(opening.id);
+    // Click sinh sau khi kéo thả/pan: bỏ qua, giữ nguyên vùng chọn.
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false;
+      return;
+    }
+    if (tool !== 'select') return;
+    const state = useBuildingStore.getState();
+    if (e.evt.shiftKey) state.toggleInSelection('opening', opening.id);
+    else state.selectSingle('opening', opening.id);
   };
 
   const setStageCursor = (cursor: string | null) => {
@@ -676,11 +804,18 @@ export default function View2D() {
   const handleOpeningMouseDownTop =
     (opening: Opening, wall: Wall) => (e: KonvaEventObject<MouseEvent>) => {
       if (tool !== 'select' || e.evt.button !== 0 || spaceRef.current) return;
+      // Shift+bấm chỉ toggle ở click, không bắt đầu kéo.
+      if (e.evt.shiftKey) return;
       e.cancelBubble = true;
       const stage = stageRef.current;
       const pointer = stage?.getPointerPosition();
       if (!pointer) return;
-      useBuildingStore.getState().setOpeningSelection(opening.id);
+      const state = useBuildingStore.getState();
+      // Cửa chưa chọn thì chọn riêng nó; đã nằm trong vùng chọn thì giữ
+      // nguyên nhóm (kéo chỉ dời cửa này, vùng chọn không đổi).
+      if (!state.selectedOpeningIds.includes(opening.id)) {
+        state.selectSingle('opening', opening.id);
+      }
       const grabOffset = projectPointOnWall(toWorld(pointer.x, pointer.y), wall).offset;
       dragRef.current = {
         kind: 'opening-top',
@@ -699,11 +834,16 @@ export default function View2D() {
   const handleOpeningMouseDownElev =
     (opening: Opening, wall: Wall) => (e: KonvaEventObject<MouseEvent>) => {
       if (tool !== 'select' || e.evt.button !== 0 || spaceRef.current || !elevView || !level) return;
+      // Shift+bấm chỉ toggle ở click, không bắt đầu kéo.
+      if (e.evt.shiftKey) return;
       e.cancelBubble = true;
       const stage = stageRef.current;
       const pointer = stage?.getPointerPosition();
       if (!pointer) return;
-      useBuildingStore.getState().setOpeningSelection(opening.id);
+      const state = useBuildingStore.getState();
+      if (!state.selectedOpeningIds.includes(opening.id)) {
+        state.selectSingle('opening', opening.id);
+      }
       const { u, z } = toElevation(pointer.x, pointer.y);
       const rect = projectWallToElevation(wall, level, elevView);
       dragRef.current = {
@@ -729,7 +869,8 @@ export default function View2D() {
       return;
     }
     if (e.target === e.currentTarget && tool === 'select') {
-      useBuildingStore.getState().setSelection(null);
+      // Shift+bấm vùng trống: giữ nguyên vùng chọn.
+      if (!e.evt.shiftKey) useBuildingStore.getState().clearSelection();
     }
   };
 
@@ -760,7 +901,16 @@ export default function View2D() {
   }, [elevView, level, effectiveWalls, effectiveOpenings]);
 
   const draftLen = draft ? Math.round(distance(draft.start, draft.current)) : 0;
-  const selected = effectiveWalls.find((w) => w.id === selectedWallId) ?? null;
+  /** Tường dùng cho thước dim + sửa dim: chỉ khi đúng 1 tường và 0 cửa được chọn. */
+  const selected =
+    selectedWallIds.length === 1 && selectedOpeningIds.length === 0
+      ? (effectiveWalls.find((w) => w.id === selectedWallIds[0]) ?? null)
+      : null;
+  /** Mọi tường đã chọn: lớp phủ xanh + tay nắm đỉnh. */
+  const selectedWalls = useMemo(
+    () => effectiveWalls.filter((w) => selectedWallSet.has(w.id)),
+    [effectiveWalls, selectedWallSet],
+  );
 
   // Marker các điểm snap gần con trỏ khi đang dùng tool Tường (bán kính 30px).
   const snapMarkers = useMemo(() => {
@@ -768,10 +918,10 @@ export default function View2D() {
     return snapPointsNear(cursorWorld, walls, 30 / camera.scale);
   }, [tool, cursorWorld, walls, camera.scale]);
 
-  // Đổi tường đang chọn trong lúc nhập số ở dim → hủy nhập.
+  // Đổi vùng chọn trong lúc nhập số ở dim → hủy nhập.
   useEffect(() => {
     setDimEditing(null);
-  }, [selectedWallId]);
+  }, [selectedWallIds, selectedOpeningIds]);
 
   // Mở ô nhập dim: focus + chọn hết số để gõ đè ngay.
   // Chỉ chạy khi TRẠNG THÁI mở/đóng đổi — không phụ thuộc dimEditing.value,
@@ -950,7 +1100,7 @@ export default function View2D() {
           {/* Đường tâm từng tường: 1 Line polyline qua mọi đỉnh + vùng click
               rộng bằng thân tường. */}
           {effectiveWalls.map((w) => {
-            const isSel = w.id === selectedWallId;
+            const isSel = selectedWallSet.has(w.id);
             return (
               <Line
                 key={`${w.id}-c`}
@@ -965,24 +1115,25 @@ export default function View2D() {
             );
           })}
 
-          {/* Tường đang chọn: tô đè từng đoạn + vá góc miter bằng màu chọn. */}
-          {selected &&
-            [...wallSegmentPolygons(selected), ...wallCornerPatches(selected)].map((poly, i) => (
+          {/* Mọi tường đang chọn: tô đè từng đoạn + vá góc miter bằng màu chọn. */}
+          {selectedWalls.map((w) =>
+            [...wallSegmentPolygons(w), ...wallCornerPatches(w)].map((poly, i) => (
               <Line
-                key={`${selected.id}-sel-${i}`}
+                key={`${w.id}-sel-${i}`}
                 points={poly}
                 closed
                 fill={c.selected}
                 opacity={0.85}
                 listening={false}
               />
-            ))}
+            )),
+          )}
 
           {/* Openings: cửa đi (khoảng trống + cánh + cung mở), cửa sổ (2 đường song song). */}
           {effectiveOpenings.map((o) => {
             const wall = effectiveWalls.find((w) => w.id === o.wallId);
             if (!wall) return null;
-            const isSel = o.id === selectedOpeningId;
+            const isSel = selectedOpeningSet.has(o.id);
             const { a, b, nx, ny, ux, uy } = openingFrame(o, wall);
             const half = wall.thickness / 2;
             const stroke = isSel ? c.selected : c.wallStroke;
@@ -1106,26 +1257,27 @@ export default function View2D() {
             ) : null,
           )}
 
-          {/* Handle ở MỌI đỉnh của tường đang chọn (kéo đỉnh dời điểm đó).
-              Vòng khép kín: điểm đầu == điểm cuối → chỉ 1 tay nắm cho vị
-              trí trùng đó (kéo nó dời cả 2 chỉ số). */}
-          {selected &&
-            selected.points
+          {/* Handle ở MỌI đỉnh của MỌI tường đang chọn (kéo đỉnh chỉ sửa
+              tường đó, giữ nguyên vùng chọn). Vòng khép kín: điểm đầu ==
+              điểm cuối → chỉ 1 tay nắm cho vị trí trùng đó (kéo nó dời
+              cả 2 chỉ số). */}
+          {selectedWalls.map((w) =>
+            w.points
               .map((p, i) => ({ p, i }))
               .filter(
                 ({ p, i }) =>
-                  selected.points.findIndex((q) => q.x === p.x && q.y === p.y) === i,
+                  w.points.findIndex((q) => q.x === p.x && q.y === p.y) === i,
               )
               .map(({ p, i }) => (
               <Circle
-                key={`${selected.id}-h-${i}`}
+                key={`${w.id}-h-${i}`}
                 x={p.x}
                 y={p.y}
                 radius={6 / camera.scale}
                 fill={c.bg}
                 stroke={c.selected}
                 strokeWidth={2 / camera.scale}
-                onMouseDown={handleHandleMouseDown(selected, i)}
+                onMouseDown={handleHandleMouseDown(w, i)}
                 onMouseEnter={(e) => {
                   e.target.getStage()?.container().style.setProperty('cursor', 'pointer');
                 }}
@@ -1133,7 +1285,8 @@ export default function View2D() {
                   e.target.getStage()?.container().style.removeProperty('cursor');
                 }}
               />
-            ))}
+            )),
+          )}
 
           {/* Draft preview */}
           {draft && draftLen > 0 && (
@@ -1249,7 +1402,7 @@ export default function View2D() {
               {/* Mặt đứng: tường vẽ xa → gần (tường gần đè lên), mỗi tường
                   kèm lỗ cửa của nó để tường gần che đúng lỗ của tường xa. */}
               {elevData?.map(({ wall, rect, openings: ops }) => {
-                const isSel = wall.id === selectedWallId;
+                const isSel = selectedWallSet.has(wall.id);
                 return (
                   <Fragment key={wall.id}>
                     <Rect
@@ -1264,7 +1417,7 @@ export default function View2D() {
                       onClick={handleWallClick(wall)}
                     />
                     {ops.map(({ opening, rect: o }) => {
-                      const oSel = opening.id === selectedOpeningId;
+                      const oSel = selectedOpeningSet.has(opening.id);
                       const stroke = oSel ? c.selected : c.wallStroke;
                       // Tường chiếu rộng: kéo 2 chiều (grab); mép mỏng: chỉ kéo dọc đổi sill (ns-resize).
                       const canMoveU = rect.u1 - rect.u0 > wall.thickness;
@@ -1307,6 +1460,21 @@ export default function View2D() {
                 );
               })}
             </>
+          )}
+
+          {/* Hình chữ nhật khung kéo chọn (marquee, chỉ mặt bằng Top). */}
+          {isTop && marqueeRect && (
+            <Rect
+              x={marqueeRect.x0}
+              y={marqueeRect.y0}
+              width={Math.max(marqueeRect.x1 - marqueeRect.x0, 1)}
+              height={Math.max(marqueeRect.y1 - marqueeRect.y0, 1)}
+              stroke={c.selected}
+              strokeWidth={1 / camera.scale}
+              dash={[6 / camera.scale, 4 / camera.scale]}
+              fill="rgba(59,155,214,0.08)"
+              listening={false}
+            />
           )}
 
           {/* Nhãn offset/sill khi đang kéo cửa. */}
