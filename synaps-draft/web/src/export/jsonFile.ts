@@ -1,3 +1,4 @@
+import { mergeBuildingWalls } from '../model/geometry';
 import { migrateBuilding, type Building } from '../model/schema';
 import { seedBuilding } from '../model/seed';
 
@@ -49,7 +50,9 @@ export function loadSavedBuilding(): Building | null {
   }
 }
 
-/** Building khởi động: autosave nếu có, ngược lại seed nhà mẫu 2 phòng. */
+/** Building khởi động: autosave nếu có, ngược lại seed nhà mẫu 2 phòng.
+ * Tường trùng đầu mút được gộp thành polyline (nhà mẫu → 2 tường: vòng
+ * ngoài khép kín + vách ngăn). */
 export function initialBuilding(): Building {
-  return loadSavedBuilding() ?? seedBuilding();
+  return mergeBuildingWalls(loadSavedBuilding() ?? seedBuilding());
 }

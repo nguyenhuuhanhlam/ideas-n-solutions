@@ -2,7 +2,7 @@ import { applyPatches, enablePatches, produceWithPatches, type Patch } from 'imm
 import { create } from 'zustand';
 import { initialBuilding } from '../export/jsonFile';
 import type { View2d } from '../model/elevation';
-import { tryMergeWall, type SnapKind } from '../model/geometry';
+import { mergeBuildingWalls, mergeCoincidentWalls, tryMergeWall, type SnapKind } from '../model/geometry';
 import type { Building, Level, Opening, Point, Wall } from '../model/schema';
 
 enablePatches();
@@ -68,6 +68,10 @@ interface BuildingState {
    * polyline (1 history entry, kể cả khi opening phải dời offset). */
   addWallOrMerge: (wall: Wall) => void;
   updateWall: (id: string, patch: Partial<Wall>) => void;
+  /** Đặt lại chuỗi điểm của tường rồi gộp mọi tường trùng đầu mút
+   * (kéo đỉnh/di chuyển tường có thể nối 2 tường thành polyline) —
+   * tất cả trong 1 history entry. */
+  commitWallPoints: (wallId: string, points: Point[]) => void;
   deleteWall: (id: string) => void;
   addOpening: (opening: Opening) => void;
   updateOpening: (id: string, patch: Partial<Opening>) => void;
@@ -163,6 +167,35 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
       if (w) Object.assign(w, patch);
     }),
 
+  commitWallPoints: (wallId, points) => {
+    const level = get().building.levels[0];
+    if (!level) return;
+    const walls = level.walls.map((w) => (w.id === wallId ? { ...w, points } : w));
+    const merged = mergeCoincidentWalls(walls, level.openings);
+    // Đổi điểm + gộp tường + dời opening trong CÙNG 1 history entry.
+    applyBuildingChange(set, get, (b) => {
+      const l = b.levels[0];
+      if (!l) return;
+      l.walls = merged.walls;
+      l.openings = merged.openings;
+    });
+    // Gộp có thể làm mất id tường đang kéo (giữ id tường đứng trước):
+    // chuyển chọn sang tường đã gộp để panel không nhảy về Canvas.
+    if (get().selectedWallId === wallId && !merged.walls.some((w) => w.id === wallId)) {
+      const first = points[0];
+      const last = points[points.length - 1];
+      const survivor =
+        first && last
+          ? merged.walls.find(
+              (w) =>
+                w.points.some((p) => p.x === first.x && p.y === first.y) &&
+                w.points.some((p) => p.x === last.x && p.y === last.y),
+            )
+          : undefined;
+      set({ selectedWallId: survivor ? survivor.id : null });
+    }
+  },
+
   deleteWall: (id) =>
     applyBuildingChange(set, get, (b) => {
       const level = b.levels[0];
@@ -196,9 +229,11 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
     }),
 
   loadBuilding: (building) => {
+    // Mở file / tạo mới: tường trùng đầu mút gộp thành polyline ngay.
+    const merged = mergeBuildingWalls(building);
     applyBuildingChange(set, get, (b) => {
-      b.version = building.version;
-      b.levels = building.levels;
+      b.version = merged.version;
+      b.levels = merged.levels;
     });
     set({ selectedWallId: null, selectedOpeningId: null, draft: null, lengthInput: '' });
   },

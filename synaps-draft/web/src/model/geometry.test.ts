@@ -3,6 +3,7 @@ import {
   clampOpeningOffset,
   distance,
   fitScaleFor,
+  mergeCoincidentWalls,
   mergeWallPolygons,
   mergeWallPolygonsWithHoles,
   midpoint,
@@ -419,6 +420,176 @@ describe('tryMergeWall', () => {
     ]);
     expect(merged!.walls.find((x) => x.id === 'right')).toBe(right);
   });
+
+  it('khác thickness → null dù trùng đầu mút', () => {
+    expect(
+      tryMergeWall(
+        [base],
+        [],
+        { id: 'new', points: [{ x: 3000, y: 0 }, { x: 3000, y: 4000 }], thickness: 300 },
+      ),
+    ).toBeNull();
+  });
+
+  it('khác height → null dù trùng đầu mút', () => {
+    const tall: Wall = { ...base, height: 3000 };
+    expect(
+      tryMergeWall(
+        [tall],
+        [],
+        { id: 'new', points: [{ x: 3000, y: 0 }, { x: 3000, y: 4000 }], thickness: 200 },
+      ),
+    ).toBeNull();
+  });
+});
+
+describe('mergeCoincidentWalls', () => {
+  const w = (id: string, pts: Point[], extra: Partial<Wall> = {}): Wall => ({
+    id,
+    points: pts,
+    thickness: 200,
+    ...extra,
+  });
+
+  it('2 tường nối đầu-cuối thành 1 chuỗi, giữ id tường đứng trước', () => {
+    const a = w('a', [{ x: 0, y: 0 }, { x: 3000, y: 0 }]);
+    const b = w('b', [{ x: 3000, y: 0 }, { x: 3000, y: 4000 }]);
+    const { walls, openings } = mergeCoincidentWalls([a, b], []);
+    expect(walls).toHaveLength(1);
+    expect(walls[0].id).toBe('a');
+    expect(walls[0].points).toEqual([
+      { x: 0, y: 0 },
+      { x: 3000, y: 0 },
+      { x: 3000, y: 4000 },
+    ]);
+    expect(openings).toEqual([]);
+  });
+
+  it('3 tường nối tiếp thành 1 chuỗi 4 điểm', () => {
+    const a = w('a', [{ x: 0, y: 0 }, { x: 1000, y: 0 }]);
+    const b = w('b', [{ x: 1000, y: 0 }, { x: 2000, y: 0 }]);
+    const c = w('c', [{ x: 2000, y: 0 }, { x: 3000, y: 0 }]);
+    const { walls } = mergeCoincidentWalls([a, b, c], []);
+    expect(walls).toHaveLength(1);
+    expect(walls[0].points).toEqual([
+      { x: 0, y: 0 },
+      { x: 1000, y: 0 },
+      { x: 2000, y: 0 },
+      { x: 3000, y: 0 },
+    ]);
+  });
+
+  it('4 tường khép kín thành vòng: 5 điểm, điểm đầu == điểm cuối', () => {
+    const walls = [
+      w('n', [{ x: 0, y: 0 }, { x: 1000, y: 0 }]),
+      w('e', [{ x: 1000, y: 0 }, { x: 1000, y: 1000 }]),
+      w('s', [{ x: 1000, y: 1000 }, { x: 0, y: 1000 }]),
+      w('w', [{ x: 0, y: 1000 }, { x: 0, y: 0 }]),
+    ];
+    const { walls: merged } = mergeCoincidentWalls(walls, []);
+    expect(merged).toHaveLength(1);
+    expect(merged[0].points).toEqual([
+      { x: 0, y: 0 },
+      { x: 1000, y: 0 },
+      { x: 1000, y: 1000 },
+      { x: 0, y: 1000 },
+      { x: 0, y: 0 },
+    ]);
+    expect(merged[0].points[0]).toEqual(merged[0].points[4]);
+  });
+
+  it('khác thickness → không gộp', () => {
+    const a = w('a', [{ x: 0, y: 0 }, { x: 3000, y: 0 }]);
+    const b = w('b', [{ x: 3000, y: 0 }, { x: 3000, y: 4000 }], { thickness: 300 });
+    expect(mergeCoincidentWalls([a, b], []).walls).toHaveLength(2);
+  });
+
+  it('khác height → không gộp (một bên có height, một bên không; hoặc 2 height khác nhau)', () => {
+    const a = w('a', [{ x: 0, y: 0 }, { x: 3000, y: 0 }], { height: 3000 });
+    const b = w('b', [{ x: 3000, y: 0 }, { x: 3000, y: 4000 }]);
+    expect(mergeCoincidentWalls([a, b], []).walls).toHaveLength(2);
+    const c = w('c', [{ x: 3000, y: 0 }, { x: 3000, y: 4000 }], { height: 2500 });
+    expect(mergeCoincidentWalls([a, c], []).walls).toHaveLength(2);
+  });
+
+  it('opening dời offset theo vị trí mới trong chuỗi (tường sau dời +chiều dài tường trước)', () => {
+    const a = w('a', [{ x: 0, y: 0 }, { x: 3000, y: 0 }]);
+    const b = w('b', [{ x: 3000, y: 0 }, { x: 3000, y: 4000 }]);
+    const doorA = opening('a', 1000, 900);
+    const doorB = opening('b', 500, 800);
+    const { walls, openings } = mergeCoincidentWalls([a, b], [doorA, doorB]);
+    expect(walls).toHaveLength(1);
+    expect(openings).toHaveLength(2);
+    expect(openings.find((o) => o.id === doorA.id)).toEqual({ ...doorA, offset: 1000 });
+    expect(openings.find((o) => o.id === doorB.id)).toEqual({
+      ...doorB,
+      wallId: 'a',
+      offset: 3500,
+    });
+  });
+
+  it('trường hợp prepend: tường đứng trước trong mảng nằm sau trong chuỗi thì opening của nó dời', () => {
+    const b = w('b', [{ x: 3000, y: 0 }, { x: 6000, y: 0 }]);
+    const a = w('a', [{ x: 0, y: 0 }, { x: 3000, y: 0 }]);
+    const doorA = opening('a', 1000, 900);
+    const doorB = opening('b', 500, 800);
+    const { walls, openings } = mergeCoincidentWalls([b, a], [doorA, doorB]);
+    expect(walls).toHaveLength(1);
+    expect(walls[0].id).toBe('b'); // giữ id tường đứng trước trong mảng
+    expect(walls[0].points).toEqual([
+      { x: 0, y: 0 },
+      { x: 3000, y: 0 },
+      { x: 6000, y: 0 },
+    ]);
+    // A đứng trước trong chuỗi → offset giữ nguyên; B đứng sau → +3000.
+    expect(openings.find((o) => o.id === doorA.id)).toEqual({
+      ...doorA,
+      wallId: 'b',
+      offset: 1000,
+    });
+    expect(openings.find((o) => o.id === doorB.id)).toEqual({ ...doorB, offset: 3500 });
+  });
+
+  it('tường bị đảo chiều: opening đổi offset thành len - offset - width', () => {
+    const a = w('a', [{ x: 0, y: 0 }, { x: 3000, y: 0 }]);
+    const b = w('b', [{ x: 6000, y: 0 }, { x: 3000, y: 0 }]); // hướng ngược
+    const doorB = opening('b', 500, 900);
+    const { walls, openings } = mergeCoincidentWalls([a, b], [doorB]);
+    expect(walls[0].points).toEqual([
+      { x: 0, y: 0 },
+      { x: 3000, y: 0 },
+      { x: 6000, y: 0 },
+    ]);
+    // Cửa trên B (x 5500..4600) → trong chuỗi gộp: offset 4600.
+    expect(openings[0]).toEqual({ ...doorB, wallId: 'a', offset: 4600 });
+  });
+
+  it('nối chữ T (đầu mút nằm trên đoạn giữa) → không gộp', () => {
+    const a = w('a', [{ x: 0, y: 0 }, { x: 6000, y: 0 }]);
+    const b = w('b', [{ x: 3000, y: 0 }, { x: 3000, y: 4000 }]);
+    expect(mergeCoincidentWalls([a, b], []).walls).toHaveLength(2);
+  });
+
+  it('trùng đỉnh GIỮA của polyline → không gộp', () => {
+    const b = w('b', [{ x: 3000, y: 0 }, { x: 5000, y: 0 }]);
+    expect(mergeCoincidentWalls([lWall, b], []).walls).toHaveLength(2);
+  });
+
+  it('không thay đổi mảng/đối tượng đầu vào', () => {
+    const a = w('a', [{ x: 0, y: 0 }, { x: 3000, y: 0 }]);
+    const b = w('b', [{ x: 3000, y: 0 }, { x: 3000, y: 4000 }]);
+    const door = opening('b', 500, 800);
+    const walls = [a, b];
+    const openings = [door];
+    mergeCoincidentWalls(walls, openings);
+    expect(walls).toHaveLength(2);
+    expect(a.points).toEqual([
+      { x: 0, y: 0 },
+      { x: 3000, y: 0 },
+    ]);
+    expect(door.offset).toBe(500);
+    expect(door.wallId).toBe('b');
+  });
 });
 
 describe('resizeSegment', () => {
@@ -454,5 +625,24 @@ describe('resizeSegment', () => {
   it('chỉ số đoạn ngoài khoảng → trả lại mảng gốc', () => {
     expect(resizeSegment(lPoints, -1, 2000)).toBe(lPoints);
     expect(resizeSegment(lPoints, 2, 2000)).toBe(lPoints);
+  });
+
+  it('vòng khép kín: đổi dài đoạn cuối cũng dời điểm đầu (trùng điểm cuối)', () => {
+    const ring: Point[] = [
+      { x: 0, y: 0 },
+      { x: 3000, y: 0 },
+      { x: 3000, y: 3000 },
+      { x: 0, y: 3000 },
+      { x: 0, y: 0 },
+    ];
+    const next = resizeSegment(ring, 3, 2000);
+    expect(next).toEqual([
+      { x: 0, y: 1000 },
+      { x: 3000, y: 0 },
+      { x: 3000, y: 3000 },
+      { x: 0, y: 3000 },
+      { x: 0, y: 1000 },
+    ]);
+    expect(next[0]).toEqual(next[4]);
   });
 });

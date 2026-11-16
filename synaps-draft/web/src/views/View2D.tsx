@@ -48,7 +48,15 @@ const COLORS = {
 
 /** Trạng thái kéo thả (transient, chỉ preview — commit vào store khi thả chuột). */
 type DragState =
-  | { kind: 'endpoint'; wallId: string; index: number; fixed: Point }
+  | {
+      kind: 'endpoint';
+      wallId: string;
+      index: number;
+      /** Mọi chỉ số trùng vị trí với điểm đang kéo (vòng khép kín: điểm
+       * đầu == điểm cuối → kéo 1 tay nắm dời cả 2 để vòng vẫn kín). */
+      indices: number[];
+      fixed: Point;
+    }
   | { kind: 'move'; wallId: string; grab: Point; origPoints: Point[] }
   | {
       kind: 'opening-top';
@@ -179,6 +187,9 @@ export default function View2D() {
   const panRef = useRef<{ sx: number; sy: number; cx: number; cy: number } | null>(null);
   const fittedRef = useRef<Record<string, boolean>>({ top: false, left: false, right: false });
   const dragRef = useRef<DragState | null>(null);
+  /** Chặn click "dư" sau khi kéo thả: mouseup trên canvas trống sinh click
+   * lên stage, làm mất chọn ngay sau khi kéo xong (lỗi cũ từ giai đoạn 1). */
+  const suppressClickRef = useRef(false);
   const [dragPreview, setDragPreview] = useState<DragPreview | null>(null);
   const [openingPreview, setOpeningPreview] = useState<OpeningPreview | null>(null);
   /** Nhập độ dài trực tiếp ở nhãn thước dim (đoạn nào + chuỗi đang gõ). */
@@ -460,20 +471,22 @@ export default function View2D() {
       const others = walls.filter((w) => w.id !== drag.wallId);
       if (drag.kind === 'endpoint') {
         const snap = computeSnap(raw, others, camera.scale, drag.fixed);
-        // Không cho đoạn kề co về 0: điểm mới phải cách cả 2 đỉnh kề ≥ 1mm.
+        // Không cho đoạn kề co về 0: điểm mới phải cách mọi đỉnh kề (của
+        // mọi vị trí đang kéo — vòng khép kín kéo 2 chỉ số cùng lúc) ≥ 1mm.
         const wall = walls.find((w) => w.id === drag.wallId);
-        const prev = wall?.points[drag.index - 1];
-        const next = wall?.points[drag.index + 1];
-        if (
-          (prev && distance(prev, snap.point) < 1) ||
-          (next && distance(next, snap.point) < 1)
-        ) {
-          return;
-        }
+        const blocked = drag.indices.some((idx) => {
+          const prev = wall?.points[idx - 1];
+          const next = wall?.points[idx + 1];
+          return (
+            (prev && distance(prev, snap.point) < 1) ||
+            (next && distance(next, snap.point) < 1)
+          );
+        });
+        if (blocked) return;
         setDragPreview((prevState) => {
           if (!prevState) return prevState;
           const points = prevState.points.map((p, i) =>
-            i === drag.index ? snap.point : p,
+            drag.indices.includes(i) ? snap.point : p,
           );
           return { ...prevState, points };
         });
@@ -511,6 +524,8 @@ export default function View2D() {
   };
 
   const handleMouseDown = (e: KonvaEventObject<MouseEvent>) => {
+    // Mousedown mới = cử chỉ mới: cờ chặn click từ lần kéo trước đã hết hạn.
+    suppressClickRef.current = false;
     const stage = stageRef.current;
     if (!stage) return;
     const pointer = stage.getPointerPosition();
@@ -550,10 +565,14 @@ export default function View2D() {
   };
 
   const handleMouseUp = () => {
+    const wasPanning = panRef.current !== null;
     panRef.current = null;
     // Commit lần kéo thả thành 1 history entry (undo được).
     const drag = dragRef.current;
     dragRef.current = null;
+    // Kéo thả vừa kết thúc: click sinh ngay sau mouseup phải bị chặn
+    // (không bỏ chọn tường vừa kéo).
+    if (drag || wasPanning) suppressClickRef.current = true;
     if (drag && dragPreview) {
       const original = walls.find((w) => w.id === drag.wallId);
       const changed =
@@ -564,9 +583,11 @@ export default function View2D() {
               p.x !== dragPreview.points[i].x || p.y !== dragPreview.points[i].y,
           ));
       if (changed) {
+        // Commit + gộp tường trùng đầu mút (kéo đầu tường vào góc tường
+        // khác sẽ nối thành polyline) — 1 history entry.
         useBuildingStore
           .getState()
-          .updateWall(drag.wallId, { points: dragPreview.points });
+          .commitWallPoints(drag.wallId, dragPreview.points);
       }
     }
     if (
@@ -623,10 +644,17 @@ export default function View2D() {
         index === 0
           ? wall.points[1]
           : wall.points[index - 1];
+      // Vòng khép kín: điểm đầu == điểm cuối — kéo tay nắm ở vị trí đó
+      // phải dời CẢ 2 chỉ số để vòng vẫn khép kín.
+      const grabbed = wall.points[index];
+      const indices = wall.points
+        .map((p, i) => (p.x === grabbed.x && p.y === grabbed.y ? i : -1))
+        .filter((i) => i >= 0);
       dragRef.current = {
         kind: 'endpoint',
         wallId: wall.id,
         index,
+        indices,
         fixed: { ...fixed },
       };
       setDragPreview({ wallId: wall.id, points: wall.points.map((p) => ({ ...p })) });
@@ -695,6 +723,11 @@ export default function View2D() {
     };
 
   const handleStageClick = (e: KonvaEventObject<MouseEvent>) => {
+    // Click sinh ra ngay sau khi thả chuột kéo thả: bỏ qua, không bỏ chọn.
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false;
+      return;
+    }
     if (e.target === e.currentTarget && tool === 'select') {
       useBuildingStore.getState().setSelection(null);
     }
@@ -1073,9 +1106,17 @@ export default function View2D() {
             ) : null,
           )}
 
-          {/* Handle ở MỌI đỉnh của tường đang chọn (kéo đỉnh dời điểm đó). */}
+          {/* Handle ở MỌI đỉnh của tường đang chọn (kéo đỉnh dời điểm đó).
+              Vòng khép kín: điểm đầu == điểm cuối → chỉ 1 tay nắm cho vị
+              trí trùng đó (kéo nó dời cả 2 chỉ số). */}
           {selected &&
-            selected.points.map((p, i) => (
+            selected.points
+              .map((p, i) => ({ p, i }))
+              .filter(
+                ({ p, i }) =>
+                  selected.points.findIndex((q) => q.x === p.x && q.y === p.y) === i,
+              )
+              .map(({ p, i }) => (
               <Circle
                 key={`${selected.id}-h-${i}`}
                 x={p.x}

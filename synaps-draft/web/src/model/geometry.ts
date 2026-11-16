@@ -1,5 +1,5 @@
 import { union, type Pair, type Polygon } from 'polygon-clipping';
-import type { Opening, Point, Wall } from './schema';
+import type { Building, Opening, Point, Wall } from './schema';
 
 /** Hình học thuần, không phụ thuộc React/Konva. Đơn vị mm, tọa độ nguyên. */
 
@@ -39,6 +39,16 @@ export function wallLength(wall: Wall): number {
 
 export function midpoint(a: Point, b: Point): Point {
   return { x: Math.round((a.x + b.x) / 2), y: Math.round((a.y + b.y) / 2) };
+}
+
+function samePoint(a: Point, b: Point): boolean {
+  return a.x === b.x && a.y === b.y;
+}
+
+/** 2 tường có gộp thành 1 polyline được không: cùng thickness và cùng
+ * height (cả 2 đều không có height cũng tính là bằng). */
+export function canMergeWalls(a: Wall, b: Wall): boolean {
+  return a.thickness === b.thickness && a.height === b.height;
 }
 
 /** Snap một tọa độ về bội gần nhất của `step` (mm). */
@@ -277,6 +287,8 @@ export function clampOpeningOffset(offset: number, width: number, wallLen: numbe
 /**
  * Đổi độ dài một đoạn của chuỗi điểm: giữ points[index] cố định, dời
  * points[index + 1] dọc hướng đoạn tới độ dài mới; các điểm khác giữ nguyên.
+ * Ngoại lệ vòng khép kín: MỌI điểm trùng với điểm cũ của points[index + 1]
+ * cũng dời theo (điểm đầu == điểm cuối chuỗi) để vòng vẫn khép kín.
  * Trả lại đúng mảng gốc (không đổi) khi độ dài không hợp lệ (<= 0), bằng độ
  * dài hiện tại, hoặc chỉ số đoạn ngoài khoảng.
  */
@@ -288,23 +300,19 @@ export function resizeSegment(points: Point[], index: number, length: number): P
   if (length <= 0 || cur === 0 || Math.round(cur) === length) return points;
   const ux = (b.x - a.x) / cur;
   const uy = (b.y - a.y) / cur;
-  const next = points.slice();
-  next[index + 1] = {
+  const moved: Point = {
     x: Math.round(a.x + ux * length),
     y: Math.round(a.y + uy * length),
   };
-  return next;
-}
-
-function samePoint(a: Point, b: Point): boolean {
-  return a.x === b.x && a.y === b.y;
+  return points.map((p) => (samePoint(p, b) ? moved : p));
 }
 
 /**
  * Gộp tường mới vào một tường có sẵn khi đầu mút của nó trùng KHỚP (mm nguyên)
  * với điểm ĐẦU hoặc CUỐI của tường đó — 2 point snap thành 1 góc polyline.
  * Chỉ gộp ở 2 đầu chuỗi; trùng đỉnh giữa (nối chữ T / phân nhánh) thì không
- * gộp. Tường gộp giữ id/thickness/height của tường cũ. Khi gộp vào ĐẦU
+ * gộp. Chỉ gộp khi cùng thickness và cùng height (xem canMergeWalls).
+ * Tường gộp giữ id/thickness/height của tường cũ. Khi gộp vào ĐẦU
  * (prepend), mọi opening trên tường cũ dời +chiều dài chuỗi mới (offset đo
  * từ points[0]); gộp vào CUỐI thì offset giữ nguyên.
  * Trả null khi không gộp được (không trùng đầu nào, hoặc tường mới dài 0).
@@ -326,6 +334,7 @@ export function tryMergeWall(
   let mergedPoints: Point[] | null = null;
   let prepend = false;
   for (const w of walls) {
+    if (!canMergeWalls(w, newWall)) continue;
     const first = w.points[0];
     const last = w.points[w.points.length - 1];
     if (samePoint(newStart, first)) {
@@ -343,6 +352,7 @@ export function tryMergeWall(
   }
   if (!target) {
     for (const w of walls) {
+      if (!canMergeWalls(w, newWall)) continue;
       const first = w.points[0];
       const last = w.points[w.points.length - 1];
       if (samePoint(newEnd, first)) {
@@ -371,5 +381,110 @@ export function tryMergeWall(
           o.wallId === targetWall.id ? { ...o, offset: o.offset + shift } : o,
         )
       : openings,
+  };
+}
+
+/** Cách 2 tường nối nhau tại đầu mút trùng khít (a = tường đứng trước
+ * trong mảng, giữ id; b = tường còn lại). */
+type MergeMode = 'aLast-bFirst' | 'aLast-bLast' | 'aFirst-bFirst' | 'aFirst-bLast';
+
+/** Tìm cặp tường đầu tiên (i < j) gộp được: trùng đầu/cuối + cùng
+ * thickness/height. Chỉ xét điểm ĐẦU/CUỐI chuỗi — trùng đỉnh giữa hay
+ * đầu mút nằm trên đoạn giữa của tường kia (nối chữ T) thì không gộp. */
+function findMergeablePair(walls: Wall[]): { i: number; j: number; mode: MergeMode } | null {
+  for (let i = 0; i < walls.length; i++) {
+    const a = walls[i];
+    const aFirst = a.points[0];
+    const aLast = a.points[a.points.length - 1];
+    for (let j = i + 1; j < walls.length; j++) {
+      const b = walls[j];
+      if (!canMergeWalls(a, b)) continue;
+      const bFirst = b.points[0];
+      const bLast = b.points[b.points.length - 1];
+      if (samePoint(aLast, bFirst)) return { i, j, mode: 'aLast-bFirst' };
+      if (samePoint(aLast, bLast)) return { i, j, mode: 'aLast-bLast' };
+      if (samePoint(aFirst, bFirst)) return { i, j, mode: 'aFirst-bFirst' };
+      if (samePoint(aFirst, bLast)) return { i, j, mode: 'aFirst-bLast' };
+    }
+  }
+  return null;
+}
+
+/**
+ * Gộp TẤT CẢ tường có đầu mút trùng khít (mm nguyên) thành polyline —
+ * lặp cho tới khi không còn cặp nào gộp được. Tường gộp giữ id của
+ * tường đứng TRƯỚC trong mảng đầu vào; opening dời offset theo vị trí
+ * mới trong chuỗi (tường đứng sau dời +chiều dài tường đứng trước;
+ * tường bị đảo chiều thì offset đổi thành len - offset - width, làm
+ * tròn về mm nguyên). Không thay đổi mảng/đối tượng đầu vào.
+ * Vòng khép kín (điểm đầu == điểm cuối) là kết quả HỢP LỆ — không bỏ
+ * điểm trùng. Không gộp ở đỉnh giữa hay nối chữ T.
+ */
+export function mergeCoincidentWalls(
+  walls: Wall[],
+  openings: Opening[],
+): { walls: Wall[]; openings: Opening[] } {
+  let currentWalls = walls.slice();
+  let currentOpenings = openings.slice();
+  for (;;) {
+    const pair = findMergeablePair(currentWalls);
+    if (!pair) break;
+    const a = currentWalls[pair.i];
+    const b = currentWalls[pair.j];
+    // Xác định thứ tự chuỗi gộp + bên nào phải đảo chiều để nối liền.
+    let first: Wall;
+    let second: Wall;
+    let firstReversed: boolean;
+    let secondReversed: boolean;
+    switch (pair.mode) {
+      case 'aLast-bFirst':
+        first = a; firstReversed = false; second = b; secondReversed = false;
+        break;
+      case 'aLast-bLast':
+        first = a; firstReversed = false; second = b; secondReversed = true;
+        break;
+      case 'aFirst-bFirst':
+        first = b; firstReversed = true; second = a; secondReversed = false;
+        break;
+      case 'aFirst-bLast':
+        first = b; firstReversed = false; second = a; secondReversed = false;
+        break;
+    }
+    const firstPts = firstReversed ? [...first.points].reverse() : first.points;
+    const secondPts = secondReversed ? [...second.points].reverse() : second.points;
+    // Điểm chung (cuối first == đầu second) chỉ giữ 1 lần.
+    const mergedWall: Wall = { ...a, points: [...firstPts, ...secondPts.slice(1)] };
+    const lenFirst = wallLength(first);
+    const lenSecond = wallLength(second);
+    const remapOffset = (o: Opening, wallLen: number, reversed: boolean, base: number) =>
+      Math.round(base + (reversed ? wallLen - o.offset - o.width : o.offset));
+    currentOpenings = currentOpenings.map((o) => {
+      if (o.wallId === first.id) {
+        return { ...o, wallId: a.id, offset: remapOffset(o, lenFirst, firstReversed, 0) };
+      }
+      if (o.wallId === second.id) {
+        return {
+          ...o,
+          wallId: a.id,
+          offset: remapOffset(o, lenSecond, secondReversed, lenFirst),
+        };
+      }
+      return o;
+    });
+    currentWalls = currentWalls.map((w, idx) => (idx === pair.i ? mergedWall : w));
+    currentWalls.splice(pair.j, 1); // mảng này là bản sao mới từ map — splice an toàn
+  }
+  return { walls: currentWalls, openings: currentOpenings };
+}
+
+/** Gộp tường trùng đầu mút trong MỌI level của Building — dùng khi nạp
+ * Building vào store (seed, mở file, autosave). */
+export function mergeBuildingWalls(building: Building): Building {
+  return {
+    ...building,
+    levels: building.levels.map((level) => {
+      const merged = mergeCoincidentWalls(level.walls, level.openings);
+      return { ...level, walls: merged.walls, openings: merged.openings };
+    }),
   };
 }
