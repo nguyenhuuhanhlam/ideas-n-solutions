@@ -43,8 +43,10 @@ export function seedBuilding(): Building {
           { id: 'o-door-hall', wallId: 'w-hall-south', type: 'door', offset: 400, width: 600, height: 2100, sillHeight: 0 },
           // Cửa hall sang phòng chính 650 (tường dài 7700, đo từ nam lên bắc): 5000–5650.
           { id: 'o-door-main', wallId: 'w-vertical', type: 'door', offset: 5000, width: 650, height: 2100, sillHeight: 0 },
-          // Cửa phòng tắm 550 (tường dài 3600): 200–750.
-          { id: 'o-door-bath', wallId: 'w-bath-south', type: 'door', offset: 200, width: 550, height: 2100, sillHeight: 0 },
+          // Cửa phòng tắm 550 (tường dài 3600): 200–750. Mở vào TRONG phòng
+          // tắm (flip: cánh + cung về phía bắc) để cung mở không chạm cung
+          // mở của cửa chính ở phòng chính.
+          { id: 'o-door-bath', wallId: 'w-bath-south', type: 'door', offset: 200, width: 550, height: 2100, sillHeight: 0, flip: true },
         ],
       },
     ],

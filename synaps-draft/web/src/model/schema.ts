@@ -24,6 +24,10 @@ export const openingSchema = z.object({
   width: mm,
   height: mm,
   sillHeight: mm,
+  /** Cửa đi: đảo chiều mở sang phía đối diện của tường (mặc định false
+   * = mở về phía pháp tuyến trái). Cửa sổ không dùng. File cũ không có
+   * trường này vẫn load được, vẽ như hiện tại. */
+  flip: z.boolean().optional(),
 });
 
 export const levelSchema = z.object({

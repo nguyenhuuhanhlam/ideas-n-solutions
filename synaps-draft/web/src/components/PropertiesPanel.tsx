@@ -290,6 +290,15 @@ export default function PropertiesPanel() {
           <div className="flex flex-col gap-3">
             <GroupLabel>Configuration</GroupLabel>
             <AlignmentControl />
+            {opening.type === 'door' && (
+              <button
+                type="button"
+                onClick={() => store().updateOpening(opening.id, { flip: !opening.flip })}
+                className="rounded-lg border border-syn-border bg-white px-2 py-1.5 text-xs text-syn-ink hover:bg-syn-field"
+              >
+                Đảo chiều mở
+              </button>
+            )}
           </div>
           {openingError && (
             <p role="alert" className="rounded bg-amber-50 px-2 py-1.5 text-xs text-amber-800">

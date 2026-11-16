@@ -33,6 +33,10 @@ class Opening(BaseModel):
     width: int
     height: int
     sillHeight: int
+    # Cửa đi: đảo chiều mở sang phía đối diện của tường (mặc định False
+    # = mở về phía pháp tuyến trái). DXF không vẽ cung mở nên field này
+    # chỉ được nhận (validate), không ảnh hưởng hình học xuất.
+    flip: bool | None = None
 
 
 class Level(BaseModel):

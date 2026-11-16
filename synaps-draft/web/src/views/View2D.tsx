@@ -5,7 +5,7 @@ import { Arc, Layer, Line, Circle, Rect, Stage, Text } from 'react-konva';
 import Segments from '../components/Segments';
 import WallFill from '../components/WallFill';
 import { elevationBounds, elevationUToOffset, projectOpeningToElevation, projectWallToElevation, sortWallsByDepth, type ElevationView } from '../model/elevation';
-import { distance, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, openingsExceedLength, planBounds, pointAtChainOffset, pointsLength, projectPointOnWall, resizeSegment, wallCornerPatches, wallPolygon, wallSegmentPolygons } from '../model/geometry';
+import { distance, doorSwing, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, openingFrame, openingsExceedLength, planBounds, pointsLength, projectPointOnWall, resizeSegment, wallCornerPatches, wallPolygon, wallSegmentPolygons } from '../model/geometry';
 import { computeGridSegments, gridStepFor } from '../model/grid';
 import { clampOffset, clampSill } from '../model/openingDrag';
 import type { Opening, Point, Wall } from '../model/schema';
@@ -105,22 +105,6 @@ interface OpeningPreview {
   openingId: string;
   offset: number;
   sillHeight: number;
-}
-
-/** Các điểm của opening dọc tường: a = mép đầu, b = mép cuối, n = pháp tuyến.
- * Hướng lấy theo đoạn chứa offset (giới hạn: lỗ bắc qua đỉnh polyline chỉ
- * vẽ theo đoạn chứa offset — chưa xảy ra ở D3a). */
-function openingFrame(opening: Opening, wall: Wall) {
-  const { point: a, segmentIndex } = pointAtChainOffset(wall.points, opening.offset);
-  const p0 = wall.points[segmentIndex];
-  const p1 = wall.points[segmentIndex + 1];
-  const segLen = p0 && p1 ? distance(p0, p1) : 0;
-  const ux = segLen === 0 ? 1 : (p1.x - p0.x) / segLen;
-  const uy = segLen === 0 ? 0 : (p1.y - p0.y) / segLen;
-  const nx = -uy;
-  const ny = ux;
-  const b = { x: a.x + ux * opening.width, y: a.y + uy * opening.width };
-  return { a, b, nx, ny, ux, uy };
 }
 
 /** Polygon hình chữ nhật bao opening (dọc tường × ngang tường). */
@@ -1134,12 +1118,12 @@ export default function View2D() {
             const wall = effectiveWalls.find((w) => w.id === o.wallId);
             if (!wall) return null;
             const isSel = selectedOpeningSet.has(o.id);
-            const { a, b, nx, ny, ux, uy } = openingFrame(o, wall);
+            const { a, b, nx, ny } = openingFrame(o, wall);
             const half = wall.thickness / 2;
             const stroke = isSel ? c.selected : c.wallStroke;
             if (o.type === 'door') {
-              const leafEnd = { x: a.x + nx * o.width, y: a.y + ny * o.width };
-              const angleDeg = (Math.atan2(uy, ux) * 180) / Math.PI;
+              const swing = doorSwing(o, wall);
+              const leafEnd = swing.leafEnd;
               return (
                 <Fragment key={o.id}>
                   {/* Khoảng trống trên thân tường. */}
@@ -1149,7 +1133,7 @@ export default function View2D() {
                     fill={c.bg}
                     listening={false}
                   />
-                  {/* Cánh cửa + cung 90° thể hiện hướng mở. */}
+                  {/* Cánh cửa + cung 90° thể hiện hướng mở (flip đảo phía). */}
                   <Line
                     points={[a.x, a.y, leafEnd.x, leafEnd.y]}
                     stroke={stroke}
@@ -1161,8 +1145,8 @@ export default function View2D() {
                     y={a.y}
                     innerRadius={0}
                     outerRadius={o.width}
-                    angle={90}
-                    rotation={angleDeg}
+                    angle={swing.arcAngle}
+                    rotation={swing.arcRotation}
                     stroke={stroke}
                     strokeWidth={1.5 / camera.scale}
                     listening={false}
@@ -1184,20 +1168,28 @@ export default function View2D() {
                 </Fragment>
               );
             }
-            // Window: 2 đường song song trong thân tường.
+            // Window: khoét tường tại lỗ cửa (như cửa đi) rồi vẽ 2 đường
+            // khung sậm song song trong lỗ — tường không còn đè lên cửa sổ.
             const q = wall.thickness / 4;
             return (
               <Fragment key={o.id}>
+                {/* Khoảng trống trên thân tường (che cả viền tường + đường tâm). */}
+                <Line
+                  points={openingPolygon(o, wall, half + 3 / camera.scale)}
+                  closed
+                  fill={c.bg}
+                  listening={false}
+                />
                 <Line
                   points={[a.x + nx * q, a.y + ny * q, b.x + nx * q, b.y + ny * q]}
-                  stroke={c.bg}
-                  strokeWidth={2 / camera.scale}
+                  stroke={stroke}
+                  strokeWidth={1.5 / camera.scale}
                   listening={false}
                 />
                 <Line
                   points={[a.x - nx * q, a.y - ny * q, b.x - nx * q, b.y - ny * q]}
-                  stroke={c.bg}
-                  strokeWidth={2 / camera.scale}
+                  stroke={stroke}
+                  strokeWidth={1.5 / camera.scale}
                   listening={false}
                 />
                 <Line

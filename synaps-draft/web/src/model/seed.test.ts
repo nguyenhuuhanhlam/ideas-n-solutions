@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mergeBuildingWalls, wallLength } from './geometry';
+import { doorSwing, mergeBuildingWalls, openingFrame, wallLength } from './geometry';
 import { seedBuilding } from './seed';
 
 describe('seedBuilding', () => {
@@ -34,6 +34,49 @@ describe('seedBuilding', () => {
     expect(east.points[0]).toEqual({ x: 4850, y: 5150 });
     expect(east.points[0].x - west.points[1].x).toBe(2100);
     expect(level.openings.some((o) => o.wallId === 'w-bed-west' || o.wallId === 'w-bed-east')).toBe(false);
+  });
+
+  it('chỉ cửa phòng tắm đảo chiều mở (vào trong phòng tắm)', () => {
+    const level = seedBuilding().levels[0];
+    const bath = level.openings.find((o) => o.id === 'o-door-bath')!;
+    expect(bath.flip).toBe(true);
+    for (const o of level.openings) {
+      if (o.id !== 'o-door-bath') expect(o.flip ?? false).toBe(false);
+    }
+  });
+
+  it('vùng cung mở của 3 cửa đi đôi một không giao nhau', () => {
+    const level = mergeBuildingWalls(seedBuilding()).levels[0];
+    // Bbox vùng cung mở = bao của {bản lề, đầu cánh, đầu cung trên tường}
+    // (tường nhà demo đều thẳng trục nên cung phần tư nằm gọn trong hình
+    // vuông đó).
+    const boxes: Record<string, { x0: number; y0: number; x1: number; y1: number }> = {};
+    for (const o of level.openings.filter((x) => x.type === 'door')) {
+      const wall = level.walls.find((w) => w.id === o.wallId)!;
+      const { hinge, leafEnd } = doorSwing(o, wall);
+      const { ux, uy } = openingFrame(o, wall);
+      const arcEnd = { x: hinge.x + ux * o.width, y: hinge.y + uy * o.width };
+      const xs = [hinge.x, leafEnd.x, arcEnd.x];
+      const ys = [hinge.y, leafEnd.y, arcEnd.y];
+      boxes[o.id] = { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys) };
+    }
+    // Cửa sảnh: bản lề (1100,3500), cánh lên bắc tới y=2900.
+    expect(boxes['o-door-hall']).toEqual({ x0: 500, y0: 2900, x1: 1100, y1: 3500 });
+    // Cửa chính: bản lề (1900,2800), cánh sang đông, cung từ y=2150.
+    expect(boxes['o-door-main']).toEqual({ x0: 1900, y0: 2150, x1: 2550, y1: 2800 });
+    // Cửa tắm (đã flip): nằm trọn trong phòng tắm, phía bắc tường y=1800.
+    expect(boxes['o-door-bath']).toEqual({ x0: 2100, y0: 1250, x1: 2650, y1: 1800 });
+    expect(boxes['o-door-bath'].y1).toBeLessThanOrEqual(1800);
+    expect(boxes['o-door-main'].y0).toBeGreaterThanOrEqual(2150);
+    // Đôi một không giao nhau (chạm mép cũng không tính là giao).
+    const ids = Object.keys(boxes);
+    const overlap = (a: { x0: number; y0: number; x1: number; y1: number }, b: { x0: number; y0: number; x1: number; y1: number }) =>
+      a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+    for (let i = 0; i < ids.length; i++) {
+      for (let j = i + 1; j < ids.length; j++) {
+        expect(overlap(boxes[ids[i]], boxes[ids[j]]), `${ids[i]} giao ${ids[j]}`).toBe(false);
+      }
+    }
   });
 
   it('sau khi gộp trùng đầu mút: 4 tường (1 chuỗi 7 điểm + 3 vách)', () => {

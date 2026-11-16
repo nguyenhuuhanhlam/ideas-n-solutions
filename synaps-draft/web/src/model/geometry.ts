@@ -366,6 +366,68 @@ export function clampOpeningOffset(offset: number, width: number, wallLen: numbe
   return Math.min(max, Math.max(0, Math.round(offset)));
 }
 
+/** Khung tọa độ của opening dọc tường: a = mép đầu, b = mép cuối,
+ * (ux, uy) = hướng đoạn tường chứa offset, (nx, ny) = pháp tuyến trái
+ * (-uy, ux). Hướng lấy theo đoạn chứa offset (giới hạn: lỗ bắc qua
+ * đỉnh polyline chỉ vẽ theo đoạn chứa offset). */
+export interface OpeningFrame {
+  a: Point;
+  b: Point;
+  nx: number;
+  ny: number;
+  ux: number;
+  uy: number;
+}
+
+export function openingFrame(opening: Opening, wall: Wall): OpeningFrame {
+  const { point: a, segmentIndex } = pointAtChainOffset(wall.points, opening.offset);
+  const p0 = wall.points[segmentIndex];
+  const p1 = wall.points[segmentIndex + 1];
+  const segLen = p0 && p1 ? distance(p0, p1) : 0;
+  const ux = segLen === 0 ? 1 : (p1.x - p0.x) / segLen;
+  const uy = segLen === 0 ? 0 : (p1.y - p0.y) / segLen;
+  const nx = -uy;
+  const ny = ux;
+  const b = { x: a.x + ux * opening.width, y: a.y + uy * opening.width };
+  return { a, b, nx, ny, ux, uy };
+}
+
+/** Hình học cánh + cung mở của cửa đi (mặt bằng, Y hướng xuống). */
+export interface DoorSwing {
+  /** Bản lề: luôn ở mép đầu `a` của lỗ cửa. */
+  hinge: Point;
+  /** Đầu cánh cửa khi mở 90° (cách bản lề một đoạn = chiều rộng cửa,
+   * theo pháp tuyến). */
+  leafEnd: Point;
+  /** Góc xoay bắt đầu của cung (độ): = góc hướng tường khi không flip,
+   * = góc hướng tường − 90° (hướng cánh −n) khi flip. */
+  arcRotation: number;
+  /** Góc quét của cung (độ): LUÔN +90. Konva Arc với angle âm vẽ 270°
+   * (canvas arc clockwise từ 0 tới góc âm đi đường dài) nên khi đảo
+   * chiều phải đổi điểm bắt đầu thay vì đổi dấu góc quét. */
+  arcAngle: number;
+}
+
+/**
+ * Cánh + cung mở của cửa đi. flip=false (mặc định): cánh + cung về phía
+ * pháp tuyến trái +n, cung từ hướng tường quét +90° tới +n (hành vi cũ,
+ * không đổi). flip=true: cánh + cung về phía −n, cung bắt đầu ở hướng
+ * cánh (−n, = góc hướng tường − 90°) quét +90° về hướng tường — cùng
+ * tập điểm với cung 90° từ hướng tường tới −n, nhưng tương thích Konva.
+ * Bản lề luôn ở mép đầu offset.
+ */
+export function doorSwing(opening: Opening, wall: Wall): DoorSwing {
+  const { a, nx, ny, ux, uy } = openingFrame(opening, wall);
+  const s = opening.flip ? -1 : 1;
+  const angleDeg = (Math.atan2(uy, ux) * 180) / Math.PI;
+  return {
+    hinge: a,
+    leafEnd: { x: a.x + s * nx * opening.width, y: a.y + s * ny * opening.width },
+    arcRotation: opening.flip ? angleDeg - 90 : angleDeg,
+    arcAngle: 90,
+  };
+}
+
 /**
  * Đổi độ dài một đoạn của chuỗi điểm: giữ points[index] cố định, dời
  * points[index + 1] dọc hướng đoạn tới độ dài mới; các điểm khác giữ nguyên.

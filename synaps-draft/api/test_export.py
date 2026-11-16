@@ -78,6 +78,18 @@ def test_export_invalid_body_422():
     assert res.status_code == 422
 
 
+def test_export_flipped_door_accepted():
+    """Cửa đi có flip=true (đảo chiều mở, chỉ dùng ở mặt bằng web): API
+    nhận field mới, vẫn export 200, đủ 3 DOORS + 4 WINDOWS."""
+    payload = json.loads(json.dumps(SAMPLE))
+    door = next(o for o in payload["levels"][0]["openings"] if o["type"] == "door")
+    door["flip"] = True
+    doc = ezdxf.read(io.StringIO(_export(payload).decode()))
+    msp = doc.modelspace()
+    assert len(list(msp.query("LWPOLYLINE[layer=='DOORS']"))) == 3
+    assert len(list(msp.query("LWPOLYLINE[layer=='WINDOWS']"))) == 4
+
+
 def _l_building() -> dict:
     """1 tường polyline hình L: đoạn ngang 3000 + đoạn đứng 4000, dày 200,
     kèm 1 cửa sổ nằm trọn trên đoạn đứng (offset 3200 = 200 vào đoạn 2)."""
