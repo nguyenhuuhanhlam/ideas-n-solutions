@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { Arc, Layer, Line, Circle, Rect, Stage, Text } from 'react-konva';
+import { Layer, Line, Circle, Rect, Shape, Stage, Text } from 'react-konva';
 import Segments from '../components/Segments';
 import WallFill from '../components/WallFill';
 import { elevationBounds, elevationUToOffset, projectOpeningToElevation, projectWallToElevation, sortWallsByDepth, type ElevationView } from '../model/elevation';
@@ -1420,17 +1420,29 @@ export default function View2D() {
                     strokeWidth={4 / camera.scale}
                     listening={false}
                   />
-                  <Arc
+                  {/* Cung 90° thể hiện hướng mở: vẽ bằng Shape + ctx.arc,
+                      KHÔNG dùng Konva Arc — Arc luôn closePath() nên vẽ thêm
+                      1 đoạn thẳng từ tâm tới điểm đầu cung; với cửa không flip
+                      đoạn đó nằm dọc tường, chạy xuyên qua lỗ cửa (lỗi thấy
+                      trên bản live 16-11, tưởng là đường tâm chưa cắt). */}
+                  <Shape
                     x={a.x}
                     y={a.y}
-                    innerRadius={0}
-                    outerRadius={o.width}
-                    angle={swing.arcAngle}
-                    rotation={swing.arcRotation}
                     stroke={swingStroke}
                     strokeWidth={1.5 / camera.scale}
                     dash={swingDash}
                     listening={false}
+                    sceneFunc={(ctx: Konva.Context, shape: Konva.Shape) => {
+                      ctx.beginPath();
+                      ctx.arc(
+                        0,
+                        0,
+                        o.width,
+                        (swing.arcRotation * Math.PI) / 180,
+                        ((swing.arcRotation + swing.arcAngle) * Math.PI) / 180,
+                      );
+                      ctx.strokeShape(shape);
+                    }}
                   />
                   {/* Vùng click chọn + kéo thả opening (phủ đúng lỗ cửa). */}
                   <Line
