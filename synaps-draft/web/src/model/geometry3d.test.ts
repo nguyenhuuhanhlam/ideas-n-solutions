@@ -4,8 +4,10 @@ import type { Opening, Wall } from './schema';
 
 const wall = (over: Partial<Wall> = {}): Wall => ({
   id: 'w1',
-  start: { x: 0, y: 0 },
-  end: { x: 4000, y: 0 },
+  points: [
+    { x: 0, y: 0 },
+    { x: 4000, y: 0 },
+  ],
   thickness: 200,
   ...over,
 });
@@ -73,7 +75,7 @@ describe('wallSegments', () => {
   });
 
   it('tường dọc có rotationY -90°', () => {
-    const w = wall({ start: { x: 0, y: 0 }, end: { x: 0, y: 4000 } });
+    const w = wall({ points: [{ x: 0, y: 0 }, { x: 0, y: 4000 }] });
     const boxes = wallSegments(w, [], 3000);
     expect(boxes).toHaveLength(1);
     expect(boxes[0].rotationY).toBeCloseTo(-Math.PI / 2, 10);
@@ -87,7 +89,7 @@ describe('wallSegments', () => {
   });
 
   it('tường độ dài 0 → không có box', () => {
-    const w = wall({ end: { x: 0, y: 0 } });
+    const w = wall({ points: [{ x: 0, y: 0 }, { x: 0, y: 0 }] });
     expect(wallSegments(w, [], 3000)).toEqual([]);
   });
 });

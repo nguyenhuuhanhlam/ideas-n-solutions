@@ -5,12 +5,12 @@ import { Arc, Layer, Line, Circle, Rect, Stage, Text } from 'react-konva';
 import Segments from '../components/Segments';
 import WallFill from '../components/WallFill';
 import { elevationBounds, elevationUToOffset, projectOpeningToElevation, projectWallToElevation, sortWallsByDepth, type ElevationView } from '../model/elevation';
-import { distance, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, projectPointOnWall, wallLength, wallPolygon } from '../model/geometry';
+import { distance, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, openingsExceedLength, pointAtChainOffset, pointsLength, projectPointOnWall, resizeSegment, wallPolygon, wallSegmentPolygons } from '../model/geometry';
 import { computeGridSegments, gridStepFor } from '../model/grid';
 import { clampOffset, clampSill } from '../model/openingDrag';
 import type { Opening, Point, Wall } from '../model/schema';
 import { selectActiveLevel, useBuildingStore, type Unit } from '../store/useBuildingStore';
-import { computeSnap, createWall } from '../tools/wallTool';
+import { computeSnap, createWall, snapPointsNear } from '../tools/wallTool';
 import { createOpening, findNearestWall } from '../tools/openingTool';
 
 /**
@@ -48,8 +48,8 @@ const COLORS = {
 
 /** Trạng thái kéo thả (transient, chỉ preview — commit vào store khi thả chuột). */
 type DragState =
-  | { kind: 'endpoint'; wallId: string; end: 'start' | 'end'; fixed: Point }
-  | { kind: 'move'; wallId: string; grab: Point; origStart: Point; origEnd: Point }
+  | { kind: 'endpoint'; wallId: string; index: number; fixed: Point }
+  | { kind: 'move'; wallId: string; grab: Point; origPoints: Point[] }
   | {
       kind: 'opening-top';
       openingId: string;
@@ -78,8 +78,7 @@ type DragState =
 
 interface DragPreview {
   wallId: string;
-  start: Point;
-  end: Point;
+  points: Point[];
 }
 
 interface OpeningPreview {
@@ -88,18 +87,20 @@ interface OpeningPreview {
   sillHeight: number;
 }
 
-/** Các điểm của opening dọc tường: a = mép đầu, b = mép cuối, n = pháp tuyến. */
+/** Các điểm của opening dọc tường: a = mép đầu, b = mép cuối, n = pháp tuyến.
+ * Hướng lấy theo đoạn chứa offset (giới hạn: lỗ bắc qua đỉnh polyline chỉ
+ * vẽ theo đoạn chứa offset — chưa xảy ra ở D3a). */
 function openingFrame(opening: Opening, wall: Wall) {
-  const len = wallLength(wall);
-  const ux = len === 0 ? 1 : (wall.end.x - wall.start.x) / len;
-  const uy = len === 0 ? 0 : (wall.end.y - wall.start.y) / len;
+  const { point: a, segmentIndex } = pointAtChainOffset(wall.points, opening.offset);
+  const p0 = wall.points[segmentIndex];
+  const p1 = wall.points[segmentIndex + 1];
+  const segLen = p0 && p1 ? distance(p0, p1) : 0;
+  const ux = segLen === 0 ? 1 : (p1.x - p0.x) / segLen;
+  const uy = segLen === 0 ? 0 : (p1.y - p0.y) / segLen;
   const nx = -uy;
   const ny = ux;
-  const at = (t: number): Point => ({
-    x: wall.start.x + ux * t,
-    y: wall.start.y + uy * t,
-  });
-  return { a: at(opening.offset), b: at(opening.offset + opening.width), nx, ny, ux, uy };
+  const b = { x: a.x + ux * opening.width, y: a.y + uy * opening.width };
+  return { a, b, nx, ny, ux, uy };
 }
 
 /** Polygon hình chữ nhật bao opening (dọc tường × ngang tường). */
@@ -113,6 +114,63 @@ function openingPolygon(opening: Opening, wall: Wall, halfWidth: number): number
   ];
 }
 
+/** Một thước dim của 1 đoạn tường: đường + extension + mũi tên hở + nhãn. */
+interface SegmentDim {
+  line: number[];
+  ext: number[];
+  arrows: number[];
+  label: string;
+  lx: number;
+  ly: number;
+  rot: number;
+}
+
+/** Tính thước dim cho 1 đoạn p0→p1, offset 600mm về phía xa tâm building
+ * (cx, cy — phía trống). Trả null khi đoạn dài 0. */
+function segmentDim(p0: Point, p1: Point, cx: number, cy: number, unit: Unit): SegmentDim | null {
+  const len = distance(p0, p1);
+  if (len <= 0) return null;
+  const ux = (p1.x - p0.x) / len;
+  const uy = (p1.y - p0.y) / len;
+  const nx = -uy;
+  const ny = ux;
+  const mid = midpoint(p0, p1);
+  const dPlus = Math.hypot(mid.x + nx * DIM_OFFSET - cx, mid.y + ny * DIM_OFFSET - cy);
+  const dMinus = Math.hypot(mid.x - nx * DIM_OFFSET - cx, mid.y - ny * DIM_OFFSET - cy);
+  const s = dPlus >= dMinus ? 1 : -1;
+  const ox = nx * DIM_OFFSET * s;
+  const oy = ny * DIM_OFFSET * s;
+  const ds = { x: p0.x + ox, y: p0.y + oy };
+  const de = { x: p1.x + ox, y: p1.y + oy };
+  const extLen = DIM_OFFSET + 150;
+  let rot = (Math.atan2(uy, ux) * 180) / Math.PI;
+  if (rot > 90) rot -= 180;
+  if (rot < -90) rot += 180;
+  // Mũi tên hở ở 2 đầu đường kích thước: đỉnh tại đầu đường, 2 cánh
+  // mở ngược vào trong (~120mm dọc đường, ~50mm ngang).
+  const arrowLen = 120;
+  const arrowSpread = 50;
+  return {
+    line: [ds.x, ds.y, de.x, de.y],
+    ext: [
+      p0.x, p0.y,
+      p0.x + nx * extLen * s, p0.y + ny * extLen * s,
+      p1.x, p1.y,
+      p1.x + nx * extLen * s, p1.y + ny * extLen * s,
+    ],
+    arrows: [
+      ds.x, ds.y, ds.x + ux * arrowLen + nx * arrowSpread, ds.y + uy * arrowLen + ny * arrowSpread,
+      ds.x, ds.y, ds.x + ux * arrowLen - nx * arrowSpread, ds.y + uy * arrowLen - ny * arrowSpread,
+      de.x, de.y, de.x - ux * arrowLen + nx * arrowSpread, de.y - uy * arrowLen + ny * arrowSpread,
+      de.x, de.y, de.x - ux * arrowLen - nx * arrowSpread, de.y - uy * arrowLen - ny * arrowSpread,
+    ],
+    label: fmt(len, unit),
+    lx: (ds.x + de.x) / 2 + nx * 140 * s,
+    ly: (ds.y + de.y) / 2 + ny * 140 * s,
+    rot,
+  };
+}
+
 export default function View2D() {
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
@@ -123,6 +181,9 @@ export default function View2D() {
   const dragRef = useRef<DragState | null>(null);
   const [dragPreview, setDragPreview] = useState<DragPreview | null>(null);
   const [openingPreview, setOpeningPreview] = useState<OpeningPreview | null>(null);
+  /** Nhập độ dài trực tiếp ở nhãn thước dim (đoạn nào + chuỗi đang gõ). */
+  const [dimEditing, setDimEditing] = useState<{ segmentIndex: number; value: string } | null>(null);
+  const dimInputRef = useRef<HTMLInputElement>(null);
 
   const walls = useBuildingStore((s) => selectActiveLevel(s)?.walls ?? []);
   const openings = useBuildingStore((s) => selectActiveLevel(s)?.openings ?? []);
@@ -136,6 +197,7 @@ export default function View2D() {
   const unit = useBuildingStore((s) => s.unit);
   const draft = useBuildingStore((s) => s.draft);
   const lengthInput = useBuildingStore((s) => s.lengthInput);
+  const cursorWorld = useBuildingStore((s) => s.cursorWorld);
   const selectedWallId = useBuildingStore((s) => s.selectedWallId);
   const selectedOpeningId = useBuildingStore((s) => s.selectedOpeningId);
 
@@ -145,9 +207,7 @@ export default function View2D() {
   const effectiveWalls = useMemo(() => {
     if (!dragPreview) return walls;
     return walls.map((w) =>
-      w.id === dragPreview.wallId
-        ? { ...w, start: dragPreview.start, end: dragPreview.end }
-        : w,
+      w.id === dragPreview.wallId ? { ...w, points: dragPreview.points } : w,
     );
   }, [walls, dragPreview]);
 
@@ -400,14 +460,22 @@ export default function View2D() {
       const others = walls.filter((w) => w.id !== drag.wallId);
       if (drag.kind === 'endpoint') {
         const snap = computeSnap(raw, others, camera.scale, drag.fixed);
-        if (distance(drag.fixed, snap.point) < 1) return; // không cho tường co về 0
-        setDragPreview((prev) => {
-          if (!prev) return prev;
-          const next =
-            drag.end === 'start'
-              ? { ...prev, start: snap.point }
-              : { ...prev, end: snap.point };
-          return next;
+        // Không cho đoạn kề co về 0: điểm mới phải cách cả 2 đỉnh kề ≥ 1mm.
+        const wall = walls.find((w) => w.id === drag.wallId);
+        const prev = wall?.points[drag.index - 1];
+        const next = wall?.points[drag.index + 1];
+        if (
+          (prev && distance(prev, snap.point) < 1) ||
+          (next && distance(next, snap.point) < 1)
+        ) {
+          return;
+        }
+        setDragPreview((prevState) => {
+          if (!prevState) return prevState;
+          const points = prevState.points.map((p, i) =>
+            i === drag.index ? snap.point : p,
+          );
+          return { ...prevState, points };
         });
         state.setCursor(snap.point, snap.kind);
       } else if (drag.kind === 'move') {
@@ -416,8 +484,7 @@ export default function View2D() {
         const dy = snap.point.y - drag.grab.y;
         setDragPreview({
           wallId: drag.wallId,
-          start: { x: drag.origStart.x + dx, y: drag.origStart.y + dy },
-          end: { x: drag.origEnd.x + dx, y: drag.origEnd.y + dy },
+          points: drag.origPoints.map((p) => ({ x: p.x + dx, y: p.y + dy })),
         });
         state.setCursor(snap.point, snap.kind);
       }
@@ -477,7 +544,7 @@ export default function View2D() {
       return;
     }
     if (distance(state.draft.start, snap.point) < 1) return; // bỏ qua click trùng điểm
-    state.addWall(createWall(state.draft.start, snap.point));
+    state.addWallOrMerge(createWall(state.draft.start, snap.point));
     state.setDraft({ start: snap.point, current: snap.point });
     state.setLengthInput('');
   };
@@ -489,16 +556,17 @@ export default function View2D() {
     dragRef.current = null;
     if (drag && dragPreview) {
       const original = walls.find((w) => w.id === drag.wallId);
-      if (
+      const changed =
         original &&
-        (original.start.x !== dragPreview.start.x ||
-          original.start.y !== dragPreview.start.y ||
-          original.end.x !== dragPreview.end.x ||
-          original.end.y !== dragPreview.end.y)
-      ) {
+        (original.points.length !== dragPreview.points.length ||
+          original.points.some(
+            (p, i) =>
+              p.x !== dragPreview.points[i].x || p.y !== dragPreview.points[i].y,
+          ));
+      if (changed) {
         useBuildingStore
           .getState()
-          .updateWall(drag.wallId, { start: dragPreview.start, end: dragPreview.end });
+          .updateWall(drag.wallId, { points: dragPreview.points });
       }
     }
     if (
@@ -540,23 +608,28 @@ export default function View2D() {
       kind: 'move',
       wallId: wall.id,
       grab: toWorld(pointer.x, pointer.y),
-      origStart: { ...wall.start },
-      origEnd: { ...wall.end },
+      origPoints: wall.points.map((p) => ({ ...p })),
     };
-    setDragPreview({ wallId: wall.id, start: { ...wall.start }, end: { ...wall.end } });
+    setDragPreview({ wallId: wall.id, points: wall.points.map((p) => ({ ...p })) });
   };
 
   const handleHandleMouseDown =
-    (wall: Wall, end: 'start' | 'end') => (e: KonvaEventObject<MouseEvent>) => {
+    (wall: Wall, index: number) => (e: KonvaEventObject<MouseEvent>) => {
       if (tool !== 'select' || e.evt.button !== 0 || spaceRef.current) return;
       e.cancelBubble = true;
+      // Điểm neo cho khóa góc 45° khi kéo đỉnh: đỉnh kề (đầu chuỗi → điểm
+      // sau nó, cuối chuỗi → điểm trước nó, đỉnh giữa → điểm trước nó).
+      const fixed =
+        index === 0
+          ? wall.points[1]
+          : wall.points[index - 1];
       dragRef.current = {
         kind: 'endpoint',
         wallId: wall.id,
-        end,
-        fixed: end === 'start' ? { ...wall.end } : { ...wall.start },
+        index,
+        fixed: { ...fixed },
       };
-      setDragPreview({ wallId: wall.id, start: { ...wall.start }, end: { ...wall.end } });
+      setDragPreview({ wallId: wall.id, points: wall.points.map((p) => ({ ...p })) });
     };
 
   const handleOpeningClick = (opening: Opening) => (e: KonvaEventObject<MouseEvent>) => {
@@ -656,6 +729,56 @@ export default function View2D() {
   const draftLen = draft ? Math.round(distance(draft.start, draft.current)) : 0;
   const selected = effectiveWalls.find((w) => w.id === selectedWallId) ?? null;
 
+  // Marker các điểm snap gần con trỏ khi đang dùng tool Tường (bán kính 30px).
+  const snapMarkers = useMemo(() => {
+    if (tool !== 'wall' || !cursorWorld) return [];
+    return snapPointsNear(cursorWorld, walls, 30 / camera.scale);
+  }, [tool, cursorWorld, walls, camera.scale]);
+
+  // Đổi tường đang chọn trong lúc nhập số ở dim → hủy nhập.
+  useEffect(() => {
+    setDimEditing(null);
+  }, [selectedWallId]);
+
+  // Mở ô nhập dim: focus + chọn hết số để gõ đè ngay.
+  // Chỉ chạy khi TRẠNG THÁI mở/đóng đổi — không phụ thuộc dimEditing.value,
+  // nếu không mỗi phím gõ sẽ select() lại toàn bộ và chỉ giữ được ký tự cuối.
+  const dimEditingOpen = dimEditing !== null;
+  useEffect(() => {
+    if (!dimEditingOpen) return;
+    dimInputRef.current?.focus();
+    dimInputRef.current?.select();
+  }, [dimEditingOpen]);
+
+  /** Chốt độ dài mới từ ô nhập ở thước dim: giữ points[i] của đoạn đang
+   * sửa, dời points[i+1] dọc hướng đoạn đó; đoạn kề giữ đầu còn lại cố định
+   * nên nó xoay/dài theo. Chặn khi tổng chuỗi mới làm cửa vượt khỏi tường. */
+  const commitDimEdit = () => {
+    if (!dimEditing || !selected) return;
+    const { segmentIndex, value } = dimEditing;
+    setDimEditing(null);
+    const p0 = selected.points[segmentIndex];
+    const p1 = selected.points[segmentIndex + 1];
+    if (!p0 || !p1) return;
+    const len = Number.parseInt(value, 10);
+    if (!Number.isInteger(len) || len <= 0) return;
+    if (len === Math.round(distance(p0, p1))) return;
+    const newPoints = resizeSegment(selected.points, segmentIndex, len);
+    if (newPoints === selected.points) return;
+    if (openingsExceedLength(effectiveOpenings, selected.id, pointsLength(newPoints))) {
+      const minLen = Math.max(
+        ...effectiveOpenings
+          .filter((o) => o.wallId === selected.id)
+          .map((o) => o.offset + o.width),
+      );
+      window.alert(
+        `Không thể rút ngắn tường: cửa sẽ vượt khỏi tường (cần ít nhất ${minLen} mm).`,
+      );
+      return;
+    }
+    useBuildingStore.getState().updateWall(selected.id, { points: newPoints });
+  };
+
   // Pill nổi length/angle bám theo con trỏ khi đang vẽ tường (kiểu Synaps):
   // vị trí theo tọa độ màn hình của draft.current, kẹp trong khung canvas.
   let pill: { x: number; y: number; lengthText: string; angleText: string } | null = null;
@@ -673,66 +796,34 @@ export default function View2D() {
     };
   }
 
-  // Dimension cho tường đang chọn (chỉ mặt bằng Top): đường song song,
-  // offset 600mm về phía xa tâm building (phía trống), mũi tên hở 2 đầu + nhãn.
-  let dim: { line: number[]; ext: number[]; arrows: number[]; label: string; lx: number; ly: number; rot: number } | null = null;
+  // Dimension cho từng đoạn của tường đang chọn (chỉ mặt bằng Top): mỗi đoạn
+  // 1 thước song song, offset 600mm về phía xa tâm building (phía trống),
+  // mũi tên hở 2 đầu + nhãn. Mảng căn theo chỉ số đoạn (đoạn dài 0 → null).
+  const dims: (SegmentDim | null)[] = [];
   if (isTop && selected) {
-    const len = wallLength(selected);
-    if (len > 0) {
-      const ux = (selected.end.x - selected.start.x) / len;
-      const uy = (selected.end.y - selected.start.y) / len;
-      const nx = -uy;
-      const ny = ux;
-      const mid = midpoint(selected.start, selected.end);
-      // Tâm bounding box của toàn bộ tường — dimension đặt về phía xa tâm.
-      let minX = Infinity;
-      let minY = Infinity;
-      let maxX = -Infinity;
-      let maxY = -Infinity;
-      for (const w of effectiveWalls) {
-        minX = Math.min(minX, w.start.x, w.end.x);
-        minY = Math.min(minY, w.start.y, w.end.y);
-        maxX = Math.max(maxX, w.start.x, w.end.x);
-        maxY = Math.max(maxY, w.start.y, w.end.y);
+    // Tâm bounding box của toàn bộ tường — dimension đặt về phía xa tâm.
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    for (const w of effectiveWalls) {
+      for (const p of w.points) {
+        minX = Math.min(minX, p.x);
+        minY = Math.min(minY, p.y);
+        maxX = Math.max(maxX, p.x);
+        maxY = Math.max(maxY, p.y);
       }
-      const cx = (minX + maxX) / 2;
-      const cy = (minY + maxY) / 2;
-      const dPlus = Math.hypot(mid.x + nx * DIM_OFFSET - cx, mid.y + ny * DIM_OFFSET - cy);
-      const dMinus = Math.hypot(mid.x - nx * DIM_OFFSET - cx, mid.y - ny * DIM_OFFSET - cy);
-      const s = dPlus >= dMinus ? 1 : -1;
-      const ox = nx * DIM_OFFSET * s;
-      const oy = ny * DIM_OFFSET * s;
-      const ds = { x: selected.start.x + ox, y: selected.start.y + oy };
-      const de = { x: selected.end.x + ox, y: selected.end.y + oy };
-      const extLen = DIM_OFFSET + 150;
-      let rot = (Math.atan2(uy, ux) * 180) / Math.PI;
-      if (rot > 90) rot -= 180;
-      if (rot < -90) rot += 180;
-      // Mũi tên hở ở 2 đầu đường kích thước: đỉnh tại đầu đường, 2 cánh
-      // mở ngược vào trong (~120mm dọc đường, ~50mm ngang).
-      const arrowLen = 120;
-      const arrowSpread = 50;
-      dim = {
-        line: [ds.x, ds.y, de.x, de.y],
-        ext: [
-          selected.start.x, selected.start.y,
-          selected.start.x + nx * extLen * s, selected.start.y + ny * extLen * s,
-          selected.end.x, selected.end.y,
-          selected.end.x + nx * extLen * s, selected.end.y + ny * extLen * s,
-        ],
-        arrows: [
-          ds.x, ds.y, ds.x + ux * arrowLen + nx * arrowSpread, ds.y + uy * arrowLen + ny * arrowSpread,
-          ds.x, ds.y, ds.x + ux * arrowLen - nx * arrowSpread, ds.y + uy * arrowLen - ny * arrowSpread,
-          de.x, de.y, de.x - ux * arrowLen + nx * arrowSpread, de.y - uy * arrowLen + ny * arrowSpread,
-          de.x, de.y, de.x - ux * arrowLen - nx * arrowSpread, de.y - uy * arrowLen - ny * arrowSpread,
-        ],
-        label: fmt(len, unit),
-        lx: (ds.x + de.x) / 2 + nx * 140 * s,
-        ly: (ds.y + de.y) / 2 + ny * 140 * s,
-        rot,
-      };
+    }
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
+    for (let i = 0; i + 1 < selected.points.length; i++) {
+      const p0 = selected.points[i];
+      const p1 = selected.points[i + 1];
+      dims.push(p0 && p1 ? segmentDim(p0, p1, cx, cy, unit) : null);
     }
   }
+  /** Thước dim của đoạn đang nhập số (ô input HTML đặt tại nhãn của nó). */
+  const editingDim = dimEditing ? dims[dimEditing.segmentIndex] : undefined;
 
   // Nhãn trực tiếp khi kéo cửa: offset (mặt bằng) / offset + sill (mặt đứng).
   let dragLabel: { x: number; y: number; text: string } | null = null;
@@ -823,13 +914,14 @@ export default function View2D() {
             strokeWidth={1 / camera.scale}
           />
 
-          {/* Đường tâm từng tường: hiển thị mảnh + vùng click rộng bằng thân tường. */}
+          {/* Đường tâm từng tường: 1 Line polyline qua mọi đỉnh + vùng click
+              rộng bằng thân tường. */}
           {effectiveWalls.map((w) => {
             const isSel = w.id === selectedWallId;
             return (
               <Line
                 key={`${w.id}-c`}
-                points={[w.start.x, w.start.y, w.end.x, w.end.y]}
+                points={w.points.flatMap((p) => [p.x, p.y])}
                 stroke={isSel ? c.selected : c.center}
                 strokeWidth={1 / camera.scale}
                 dash={[6 / camera.scale, 6 / camera.scale]}
@@ -840,16 +932,18 @@ export default function View2D() {
             );
           })}
 
-          {/* Tường đang chọn: tô đè bằng màu chọn. */}
-          {selected && (
-            <Line
-              points={wallPolygon(selected)}
-              closed
-              fill={c.selected}
-              opacity={0.85}
-              listening={false}
-            />
-          )}
+          {/* Tường đang chọn: tô đè từng đoạn bằng màu chọn. */}
+          {selected &&
+            wallSegmentPolygons(selected).map((poly, i) => (
+              <Line
+                key={`${selected.id}-sel-${i}`}
+                points={poly}
+                closed
+                fill={c.selected}
+                opacity={0.85}
+                listening={false}
+              />
+            ))}
 
           {/* Openings: cửa đi (khoảng trống + cánh + cung mở), cửa sổ (2 đường song song). */}
           {effectiveOpenings.map((o) => {
@@ -939,37 +1033,58 @@ export default function View2D() {
             );
           })}
 
-          {/* Dimension cho tường đang chọn. */}
-          {dim && (
-            <>
-              <Segments points={dim.ext} stroke={c.dim} strokeWidth={1 / camera.scale} />
-              <Line points={dim.line} stroke={c.dim} strokeWidth={1.5 / camera.scale} listening={false} />
-              <Segments points={dim.arrows} stroke={c.dim} strokeWidth={1.5 / camera.scale} />
-              <Text
-                x={dim.lx}
-                y={dim.ly}
-                text={dim.label}
-                fontSize={13 / camera.scale}
-                fill={c.dim}
-                rotation={dim.rot}
-                offsetX={(dim.label.length * 8) / camera.scale / 2}
-                offsetY={7 / camera.scale}
-                listening={false}
-              />
-            </>
+          {/* Dimension cho từng đoạn của tường đang chọn. */}
+          {dims.map((d, i) =>
+            d ? (
+              <Fragment key={`dim-${i}`}>
+                <Segments points={d.ext} stroke={c.dim} strokeWidth={1 / camera.scale} />
+                <Line points={d.line} stroke={c.dim} strokeWidth={1.5 / camera.scale} listening={false} />
+                <Segments points={d.arrows} stroke={c.dim} strokeWidth={1.5 / camera.scale} />
+                {/* Bấm nhãn để nhập độ dài trực tiếp đoạn đó (ẩn khi đang nhập đoạn này,
+                    ô input HTML hiện thay; nhãn các đoạn khác vẫn hiện). */}
+                {!(dimEditing && dimEditing.segmentIndex === i) && (
+                  <Text
+                    x={d.lx}
+                    y={d.ly}
+                    text={d.label}
+                    fontSize={13 / camera.scale}
+                    fill={c.dim}
+                    rotation={d.rot}
+                    offsetX={(d.label.length * 8) / camera.scale / 2}
+                    offsetY={7 / camera.scale}
+                    onClick={(e) => {
+                      e.cancelBubble = true;
+                      if (selected) {
+                        const p0 = selected.points[i];
+                        const p1 = selected.points[i + 1];
+                        if (p0 && p1) {
+                          setDimEditing({
+                            segmentIndex: i,
+                            value: String(Math.round(distance(p0, p1))),
+                          });
+                        }
+                      }
+                    }}
+                    onMouseEnter={() => setStageCursor('pointer')}
+                    onMouseLeave={() => setStageCursor(null)}
+                  />
+                )}
+              </Fragment>
+            ) : null,
           )}
 
-          {/* Handle đầu mút của tường đang chọn (kéo để đổi start/end). */}
-          {selected && (
-            <>
+          {/* Handle ở MỌI đỉnh của tường đang chọn (kéo đỉnh dời điểm đó). */}
+          {selected &&
+            selected.points.map((p, i) => (
               <Circle
-                x={selected.start.x}
-                y={selected.start.y}
+                key={`${selected.id}-h-${i}`}
+                x={p.x}
+                y={p.y}
                 radius={6 / camera.scale}
                 fill={c.bg}
                 stroke={c.selected}
                 strokeWidth={2 / camera.scale}
-                onMouseDown={handleHandleMouseDown(selected, 'start')}
+                onMouseDown={handleHandleMouseDown(selected, i)}
                 onMouseEnter={(e) => {
                   e.target.getStage()?.container().style.setProperty('cursor', 'pointer');
                 }}
@@ -977,29 +1092,13 @@ export default function View2D() {
                   e.target.getStage()?.container().style.removeProperty('cursor');
                 }}
               />
-              <Circle
-                x={selected.end.x}
-                y={selected.end.y}
-                radius={6 / camera.scale}
-                fill={c.bg}
-                stroke={c.selected}
-                strokeWidth={2 / camera.scale}
-                onMouseDown={handleHandleMouseDown(selected, 'end')}
-                onMouseEnter={(e) => {
-                  e.target.getStage()?.container().style.setProperty('cursor', 'pointer');
-                }}
-                onMouseLeave={(e) => {
-                  e.target.getStage()?.container().style.removeProperty('cursor');
-                }}
-              />
-            </>
-          )}
+            ))}
 
           {/* Draft preview */}
           {draft && draftLen > 0 && (
             <>
               <Line
-                points={wallPolygon({ id: 'draft', start: draft.start, end: draft.current, thickness: 200 })}
+                points={wallPolygon(draft.start, draft.current, 200)}
                 closed
                 fill={c.draft}
                 opacity={0.45}
@@ -1038,6 +1137,71 @@ export default function View2D() {
               />
             </>
           )}
+
+          {/* Marker điểm snap gần con trỏ (tool Tường): vuông = đầu mút,
+              tròn = trung điểm, thoi = chân vuông góc, X = giao điểm. */}
+          {snapMarkers.map((m) => {
+            const s = camera.scale;
+            const key = `${m.kind}-${m.point.x}-${m.point.y}`;
+            if (m.kind === 'endpoint') {
+              const h = 7 / s;
+              return (
+                <Rect
+                  key={key}
+                  x={m.point.x - h / 2}
+                  y={m.point.y - h / 2}
+                  width={h}
+                  height={h}
+                  stroke={c.snap}
+                  strokeWidth={1.5 / s}
+                  listening={false}
+                />
+              );
+            }
+            if (m.kind === 'midpoint') {
+              return (
+                <Circle
+                  key={key}
+                  x={m.point.x}
+                  y={m.point.y}
+                  radius={4 / s}
+                  stroke={c.snap}
+                  strokeWidth={1.5 / s}
+                  listening={false}
+                />
+              );
+            }
+            if (m.kind === 'perpendicular') {
+              const h = 7 / s;
+              return (
+                <Rect
+                  key={key}
+                  x={m.point.x}
+                  y={m.point.y}
+                  offsetX={h / 2}
+                  offsetY={h / 2}
+                  width={h}
+                  height={h}
+                  rotation={45}
+                  stroke={c.snap}
+                  strokeWidth={1.5 / s}
+                  listening={false}
+                />
+              );
+            }
+            const h = 3.5 / s;
+            return (
+              <Segments
+                key={key}
+                points={[
+                  m.point.x - h, m.point.y - h, m.point.x + h, m.point.y + h,
+                  m.point.x - h, m.point.y + h, m.point.x + h, m.point.y - h,
+                ]}
+                stroke={c.snap}
+                strokeWidth={1.5 / s}
+              />
+            );
+          })}
             </>
           ) : (
             <>
@@ -1127,6 +1291,30 @@ export default function View2D() {
           <span>{pill.lengthText}</span>
           <span className="text-syn-grey">{pill.angleText}</span>
         </div>
+      )}
+      {/* Ô nhập độ dài trực tiếp tại nhãn thước dim của đoạn đang sửa:
+          Enter chốt, Esc / blur hủy. */}
+      {editingDim && dimEditing && (
+        <input
+          ref={dimInputRef}
+          value={dimEditing.value}
+          inputMode="numeric"
+          onChange={(e) =>
+            setDimEditing((prev) => (prev ? { ...prev, value: e.target.value } : prev))
+          }
+          onKeyDown={(e) => {
+            e.nativeEvent.stopPropagation();
+            if (e.key === 'Enter') commitDimEdit();
+            else if (e.key === 'Escape') setDimEditing(null);
+          }}
+          onBlur={() => setDimEditing(null)}
+          className="absolute z-10 w-[120px] rounded-full border border-syn-border bg-white px-3 py-1 text-center text-[13px] tabular-nums text-syn-ink shadow-md outline-none"
+          style={{
+            left: camera.x + editingDim.lx * camera.scale,
+            top: camera.y + editingDim.ly * camera.scale,
+            transform: 'translate(-50%, -50%)',
+          }}
+        />
       )}
     </div>
   );

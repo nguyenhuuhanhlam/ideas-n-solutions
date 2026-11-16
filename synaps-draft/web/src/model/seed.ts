@@ -12,11 +12,11 @@ export function seedBuilding(): Building {
         elevation: 0,
         height: 3000,
         walls: [
-          { id: 'w-north', start: { x: 0, y: 0 }, end: { x: 8000, y: 0 }, thickness: t },
-          { id: 'w-east', start: { x: 8000, y: 0 }, end: { x: 8000, y: 6000 }, thickness: t },
-          { id: 'w-south', start: { x: 8000, y: 6000 }, end: { x: 0, y: 6000 }, thickness: t },
-          { id: 'w-west', start: { x: 0, y: 6000 }, end: { x: 0, y: 0 }, thickness: t },
-          { id: 'w-divider', start: { x: 4000, y: 0 }, end: { x: 4000, y: 6000 }, thickness: t },
+          { id: 'w-north', points: [{ x: 0, y: 0 }, { x: 8000, y: 0 }], thickness: t },
+          { id: 'w-east', points: [{ x: 8000, y: 0 }, { x: 8000, y: 6000 }], thickness: t },
+          { id: 'w-south', points: [{ x: 8000, y: 6000 }, { x: 0, y: 6000 }], thickness: t },
+          { id: 'w-west', points: [{ x: 0, y: 6000 }, { x: 0, y: 0 }], thickness: t },
+          { id: 'w-divider', points: [{ x: 4000, y: 0 }, { x: 4000, y: 6000 }], thickness: t },
         ],
         openings: [
           // Cửa chính 900 giữa tường nam (dài 8000): 3550–4450.

@@ -1,5 +1,5 @@
 import type { Level, Opening, Point, Wall } from './schema';
-import { wallLength } from './geometry';
+import { distance, pointAtChainOffset } from './geometry';
 import { clampOffset, clampSill } from './openingDrag';
 
 /** Các view 2D: mặt bằng (Top) và 2 mặt đứng (Left/Right). */
@@ -43,20 +43,26 @@ function projectU(p: Point, view: ElevationView): number {
   return view === 'left' ? p.y : -p.y;
 }
 
-/** 4 góc của thân tường (hình chữ nhật start/end ± thickness/2 theo pháp tuyến). */
+/** 4 góc của thân MỖI đoạn tường (hình chữ nhật 2 đầu ± thickness/2 theo pháp tuyến). */
 function wallCorners(wall: Wall): Point[] {
-  const len = wallLength(wall);
-  const ux = len === 0 ? 1 : (wall.end.x - wall.start.x) / len;
-  const uy = len === 0 ? 0 : (wall.end.y - wall.start.y) / len;
-  const nx = -uy;
-  const ny = ux;
-  const h = wall.thickness / 2;
-  return [
-    { x: wall.start.x + nx * h, y: wall.start.y + ny * h },
-    { x: wall.end.x + nx * h, y: wall.end.y + ny * h },
-    { x: wall.end.x - nx * h, y: wall.end.y - ny * h },
-    { x: wall.start.x - nx * h, y: wall.start.y - ny * h },
-  ];
+  const corners: Point[] = [];
+  for (let i = 0; i + 1 < wall.points.length; i++) {
+    const a = wall.points[i];
+    const b = wall.points[i + 1];
+    const len = distance(a, b);
+    const ux = len === 0 ? 1 : (b.x - a.x) / len;
+    const uy = len === 0 ? 0 : (b.y - a.y) / len;
+    const nx = -uy;
+    const ny = ux;
+    const h = wall.thickness / 2;
+    corners.push(
+      { x: a.x + nx * h, y: a.y + ny * h },
+      { x: b.x + nx * h, y: b.y + ny * h },
+      { x: b.x - nx * h, y: b.y - ny * h },
+      { x: a.x - nx * h, y: a.y - ny * h },
+    );
+  }
+  return corners;
 }
 
 function wallHeight(wall: Wall, level: Level): number {
@@ -71,7 +77,11 @@ export function projectWallToElevation(
   // Giới hạn: tường xiên chiếu thành hình chữ nhật bao (min/max u của 4 góc),
   // không phải hình bình hành đúng — đủ cho mặt đứng trực giao giai đoạn 2A.
   const us = wallCorners(wall).map((p) => projectU(p, view));
-  const cx = (wall.start.x + wall.end.x) / 2;
+  // Tâm X trung bình của các đỉnh (tường 1 đoạn = trung điểm như trước).
+  const cx =
+    wall.points.length === 0
+      ? 0
+      : wall.points.reduce((s, p) => s + p.x, 0) / wall.points.length;
   return {
     // + 0 để chuẩn hóa −0 thành 0 (đảo dấu 0 ra −0).
     u0: Math.round(Math.min(...us)) + 0,
@@ -88,19 +98,19 @@ export function projectOpeningToElevation(
   level: Level,
   view: ElevationView,
 ): OpeningElevation {
-  const len = wallLength(wall);
-  const ux = len === 0 ? 1 : (wall.end.x - wall.start.x) / len;
-  const uy = len === 0 ? 0 : (wall.end.y - wall.start.y) / len;
+  // Hướng đoạn chứa mép đầu lỗ; lỗ vẽ dọc đoạn này (giới hạn: lỗ bắc qua
+  // đỉnh polyline chỉ vẽ theo đoạn chứa offset — chưa xảy ra ở D3a).
+  const { point: a, segmentIndex } = pointAtChainOffset(wall.points, opening.offset);
+  const p0 = wall.points[segmentIndex];
+  const p1 = wall.points[segmentIndex + 1];
+  const segLen = p0 && p1 ? distance(p0, p1) : 0;
+  const ux = segLen === 0 ? 1 : (p1.x - p0.x) / segLen;
+  const uy = segLen === 0 ? 0 : (p1.y - p0.y) / segLen;
   const nx = -uy;
   const ny = ux;
   const h = wall.thickness / 2;
   // 2 mép lỗ dọc tường × 2 mặt tường: lỗ xuyên suốt bề dày tường.
-  const at = (t: number): Point => ({
-    x: wall.start.x + ux * t,
-    y: wall.start.y + uy * t,
-  });
-  const a = at(opening.offset);
-  const b = at(opening.offset + opening.width);
+  const b = { x: a.x + ux * opening.width, y: a.y + uy * opening.width };
   const corners: Point[] = [
     { x: a.x + nx * h, y: a.y + ny * h },
     { x: b.x + nx * h, y: b.y + ny * h },
@@ -118,15 +128,37 @@ export function projectOpeningToElevation(
 
 /**
  * Chiếu ngược: tọa độ u trên mặt đứng → vị trí dọc tường (offset, chưa kẹp).
- * Dùng đường tâm tường: u(t) tuyến tính theo t nên đảo được. Tường chiếu
- * thành mép mỏng (u không đổi dọc tường) thì không đảo được → trả NaN.
+ * u(t) tuyến tính từng đoạn nên đảo trong đoạn chứa u. u ngoài phạm vi thì
+ * ngoại suy từ đoạn gần nhất (nơi gọi kẹp lại bằng clampOffset — giữ hành vi
+ * cũ của tường 1 đoạn). Mọi đoạn đều chiếu thành mép mỏng (u không đổi dọc
+ * tường) thì không đảo được → trả NaN.
  */
 export function elevationUToOffset(wall: Wall, view: ElevationView, u: number): number {
-  const len = wallLength(wall);
-  if (len === 0) return Number.NaN;
-  const du = (projectU(wall.end, view) - projectU(wall.start, view)) / len;
-  if (Math.abs(du) < 1e-9) return Number.NaN;
-  return (u - projectU(wall.start, view)) / du;
+  const points = wall.points;
+  let acc = 0;
+  let nearest: { dist: number; offset: number } | null = null;
+  for (let i = 0; i + 1 < points.length; i++) {
+    const a = points[i];
+    const b = points[i + 1];
+    const segLen = distance(a, b);
+    const ua = projectU(a, view);
+    const ub = projectU(b, view);
+    const du = segLen === 0 ? 0 : (ub - ua) / segLen;
+    if (Math.abs(du) >= 1e-9) {
+      const lo = Math.min(ua, ub);
+      const hi = Math.max(ua, ub);
+      if (u >= lo - 1e-9 && u <= hi + 1e-9) {
+        return acc + (u - ua) / du;
+      }
+      // Ngoài đoạn: ghi nhận để ngoại suy nếu không đoạn nào chứa u.
+      const dist = u < lo ? lo - u : u - hi;
+      if (!nearest || dist < nearest.dist) {
+        nearest = { dist, offset: acc + (u - ua) / du };
+      }
+    }
+    acc += segLen;
+  }
+  return nearest ? nearest.offset : Number.NaN;
 }
 
 /**

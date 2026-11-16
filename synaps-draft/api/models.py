@@ -6,7 +6,7 @@ Mọi tọa độ/kích thước là số nguyên, đơn vị mm. Thay đổi sc
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Point(BaseModel):
@@ -18,8 +18,8 @@ class Point(BaseModel):
 class Wall(BaseModel):
     model_config = ConfigDict(extra="forbid")
     id: str
-    start: Point
-    end: Point
+    # Chuỗi điểm của tường polyline: 2 điểm = 1 đoạn, 3+ điểm = nhiều đoạn.
+    points: list[Point] = Field(min_length=2)
     thickness: int
     height: int | None = None
 

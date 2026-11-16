@@ -1,12 +1,13 @@
-import { buildingSchema, type Building } from '../model/schema';
+import { migrateBuilding, type Building } from '../model/schema';
 import { seedBuilding } from '../model/seed';
 
 /** Key autosave trong localStorage. */
 export const STORAGE_KEY = 'synaps-draft-building-v1';
 
 /**
- * Parse + validate chuỗi JSON thành Building. Ném Error với thông điệp
- * đọc được (đường dẫn field + lý do) thay vì trả ZodError thô.
+ * Parse + validate chuỗi JSON thành Building (tự migrate tường cũ
+ * { start, end } sang { points }). Ném Error với thông điệp đọc được
+ * (đường dẫn field + lý do) thay vì trả ZodError thô.
  */
 export function parseBuildingJson(text: string): Building {
   let raw: unknown;
@@ -15,14 +16,7 @@ export function parseBuildingJson(text: string): Building {
   } catch {
     throw new Error('File không phải JSON hợp lệ.');
   }
-  const result = buildingSchema.safeParse(raw);
-  if (!result.success) {
-    const details = result.error.issues
-      .map((i) => `${i.path.join('.') || '(gốc)'}: ${i.message}`)
-      .join('; ');
-    throw new Error(`File không đúng định dạng Building: ${details}`);
-  }
-  return result.data;
+  return migrateBuilding(raw);
 }
 
 /** Đọc Building từ File do người dùng chọn (input file / kéo-thả). */

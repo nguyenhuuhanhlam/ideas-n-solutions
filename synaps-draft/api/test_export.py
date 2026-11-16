@@ -56,9 +56,9 @@ def test_export_dimensions():
     assert max(xs) - min(xs) == 8200
     assert max(ys) - min(ys) == 6200
     dims = list(msp.query("DIMENSION[layer=='DIMS']"))
-    assert len(dims) == 5  # 1 dimension mỗi tường
-    # Mọi dimension đều phải đo đúng độ dài tường của nó:
-    # 2 tường ngang 8000 + 3 tường đứng 6000 (2 ngoài + 1 ngăn).
+    assert len(dims) == 5  # 1 dimension mỗi đoạn tường (nhà mẫu: 5 tường 1 đoạn)
+    # Mọi dimension đều phải đo đúng độ dài đoạn của nó:
+    # 2 đoạn ngang 8000 + 3 đoạn đứng 6000 (2 ngoài + 1 ngăn).
     assert sorted(d.get_measurement() for d in dims) == [
         6000, 6000, 6000, 8000, 8000,
     ]
@@ -67,5 +67,72 @@ def test_export_dimensions():
 def test_export_invalid_body_422():
     bad = json.loads(json.dumps(SAMPLE))
     del bad["levels"][0]["walls"][0]["thickness"]  # thiếu field bắt buộc
+    res = client.post("/export/dxf", json=bad)
+    assert res.status_code == 422
+
+
+def _l_building() -> dict:
+    """1 tường polyline hình L: đoạn ngang 3000 + đoạn đứng 4000, dày 200,
+    kèm 1 cửa sổ nằm trọn trên đoạn đứng (offset 3200 = 200 vào đoạn 2)."""
+    return {
+        "version": 1,
+        "levels": [{
+            "id": "level-1", "name": "Tầng 1", "elevation": 0, "height": 3000,
+            "walls": [{
+                "id": "w-l",
+                "points": [{"x": 0, "y": 0}, {"x": 3000, "y": 0}, {"x": 3000, "y": 4000}],
+                "thickness": 200,
+            }],
+            "openings": [{
+                "id": "o-win", "wallId": "w-l", "type": "window",
+                "offset": 3200, "width": 1000, "height": 1200, "sillHeight": 900,
+            }],
+        }],
+    }
+
+
+def test_export_polyline_wall_segments():
+    """Tường L 3 điểm: 1 DIMENSION cho mỗi đoạn (3000 + 4000), và thân
+    tường bao phủ cả 2 đoạn: bbox 3100 x 4100 (đoạn ngang x 0..3000 cộng
+    nửa dày ở góc trong x 3100; đoạn đứng y 0..4000 cộng nửa dày y -100)."""
+    doc = ezdxf.read(io.StringIO(_export(_l_building()).decode()))
+    msp = doc.modelspace()
+    dims = list(msp.query("DIMENSION[layer=='DIMS']"))
+    assert len(dims) == 2  # 1 dimension mỗi đoạn, không phải mỗi tường
+    assert sorted(d.get_measurement() for d in dims) == [3000, 4000]
+    walls = list(msp.query("LWPOLYLINE[layer=='WALLS']"))
+    assert walls
+    xs, ys = [], []
+    for e in walls:
+        for x, y in e.get_points(format="xy"):
+            xs.append(x)
+            ys.append(y)
+    assert max(xs) - min(xs) == 3100
+    assert max(ys) - min(ys) == 4100
+
+
+def test_export_opening_on_second_segment():
+    """Cửa sổ offset 3200 trên tường L nằm trên đoạn đứng (offset 200 vào
+    đoạn 2), rộng 1000: rect phải chạy dọc Y, từ y=200 tới y=1200 (2D)."""
+    doc = ezdxf.read(io.StringIO(_export(_l_building()).decode()))
+    msp = doc.modelspace()
+    wins = list(msp.query("LWPOLYLINE[layer=='WINDOWS']"))
+    assert len(wins) == 1
+    xs, ys = [], []
+    for x, y in wins[0].get_points(format="xy"):
+        xs.append(x)
+        ys.append(y)
+    # Dọc đoạn đứng x=3000, dày 200: x từ 2900 tới 3100; y lật dấu:
+    # y_2d 200..1200 -> y_dxf -1200..-200.
+    assert min(xs) == 2900 and max(xs) == 3100
+    assert min(ys) == -1200 and max(ys) == -200
+
+
+def test_export_old_format_rejected():
+    """Tường dạng cũ {start, end} không còn hợp lệ: thiếu points -> 422."""
+    bad = json.loads(json.dumps(SAMPLE))
+    wall = bad["levels"][0]["walls"][0]
+    pts = wall.pop("points")
+    wall["start"], wall["end"] = pts[0], pts[1]
     res = client.post("/export/dxf", json=bad)
     assert res.status_code == 422

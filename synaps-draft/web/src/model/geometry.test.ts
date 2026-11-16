@@ -6,20 +6,63 @@ import {
   mergeWallPolygons,
   mergeWallPolygonsWithHoles,
   midpoint,
+  nearestPointOnChain,
+  openingsExceedLength,
+  pointAtChainOffset,
   projectPointOnWall,
+  resizeSegment,
   snapAngle,
   snapPointToGrid,
   snapToGrid,
+  tryMergeWall,
   wallLength,
   wallPolygon,
 } from './geometry';
-import type { Wall } from './schema';
+import type { Opening, Point, Wall } from './schema';
 
 const wall = (start: { x: number; y: number }, end: { x: number; y: number }): Wall => ({
   id: 'w1',
-  start,
-  end,
+  points: [start, end],
   thickness: 200,
+});
+
+/** Tường polyline chữ L: (0,0) → (3000,0) → (3000,4000), tổng dài 7000. */
+const lPoints: Point[] = [
+  { x: 0, y: 0 },
+  { x: 3000, y: 0 },
+  { x: 3000, y: 4000 },
+];
+const lWall: Wall = { id: 'poly', points: lPoints, thickness: 200 };
+
+const opening = (wallId: string, offset: number, width: number): Opening => ({
+  id: `o-${wallId}-${offset}`,
+  wallId,
+  type: 'door',
+  offset,
+  width,
+  height: 2100,
+  sillHeight: 0,
+});
+
+describe('openingsExceedLength', () => {
+  const openings = [
+    opening('w1', 1000, 900),
+    opening('w1', 3000, 1200),
+    opening('w2', 7000, 900),
+  ];
+  it('cửa nằm gọn trong độ dài mới → false', () => {
+    expect(openingsExceedLength(openings, 'w1', 5000)).toBe(false);
+  });
+  it('cửa chạm đúng mép độ dài mới → false', () => {
+    expect(openingsExceedLength(openings, 'w1', 4200)).toBe(false);
+  });
+  it('cửa vượt khỏi độ dài mới → true', () => {
+    expect(openingsExceedLength(openings, 'w1', 4199)).toBe(true);
+  });
+  it('cửa của tường khác bị bỏ qua', () => {
+    expect(openingsExceedLength(openings, 'w1', 5000)).toBe(false);
+    expect(openingsExceedLength(openings, 'w2', 5000)).toBe(true);
+  });
 });
 
 describe('snapToGrid', () => {
@@ -88,16 +131,77 @@ describe('wallLength & wallPolygon', () => {
   it('độ dài 3-4-5', () => {
     expect(wallLength(wall({ x: 0, y: 0 }, { x: 3000, y: 4000 }))).toBe(5000);
   });
+  it('độ dài chuỗi = tổng các đoạn', () => {
+    expect(wallLength(lWall)).toBe(7000);
+  });
   it('polygon tường ngang rộng đúng thickness', () => {
-    const poly = wallPolygon(wall({ x: 0, y: 0 }, { x: 4000, y: 0 }));
+    const poly = wallPolygon({ x: 0, y: 0 }, { x: 4000, y: 0 }, 200);
     expect(poly).toEqual([0, 100, 4000, 100, 4000, -100, 0, -100]);
   });
   it('polygon tường dọc', () => {
-    const poly = wallPolygon(wall({ x: 0, y: 0 }, { x: 0, y: 4000 }));
+    const poly = wallPolygon({ x: 0, y: 0 }, { x: 0, y: 4000 }, 200);
     expect(poly).toEqual([-100, 0, -100, 4000, 100, 4000, 100, 0]);
   });
   it('distance pitago', () => {
     expect(distance({ x: 0, y: 0 }, { x: 3, y: 4 })).toBe(5);
+  });
+});
+
+describe('pointAtChainOffset', () => {
+  it('offset trong đoạn đầu', () => {
+    expect(pointAtChainOffset(lPoints, 1000)).toEqual({
+      point: { x: 1000, y: 0 },
+      segmentIndex: 0,
+    });
+  });
+  it('offset qua đỉnh sang đoạn 2', () => {
+    expect(pointAtChainOffset(lPoints, 5000)).toEqual({
+      point: { x: 3000, y: 2000 },
+      segmentIndex: 1,
+    });
+  });
+  it('offset đúng đỉnh thuộc đoạn trước', () => {
+    expect(pointAtChainOffset(lPoints, 3000)).toEqual({
+      point: { x: 3000, y: 0 },
+      segmentIndex: 0,
+    });
+  });
+  it('offset vượt cuối chuỗi kẹp về điểm cuối', () => {
+    expect(pointAtChainOffset(lPoints, 99999)).toEqual({
+      point: { x: 3000, y: 4000 },
+      segmentIndex: 1,
+    });
+  });
+  it('offset âm kẹp về điểm đầu', () => {
+    expect(pointAtChainOffset(lPoints, -100)).toEqual({
+      point: { x: 0, y: 0 },
+      segmentIndex: 0,
+    });
+  });
+});
+
+describe('nearestPointOnChain', () => {
+  it('điểm gần đoạn 2: offset tính từ đầu chuỗi', () => {
+    const r = nearestPointOnChain(lPoints, { x: 3500, y: 2000 });
+    expect(r.point).toEqual({ x: 3000, y: 2000 });
+    expect(r.offset).toBe(5000);
+    expect(r.segmentIndex).toBe(1);
+    expect(r.distance).toBe(500);
+  });
+  it('điểm gần đoạn đầu', () => {
+    const r = nearestPointOnChain(lPoints, { x: 1000, y: 300 });
+    expect(r.point).toEqual({ x: 1000, y: 0 });
+    expect(r.offset).toBe(1000);
+    expect(r.segmentIndex).toBe(0);
+  });
+});
+
+describe('projectPointOnWall chuỗi polyline', () => {
+  it('chiếu lên đoạn 2 của polyline', () => {
+    const r = projectPointOnWall({ x: 3500, y: 2000 }, lWall);
+    expect(r.point).toEqual({ x: 3000, y: 2000 });
+    expect(r.offset).toBe(5000);
+    expect(r.distance).toBe(500);
   });
 });
 
@@ -191,5 +295,164 @@ describe('clampOpeningOffset', () => {
   });
   it('làm tròn offset về mm nguyên', () => {
     expect(clampOpeningOffset(1400.6, 1200, 8000)).toBe(1401);
+  });
+});
+
+describe('tryMergeWall', () => {
+  const base: Wall = { id: 'base', points: [{ x: 0, y: 0 }, { x: 3000, y: 0 }], thickness: 200 };
+  const other: Wall = { id: 'other', points: [{ x: 0, y: 6000 }, { x: 3000, y: 6000 }], thickness: 200 };
+
+  it('gộp vào cuối khi start tường mới trùng điểm cuối tường cũ', () => {
+    const merged = tryMergeWall(
+      [base, other],
+      [],
+      { id: 'new', points: [{ x: 3000, y: 0 }, { x: 3000, y: 4000 }], thickness: 200 },
+    );
+    expect(merged).not.toBeNull();
+    expect(merged!.walls).toHaveLength(2);
+    const w = merged!.walls.find((x) => x.id === 'base')!;
+    expect(w.points).toEqual([
+      { x: 0, y: 0 },
+      { x: 3000, y: 0 },
+      { x: 3000, y: 4000 },
+    ]);
+    expect(w.thickness).toBe(200);
+    expect(merged!.walls.find((x) => x.id === 'other')).toBe(other);
+  });
+
+  it('gộp vào cuối (đảo chiều) khi end tường mới trùng điểm cuối tường cũ', () => {
+    const merged = tryMergeWall(
+      [base],
+      [],
+      { id: 'new', points: [{ x: 6000, y: 0 }, { x: 3000, y: 0 }], thickness: 200 },
+    );
+    expect(merged!.walls[0].points).toEqual([
+      { x: 0, y: 0 },
+      { x: 3000, y: 0 },
+      { x: 6000, y: 0 },
+    ]);
+  });
+
+  it('gộp vào đầu khi end tường mới trùng điểm đầu: opening dời +chiều dài đoạn mới', () => {
+    const door = opening('base', 1000, 900);
+    const merged = tryMergeWall(
+      [base],
+      [door],
+      { id: 'new', points: [{ x: -2000, y: 0 }, { x: 0, y: 0 }], thickness: 200 },
+    );
+    expect(merged!.walls[0].points).toEqual([
+      { x: -2000, y: 0 },
+      { x: 0, y: 0 },
+      { x: 3000, y: 0 },
+    ]);
+    expect(merged!.openings).toEqual([{ ...door, offset: 3000 }]);
+  });
+
+  it('gộp vào đầu (đảo chiều) khi start tường mới trùng điểm đầu: opening dời theo', () => {
+    const door = opening('base', 1000, 900);
+    const merged = tryMergeWall(
+      [base],
+      [door],
+      { id: 'new', points: [{ x: 0, y: 0 }, { x: -2000, y: 0 }], thickness: 200 },
+    );
+    expect(merged!.walls[0].points).toEqual([
+      { x: -2000, y: 0 },
+      { x: 0, y: 0 },
+      { x: 3000, y: 0 },
+    ]);
+    expect(merged!.openings[0].offset).toBe(3000);
+  });
+
+  it('gộp vào cuối thì opening giữ nguyên offset', () => {
+    const door = opening('base', 1000, 900);
+    const merged = tryMergeWall(
+      [base],
+      [door],
+      { id: 'new', points: [{ x: 3000, y: 0 }, { x: 3000, y: 4000 }], thickness: 200 },
+    );
+    expect(merged!.openings[0].offset).toBe(1000);
+  });
+
+  it('không trùng đầu nào → null', () => {
+    expect(
+      tryMergeWall(
+        [base],
+        [],
+        { id: 'new', points: [{ x: 5000, y: 0 }, { x: 6000, y: 0 }], thickness: 200 },
+      ),
+    ).toBeNull();
+  });
+
+  it('trùng đỉnh GIỮA của polyline (nối chữ T) → không gộp', () => {
+    expect(
+      tryMergeWall(
+        [lWall],
+        [],
+        { id: 'new', points: [{ x: 3000, y: 0 }, { x: 5000, y: 0 }], thickness: 200 },
+      ),
+    ).toBeNull();
+  });
+
+  it('tường mới dài 0 → null dù trùng điểm', () => {
+    expect(
+      tryMergeWall(
+        [base],
+        [],
+        { id: 'new', points: [{ x: 3000, y: 0 }, { x: 3000, y: 0 }], thickness: 200 },
+      ),
+    ).toBeNull();
+  });
+
+  it('cả 2 đầu đều trùng thì chỉ gộp với tường trùng đầu start', () => {
+    const left: Wall = { id: 'left', points: [{ x: -3000, y: 0 }, { x: 0, y: 0 }], thickness: 200 };
+    const right: Wall = { id: 'right', points: [{ x: 3000, y: 0 }, { x: 6000, y: 0 }], thickness: 200 };
+    const merged = tryMergeWall(
+      [left, right],
+      [],
+      { id: 'new', points: [{ x: 0, y: 0 }, { x: 3000, y: 0 }], thickness: 200 },
+    );
+    expect(merged!.walls).toHaveLength(2);
+    expect(merged!.walls.find((x) => x.id === 'left')!.points).toEqual([
+      { x: -3000, y: 0 },
+      { x: 0, y: 0 },
+      { x: 3000, y: 0 },
+    ]);
+    expect(merged!.walls.find((x) => x.id === 'right')).toBe(right);
+  });
+});
+
+describe('resizeSegment', () => {
+  it('đổi dài đoạn đầu: giữ điểm đầu, dời điểm chung, điểm cuối giữ nguyên', () => {
+    const next = resizeSegment(lPoints, 0, 2000);
+    expect(next).toEqual([
+      { x: 0, y: 0 },
+      { x: 2000, y: 0 },
+      { x: 3000, y: 4000 },
+    ]);
+    expect(next).not.toBe(lPoints);
+  });
+
+  it('đổi dài đoạn giữa: chỉ dời đỉnh chung của đoạn đó', () => {
+    const next = resizeSegment(lPoints, 1, 2000);
+    expect(next).toEqual([
+      { x: 0, y: 0 },
+      { x: 3000, y: 0 },
+      { x: 3000, y: 2000 },
+    ]);
+  });
+
+  it('độ dài không hợp lệ (0 / âm) → trả lại mảng gốc', () => {
+    expect(resizeSegment(lPoints, 0, 0)).toBe(lPoints);
+    expect(resizeSegment(lPoints, 0, -500)).toBe(lPoints);
+  });
+
+  it('độ dài bằng đoạn hiện tại → trả lại mảng gốc', () => {
+    expect(resizeSegment(lPoints, 0, 3000)).toBe(lPoints);
+    expect(resizeSegment(lPoints, 1, 4000)).toBe(lPoints);
+  });
+
+  it('chỉ số đoạn ngoài khoảng → trả lại mảng gốc', () => {
+    expect(resizeSegment(lPoints, -1, 2000)).toBe(lPoints);
+    expect(resizeSegment(lPoints, 2, 2000)).toBe(lPoints);
   });
 });

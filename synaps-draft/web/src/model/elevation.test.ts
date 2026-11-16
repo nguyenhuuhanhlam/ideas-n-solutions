@@ -47,14 +47,14 @@ describe('projectWallToElevation — Right (nhìn từ đông, u = −y)', () =>
   });
 
   it('tường có height riêng thì vTop theo height riêng', () => {
-    const low: Wall = { id: 'low', start: { x: 0, y: 0 }, end: { x: 0, y: 1000 }, thickness: 200, height: 2500 };
+    const low: Wall = { id: 'low', points: [{ x: 0, y: 0 }, { x: 0, y: 1000 }], thickness: 200, height: 2500 };
     expect(projectWallToElevation(low, level, 'right')).toMatchObject({
       vBottom: 0, vTop: 2500,
     });
   });
 
   it('tường xiên chiếu thành hình chữ nhật bao', () => {
-    const diag: Wall = { id: 'diag', start: { x: 0, y: 0 }, end: { x: 3000, y: 4000 }, thickness: 200 };
+    const diag: Wall = { id: 'diag', points: [{ x: 0, y: 0 }, { x: 3000, y: 4000 }], thickness: 200 };
     const r = projectWallToElevation(diag, level, 'left');
     expect(r.u0).toBeLessThanOrEqual(0);
     expect(r.u1).toBeGreaterThanOrEqual(4000);

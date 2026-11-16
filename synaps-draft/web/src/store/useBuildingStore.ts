@@ -2,7 +2,7 @@ import { applyPatches, enablePatches, produceWithPatches, type Patch } from 'imm
 import { create } from 'zustand';
 import { initialBuilding } from '../export/jsonFile';
 import type { View2d } from '../model/elevation';
-import type { SnapKind } from '../model/geometry';
+import { tryMergeWall, type SnapKind } from '../model/geometry';
 import type { Building, Level, Opening, Point, Wall } from '../model/schema';
 
 enablePatches();
@@ -64,6 +64,9 @@ interface BuildingState {
   lengthInput: string;
 
   addWall: (wall: Wall) => void;
+  /** Thêm tường mới; nếu đầu mút trùng đầu/cuối tường cũ thì gộp thành
+   * polyline (1 history entry, kể cả khi opening phải dời offset). */
+  addWallOrMerge: (wall: Wall) => void;
   updateWall: (id: string, patch: Partial<Wall>) => void;
   deleteWall: (id: string) => void;
   addOpening: (opening: Opening) => void;
@@ -136,6 +139,23 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
     applyBuildingChange(set, get, (b) => {
       b.levels[0]?.walls.push(wall);
     }),
+
+  addWallOrMerge: (wall) => {
+    const level = get().building.levels[0];
+    if (!level) return;
+    const merged = tryMergeWall(level.walls, level.openings, wall);
+    if (!merged) {
+      get().addWall(wall);
+      return;
+    }
+    // Gộp tường + dời opening trong CÙNG 1 history entry.
+    applyBuildingChange(set, get, (b) => {
+      const l = b.levels[0];
+      if (!l) return;
+      l.walls = merged.walls;
+      l.openings = merged.openings;
+    });
+  },
 
   updateWall: (id, patch) =>
     applyBuildingChange(set, get, (b) => {

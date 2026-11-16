@@ -25,15 +25,17 @@ def _flip(p: tuple[float, float]) -> tuple[float, float]:
     return (p[0], -p[1])
 
 
-def _wall_polygon(wall: Wall) -> Polygon:
-    """Thân tường: hình chữ nhật dài theo tường, rộng = thickness."""
-    x1, y1 = wall.start.x, wall.start.y
-    x2, y2 = wall.end.x, wall.end.y
+def _segment_polygon(
+    p1: tuple[float, float], p2: tuple[float, float], thickness: int
+) -> Polygon:
+    """Thân 1 đoạn tường: hình chữ nhật dài theo đoạn, rộng = thickness."""
+    x1, y1 = p1
+    x2, y2 = p2
     length = math.hypot(x2 - x1, y2 - y1)
     if length == 0:
         return Polygon()
     nx, ny = -(y2 - y1) / length, (x2 - x1) / length
-    h = wall.thickness / 2
+    h = thickness / 2
     return Polygon([
         (x1 + nx * h, y1 + ny * h),
         (x2 + nx * h, y2 + ny * h),
@@ -42,17 +44,48 @@ def _wall_polygon(wall: Wall) -> Polygon:
     ])
 
 
+def _wall_polygons(wall: Wall) -> list[Polygon]:
+    """1 polygon cho mỗi đoạn của tường polyline (chuỗi points)."""
+    pts = [(float(p.x), float(p.y)) for p in wall.points]
+    return [
+        _segment_polygon(pts[i], pts[i + 1], wall.thickness)
+        for i in range(len(pts) - 1)
+    ]
+
+
+def _segment_at_offset(
+    wall: Wall, offset: int
+) -> tuple[tuple[float, float], tuple[float, float], float]:
+    """Đoạn chứa `offset` dọc chuỗi tường (tính từ points[0]).
+
+    Trả về (điểm đầu đoạn, điểm cuối đoạn, offset cục bộ trong đoạn).
+    Offset đúng tại đỉnh thì thuộc về đoạn SAU đỉnh; offset vượt quá
+    tổng dài chuỗi thì kẹp vào đoạn cuối.
+    """
+    pts = [(float(p.x), float(p.y)) for p in wall.points]
+    remaining = float(max(offset, 0))
+    for i in range(len(pts) - 1):
+        seg_len = math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1])
+        if remaining < seg_len or i == len(pts) - 2:
+            return pts[i], pts[i + 1], remaining
+        remaining -= seg_len
+    return pts[-2], pts[-1], 0.0  # không tới được: chuỗi luôn >= 2 điểm
+
+
 def _opening_rect(wall: Wall, opening: Opening) -> list[tuple[float, float]]:
-    """Hình chữ nhật của lỗ cửa trên mặt bằng, dọc tường, rộng = thickness."""
-    x1, y1 = wall.start.x, wall.start.y
-    x2, y2 = wall.end.x, wall.end.y
+    """Hình chữ nhật của lỗ cửa trên mặt bằng, dọc đoạn tường chứa offset.
+
+    Offset đo dọc toàn bộ chuỗi từ points[0]; lỗ vẽ theo hướng của đoạn
+    chứa offset (giới hạn: lỗ vắt qua đỉnh polyline chỉ vẽ theo đoạn đầu).
+    """
+    (x1, y1), (x2, y2), local = _segment_at_offset(wall, opening.offset)
     length = math.hypot(x2 - x1, y2 - y1)
     if length == 0:
         return []
     ux, uy = (x2 - x1) / length, (y2 - y1) / length
     nx, ny = -uy, ux
     h = wall.thickness / 2
-    a0, a1 = opening.offset, opening.offset + opening.width
+    a0, a1 = local, local + opening.width
     p0 = (x1 + ux * a0, y1 + uy * a0)
     p1 = (x1 + ux * a1, y1 + uy * a1)
     return [
@@ -68,17 +101,20 @@ def _building_center(levels: list[Level]) -> tuple[float, float]:
     xs, ys = [], []
     for level in levels:
         for w in level.walls:
-            xs += [w.start.x, w.end.x]
-            ys += [w.start.y, w.end.y]
+            for p in w.points:
+                xs.append(p.x)
+                ys.append(p.y)
     if not xs:
         return (0.0, 0.0)
     return ((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2)
 
 
-def _dim_base(wall: Wall, cx: float, cy: float) -> tuple[float, float]:
-    """Điểm base của dimension: trung điểm tường, offset 600mm xa tâm building."""
-    x1, y1 = wall.start.x, wall.start.y
-    x2, y2 = wall.end.x, wall.end.y
+def _dim_base(
+    p1: tuple[float, float], p2: tuple[float, float], cx: float, cy: float
+) -> tuple[float, float]:
+    """Điểm base của dimension: trung điểm đoạn, offset 600mm xa tâm building."""
+    x1, y1 = p1
+    x2, y2 = p2
     length = math.hypot(x2 - x1, y2 - y1)
     if length == 0:
         return ((x1 + x2) / 2, (y1 + y2) / 2)
@@ -106,7 +142,8 @@ def building_to_dxf(building: Building) -> str:
         z = float(level.elevation)
 
         # Tường: union các thân tường theo level, mỗi polygon -> LWPOLYLINE kín.
-        polys = [_wall_polygon(w) for w in level.walls]
+        # Mỗi đoạn của tường polyline đóng góp 1 polygon hình chữ nhật.
+        polys = [p for w in level.walls for p in _wall_polygons(w)]
         polys = [p for p in polys if not p.is_empty]
         if polys:
             merged = unary_union(polys)
@@ -133,20 +170,22 @@ def building_to_dxf(building: Building) -> str:
                 pts, close=True, dxfattribs={"layer": layer, "elevation": z}
             )
 
-        # Dimension tuyến tính cho mỗi tường (entity DIMENSION thật).
+        # Dimension tuyến tính cho mỗi ĐOẠN tường (entity DIMENSION thật).
         for wall in level.walls:
-            if wall.start == wall.end:
-                continue
-            base = _flip(_dim_base(wall, cx, cy))
-            p1 = _flip((float(wall.start.x), float(wall.start.y)))
-            p2 = _flip((float(wall.end.x), float(wall.end.y)))
-            # Góc đo phải theo hướng tường: mặc định angle=0 chỉ đo theo
-            # phương ngang nên tường đứng sẽ cho measurement = 0.
-            angle = math.degrees(math.atan2(p2[1] - p1[1], p2[0] - p1[0]))
-            msp.add_linear_dim(
-                base=base, p1=p1, p2=p2, angle=angle,
-                dxfattribs={"layer": "DIMS"},
-            ).render()
+            pts = [(float(p.x), float(p.y)) for p in wall.points]
+            for i in range(len(pts) - 1):
+                if pts[i] == pts[i + 1]:
+                    continue
+                base = _flip(_dim_base(pts[i], pts[i + 1], cx, cy))
+                p1 = _flip(pts[i])
+                p2 = _flip(pts[i + 1])
+                # Góc đo phải theo hướng đoạn tường: mặc định angle=0 chỉ đo
+                # theo phương ngang nên đoạn đứng sẽ cho measurement = 0.
+                angle = math.degrees(math.atan2(p2[1] - p1[1], p2[0] - p1[0]))
+                msp.add_linear_dim(
+                    base=base, p1=p1, p2=p2, angle=angle,
+                    dxfattribs={"layer": "DIMS"},
+                ).render()
 
     buf = io.StringIO()
     doc.write(buf)

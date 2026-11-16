@@ -47,6 +47,7 @@ export default function App() {
         target &&
         (target.tagName === 'INPUT' ||
           target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
           target.isContentEditable)
       ) {
         return;
@@ -98,7 +99,8 @@ export default function App() {
         if (Number.isFinite(len) && len > 0) {
           const end = pointAtLength(s.draft.start, s.draft.current, len);
           if (distance(s.draft.start, end) > 0) {
-            s.addWall(createWall(s.draft.start, end));
+            // Chốt tường bằng số cũng gộp polyline như chốt bằng click.
+            s.addWallOrMerge(createWall(s.draft.start, end));
             s.setDraft({ start: end, current: end });
           }
         }

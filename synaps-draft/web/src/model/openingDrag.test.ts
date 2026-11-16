@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { clampOffset, clampSill } from './openingDrag';
 import type { Opening, Wall } from './schema';
 
-const wall: Wall = { id: 'w', start: { x: 0, y: 0 }, end: { x: 6000, y: 0 }, thickness: 200 };
+const wall: Wall = { id: 'w', points: [{ x: 0, y: 0 }, { x: 6000, y: 0 }], thickness: 200 };
 const mk = (id: string, offset: number, width: number, height = 2100, sillHeight = 0): Opening => ({
   id, wallId: 'w', type: 'door', offset, width, height, sillHeight,
 });
