@@ -1399,8 +1399,8 @@ export default function View2D() {
             if (o.type === 'door') {
               const swing = doorSwing(o, wall);
               const leafEnd = swing.leafEnd;
-              // Ký hiệu hướng mở: nét đứt khúc, màu nhạt hơn nét tường
-              // (khi chọn thì xanh như các nét chọn khác, vẫn đứt khúc).
+              // Ký hiệu hướng mở: chỉ cung 1/4 vòng là nét đứt khúc, màu
+              // nhạt; cánh cửa là nét liền, hơi dày (khi chọn thì xanh).
               const swingStroke = isSel ? c.selected : c.swing;
               const swingDash = [8 / camera.scale, 5 / camera.scale];
               return (
@@ -1412,12 +1412,11 @@ export default function View2D() {
                     fill={c.bg}
                     listening={false}
                   />
-                  {/* Cánh cửa + cung 90° thể hiện hướng mở (flip đảo phía). */}
+                  {/* Cánh cửa (nét liền, hơi dày) + cung 90° thể hiện hướng mở (flip đảo phía). */}
                   <Line
                     points={[a.x, a.y, leafEnd.x, leafEnd.y]}
-                    stroke={swingStroke}
-                    strokeWidth={1.5 / camera.scale}
-                    dash={swingDash}
+                    stroke={stroke}
+                    strokeWidth={2 / camera.scale}
                     listening={false}
                   />
                   <Arc
