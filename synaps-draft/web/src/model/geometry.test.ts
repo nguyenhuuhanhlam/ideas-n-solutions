@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { union, type Polygon } from 'polygon-clipping';
 import {
+  centerlineSegments,
   clampOpeningOffset,
   distance,
   doorSwing,
@@ -1088,5 +1089,79 @@ describe('pinchZoom', () => {
   it('khoảng cách ≤ 0 thì giữ nguyên camera', () => {
     expect(pinchZoom(0, 100, mid, cam, 0.02, 10)).toEqual(cam);
     expect(pinchZoom(100, 0, mid, cam, 0.02, 10)).toEqual(cam);
+  });
+});
+
+describe('centerlineSegments', () => {
+  it('không có lỗ cửa thì giữ nguyên cả chuỗi', () => {
+    expect(centerlineSegments(lWall, [])).toEqual([lPoints]);
+  });
+
+  it('1 cửa giữa tường thẳng thì cắt thành 2 đoạn', () => {
+    const w = wall({ x: 0, y: 0 }, { x: 5000, y: 0 });
+    const segs = centerlineSegments(w, [opening('w1', 2000, 900)]);
+    expect(segs).toEqual([
+      [
+        { x: 0, y: 0 },
+        { x: 2000, y: 0 },
+      ],
+      [
+        { x: 2900, y: 0 },
+        { x: 5000, y: 0 },
+      ],
+    ]);
+  });
+
+  it('cửa ở đầu chuỗi thì chỉ còn đoạn sau cửa', () => {
+    const w = wall({ x: 0, y: 0 }, { x: 5000, y: 0 });
+    expect(centerlineSegments(w, [opening('w1', 0, 900)])).toEqual([
+      [
+        { x: 900, y: 0 },
+        { x: 5000, y: 0 },
+      ],
+    ]);
+  });
+
+  it('cửa ở cuối chuỗi thì chỉ còn đoạn trước cửa', () => {
+    const w = wall({ x: 0, y: 0 }, { x: 5000, y: 0 });
+    expect(centerlineSegments(w, [opening('w1', 4100, 900)])).toEqual([
+      [
+        { x: 0, y: 0 },
+        { x: 4100, y: 0 },
+      ],
+    ]);
+  });
+
+  it('2 cửa thì cắt thành 3 đoạn', () => {
+    const w = wall({ x: 0, y: 0 }, { x: 6000, y: 0 });
+    const segs = centerlineSegments(w, [opening('w1', 1000, 900), opening('w1', 3000, 900)]);
+    expect(segs).toHaveLength(3);
+    expect(segs[0]).toEqual([
+      { x: 0, y: 0 },
+      { x: 1000, y: 0 },
+    ]);
+    expect(segs[1]).toEqual([
+      { x: 1900, y: 0 },
+      { x: 3000, y: 0 },
+    ]);
+    expect(segs[2]).toEqual([
+      { x: 3900, y: 0 },
+      { x: 6000, y: 0 },
+    ]);
+  });
+
+  it('cửa bắc qua đỉnh polyline thì cắt đúng qua đỉnh', () => {
+    // Tường L dài 7000, đỉnh ở 3000; cửa [2500, 3500] bắc qua đỉnh.
+    const segs = centerlineSegments(lWall, [opening('poly', 2500, 1000)]);
+    expect(segs).toEqual([
+      [
+        { x: 0, y: 0 },
+        { x: 2500, y: 0 },
+      ],
+      [
+        { x: 3000, y: 500 },
+        { x: 3000, y: 4000 },
+      ],
+    ]);
   });
 });

@@ -5,7 +5,7 @@ import { Arc, Layer, Line, Circle, Rect, Stage, Text } from 'react-konva';
 import Segments from '../components/Segments';
 import WallFill from '../components/WallFill';
 import { elevationBounds, elevationUToOffset, projectOpeningToElevation, projectWallToElevation, sortWallsByDepth, type ElevationView } from '../model/elevation';
-import { distance, doorSwing, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, offsetFromRefDim, openingFrame, openingRefDims, openingsExceedLength, pinchZoom, planBounds, pointsLength, projectPointOnWall, resizeSegment, wallCornerPatches, wallPolygon, wallSegmentPolygons, windowLines, type OpeningRefDim } from '../model/geometry';
+import { distance, centerlineSegments, doorSwing, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, offsetFromRefDim, openingFrame, openingRefDims, openingsExceedLength, pinchZoom, planBounds, pointsLength, projectPointOnWall, resizeSegment, wallCornerPatches, wallPolygon, wallSegmentPolygons, windowLines, type OpeningRefDim } from '../model/geometry';
 import { computeGridSegments, gridStepFor } from '../model/grid';
 import { clampOffset, clampSill } from '../model/openingDrag';
 import type { Opening, Point, Wall } from '../model/schema';
@@ -1355,14 +1355,15 @@ export default function View2D() {
             strokeWidth={1 / camera.scale}
           />
 
-          {/* Đường tâm từng tường: 1 Line polyline qua mọi đỉnh + vùng click
-              rộng bằng thân tường. */}
+          {/* Đường tâm từng tường: cắt khúc tại các lỗ cửa (không chạy
+              xuyên qua cửa đi/cửa sổ) + vùng click rộng bằng thân tường. */}
           {effectiveWalls.map((w) => {
             const isSel = selectedWallSet.has(w.id);
-            return (
+            const openingsOnWall = effectiveOpenings.filter((o) => o.wallId === w.id);
+            return centerlineSegments(w, openingsOnWall).map((pts, i) => (
               <Line
-                key={`${w.id}-c`}
-                points={w.points.flatMap((p) => [p.x, p.y])}
+                key={`${w.id}-c-${i}`}
+                points={pts.flatMap((p) => [p.x, p.y])}
                 stroke={isSel ? c.selected : c.center}
                 strokeWidth={1 / camera.scale}
                 dash={[6 / camera.scale, 6 / camera.scale]}
@@ -1371,7 +1372,7 @@ export default function View2D() {
                 onTap={handleWallTap(w)}
                 onMouseDown={handleWallMouseDown(w)}
               />
-            );
+            ));
           })}
 
           {/* Mọi tường đang chọn: tô đè từng đoạn + vá góc miter bằng màu chọn. */}
@@ -1400,7 +1401,7 @@ export default function View2D() {
               const swing = doorSwing(o, wall);
               const leafEnd = swing.leafEnd;
               // Ký hiệu hướng mở: chỉ cung 1/4 vòng là nét đứt khúc, màu
-              // nhạt; cánh cửa là nét liền, hơi dày (khi chọn thì xanh).
+              // nhạt; cánh cửa là nét liền dày (khi chọn thì xanh).
               const swingStroke = isSel ? c.selected : c.swing;
               const swingDash = [8 / camera.scale, 5 / camera.scale];
               return (
@@ -1412,11 +1413,11 @@ export default function View2D() {
                     fill={c.bg}
                     listening={false}
                   />
-                  {/* Cánh cửa (nét liền, hơi dày) + cung 90° thể hiện hướng mở (flip đảo phía). */}
+                  {/* Cánh cửa (nét liền dày) + cung 90° thể hiện hướng mở (flip đảo phía). */}
                   <Line
                     points={[a.x, a.y, leafEnd.x, leafEnd.y]}
                     stroke={stroke}
-                    strokeWidth={2 / camera.scale}
+                    strokeWidth={4 / camera.scale}
                     listening={false}
                   />
                   <Arc

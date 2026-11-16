@@ -427,6 +427,58 @@ export function openingFrame(opening: Opening, wall: Wall): OpeningFrame {
   return { a, b, nx, ny, ux, uy };
 }
 
+/**
+ * Đường tâm tường cắt khúc tại các lỗ cửa: trả về các polyline còn lại
+ * sau khi bỏ đoạn tâm chạy qua mỗi opening ([offset, offset+width]).
+ * Dùng cho mặt bằng: đường tâm không được chạy xuyên qua lỗ cửa
+ * (chỉ cung mở cửa là nét đứt ở quanh cửa).
+ */
+export function centerlineSegments(wall: Wall, openings: Opening[]): Point[][] {
+  const total = pointsLength(wall.points);
+  if (total <= 0 || wall.points.length < 2) return [];
+  // Các khoảng bị cắt (kẹp vào [0, total]).
+  const cuts = openings
+    .map((o) => [Math.max(0, o.offset), Math.min(total, o.offset + o.width)] as const)
+    .filter(([s, e]) => e > s);
+  if (cuts.length === 0) return [wall.points.map((p) => ({ ...p }))];
+  // Mọi điểm ngắt: 0, total, các đỉnh chuỗi, biên của mỗi khoảng cắt.
+  const marks = new Set<number>([0, total]);
+  let acc = 0;
+  for (let i = 0; i + 1 < wall.points.length; i++) {
+    acc += distance(wall.points[i], wall.points[i + 1]);
+    marks.add(acc);
+  }
+  for (const [s, e] of cuts) {
+    marks.add(s);
+    marks.add(e);
+  }
+  const sorted = [...marks].sort((a, b) => a - b);
+  // Quét các khoảng con: giữ khoảng nào không nằm trong lỗ cửa, nối
+  // các khoảng kề nhau thành polyline.
+  const segments: Point[][] = [];
+  let current: Point[] = [];
+  const pushCurrent = () => {
+    if (current.length >= 2) segments.push(current);
+    current = [];
+  };
+  for (let i = 0; i + 1 < sorted.length; i++) {
+    const d0 = sorted[i];
+    const d1 = sorted[i + 1];
+    if (d1 - d0 < 0.5) continue; // khoảng suy biến
+    const mid = (d0 + d1) / 2;
+    if (cuts.some(([s, e]) => mid > s && mid < e)) {
+      pushCurrent();
+      continue;
+    }
+    const p0 = pointAtChainOffset(wall.points, d0).point;
+    const p1 = pointAtChainOffset(wall.points, d1).point;
+    if (current.length === 0) current.push(p0);
+    current.push(p1);
+  }
+  pushCurrent();
+  return segments;
+}
+
 /** Hình học cánh + cung mở của cửa đi (mặt bằng, Y hướng xuống). */
 export interface DoorSwing {
   /** Bản lề: luôn ở mép đầu `a` của lỗ cửa. */
