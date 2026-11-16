@@ -1394,12 +1394,11 @@ export default function View2D() {
             const wall = effectiveWalls.find((w) => w.id === o.wallId);
             if (!wall) return null;
             const isSel = selectedOpeningSet.has(o.id);
-            const { a } = openingFrame(o, wall);
             const half = wall.thickness / 2;
             const stroke = isSel ? c.selected : c.wallStroke;
             if (o.type === 'door') {
               const swing = doorSwing(o, wall);
-              const leafEnd = swing.leafEnd;
+              const { hinge, leafEnd } = swing;
               // Ký hiệu hướng mở: chỉ cung 1/4 vòng là nét đứt khúc, màu
               // nhạt; cánh cửa là nét liền dày (khi chọn thì xanh).
               const swingStroke = isSel ? c.selected : c.swing;
@@ -1413,9 +1412,11 @@ export default function View2D() {
                     fill={c.bg}
                     listening={false}
                   />
-                  {/* Cánh cửa (nét liền dày) + cung 90° thể hiện hướng mở (flip đảo phía). */}
+                  {/* Cánh cửa (nét liền dày) + cung 90° thể hiện hướng mở (flip đảo phía).
+                      Bản lề nằm trên mặt tường phía mở vào (doorSwing đã dời
+                      nửa độ dày tường từ tim tường). */}
                   <Line
-                    points={[a.x, a.y, leafEnd.x, leafEnd.y]}
+                    points={[hinge.x, hinge.y, leafEnd.x, leafEnd.y]}
                     stroke={stroke}
                     strokeWidth={4 / camera.scale}
                     listening={false}
@@ -1426,8 +1427,8 @@ export default function View2D() {
                       đoạn đó nằm dọc tường, chạy xuyên qua lỗ cửa (lỗi thấy
                       trên bản live 16-11, tưởng là đường tâm chưa cắt). */}
                   <Shape
-                    x={a.x}
-                    y={a.y}
+                    x={hinge.x}
+                    y={hinge.y}
                     stroke={swingStroke}
                     strokeWidth={1.5 / camera.scale}
                     dash={swingDash}

@@ -60,12 +60,12 @@ describe('seedBuilding', () => {
       const ys = [hinge.y, leafEnd.y, arcEnd.y];
       boxes[o.id] = { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys) };
     }
-    // Cửa sảnh: bản lề (1100,3500), cánh lên bắc tới y=2900.
-    expect(boxes['o-door-hall']).toEqual({ x0: 500, y0: 2900, x1: 1100, y1: 3500 });
-    // Cửa chính: bản lề (1900,2800), cánh sang đông, cung từ y=2150.
-    expect(boxes['o-door-main']).toEqual({ x0: 1900, y0: 2150, x1: 2550, y1: 2800 });
+    // Cửa sảnh: bản lề (1100,3400) trên mặt tường phía bắc, cánh lên bắc tới y=2800.
+    expect(boxes['o-door-hall']).toEqual({ x0: 500, y0: 2800, x1: 1100, y1: 3400 });
+    // Cửa chính: bản lề (2000,2800) trên mặt tường phía đông, cánh sang đông, cung từ y=2150.
+    expect(boxes['o-door-main']).toEqual({ x0: 2000, y0: 2150, x1: 2650, y1: 2800 });
     // Cửa tắm (đã flip): nằm trọn trong phòng tắm, phía bắc tường y=1800.
-    expect(boxes['o-door-bath']).toEqual({ x0: 2100, y0: 1250, x1: 2650, y1: 1800 });
+    expect(boxes['o-door-bath']).toEqual({ x0: 2100, y0: 1150, x1: 2650, y1: 1700 });
     expect(boxes['o-door-bath'].y1).toBeLessThanOrEqual(1800);
     expect(boxes['o-door-main'].y0).toBeGreaterThanOrEqual(2150);
     // Đôi một không giao nhau (chạm mép cũng không tính là giao).

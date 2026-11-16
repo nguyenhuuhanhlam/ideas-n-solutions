@@ -481,10 +481,11 @@ export function centerlineSegments(wall: Wall, openings: Opening[]): Point[][] {
 
 /** Hình học cánh + cung mở của cửa đi (mặt bằng, Y hướng xuống). */
 export interface DoorSwing {
-  /** Bản lề: luôn ở mép đầu `a` của lỗ cửa. */
+  /** Bản lề: ở mép đầu `a` của lỗ cửa nhưng dời ra MẶT tường phía
+   * cửa mở vào (nửa độ dày tường từ tim tường), không còn ở tim tường. */
   hinge: Point;
   /** Đầu cánh cửa khi mở 90° (cách bản lề một đoạn = chiều rộng cửa,
-   * theo pháp tuyến). */
+   * theo pháp tuyến phía mở). */
   leafEnd: Point;
   /** Góc xoay bắt đầu của cung (độ): = góc hướng tường khi không flip,
    * = góc hướng tường − 90° (hướng cánh −n) khi flip. */
@@ -501,15 +502,19 @@ export interface DoorSwing {
  * không đổi). flip=true: cánh + cung về phía −n, cung bắt đầu ở hướng
  * cánh (−n, = góc hướng tường − 90°) quét +90° về hướng tường — cùng
  * tập điểm với cung 90° từ hướng tường tới −n, nhưng tương thích Konva.
- * Bản lề luôn ở mép đầu offset.
+ * Bản lề ở mép đầu offset nhưng dời ra mặt tường phía cửa mở vào
+ * (nửa độ dày tường từ tim tường theo phía mở): cánh cửa trong bản vẽ
+ * kiến trúc nằm ở một mặt tường, không ở giữa thân tường.
  */
 export function doorSwing(opening: Opening, wall: Wall): DoorSwing {
   const { a, nx, ny, ux, uy } = openingFrame(opening, wall);
   const s = opening.flip ? -1 : 1;
   const angleDeg = (Math.atan2(uy, ux) * 180) / Math.PI;
+  const half = wall.thickness / 2;
+  const hinge = { x: a.x + s * nx * half, y: a.y + s * ny * half };
   return {
-    hinge: a,
-    leafEnd: { x: a.x + s * nx * opening.width, y: a.y + s * ny * opening.width },
+    hinge,
+    leafEnd: { x: hinge.x + s * nx * opening.width, y: hinge.y + s * ny * opening.width },
     arcRotation: opening.flip ? angleDeg - 90 : angleDeg,
     arcAngle: 90,
   };

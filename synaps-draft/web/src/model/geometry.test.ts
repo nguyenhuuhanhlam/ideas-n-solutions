@@ -866,34 +866,34 @@ describe('doorSwing', () => {
   const eastWall = wall({ x: 0, y: 0 }, { x: 4000, y: 0 });
   const northWall = wall({ x: 0, y: 4000 }, { x: 0, y: 0 });
 
-  it('tường hướng đông, không flip: bản lề ở mép đầu, cánh về phía nam (+n), cung +90°', () => {
+  it('tường hướng đông, không flip: bản lề ở mặt tường phía nam (+n), cánh về phía nam, cung +90°', () => {
     const swing = doorSwing(opening('w1', 1000, 900), eastWall);
-    expect(swing.hinge).toEqual({ x: 1000, y: 0 });
-    expect(swing.leafEnd).toEqual({ x: 1000, y: 900 });
+    expect(swing.hinge).toEqual({ x: 1000, y: 100 });
+    expect(swing.leafEnd).toEqual({ x: 1000, y: 1000 });
     expect(swing.arcRotation).toBe(0);
     expect(swing.arcAngle).toBe(90);
   });
 
-  it('tường hướng đông, flip: cánh về phía bắc (−n), cung +90° từ −90° (hướng cánh)', () => {
+  it('tường hướng đông, flip: bản lề ở mặt tường phía bắc (−n), cánh về phía bắc, cung +90° từ −90° (hướng cánh)', () => {
     const swing = doorSwing({ ...opening('w1', 1000, 900), flip: true }, eastWall);
-    expect(swing.hinge).toEqual({ x: 1000, y: 0 });
-    expect(swing.leafEnd).toEqual({ x: 1000, y: -900 });
+    expect(swing.hinge).toEqual({ x: 1000, y: -100 });
+    expect(swing.leafEnd).toEqual({ x: 1000, y: -1000 });
     expect(swing.arcRotation).toBe(-90);
     expect(swing.arcAngle).toBe(90);
   });
 
-  it('tường hướng bắc, không flip: cánh về phía đông (+n), cung +90° từ −90°', () => {
+  it('tường hướng bắc, không flip: bản lề ở mặt tường phía đông (+n), cánh về phía đông, cung +90° từ −90°', () => {
     const swing = doorSwing(opening('w1', 1000, 800), northWall);
-    expect(swing.hinge).toEqual({ x: 0, y: 3000 });
-    expect(swing.leafEnd).toEqual({ x: 800, y: 3000 });
+    expect(swing.hinge).toEqual({ x: 100, y: 3000 });
+    expect(swing.leafEnd).toEqual({ x: 900, y: 3000 });
     expect(swing.arcRotation).toBe(-90);
     expect(swing.arcAngle).toBe(90);
   });
 
-  it('tường hướng bắc, flip: cánh về phía tây (−n), cung +90° từ −180° (hướng cánh)', () => {
+  it('tường hướng bắc, flip: bản lề ở mặt tường phía tây (−n), cánh về phía tây, cung +90° từ −180° (hướng cánh)', () => {
     const swing = doorSwing({ ...opening('w1', 1000, 800), flip: true }, northWall);
-    expect(swing.hinge).toEqual({ x: 0, y: 3000 });
-    expect(swing.leafEnd).toEqual({ x: -800, y: 3000 });
+    expect(swing.hinge).toEqual({ x: -100, y: 3000 });
+    expect(swing.leafEnd).toEqual({ x: -900, y: 3000 });
     expect(swing.arcRotation).toBe(-180);
     expect(swing.arcAngle).toBe(90);
   });
@@ -902,7 +902,8 @@ describe('doorSwing', () => {
     const o = opening('w1', 1000, 900);
     expect(o.flip).toBeUndefined();
     const swing = doorSwing(o, eastWall);
-    expect(swing.leafEnd).toEqual({ x: 1000, y: 900 });
+    expect(swing.hinge).toEqual({ x: 1000, y: 100 });
+    expect(swing.leafEnd).toEqual({ x: 1000, y: 1000 });
     expect(swing.arcAngle).toBe(90);
   });
 });
