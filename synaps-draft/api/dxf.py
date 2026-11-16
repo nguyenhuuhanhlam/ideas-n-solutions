@@ -53,6 +53,72 @@ def _wall_polygons(wall: Wall) -> list[Polygon]:
     ]
 
 
+def _corner_patches(
+    points: list[tuple[float, float]], thickness: int
+) -> list[Polygon]:
+    """Miếng vá góc miter/bevel tại các đỉnh trong của tường polyline.
+
+    Mỗi đoạn tường là 1 hình chữ nhật; union các hình chữ nhật để hở
+    góc ngoài (ô vuông 100x100mm ở góc 90° với tường dày 200, nêm càng
+    to khi góc càng nhọn). Tại mỗi đỉnh, miếng vá lấp đúng phần hở đó:
+    tứ giác (A, M, B, P) với M là giao của 2 mép ngoài (miter), hoặc
+    tam giác (A, B, P) khi |M - P| > 2*thickness (bevel, tránh nhọn
+    hoắt ở góc rất nhọn).
+
+    Chỉ vá đỉnh TRONG của 1 tường: góc giữa 2 tường rời nhau không được
+    miter (web app gộp tường trùng đầu mút khi load nên bản vẽ xuất từ
+    app luôn miter đủ).
+    """
+    h = thickness / 2
+    limit = 2 * thickness
+    n = len(points)
+    if n < 3:
+        return []
+    closed = points[0] == points[-1]
+    indices = list(range(1, n - 1))
+    if closed:
+        indices.append(0)  # đỉnh khép kín: đoạn vào là đoạn cuối
+    patches: list[Polygon] = []
+    for i in indices:
+        prev = points[i - 1] if i > 0 else points[-2]
+        cur = points[i]
+        nxt = points[i + 1] if i + 1 < n else points[1]
+        ux, uy = cur[0] - prev[0], cur[1] - prev[1]
+        vx, vy = nxt[0] - cur[0], nxt[1] - cur[1]
+        lu = math.hypot(ux, uy)
+        lv = math.hypot(vx, vy)
+        if lu == 0 or lv == 0:
+            continue
+        ux, uy = ux / lu, uy / lu
+        vx, vy = vx / lv, vy / lv
+        cross = ux * vy - uy * vx
+        if abs(cross) < 1e-9:
+            continue  # thẳng hàng hoặc gập ngược: không có góc hở
+        # Pháp tuyến phía ngoài của mỗi hướng (phía góc lồi).
+        if cross > 0:
+            nux, nuy = uy, -ux
+            nvx, nvy = vy, -vx
+        else:
+            nux, nuy = -uy, ux
+            nvx, nvy = -vy, vx
+        ax, ay = cur[0] + nux * h, cur[1] + nuy * h
+        bx, by = cur[0] + nvx * h, cur[1] + nvy * h
+        # M = giao của đường qua A hướng u và đường qua B hướng v.
+        s = ((bx - ax) * vy - (by - ay) * vx) / cross
+        mx, my = ax + s * ux, ay + s * uy
+        if math.hypot(mx - cur[0], my - cur[1]) > limit:
+            patches.append(Polygon([(ax, ay), (bx, by), cur]))
+        else:
+            patches.append(Polygon([(ax, ay), (mx, my), (bx, by), cur]))
+    return [p for p in patches if not p.is_empty and p.area > 0]
+
+
+def _wall_body_polygons(wall: Wall) -> list[Polygon]:
+    """Thân tường đầy đủ: hình chữ nhật từng đoạn + miếng vá góc."""
+    pts = [(float(p.x), float(p.y)) for p in wall.points]
+    return _wall_polygons(wall) + _corner_patches(pts, wall.thickness)
+
+
 def _segment_at_offset(
     wall: Wall, offset: int
 ) -> tuple[tuple[float, float], tuple[float, float], float]:
@@ -142,8 +208,9 @@ def building_to_dxf(building: Building) -> str:
         z = float(level.elevation)
 
         # Tường: union các thân tường theo level, mỗi polygon -> LWPOLYLINE kín.
-        # Mỗi đoạn của tường polyline đóng góp 1 polygon hình chữ nhật.
-        polys = [p for w in level.walls for p in _wall_polygons(w)]
+        # Mỗi đoạn của tường polyline đóng góp 1 polygon hình chữ nhật,
+        # cộng miếng vá miter/bevel ở các đỉnh trong để góc ngoài không khuyết.
+        polys = [p for w in level.walls for p in _wall_body_polygons(w)]
         polys = [p for p in polys if not p.is_empty]
         if polys:
             merged = unary_union(polys)

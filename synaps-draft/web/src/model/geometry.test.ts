@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { union, type Polygon } from 'polygon-clipping';
 import {
   clampOpeningOffset,
   distance,
@@ -16,8 +17,11 @@ import {
   snapPointToGrid,
   snapToGrid,
   tryMergeWall,
+  wallCornerPatches,
   wallLength,
   wallPolygon,
+  wallSegmentPolygons,
+  type MergedWallPolygon,
 } from './geometry';
 import type { Opening, Point, Wall } from './schema';
 
@@ -644,5 +648,183 @@ describe('resizeSegment', () => {
       { x: 0, y: 1000 },
     ]);
     expect(next[0]).toEqual(next[4]);
+  });
+});
+
+/** Diện tích ring phẳng [x0,y0,...] bằng công thức shoelace. */
+const ringArea = (flat: number[]): number => {
+  let sum = 0;
+  for (let i = 0; i + 1 < flat.length; i += 2) {
+    const x1 = flat[i];
+    const y1 = flat[i + 1];
+    const x2 = flat[(i + 2) % flat.length];
+    const y2 = flat[(i + 3) % flat.length];
+    sum += x1 * y2 - x2 * y1;
+  }
+  return Math.abs(sum) / 2;
+};
+
+/** Diện tích đã gộp: vòng ngoài trừ các lỗ. */
+const mergedArea = (merged: MergedWallPolygon[]): number =>
+  merged.reduce(
+    (sum, p) =>
+      sum + ringArea(p.outer) - p.holes.reduce((h, hole) => h + ringArea(hole), 0),
+    0,
+  );
+
+/** Điểm có nằm trong ring phẳng không (ray casting, even-odd). */
+const pointInRing = (x: number, y: number, flat: number[]): boolean => {
+  let inside = false;
+  for (let i = 0, j = flat.length - 2; i < flat.length; i += 2) {
+    const xi = flat[i];
+    const yi = flat[i + 1];
+    const xj = flat[j];
+    const yj = flat[j + 1];
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) {
+      inside = !inside;
+    }
+    j = i;
+  }
+  return inside;
+};
+
+/** Điểm có nằm trong kết quả đã gộp (trong vòng ngoài, ngoài mọi lỗ). */
+const pointInMerged = (x: number, y: number, merged: MergedWallPolygon[]): boolean =>
+  merged.some(
+    (p) => pointInRing(x, y, p.outer) && !p.holes.some((h) => pointInRing(x, y, h)),
+  );
+
+/** Trọng tâm (trung bình các đỉnh) của polygon phẳng. */
+const centroid = (flat: number[]): { x: number; y: number } => {
+  let x = 0;
+  let y = 0;
+  for (let i = 0; i + 1 < flat.length; i += 2) {
+    x += flat[i];
+    y += flat[i + 1];
+  }
+  const n = flat.length / 2;
+  return { x: x / n, y: y / n };
+};
+
+const toRing = (flat: number[]): [number, number][] => {
+  const ring: [number, number][] = [];
+  for (let i = 0; i + 1 < flat.length; i += 2) ring.push([flat[i], flat[i + 1]]);
+  return ring;
+};
+
+describe('wallCornerPatches (miter góc)', () => {
+  it('tường L 90°: vá lấp ô khuyết 100×100, diện tích 1.400.000', () => {
+    const patches = wallCornerPatches(lWall);
+    expect(patches).toHaveLength(1);
+    expect(patches[0]).toHaveLength(8); // tứ giác miter
+    const merged = mergeWallPolygonsWithHoles([lWall]);
+    expect(merged).toHaveLength(1);
+    expect(merged[0].holes).toHaveLength(0);
+    // Rect 3000×200 + rect 4000×200 − chồng 100×100 + vá miter 100×100.
+    expect(Math.abs(mergedArea(merged) - 1400000)).toBeLessThan(1);
+    expect(pointInMerged(3050, -50, merged)).toBe(true);
+    // mergeWallPolygons (không lỗ) cũng nhận vá miter.
+    const flat = mergeWallPolygons([lWall]);
+    expect(flat).toHaveLength(1);
+    expect(Math.abs(ringArea(flat[0]) - 1400000)).toBeLessThan(1);
+  });
+
+  it('góc nhọn 30°: vá miter nằm trong polygon đã gộp, diện tích tăng so với chỉ-rect', () => {
+    const sharp: Wall = {
+      id: 'sharp30',
+      points: [
+        { x: 0, y: 0 },
+        { x: 3000, y: 0 },
+        { x: 402, y: 1500 },
+      ],
+      thickness: 200,
+    };
+    const patches = wallCornerPatches(sharp);
+    expect(patches).toHaveLength(1);
+    expect(patches[0]).toHaveLength(8); // miter (|M−P| ≈ 386 < 2×200)
+    const merged = mergeWallPolygonsWithHoles([sharp]);
+    const c = centroid(patches[0]);
+    expect(pointInMerged(c.x, c.y, merged)).toBe(true);
+    // Union chỉ-rect (không vá) nhỏ hơn vì thiếu miếng góc.
+    const rectPolys = wallSegmentPolygons(sharp).map(
+      (poly) => [toRing(poly)] as Polygon,
+    );
+    const rectOnly = union(rectPolys[0], ...rectPolys.slice(1));
+    const rectArea = rectOnly.reduce((sum, poly) => sum + ringArea(poly[0].flat()), 0);
+    expect(mergedArea(merged)).toBeGreaterThan(rectArea);
+  });
+
+  it('góc rất nhọn 10°: bevel — điểm miter nằm ngoài, tam giác bevel nằm trong', () => {
+    const acute: Wall = {
+      id: 'acute10',
+      points: [
+        { x: 0, y: 0 },
+        { x: 3000, y: 0 },
+        { x: 47, y: 521 },
+      ],
+      thickness: 200,
+    };
+    const patches = wallCornerPatches(acute);
+    expect(patches).toHaveLength(1);
+    expect(patches[0]).toHaveLength(6); // tam giác bevel
+    const merged = mergeWallPolygonsWithHoles([acute]);
+    const c = centroid(patches[0]);
+    expect(pointInMerged(c.x, c.y, merged)).toBe(true);
+    // Tính lại điểm miter M theo công thức (độc lập với implementation).
+    const p = { x: 3000, y: 0 };
+    const u = { x: 1, y: 0 };
+    const lv = Math.hypot(47 - 3000, 521 - 0);
+    const v = { x: (47 - 3000) / lv, y: 521 / lv };
+    const cross = u.x * v.y - u.y * v.x;
+    expect(cross).toBeGreaterThan(0);
+    const A = { x: p.x, y: p.y - 100 }; // nout(u) = (0, −1)
+    const B = { x: p.x + v.y * 100, y: p.y - v.x * 100 }; // nout(v) = (vy, −vx)
+    const s = ((B.x - A.x) * v.y - (B.y - A.y) * v.x) / cross;
+    const M = { x: A.x + s * u.x, y: A.y + s * u.y };
+    expect(Math.hypot(M.x - p.x, M.y - p.y)).toBeGreaterThan(400);
+    expect(pointInMerged(M.x, M.y, merged)).toBe(false);
+  });
+
+  it('vòng kín + vách: 4 góc đều vá, diện tích 6.760.000, đúng 2 lỗ', () => {
+    const ring: Wall = {
+      id: 'ring',
+      points: [
+        { x: 0, y: 0 },
+        { x: 8000, y: 0 },
+        { x: 8000, y: 6000 },
+        { x: 0, y: 6000 },
+        { x: 0, y: 0 },
+      ],
+      thickness: 200,
+    };
+    const divider: Wall = {
+      id: 'div',
+      points: [
+        { x: 4000, y: 0 },
+        { x: 4000, y: 6000 },
+      ],
+      thickness: 200,
+    };
+    expect(wallCornerPatches(ring)).toHaveLength(4);
+    const merged = mergeWallPolygonsWithHoles([ring, divider]);
+    expect(merged).toHaveLength(1);
+    expect(merged[0].holes).toHaveLength(2);
+    // Vòng miter 8200×6200 − lỗ 7800×5800 + vách 6000×200 − chồng 2×(200×100).
+    expect(Math.abs(mergedArea(merged) - 6760000)).toBeLessThan(1);
+  });
+
+  it('tường thẳng 3 điểm: không vá, diện tích 1.600.000', () => {
+    const straight: Wall = {
+      id: 'straight',
+      points: [
+        { x: 0, y: 0 },
+        { x: 3000, y: 0 },
+        { x: 8000, y: 0 },
+      ],
+      thickness: 200,
+    };
+    expect(wallCornerPatches(straight)).toEqual([]);
+    const merged = mergeWallPolygonsWithHoles([straight]);
+    expect(Math.abs(mergedArea(merged) - 1600000)).toBeLessThan(1);
   });
 });

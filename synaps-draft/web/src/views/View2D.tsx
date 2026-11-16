@@ -5,7 +5,7 @@ import { Arc, Layer, Line, Circle, Rect, Stage, Text } from 'react-konva';
 import Segments from '../components/Segments';
 import WallFill from '../components/WallFill';
 import { elevationBounds, elevationUToOffset, projectOpeningToElevation, projectWallToElevation, sortWallsByDepth, type ElevationView } from '../model/elevation';
-import { distance, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, openingsExceedLength, pointAtChainOffset, pointsLength, projectPointOnWall, resizeSegment, wallPolygon, wallSegmentPolygons } from '../model/geometry';
+import { distance, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, openingsExceedLength, pointAtChainOffset, pointsLength, projectPointOnWall, resizeSegment, wallCornerPatches, wallPolygon, wallSegmentPolygons } from '../model/geometry';
 import { computeGridSegments, gridStepFor } from '../model/grid';
 import { clampOffset, clampSill } from '../model/openingDrag';
 import type { Opening, Point, Wall } from '../model/schema';
@@ -965,9 +965,9 @@ export default function View2D() {
             );
           })}
 
-          {/* Tường đang chọn: tô đè từng đoạn bằng màu chọn. */}
+          {/* Tường đang chọn: tô đè từng đoạn + vá góc miter bằng màu chọn. */}
           {selected &&
-            wallSegmentPolygons(selected).map((poly, i) => (
+            [...wallSegmentPolygons(selected), ...wallCornerPatches(selected)].map((poly, i) => (
               <Line
                 key={`${selected.id}-sel-${i}`}
                 points={poly}

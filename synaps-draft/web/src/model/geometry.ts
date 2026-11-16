@@ -200,6 +200,51 @@ export function wallSegmentPolygons(wall: Wall): number[][] {
   return wallSegments(wall).map(([a, b]) => wallPolygon(a, b, wall.thickness));
 }
 
+/**
+ * Miếng vá góc ngoài cho tường polyline (nối miter): mỗi đoạn là hình chữ
+ * nhật nên ở góc ngoài 2 hình chữ nhật không chạm nhau, thiếu 1 ô vuông
+ * (góc 90°, dày 200) hoặc 1 hình nêm (góc nhọn). Miếng vá lấp đúng phần
+ * thiếu đó: giao của 2 mép ngoài là điểm miter M, vá = tứ giác (A, M, B, P).
+ * Góc quá nhọn (|M − P| > 2×thickness) thì cắt phẳng (bevel): tam giác
+ * (A, B, P). Đỉnh thẳng hàng/gập ngược và đoạn dài 0 thì bỏ qua. Vòng kín
+ * (điểm đầu trùng điểm cuối) vá thêm ở điểm đầu. Trả về polygon phẳng.
+ */
+export function wallCornerPatches(wall: Wall): number[][] {
+  const patches: number[][] = [];
+  const pts = wall.points;
+  const t = wall.thickness;
+  const h = t / 2;
+  const patchAt = (prev: Point, p: Point, next: Point): void => {
+    const lu = distance(prev, p);
+    const lv = distance(p, next);
+    if (lu === 0 || lv === 0) return;
+    const u = { x: (p.x - prev.x) / lu, y: (p.y - prev.y) / lu };
+    const v = { x: (next.x - p.x) / lv, y: (next.y - p.y) / lv };
+    const cross = u.x * v.y - u.y * v.x;
+    if (Math.abs(cross) < 1e-9) return;
+    // Pháp tuyến phía ngoài của hướng d: cross > 0 → (dy, −dx), ngược lại (−dy, dx).
+    const nout = (d: Point): Point =>
+      cross > 0 ? { x: d.y, y: -d.x } : { x: -d.y, y: d.x };
+    const nu = nout(u);
+    const nv = nout(v);
+    const A = { x: p.x + nu.x * h, y: p.y + nu.y * h };
+    const B = { x: p.x + nv.x * h, y: p.y + nv.y * h };
+    // M = giao đường qua A hướng u và đường qua B hướng v.
+    const s = ((B.x - A.x) * v.y - (B.y - A.y) * v.x) / cross;
+    const M = { x: A.x + s * u.x, y: A.y + s * u.y };
+    if (distance(p, M) > 2 * t) {
+      patches.push([A.x, A.y, B.x, B.y, p.x, p.y]);
+    } else {
+      patches.push([A.x, A.y, M.x, M.y, B.x, B.y, p.x, p.y]);
+    }
+  };
+  for (let i = 1; i + 1 < pts.length; i++) patchAt(pts[i - 1], pts[i], pts[i + 1]);
+  if (pts.length > 2 && samePoint(pts[0], pts[pts.length - 1])) {
+    patchAt(pts[pts.length - 2], pts[0], pts[1]);
+  }
+  return patches;
+}
+
 /** Chuyển polygon phẳng [x0,y0,x1,y1,...] thành ring [[x0,y0],[x1,y1],...]. */
 function toRing(flat: number[]): Pair[] {
   const ring: Pair[] = [];
@@ -211,6 +256,15 @@ function fromRing(ring: Pair[]): number[] {
   return ring.flat();
 }
 
+/** Mọi polygon thân tường đưa vào union: hình chữ nhật từng đoạn + vá góc miter. */
+function wallPolygons(walls: Wall[]): Polygon[] {
+  return walls.flatMap((w) =>
+    [...wallSegmentPolygons(w), ...wallCornerPatches(w)].map(
+      (flat) => [toRing(flat)] as Polygon,
+    ),
+  );
+}
+
 /**
  * Union các polygon thân tường thành các khối liền nhau (nối góc sạch:
  * 2 tường giao nhau không còn đường biên chồng nhau ở góc).
@@ -218,9 +272,7 @@ function fromRing(ring: Pair[]): number[] {
  * hiếm gặp ở giai đoạn này — ví dụ sân trong khép kín sẽ bị tô đầy).
  */
 export function mergeWallPolygons(walls: Wall[]): number[][] {
-  const polys: Polygon[] = walls.flatMap((w) =>
-    wallSegmentPolygons(w).map((flat) => [toRing(flat)] as Polygon),
-  );
+  const polys = wallPolygons(walls);
   if (polys.length === 0) return [];
   const merged = union(polys[0], ...polys.slice(1));
   return merged.map((poly) => fromRing(poly[0])).filter((flat) => flat.length >= 6);
@@ -239,9 +291,7 @@ export interface MergedWallPolygon {
  * Render bằng Konva Shape với fillRule="evenodd".
  */
 export function mergeWallPolygonsWithHoles(walls: Wall[]): MergedWallPolygon[] {
-  const polys: Polygon[] = walls.flatMap((w) =>
-    wallSegmentPolygons(w).map((flat) => [toRing(flat)] as Polygon),
-  );
+  const polys = wallPolygons(walls);
   if (polys.length === 0) return [];
   const merged = union(polys[0], ...polys.slice(1));
   return merged

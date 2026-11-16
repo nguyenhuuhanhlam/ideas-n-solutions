@@ -2,12 +2,17 @@
 
 import io
 import json
+import math
 from pathlib import Path
 
 import ezdxf
 from fastapi.testclient import TestClient
+from shapely.geometry import Point as ShapelyPoint
+from shapely.ops import unary_union
 
+from dxf import _wall_body_polygons
 from main import app
+from models import Point, Wall
 
 client = TestClient(app)
 SAMPLE = json.loads((Path(__file__).parent / "sample_building.json").read_text())
@@ -38,8 +43,8 @@ def test_export_walls_closed_polyline():
 def test_export_openings_present():
     doc = ezdxf.read(io.StringIO(_export(SAMPLE).decode()))
     msp = doc.modelspace()
-    assert len(list(msp.query("LWPOLYLINE[layer=='DOORS']"))) == 1
-    assert len(list(msp.query("LWPOLYLINE[layer=='WINDOWS']"))) == 1
+    assert len(list(msp.query("LWPOLYLINE[layer=='DOORS']"))) == 2
+    assert len(list(msp.query("LWPOLYLINE[layer=='WINDOWS']"))) == 2
 
 
 def test_export_dimensions():
@@ -56,7 +61,7 @@ def test_export_dimensions():
     assert max(xs) - min(xs) == 8200
     assert max(ys) - min(ys) == 6200
     dims = list(msp.query("DIMENSION[layer=='DIMS']"))
-    assert len(dims) == 5  # 1 dimension mỗi đoạn tường (nhà mẫu: 5 tường 1 đoạn)
+    assert len(dims) == 5  # 1 dimension mỗi đoạn tường (nhà mẫu: 2 tường, 5 đoạn)
     # Mọi dimension đều phải đo đúng độ dài đoạn của nó:
     # 2 đoạn ngang 8000 + 3 đoạn đứng 6000 (2 ngoài + 1 ngăn).
     assert sorted(d.get_measurement() for d in dims) == [
@@ -136,3 +141,59 @@ def test_export_old_format_rejected():
     wall["start"], wall["end"] = pts[0], pts[1]
     res = client.post("/export/dxf", json=bad)
     assert res.status_code == 422
+
+
+def test_miter_corner_area():
+    """Tường L, góc ngoài được miter: diện tích union = 3000x200 + 4000x200
+    - 100x100 (chồng nhau ở góc trong) + 100x100 (miếng vá miter ở góc
+    ngoài) = 1.400.000."""
+    wall = Wall(
+        id="w-l",
+        points=[Point(x=0, y=0), Point(x=3000, y=0), Point(x=3000, y=4000)],
+        thickness=200,
+    )
+    merged = unary_union(_wall_body_polygons(wall))
+    assert merged.area == 1_400_000
+
+
+def test_export_miter_vertex_in_dxf():
+    """End-to-end tường L: đỉnh miter của góc ngoài (3100, -100) trên mặt
+    bằng phải xuất hiện làm 1 đỉnh LWPOLYLINE lớp WALLS — sau khi lật Y
+    thành (3100, 100) trong DXF."""
+    doc = ezdxf.read(io.StringIO(_export(_l_building()).decode()))
+    msp = doc.modelspace()
+    walls = list(msp.query("LWPOLYLINE[layer=='WALLS']"))
+    assert walls
+    found = False
+    for e in walls:
+        for x, y in e.get_points(format="xy"):
+            if abs(x - 3100) < 1e-6 and abs(y - 100) < 1e-6:
+                found = True
+    assert found, "không thấy đỉnh miter (3100, 100) trong layer WALLS"
+
+
+def test_sharp_corner_beveled():
+    """Góc rất nhọn 10°: điểm miter nằm xa đỉnh hơn 2*thickness nên góc
+    bị cắt phẳng (bevel) — điểm miter tính theo công thức KHÔNG nằm trong
+    union thân tường."""
+    wall = Wall(
+        id="w-a",
+        points=[Point(x=0, y=0), Point(x=3000, y=0), Point(x=47, y=521)],
+        thickness=200,
+    )
+    merged = unary_union(_wall_body_polygons(wall))
+    # Điểm miter theo công thức: giao của 2 mép ngoài tại đỉnh (3000, 0).
+    p = (3000.0, 0.0)
+    u = (1.0, 0.0)
+    lv = math.hypot(47 - 3000, 521 - 0)
+    v = ((47 - 3000) / lv, 521 / lv)
+    cross = u[0] * v[1] - u[1] * v[0]
+    assert cross > 0
+    nout_u = (u[1], -u[0])
+    nout_v = (v[1], -v[0])
+    a = (p[0] + nout_u[0] * 100, p[1] + nout_u[1] * 100)
+    b = (p[0] + nout_v[0] * 100, p[1] + nout_v[1] * 100)
+    s = ((b[0] - a[0]) * v[1] - (b[1] - a[1]) * v[0]) / cross
+    miter = (a[0] + s * u[0], a[1] + s * u[1])
+    assert math.hypot(miter[0] - p[0], miter[1] - p[1]) > 2 * 200
+    assert not merged.contains(ShapelyPoint(miter))
