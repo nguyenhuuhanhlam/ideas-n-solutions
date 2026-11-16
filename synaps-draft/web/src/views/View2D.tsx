@@ -5,7 +5,7 @@ import { Arc, Layer, Line, Circle, Rect, Stage, Text } from 'react-konva';
 import Segments from '../components/Segments';
 import WallFill from '../components/WallFill';
 import { elevationBounds, elevationUToOffset, projectOpeningToElevation, projectWallToElevation, sortWallsByDepth, type ElevationView } from '../model/elevation';
-import { distance, doorSwing, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, openingFrame, openingsExceedLength, planBounds, pointsLength, projectPointOnWall, resizeSegment, wallCornerPatches, wallPolygon, wallSegmentPolygons, windowLines } from '../model/geometry';
+import { distance, doorSwing, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, offsetFromRefDim, openingFrame, openingRefDims, openingsExceedLength, planBounds, pointsLength, projectPointOnWall, resizeSegment, wallCornerPatches, wallPolygon, wallSegmentPolygons, windowLines, type OpeningRefDim } from '../model/geometry';
 import { computeGridSegments, gridStepFor } from '../model/grid';
 import { clampOffset, clampSill } from '../model/openingDrag';
 import type { Opening, Point, Wall } from '../model/schema';
@@ -175,6 +175,41 @@ function segmentDim(p0: Point, p1: Point, cx: number, cy: number, unit: Unit): S
   };
 }
 
+/** Thước dim tham chiếu cho 1 dim của cửa (Top): dùng segmentDim khi dài
+ * > 0 (bỏ mũi tên khi < 240mm — không đủ chỗ cho 2 mũi tên 120mm); khi
+ * = 0 (2 điểm đo trùng nhau) chỉ vẽ extension + nhãn tại vị trí đường dim
+ * (hướng dọc tường lấy từ openingFrame, đường dim suy biến thành 1 điểm). */
+function openingRefDimView(
+  rd: OpeningRefDim,
+  frame: { ux: number; uy: number; nx: number; ny: number },
+  cx: number,
+  cy: number,
+  unit: Unit,
+): SegmentDim {
+  const d = segmentDim(rd.p0, rd.p1, cx, cy, unit);
+  if (d) return rd.value < 240 ? { ...d, arrows: [] } : d;
+  const { ux, uy, nx, ny } = frame;
+  const mid = rd.p0;
+  const dPlus = Math.hypot(mid.x + nx * DIM_OFFSET - cx, mid.y + ny * DIM_OFFSET - cy);
+  const dMinus = Math.hypot(mid.x - nx * DIM_OFFSET - cx, mid.y - ny * DIM_OFFSET - cy);
+  const s = dPlus >= dMinus ? 1 : -1;
+  const extLen = DIM_OFFSET + 150;
+  let rot = (Math.atan2(uy, ux) * 180) / Math.PI;
+  if (rot > 90) rot -= 180;
+  if (rot < -90) rot += 180;
+  const dx = mid.x + nx * DIM_OFFSET * s;
+  const dy = mid.y + ny * DIM_OFFSET * s;
+  return {
+    line: [dx, dy, dx, dy],
+    ext: [mid.x, mid.y, mid.x + nx * extLen * s, mid.y + ny * extLen * s],
+    arrows: [],
+    label: fmt(rd.value, unit),
+    lx: dx + nx * 140 * s,
+    ly: dy + ny * 140 * s,
+    rot,
+  };
+}
+
 export default function View2D() {
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
@@ -196,8 +231,13 @@ export default function View2D() {
     additive: boolean;
   } | null>(null);
   const [marqueeRect, setMarqueeRect] = useState<MarqueeRect | null>(null);
-  /** Nhập độ dài trực tiếp ở nhãn thước dim (đoạn nào + chuỗi đang gõ). */
-  const [dimEditing, setDimEditing] = useState<{ segmentIndex: number; value: string } | null>(null);
+  /** Nhập số trực tiếp ở nhãn thước dim: độ dài đoạn tường ('segment')
+   * hoặc khoảng cách mép cửa tới góc tường ('opening' — side 'a'/'b'). */
+  const [dimEditing, setDimEditing] = useState<
+    | { kind: 'segment'; segmentIndex: number; value: string }
+    | { kind: 'opening'; openingId: string; side: 'a' | 'b'; value: string }
+    | null
+  >(null);
   const dimInputRef = useRef<HTMLInputElement>(null);
 
   const walls = useBuildingStore((s) => selectActiveLevel(s)?.walls ?? []);
@@ -890,6 +930,15 @@ export default function View2D() {
     selectedWallIds.length === 1 && selectedOpeningIds.length === 0
       ? (effectiveWalls.find((w) => w.id === selectedWallIds[0]) ?? null)
       : null;
+  /** Cửa dùng cho dim tham chiếu: chỉ khi đúng 1 cửa và 0 tường được chọn.
+   * Dùng opening hiệu dụng để khi kéo cửa, dim cập nhật theo preview. */
+  const selectedOpening =
+    selectedWallIds.length === 0 && selectedOpeningIds.length === 1
+      ? (effectiveOpenings.find((o) => o.id === selectedOpeningIds[0]) ?? null)
+      : null;
+  const selectedOpeningWall = selectedOpening
+    ? (effectiveWalls.find((w) => w.id === selectedOpening.wallId) ?? null)
+    : null;
   /** Mọi tường đã chọn: lớp phủ xanh + tay nắm đỉnh. */
   const selectedWalls = useMemo(
     () => effectiveWalls.filter((w) => selectedWallSet.has(w.id)),
@@ -919,9 +968,32 @@ export default function View2D() {
 
   /** Chốt độ dài mới từ ô nhập ở thước dim: giữ points[i] của đoạn đang
    * sửa, dời points[i+1] dọc hướng đoạn đó; đoạn kề giữ đầu còn lại cố định
-   * nên nó xoay/dài theo. Chặn khi tổng chuỗi mới làm cửa vượt khỏi tường. */
+   * nên nó xoay/dài theo. Chặn khi tổng chuỗi mới làm cửa vượt khỏi tường.
+   * Với dim tham chiếu của cửa: dời cửa tới khoảng cách đã nhập từ mép
+   * tới góc đoạn, kẹp bằng đúng cơ chế kẹp của kéo-thả cửa (kẹp trong
+   * tường + chặn chồng lấn — vượt giới hạn thì về vị trí hợp lệ gần nhất). */
   const commitDimEdit = () => {
-    if (!dimEditing || !selected) return;
+    if (!dimEditing) return;
+    if (dimEditing.kind === 'opening') {
+      const { openingId, side, value } = dimEditing;
+      setDimEditing(null);
+      const target = openings.find((o) => o.id === openingId);
+      const wall = target && walls.find((w) => w.id === target.wallId);
+      if (!target || !wall) return;
+      const v = Number.parseInt(value, 10);
+      if (!Number.isInteger(v) || v < 0) return;
+      const desired = offsetFromRefDim(target, wall, side, v);
+      const clamped = clampOffset(
+        wall,
+        openings.filter((o) => o.wallId === wall.id),
+        openingId,
+        desired,
+      );
+      if (clamped === target.offset) return;
+      useBuildingStore.getState().updateOpening(openingId, { offset: clamped });
+      return;
+    }
+    if (!selected) return;
     const { segmentIndex, value } = dimEditing;
     setDimEditing(null);
     const p0 = selected.points[segmentIndex];
@@ -966,8 +1038,12 @@ export default function View2D() {
   // Dimension cho từng đoạn của tường đang chọn (chỉ mặt bằng Top): mỗi đoạn
   // 1 thước song song, offset 600mm về phía xa tâm building (phía trống),
   // mũi tên hở 2 đầu + nhãn. Mảng căn theo chỉ số đoạn (đoạn dài 0 → null).
+  // Dim tham chiếu cho cửa đang chọn: 2 thước từ 2 mép cửa tới 2 góc (đỉnh
+  // đoạn) gần nhất — dùng opening hiệu dụng nên khi kéo cửa dim cập nhật
+  // theo preview.
   const dims: (SegmentDim | null)[] = [];
-  if (isTop && selected) {
+  const openingRefDimViews: { dim: SegmentDim; side: 'a' | 'b'; value: number }[] = [];
+  if (isTop && (selected || selectedOpeningWall)) {
     // Tâm bounding box của toàn bộ tường — dimension đặt về phía xa tâm.
     let minX = Infinity;
     let minY = Infinity;
@@ -983,14 +1059,30 @@ export default function View2D() {
     }
     const cx = (minX + maxX) / 2;
     const cy = (minY + maxY) / 2;
-    for (let i = 0; i + 1 < selected.points.length; i++) {
-      const p0 = selected.points[i];
-      const p1 = selected.points[i + 1];
-      dims.push(p0 && p1 ? segmentDim(p0, p1, cx, cy, unit) : null);
+    if (selected) {
+      for (let i = 0; i + 1 < selected.points.length; i++) {
+        const p0 = selected.points[i];
+        const p1 = selected.points[i + 1];
+        dims.push(p0 && p1 ? segmentDim(p0, p1, cx, cy, unit) : null);
+      }
+    }
+    if (selectedOpening && selectedOpeningWall) {
+      const frame = openingFrame(selectedOpening, selectedOpeningWall);
+      for (const rd of openingRefDims(selectedOpening, selectedOpeningWall)) {
+        openingRefDimViews.push({
+          dim: openingRefDimView(rd, frame, cx, cy, unit),
+          side: rd.side,
+          value: rd.value,
+        });
+      }
     }
   }
   /** Thước dim của đoạn đang nhập số (ô input HTML đặt tại nhãn của nó). */
-  const editingDim = dimEditing ? dims[dimEditing.segmentIndex] : undefined;
+  const editingDim = dimEditing
+    ? dimEditing.kind === 'segment'
+      ? dims[dimEditing.segmentIndex]
+      : (openingRefDimViews.find((v) => v.side === dimEditing.side)?.dim ?? undefined)
+    : undefined;
 
   // Nhãn trực tiếp khi kéo cửa: offset (mặt bằng) / offset + sill (mặt đứng).
   let dragLabel: { x: number; y: number; text: string } | null = null;
@@ -1234,7 +1326,7 @@ export default function View2D() {
                 <Segments points={d.arrows} stroke={c.dim} strokeWidth={1.5 / camera.scale} />
                 {/* Bấm nhãn để nhập độ dài trực tiếp đoạn đó (ẩn khi đang nhập đoạn này,
                     ô input HTML hiện thay; nhãn các đoạn khác vẫn hiện). */}
-                {!(dimEditing && dimEditing.segmentIndex === i) && (
+                {!(dimEditing && dimEditing.kind === 'segment' && dimEditing.segmentIndex === i) && (
                   <Text
                     x={d.lx}
                     y={d.ly}
@@ -1251,6 +1343,7 @@ export default function View2D() {
                         const p1 = selected.points[i + 1];
                         if (p0 && p1) {
                           setDimEditing({
+                            kind: 'segment',
                             segmentIndex: i,
                             value: String(Math.round(distance(p0, p1))),
                           });
@@ -1264,6 +1357,41 @@ export default function View2D() {
               </Fragment>
             ) : null,
           )}
+
+          {/* Dim tham chiếu cho cửa đang chọn (Top, đúng 1 cửa): 2 thước từ
+              2 mép cửa tới 2 góc đoạn. Bấm nhãn để nhập khoảng cách. */}
+          {openingRefDimViews.map(({ dim: d, side, value }) => (
+            <Fragment key={`refdim-${side}`}>
+              <Segments points={d.ext} stroke={c.dim} strokeWidth={1 / camera.scale} />
+              <Line points={d.line} stroke={c.dim} strokeWidth={1.5 / camera.scale} listening={false} />
+              <Segments points={d.arrows} stroke={c.dim} strokeWidth={1.5 / camera.scale} />
+              {!(dimEditing && dimEditing.kind === 'opening' && dimEditing.side === side) && (
+                <Text
+                  x={d.lx}
+                  y={d.ly}
+                  text={d.label}
+                  fontSize={13 / camera.scale}
+                  fill={c.dim}
+                  rotation={d.rot}
+                  offsetX={(d.label.length * 8) / camera.scale / 2}
+                  offsetY={7 / camera.scale}
+                  onClick={(e) => {
+                    e.cancelBubble = true;
+                    if (selectedOpening) {
+                      setDimEditing({
+                        kind: 'opening',
+                        openingId: selectedOpening.id,
+                        side,
+                        value: String(value),
+                      });
+                    }
+                  }}
+                  onMouseEnter={() => setStageCursor('pointer')}
+                  onMouseLeave={() => setStageCursor(null)}
+                />
+              )}
+            </Fragment>
+          ))}
 
           {/* Handle ở MỌI đỉnh của MỌI tường đang chọn (kéo đỉnh chỉ sửa
               tường đó, giữ nguyên vùng chọn). Vòng khép kín: điểm đầu ==

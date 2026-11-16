@@ -461,6 +461,67 @@ export function windowLines(opening: Opening, wall: Wall): WindowLines {
   return { facePlus: at(half), faceMinus: at(-half), framePlus: at(q), frameMinus: at(-q) };
 }
 
+/** Một dim tham chiếu của cửa: từ 1 mép cửa tới góc tường (đỉnh đoạn) gần nhất. */
+export interface OpeningRefDim {
+  /** Giá trị dọc chuỗi (mm). */
+  value: number;
+  /** 2 điểm đo, theo thứ tự dọc tường (p0 → p1). */
+  p0: Point;
+  p1: Point;
+  /** 'a': từ mép đầu cửa tới đỉnh đầu đoạn; 'b': từ mép cuối cửa tới đỉnh cuối đoạn. */
+  side: 'a' | 'b';
+}
+
+/** Chain offset của 2 đầu đoạn `segmentIndex` (đo từ points[0]). */
+function segmentChainRange(points: Point[], segmentIndex: number): { start: number; end: number } {
+  let start = 0;
+  for (let i = 0; i < segmentIndex && i + 1 < points.length; i++) {
+    start += distance(points[i], points[i + 1]);
+  }
+  const p0 = points[segmentIndex];
+  const p1 = points[segmentIndex + 1];
+  return { start, end: start + (p0 && p1 ? distance(p0, p1) : 0) };
+}
+
+/**
+ * 2 dim tham chiếu của cửa: từ mép đầu tới đỉnh đầu đoạn chứa offset,
+ * từ mép cuối tới đỉnh cuối đoạn đó. Mốc là 2 đỉnh của ĐOẠN chứa cửa
+ * (góc tường gần nhất), KHÔNG phải 2 đầu của cả chuỗi. Cửa ở ngay đầu
+ * đoạn thì dim 'a' = 0. Lỗ bắc qua đỉnh polyline: dùng đoạn chứa offset
+ * (giới hạn đã biết, giống openingFrame).
+ */
+export function openingRefDims(opening: Opening, wall: Wall): [OpeningRefDim, OpeningRefDim] {
+  const { point: a, segmentIndex } = pointAtChainOffset(wall.points, opening.offset);
+  const p0 = wall.points[segmentIndex];
+  const p1 = wall.points[segmentIndex + 1];
+  if (!p0 || !p1) {
+    const zero: OpeningRefDim = { value: 0, p0: a, p1: a, side: 'a' };
+    return [zero, { ...zero, side: 'b' }];
+  }
+  const { start: segStart, end: segEnd } = segmentChainRange(wall.points, segmentIndex);
+  const { point: b } = pointAtChainOffset(wall.points, opening.offset + opening.width);
+  return [
+    { value: opening.offset - segStart, p0, p1: a, side: 'a' },
+    { value: segEnd - (opening.offset + opening.width), p0: b, p1, side: 'b' },
+  ];
+}
+
+/**
+ * Offset mới của cửa khi nhập giá trị cho 1 dim tham chiếu: side 'a' →
+ * đầu đoạn + value; side 'b' → cuối đoạn − value − width. Chưa kẹp
+ * giới hạn — bên gọi kẹp bằng clampOffset (kẹp trong tường + chặn chồng lấn).
+ */
+export function offsetFromRefDim(
+  opening: Opening,
+  wall: Wall,
+  side: 'a' | 'b',
+  value: number,
+): number {
+  const { segmentIndex } = pointAtChainOffset(wall.points, opening.offset);
+  const { start: segStart, end: segEnd } = segmentChainRange(wall.points, segmentIndex);
+  return side === 'a' ? segStart + value : segEnd - value - opening.width;
+}
+
 /**
  * Đổi độ dài một đoạn của chuỗi điểm: giữ points[index] cố định, dời
  * points[index + 1] dọc hướng đoạn tới độ dài mới; các điểm khác giữ nguyên.

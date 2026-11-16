@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { doorSwing, mergeBuildingWalls, openingFrame, wallLength } from './geometry';
+import { doorSwing, mergeBuildingWalls, openingFrame, openingRefDims, wallLength } from './geometry';
 import { seedBuilding } from './seed';
 
 describe('seedBuilding', () => {
@@ -138,5 +138,19 @@ describe('seedBuilding', () => {
       if (!wall) continue;
       expect(o.offset + o.width).toBeLessThanOrEqual(wallLength(wall));
     }
+  });
+
+  it('dim tham chiếu của cửa tắm và cửa chính trên nhà đã gộp', () => {
+    const level = mergeBuildingWalls(seedBuilding()).levels[0];
+    const bath = level.openings.find((o) => o.id === 'o-door-bath')!;
+    const bathWall = level.walls.find((w) => w.id === bath.wallId)!;
+    const [bathA, bathB] = openingRefDims(bath, bathWall);
+    expect(bathA.value).toBe(200);
+    expect(bathB.value).toBe(2850);
+    const main = level.openings.find((o) => o.id === 'o-door-main')!;
+    const mainWall = level.walls.find((w) => w.id === main.wallId)!;
+    const [mainA, mainB] = openingRefDims(main, mainWall);
+    expect(mainA.value).toBe(5000);
+    expect(mainB.value).toBe(2050);
   });
 });

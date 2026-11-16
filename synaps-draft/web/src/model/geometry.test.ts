@@ -10,6 +10,8 @@ import {
   mergeWallPolygonsWithHoles,
   midpoint,
   nearestPointOnChain,
+  offsetFromRefDim,
+  openingRefDims,
   openingsExceedLength,
   planBounds,
   pointAtChainOffset,
@@ -972,5 +974,84 @@ describe('windowLines', () => {
       { x: 500, y: -25 },
       { x: 1100, y: -25 },
     ]);
+  });
+});
+
+describe('openingRefDims', () => {
+  const eastWall = wall({ x: 0, y: 0 }, { x: 4000, y: 0 });
+  const northWall = wall({ x: 0, y: 4000 }, { x: 0, y: 0 });
+
+  it('tường đông 2 điểm: dim a tới đầu tường, dim b tới cuối tường', () => {
+    const [a, b] = openingRefDims(opening('w1', 1000, 900), eastWall);
+    expect(a).toEqual({
+      value: 1000,
+      p0: { x: 0, y: 0 },
+      p1: { x: 1000, y: 0 },
+      side: 'a',
+    });
+    expect(b).toEqual({
+      value: 2100,
+      p0: { x: 1900, y: 0 },
+      p1: { x: 4000, y: 0 },
+      side: 'b',
+    });
+  });
+
+  it('tường bắc: mốc theo hướng chuỗi (từ dưới lên trên)', () => {
+    const [a, b] = openingRefDims(opening('w1', 1000, 800), northWall);
+    expect(a).toEqual({
+      value: 1000,
+      p0: { x: 0, y: 4000 },
+      p1: { x: 0, y: 3000 },
+      side: 'a',
+    });
+    expect(b).toEqual({
+      value: 2200,
+      p0: { x: 0, y: 2200 },
+      p1: { x: 0, y: 0 },
+      side: 'b',
+    });
+  });
+
+  it('tường chữ L, cửa ở đoạn 2: mốc là 2 đỉnh của đoạn 2, không phải đầu chuỗi', () => {
+    const [a, b] = openingRefDims(opening('poly', 4000, 800), lWall);
+    expect(a).toEqual({
+      value: 1000,
+      p0: { x: 3000, y: 0 },
+      p1: { x: 3000, y: 1000 },
+      side: 'a',
+    });
+    expect(b).toEqual({
+      value: 2200,
+      p0: { x: 3000, y: 1800 },
+      p1: { x: 3000, y: 4000 },
+      side: 'b',
+    });
+  });
+
+  it('cửa ở ngay đầu đoạn: dim a = 0, 2 điểm đo trùng nhau', () => {
+    const [a, b] = openingRefDims(opening('w1', 0, 900), eastWall);
+    expect(a).toEqual({ value: 0, p0: { x: 0, y: 0 }, p1: { x: 0, y: 0 }, side: 'a' });
+    expect(b.value).toBe(3100);
+  });
+});
+
+describe('offsetFromRefDim', () => {
+  const eastWall = wall({ x: 0, y: 0 }, { x: 4000, y: 0 });
+
+  it("side 'a': offset mới = đầu đoạn + giá trị", () => {
+    expect(offsetFromRefDim(opening('w1', 1000, 900), eastWall, 'a', 500)).toBe(500);
+    expect(offsetFromRefDim(opening('w1', 1000, 900), eastWall, 'a', 0)).toBe(0);
+  });
+
+  it("side 'b': offset mới = cuối đoạn − giá trị − width", () => {
+    expect(offsetFromRefDim(opening('w1', 1000, 900), eastWall, 'b', 1000)).toBe(2100);
+    expect(offsetFromRefDim(opening('w1', 1000, 900), eastWall, 'b', 0)).toBe(3100);
+  });
+
+  it('tường chữ L, cửa ở đoạn 2: tính theo đầu/cuối đoạn 2', () => {
+    const o = opening('poly', 4000, 800);
+    expect(offsetFromRefDim(o, lWall, 'a', 200)).toBe(3200);
+    expect(offsetFromRefDim(o, lWall, 'b', 500)).toBe(5700);
   });
 });
