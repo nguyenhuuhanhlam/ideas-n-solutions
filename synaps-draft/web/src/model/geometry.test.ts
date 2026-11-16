@@ -13,6 +13,7 @@ import {
   offsetFromRefDim,
   openingRefDims,
   openingsExceedLength,
+  pinchZoom,
   planBounds,
   pointAtChainOffset,
   projectPointOnWall,
@@ -1053,5 +1054,39 @@ describe('offsetFromRefDim', () => {
     const o = opening('poly', 4000, 800);
     expect(offsetFromRefDim(o, lWall, 'a', 200)).toBe(3200);
     expect(offsetFromRefDim(o, lWall, 'b', 500)).toBe(5700);
+  });
+});
+
+describe('pinchZoom', () => {
+  const cam = { x: 100, y: 50, scale: 0.1 };
+  const mid = { x: 200, y: 150 };
+
+  it('chụm ra (khoảng cách tăng gấp đôi): scale tăng gấp đôi', () => {
+    const next = pinchZoom(100, 200, mid, cam, 0.02, 10);
+    expect(next.scale).toBeCloseTo(0.2, 9);
+  });
+
+  it('chụm vào (khoảng cách giảm một nửa): scale giảm một nửa', () => {
+    const next = pinchZoom(200, 100, mid, cam, 0.02, 10);
+    expect(next.scale).toBeCloseTo(0.05, 9);
+  });
+
+  it('điểm giữa 2 ngón đứng yên trên màn hình (điểm world dưới nó không đổi)', () => {
+    const next = pinchZoom(100, 200, mid, cam, 0.02, 10);
+    // Điểm world dưới điểm giữa trước và sau pinch phải trùng nhau.
+    const before = { x: (mid.x - cam.x) / cam.scale, y: (mid.y - cam.y) / cam.scale };
+    const after = { x: (mid.x - next.x) / next.scale, y: (mid.y - next.y) / next.scale };
+    expect(after.x).toBeCloseTo(before.x, 6);
+    expect(after.y).toBeCloseTo(before.y, 6);
+  });
+
+  it('kẹp scale trong [min, max]', () => {
+    expect(pinchZoom(100, 10000, mid, cam, 0.02, 10).scale).toBe(10);
+    expect(pinchZoom(10000, 100, mid, cam, 0.02, 10).scale).toBe(0.02);
+  });
+
+  it('khoảng cách ≤ 0 thì giữ nguyên camera', () => {
+    expect(pinchZoom(0, 100, mid, cam, 0.02, 10)).toEqual(cam);
+    expect(pinchZoom(100, 0, mid, cam, 0.02, 10)).toEqual(cam);
   });
 });

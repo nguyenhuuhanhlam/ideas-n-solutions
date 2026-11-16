@@ -18,7 +18,7 @@ const View3D = lazy(() => import('./views/View3D'));
 const pillGroup =
   'flex rounded-full border border-syn-border bg-white p-1 shadow-sm';
 const pillSegment = (active: boolean) =>
-  `rounded-full px-3 py-1 text-xs font-medium ${
+  `whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium ${
     active ? 'bg-syn-ink text-white' : 'text-syn-grey hover:text-syn-ink'
   }`;
 
@@ -35,8 +35,35 @@ export default function App() {
   const openingCount = useBuildingStore((s) => selectActiveLevel(s)?.openings.length ?? 0);
 
   const panelVisible = useBuildingStore((s) => s.panelVisible);
+  const isMobile = useBuildingStore((s) => s.isMobile);
   const [activeTab, setActiveTab] = useState<PanelTab>('properties');
   const [exportOpen, setExportOpen] = useState(false);
+
+  // Chế độ xem mobile (viewport < 768px): theo dõi matchMedia, phản ứng
+  // khi resize/xoay màn hình. Vào mobile: ép tool về select (tránh tool
+  // vẽ còn sót chạy khi chạm), đóng dialog xuất. Đổi chiều nào cũng fit
+  // lại vừa khung hình (overlay trái thay đổi). Chỉ chạy khi giá trị đổi.
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 767px)');
+    const apply = (matches: boolean) => {
+      const s = useBuildingStore.getState();
+      if (s.isMobile === matches) return;
+      s.setIsMobile(matches);
+      if (matches) {
+        s.setTool('select');
+        setExportOpen(false);
+      }
+      s.requestFit();
+    };
+    apply(mql.matches);
+    const onChange = (e: MediaQueryListEvent) => apply(e.matches);
+    if (mql.addEventListener) mql.addEventListener('change', onChange);
+    else mql.addListener(onChange);
+    return () => {
+      if (mql.removeEventListener) mql.removeEventListener('change', onChange);
+      else mql.removeListener(onChange);
+    };
+  }, []);
 
   // Phím tắt toàn cục.
   useEffect(() => {
@@ -200,22 +227,25 @@ export default function App() {
         )}
       </main>
 
-      {/* Panel trái + toolbar icon, nổi trên canvas */}
-      <div className="absolute bottom-3 left-3 top-3 z-20 flex gap-2">
-        {panelVisible && (
-          <SynapsPanel
-            tab={activeTab}
-            onTabChange={setActiveTab}
-            onCollapse={() => store().setPanelVisible(false)}
+      {/* Panel trái + toolbar icon, nổi trên canvas — ẨN ở chế độ xem
+          mobile (chỉ xem toàn màn hình, không mở lại tools). */}
+      {!isMobile && (
+        <div className="absolute bottom-3 left-3 top-3 z-20 flex gap-2">
+          {panelVisible && (
+            <SynapsPanel
+              tab={activeTab}
+              onTabChange={setActiveTab}
+              onCollapse={() => store().setPanelVisible(false)}
+            />
+          )}
+          <IconToolbar
+            tool={tool}
+            view2d={view2d}
+            onSelectTool={(t) => store().setTool(t)}
+            onTogglePanel={() => store().setPanelVisible(!panelVisible)}
           />
-        )}
-        <IconToolbar
-          tool={tool}
-          view2d={view2d}
-          onSelectTool={(t) => store().setTool(t)}
-          onTogglePanel={() => store().setPanelVisible(!panelVisible)}
-        />
-      </div>
+        </div>
+      )}
 
       {/* Chuyển view, nổi giữa trên */}
       <div className="absolute left-1/2 top-3 z-20 flex -translate-x-1/2 gap-2">
@@ -261,19 +291,21 @@ export default function App() {
         </div>
       </div>
 
-      {/* Hành động nổi góc phải trên */}
-      <div className="absolute right-3 top-3 z-20">
-        <TopActions
-          canUndo={canUndo}
-          canRedo={canRedo}
-          onUndo={() => store().undo()}
-          onRedo={() => store().redo()}
-          onOpen={() => fileInputRef.current?.click()}
-          onExport={() => setExportOpen(true)}
-          onSave={handleSave}
-          onNew={handleNew}
-        />
-      </div>
+      {/* Hành động nổi góc phải trên — ẨN ở chế độ xem mobile. */}
+      {!isMobile && (
+        <div className="absolute right-3 top-3 z-20">
+          <TopActions
+            canUndo={canUndo}
+            canRedo={canRedo}
+            onUndo={() => store().undo()}
+            onRedo={() => store().redo()}
+            onOpen={() => fileInputRef.current?.click()}
+            onExport={() => setExportOpen(true)}
+            onSave={handleSave}
+            onNew={handleNew}
+          />
+        </div>
+      )}
       <input
         ref={fileInputRef}
         type="file"

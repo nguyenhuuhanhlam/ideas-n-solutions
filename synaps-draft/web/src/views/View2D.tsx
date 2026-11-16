@@ -5,7 +5,7 @@ import { Arc, Layer, Line, Circle, Rect, Stage, Text } from 'react-konva';
 import Segments from '../components/Segments';
 import WallFill from '../components/WallFill';
 import { elevationBounds, elevationUToOffset, projectOpeningToElevation, projectWallToElevation, sortWallsByDepth, type ElevationView } from '../model/elevation';
-import { distance, doorSwing, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, offsetFromRefDim, openingFrame, openingRefDims, openingsExceedLength, planBounds, pointsLength, projectPointOnWall, resizeSegment, wallCornerPatches, wallPolygon, wallSegmentPolygons, windowLines, type OpeningRefDim } from '../model/geometry';
+import { distance, doorSwing, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, offsetFromRefDim, openingFrame, openingRefDims, openingsExceedLength, pinchZoom, planBounds, pointsLength, projectPointOnWall, resizeSegment, wallCornerPatches, wallPolygon, wallSegmentPolygons, windowLines, type OpeningRefDim } from '../model/geometry';
 import { computeGridSegments, gridStepFor } from '../model/grid';
 import { clampOffset, clampSill } from '../model/openingDrag';
 import type { Opening, Point, Wall } from '../model/schema';
@@ -216,6 +216,13 @@ export default function View2D() {
   const [size, setSize] = useState({ w: 800, h: 600 });
   const spaceRef = useRef(false);
   const panRef = useRef<{ sx: number; sy: number; cx: number; cy: number } | null>(null);
+  /** Trạng thái cảm ứng (chỉ xem mobile): 1 ngón pan, 2 ngón pinch.
+   * single: điểm bắt đầu + camera lúc chạm (pan neo theo điểm bắt đầu,
+   * như pan chuột); pinch: khoảng cách + điểm giữa lần chạm trước. */
+  const touchRef = useRef<{
+    single: { sx: number; sy: number; cx: number; cy: number; panning: boolean } | null;
+    pinch: { dist: number; mx: number; my: number } | null;
+  }>({ single: null, pinch: null });
   const fittedRef = useRef<Record<string, boolean>>({ top: false, left: false, right: false });
   const dragRef = useRef<DragState | null>(null);
   /** Chặn click "dư" sau khi kéo thả: mouseup trên canvas trống sinh click
@@ -307,14 +314,16 @@ export default function View2D() {
   // fit theo nó thì camera sẽ kẹt ở góc trên-trái màn hình lớn.
   const panelVisible = useBuildingStore((s) => s.panelVisible);
   const showGrid = useBuildingStore((s) => s.showGrid);
+  /** Chế độ xem mobile: không panel/toolbar nên overlay = 0, canvas toàn màn hình. */
+  const isMobile = useBuildingStore((s) => s.isMobile);
   const computeFit = useCallback((): { scale: number; x: number; y: number } | null => {
     const el = containerRef.current;
     if (!el || el.clientWidth < 100 || el.clientHeight < 100) return null;
     const w = el.clientWidth;
     const h = el.clientHeight;
     // Chiều rộng phần canvas bị che bên trái: panel 300 + toolbar 56 + các
-    // khoảng cách; khi panel thu gọn chỉ còn toolbar.
-    const overlay = panelVisible ? 388 : 80;
+    // khoảng cách; khi panel thu gọn chỉ còn toolbar; mobile không còn gì che.
+    const overlay = isMobile ? 0 : panelVisible ? 388 : 80;
     const centerX = (overlay + w) / 2;
     const visibleW = w - overlay;
     const state = useBuildingStore.getState();
@@ -341,7 +350,7 @@ export default function View2D() {
     const uc = (bounds.u0 + bounds.u1) / 2;
     const vc = (bounds.vBottom + bounds.vTop) / 2;
     return { scale, x: centerX - uc * scale, y: h / 2 + vc * scale };
-  }, [view2d, panelVisible]);
+  }, [view2d, panelVisible, isMobile]);
 
   // Lần đầu mở mỗi view: fit vào 100%.
   useEffect(() => {
@@ -441,6 +450,129 @@ export default function View2D() {
       x: pointer.x - (pointer.x - camera.x) * k,
       y: pointer.y - (pointer.y - camera.y) * k,
     });
+  };
+
+  // ---- Cảm ứng (CHỈ xem mobile; desktop không dùng) ----
+  // Konva tách kênh touch/mouse: chạm chỉ sinh touchstart/touchmove/
+  // touchend/tap, KHÔNG sinh mousedown/click (shape mặc định preventDefault
+  // nên trình duyệt cũng không sinh synthetic mouse event). Vì vậy pan/pinch
+  // phải tự xử lý ở đây, chọn vật thể qua onTap. preventDefault ở touchstart
+  // chặn nốt synthetic mouse event khi chạm vào vùng trống (không có shape).
+  /** Tọa độ 1 ngón chạm theo hệ màn hình của Stage (Touch cho clientX/Y
+   * theo viewport, phải trừ bounding rect của container). */
+  const touchPoint = (t: Touch): Point => {
+    const rect = stageRef.current?.container().getBoundingClientRect();
+    return { x: Math.round(t.clientX - (rect?.left ?? 0)), y: Math.round(t.clientY - (rect?.top ?? 0)) };
+  };
+
+  const handleTouchStart = (e: KonvaEventObject<TouchEvent>) => {
+    if (!isMobile) return;
+    // Chặn synthetic mouse event + gesture mặc định của trình duyệt.
+    e.evt.preventDefault();
+    const touches = e.evt.touches;
+    if (touches.length >= 2) {
+      // Ngón thứ 2 chạm xuống: hủy pan 1 ngón, chuyển sang pinch.
+      const p0 = touchPoint(touches[0]);
+      const p1 = touchPoint(touches[1]);
+      touchRef.current.single = null;
+      panRef.current = null;
+      touchRef.current.pinch = {
+        dist: Math.hypot(p1.x - p0.x, p1.y - p0.y),
+        mx: (p0.x + p1.x) / 2,
+        my: (p0.y + p1.y) / 2,
+      };
+      return;
+    }
+    if (touches.length === 1) {
+      // Cử chỉ mới: cờ chặn tap từ lần kéo trước đã hết hạn (giống
+      // handleMouseDown reset suppressClickRef ở mỗi mousedown mới).
+      if (!touchRef.current.single && !touchRef.current.pinch) {
+        suppressClickRef.current = false;
+      }
+      const p = touchPoint(touches[0]);
+      const state = useBuildingStore.getState();
+      const cam = state.cameras[state.view2d];
+      touchRef.current.single = { sx: p.x, sy: p.y, cx: cam.x, cy: cam.y, panning: false };
+    }
+  };
+
+  const handleTouchMove = (e: KonvaEventObject<TouchEvent>) => {
+    if (!isMobile) return;
+    e.evt.preventDefault();
+    const touches = e.evt.touches;
+    const pinch = touchRef.current.pinch;
+    if (pinch && touches.length >= 2) {
+      const p0 = touchPoint(touches[0]);
+      const p1 = touchPoint(touches[1]);
+      const nextDist = Math.hypot(p1.x - p0.x, p1.y - p0.y);
+      const mid = { x: (p0.x + p1.x) / 2, y: (p0.y + p1.y) / 2 };
+      const state = useBuildingStore.getState();
+      const cam = state.cameras[state.view2d];
+      const next = pinchZoom(pinch.dist, nextDist, mid, cam, MIN_SCALE, MAX_SCALE);
+      if (next.scale !== cam.scale || next.x !== cam.x || next.y !== cam.y) {
+        state.setCamera(next);
+      }
+      touchRef.current.pinch = { dist: nextDist, mx: mid.x, my: mid.y };
+      return;
+    }
+    const single = touchRef.current.single;
+    if (single && touches.length === 1) {
+      const p = touchPoint(touches[0]);
+      if (!single.panning) {
+        // Dưới ngưỡng 3px vẫn là chạm-bấm (chọn), chưa phải kéo-pan.
+        if (Math.hypot(p.x - single.sx, p.y - single.sy) < DRAG_THRESHOLD_PX) return;
+        single.panning = true;
+      }
+      // Pan neo theo điểm bắt đầu, cùng toán với pan chuột.
+      useBuildingStore.getState().setCamera({
+        x: single.cx + (p.x - single.sx),
+        y: single.cy + (p.y - single.sy),
+      });
+    }
+  };
+
+  const handleTouchEnd = (e: KonvaEventObject<TouchEvent>) => {
+    if (!isMobile) return;
+    const touches = e.evt.touches;
+    if (touchRef.current.pinch) {
+      if (touches.length >= 2) {
+        // Vẫn còn ≥ 2 ngón: neo lại pinch theo 2 ngón còn lại.
+        const p0 = touchPoint(touches[0]);
+        const p1 = touchPoint(touches[1]);
+        touchRef.current.pinch = {
+          dist: Math.hypot(p1.x - p0.x, p1.y - p0.y),
+          mx: (p0.x + p1.x) / 2,
+          my: (p0.y + p1.y) / 2,
+        };
+        return;
+      }
+      // Pinch kết thúc: chặn tap sinh ngay sau đó (pinch là cử chỉ
+      // camera, không phải chọn). Còn 1 ngón thì neo lại để kéo-pan tiếp.
+      touchRef.current.pinch = null;
+      suppressClickRef.current = true;
+      if (touches.length === 1) {
+        const p = touchPoint(touches[0]);
+        const state = useBuildingStore.getState();
+        const cam = state.cameras[state.view2d];
+        touchRef.current.single = { sx: p.x, sy: p.y, cx: cam.x, cy: cam.y, panning: false };
+      }
+      return;
+    }
+    const single = touchRef.current.single;
+    if (single) {
+      touchRef.current.single = null;
+      // Đã pan thì chặn tap sinh sau đó (không để pan làm mất chọn);
+      // chạm-bấm (không pan) thì tap vẫn chạy để chọn vật thể.
+      if (single.panning) suppressClickRef.current = true;
+    }
+  };
+
+  const handleTouchCancel = () => {
+    if (!isMobile) return;
+    // Hệ thống cắt ngang cử chỉ (VD hộp thoại): dọn trạng thái, không chặn
+    // tap (cancel không sinh tap theo sau).
+    touchRef.current.single = null;
+    touchRef.current.pinch = null;
   };
 
   const handleMouseMove = (_e: KonvaEventObject<MouseEvent>) => {
@@ -747,7 +879,23 @@ export default function View2D() {
     else state.selectSingle('wall', wall.id);
   };
 
+  /** Chạm chọn tường (cảm ứng): tap là kênh riêng của Konva, click chuột
+   * không sinh ra khi chạm nên phải có handler riêng. Không có Shift trên
+   * cảm ứng → tap luôn chọn riêng 1 tường. */
+  const handleWallTap = (wall: Wall) => (e: KonvaEventObject<TouchEvent>) => {
+    e.cancelBubble = true;
+    // Tap sinh sau khi pan/pinch: bỏ qua, giữ nguyên vùng chọn.
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false;
+      return;
+    }
+    if (tool !== 'select') return;
+    useBuildingStore.getState().selectSingle('wall', wall.id);
+  };
+
   const handleWallMouseDown = (wall: Wall) => (e: KonvaEventObject<MouseEvent>) => {
+    // Chỉ xem mobile: không kéo tường.
+    if (isMobile) return;
     if (tool !== 'select' || e.evt.button !== 0 || spaceRef.current) return;
     // Shift+bấm chỉ toggle ở click, không bắt đầu kéo.
     if (e.evt.shiftKey) return;
@@ -780,6 +928,8 @@ export default function View2D() {
 
   const handleHandleMouseDown =
     (wall: Wall, index: number) => (e: KonvaEventObject<MouseEvent>) => {
+      // Chỉ xem mobile: không kéo đỉnh tường.
+      if (isMobile) return;
       if (tool !== 'select' || e.evt.button !== 0 || spaceRef.current) return;
       e.cancelBubble = true;
       // Điểm neo cho khóa góc 45° khi kéo đỉnh: đỉnh kề (đầu chuỗi → điểm
@@ -817,6 +967,17 @@ export default function View2D() {
     else state.selectSingle('opening', opening.id);
   };
 
+  /** Chạm chọn cửa (cảm ứng): như handleWallTap, tap chọn riêng 1 cửa. */
+  const handleOpeningTap = (opening: Opening) => (e: KonvaEventObject<TouchEvent>) => {
+    e.cancelBubble = true;
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false;
+      return;
+    }
+    if (tool !== 'select') return;
+    useBuildingStore.getState().selectSingle('opening', opening.id);
+  };
+
   const setStageCursor = (cursor: string | null) => {
     const container = stageRef.current?.container();
     if (!container) return;
@@ -827,6 +988,8 @@ export default function View2D() {
   /** Bắt đầu kéo cửa ở mặt bằng: kéo dọc tường đổi offset (không sang tường khác). */
   const handleOpeningMouseDownTop =
     (opening: Opening, wall: Wall) => (e: KonvaEventObject<MouseEvent>) => {
+      // Chỉ xem mobile: không kéo cửa.
+      if (isMobile) return;
       if (tool !== 'select' || e.evt.button !== 0 || spaceRef.current) return;
       // Shift+bấm chỉ toggle ở click, không bắt đầu kéo.
       if (e.evt.shiftKey) return;
@@ -857,6 +1020,8 @@ export default function View2D() {
   /** Bắt đầu kéo cửa ở mặt đứng: ngang đổi offset (nếu tường chiếu rộng), dọc đổi sill. */
   const handleOpeningMouseDownElev =
     (opening: Opening, wall: Wall) => (e: KonvaEventObject<MouseEvent>) => {
+      // Chỉ xem mobile: không kéo cửa.
+      if (isMobile) return;
       if (tool !== 'select' || e.evt.button !== 0 || spaceRef.current || !elevView || !level) return;
       // Shift+bấm chỉ toggle ở click, không bắt đầu kéo.
       if (e.evt.shiftKey) return;
@@ -895,6 +1060,17 @@ export default function View2D() {
     if (e.target === e.currentTarget && tool === 'select') {
       // Shift+bấm vùng trống: giữ nguyên vùng chọn.
       if (!e.evt.shiftKey) useBuildingStore.getState().clearSelection();
+    }
+  };
+
+  /** Chạm vào vùng trống (cảm ứng): bỏ chọn — trừ tap sinh sau pan/pinch. */
+  const handleStageTap = (e: KonvaEventObject<TouchEvent>) => {
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false;
+      return;
+    }
+    if (e.target === e.currentTarget && tool === 'select') {
+      useBuildingStore.getState().clearSelection();
     }
   };
 
@@ -1109,7 +1285,7 @@ export default function View2D() {
   }
 
   return (
-    <div ref={containerRef} className="relative h-full w-full overflow-hidden" style={{ background: c.bg }}>
+    <div ref={containerRef} className="relative h-full w-full overflow-hidden" style={{ background: c.bg, touchAction: 'none' }}>
       <Stage
         ref={stageRef}
         width={size.w}
@@ -1120,6 +1296,11 @@ export default function View2D() {
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         onClick={handleStageClick}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
+        onTap={handleStageTap}
         style={{
           cursor:
             spaceRef.current
@@ -1186,6 +1367,7 @@ export default function View2D() {
                 dash={[6 / camera.scale, 6 / camera.scale]}
                 hitStrokeWidth={Math.max(w.thickness, 12 / camera.scale)}
                 onClick={handleWallClick(w)}
+                onTap={handleWallTap(w)}
                 onMouseDown={handleWallMouseDown(w)}
               />
             );
@@ -1251,6 +1433,7 @@ export default function View2D() {
                     stroke={isSel ? c.selected : 'rgba(0,0,0,0)'}
                     strokeWidth={2 / camera.scale}
                     onClick={handleOpeningClick(o)}
+                    onTap={handleOpeningTap(o)}
                     onMouseDown={handleOpeningMouseDownTop(o, wall)}
                     onMouseEnter={() => {
                       if (tool === 'select') setStageCursor('grab');
@@ -1307,6 +1490,7 @@ export default function View2D() {
                   stroke={isSel ? c.selected : 'rgba(0,0,0,0)'}
                   strokeWidth={2 / camera.scale}
                   onClick={handleOpeningClick(o)}
+                  onTap={handleOpeningTap(o)}
                   onMouseDown={handleOpeningMouseDownTop(o, wall)}
                   onMouseEnter={() => {
                     if (tool === 'select') setStageCursor('grab');
@@ -1338,6 +1522,8 @@ export default function View2D() {
                     offsetY={7 / camera.scale}
                     onClick={(e) => {
                       e.cancelBubble = true;
+                      // Chỉ xem mobile: nhãn dim không bấm được (không nhập số).
+                      if (isMobile) return;
                       if (selected) {
                         const p0 = selected.points[i];
                         const p1 = selected.points[i + 1];
@@ -1377,6 +1563,8 @@ export default function View2D() {
                   offsetY={7 / camera.scale}
                   onClick={(e) => {
                     e.cancelBubble = true;
+                    // Chỉ xem mobile: nhãn dim không bấm được (không nhập số).
+                    if (isMobile) return;
                     if (selectedOpening) {
                       setDimEditing({
                         kind: 'opening',
@@ -1551,6 +1739,7 @@ export default function View2D() {
                       strokeWidth={1 / camera.scale}
                       opacity={isSel ? 0.85 : 1}
                       onClick={handleWallClick(wall)}
+                      onTap={handleWallTap(wall)}
                     />
                     {ops.map(({ opening, rect: o }) => {
                       const oSel = selectedOpeningSet.has(opening.id);
@@ -1568,6 +1757,7 @@ export default function View2D() {
                             stroke={stroke}
                             strokeWidth={1.5 / camera.scale}
                             onClick={handleOpeningClick(opening)}
+                            onTap={handleOpeningTap(opening)}
                             onMouseDown={handleOpeningMouseDownElev(opening, wall)}
                             onMouseEnter={() => {
                               if (tool === 'select') setStageCursor(canMoveU ? 'grab' : 'ns-resize');

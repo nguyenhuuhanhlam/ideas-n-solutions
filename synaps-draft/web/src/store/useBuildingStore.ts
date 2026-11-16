@@ -50,6 +50,10 @@ interface BuildingState {
   panelVisible: boolean;
   /** Hiện lưới 2D hay không. UI, không undo. */
   showGrid: boolean;
+  /** Chế độ xem mobile (viewport < 768px): chỉ xem toàn màn hình, không
+   * panel/toolbar — App đăng ký matchMedia, View2D dùng để fit + cảm ứng.
+   * UI, không undo. */
+  isMobile: boolean;
   /** Tỉ lệ vừa khung hình của view 2D đang xem — mốc 100% của pill Zoom. UI, không undo. */
   fitScale: number;
   /** Bộ đếm yêu cầu vừa khung (Shift+1 / bấm pill Zoom): View2D fit khi số này tăng. UI, không undo. */
@@ -101,6 +105,7 @@ interface BuildingState {
   setView2d: (view: View2d) => void;
   setPanelVisible: (visible: boolean) => void;
   setShowGrid: (visible: boolean) => void;
+  setIsMobile: (mobile: boolean) => void;
   setFitScale: (scale: number) => void;
   requestFit: () => void;
   setDraft: (draft: Draft | null) => void;
@@ -141,6 +146,12 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
   view2d: 'top',
   panelVisible: true,
   showGrid: true,
+  // Giá trị khởi động đúng ngay từ đầu (tránh chớp layout desktop trên
+  // mobile): matchMedia có thể không tồn tại ở môi trường test → false.
+  isMobile:
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      ? window.matchMedia('(max-width: 767px)').matches
+      : false,
   fitScale: 0.1,
   fitRequest: 0,
   draft: null,
@@ -327,6 +338,7 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
   setViewMode: (viewMode) => set({ viewMode }),
   setPanelVisible: (panelVisible) => set({ panelVisible }),
   setShowGrid: (showGrid) => set({ showGrid }),
+  setIsMobile: (isMobile) => set({ isMobile }),
   setFitScale: (fitScale) => set({ fitScale }),
   requestFit: () => set((s) => ({ fitRequest: s.fitRequest + 1 })),
   setView2d: (view2d) =>

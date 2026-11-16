@@ -349,6 +349,41 @@ export function fitScaleFor(
   return Math.min((visibleW * fill) / envW, (visibleH * fill) / envH);
 }
 
+/** Camera 2D: gốc (x, y) màn hình + tỉ lệ (px/mm). */
+export interface ViewCamera {
+  x: number;
+  y: number;
+  scale: number;
+}
+
+/**
+ * Zoom chụm 2 ngón (pinch, chỉ xem mobile): từ khoảng cách 2 ngón trước/sau
+ * + camera hiện tại → camera mới, zoom quanh điểm giữa 2 ngón (tọa độ màn
+ * hình `mid`). Tỉ lệ mới = scale cũ × (distSau / distTrước), kẹp trong
+ * [minScale, maxScale]. Điểm giữa 2 ngón đứng yên trên màn hình — cùng
+ * toán zoom-theo-điểm như zoom con lăn. Khoảng cách ≤ 0 thì giữ nguyên.
+ */
+export function pinchZoom(
+  prevDist: number,
+  nextDist: number,
+  mid: Point,
+  camera: ViewCamera,
+  minScale: number,
+  maxScale: number,
+): ViewCamera {
+  if (prevDist <= 0 || nextDist <= 0) return camera;
+  const newScale = Math.min(
+    maxScale,
+    Math.max(minScale, camera.scale * (nextDist / prevDist)),
+  );
+  const k = newScale / camera.scale;
+  return {
+    scale: newScale,
+    x: mid.x - (mid.x - camera.x) * k,
+    y: mid.y - (mid.y - camera.y) * k,
+  };
+}
+
 /**
  * Có cửa nào trên tường `wallId` vượt khỏi độ dài mới không
  * (offset + width > length)? Dùng để chặn rút ngắn tường ở thước dim.
