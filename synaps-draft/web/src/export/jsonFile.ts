@@ -2,8 +2,10 @@ import { mergeBuildingWalls } from '../model/geometry';
 import { migrateBuilding, type Building } from '../model/schema';
 import { seedBuilding } from '../model/seed';
 
-/** Key autosave trong localStorage. */
-export const STORAGE_KEY = 'synaps-draft-building-v1';
+/** Key autosave trong localStorage (v2: bỏ hẳn autosave v1 cũ theo yêu cầu user 2026-11-16). */
+export const STORAGE_KEY = 'synaps-draft-building-v2';
+/** Key autosave cũ — xóa khi khởi động để bỏ các bản vẽ cũ. */
+const LEGACY_STORAGE_KEY = 'synaps-draft-building-v1';
 
 /**
  * Parse + validate chuỗi JSON thành Building (tự migrate tường cũ
@@ -41,6 +43,11 @@ export function downloadBuilding(building: Building, filename = 'building.json')
  * dùng seed — không bao giờ ném lỗi ra ngoài.
  */
 export function loadSavedBuilding(): Building | null {
+  try {
+    localStorage.removeItem(LEGACY_STORAGE_KEY);
+  } catch {
+    // localStorage bị chặn: không có gì để xóa, cứ tiếp tục.
+  }
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
