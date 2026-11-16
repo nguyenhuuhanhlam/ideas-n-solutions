@@ -3,7 +3,7 @@ import { Banner } from '@astryxdesign/core/Banner'
 import { Button } from '@astryxdesign/core/Button'
 import { Card } from '@astryxdesign/core/Card'
 import { ClickableCard } from '@astryxdesign/core/ClickableCard'
-import { Award, BookOpen, Cloud, Compass, Crown, Flag, Flame, FlameKindling, Footprints, Hash, History, LayoutGrid, Lightbulb, List, NotebookPen, Pencil, Search, Settings, Shuffle, Sparkles, Star, TriangleAlert, Trophy, Workflow } from 'lucide-react'
+import { Award, BookOpen, Cloud, Combine, Compass, Crown, Flag, Flame, FlameKindling, Footprints, Hash, History, LayoutGrid, Lightbulb, List, NotebookPen, Pencil, Search, Settings, Shuffle, Sparkles, Star, TriangleAlert, Trophy, Workflow } from 'lucide-react'
 import { Heading } from '@astryxdesign/core/Heading'
 import { HStack } from '@astryxdesign/core/HStack'
 import { ProgressBar } from '@astryxdesign/core/ProgressBar'
@@ -767,6 +767,27 @@ export default function App() {
     setView({ name: 'quiz' })
   }
 
+  // Bài tập tổng hợp theo nhóm chọn sẵn (vd to-be + hiện tại đơn): trộn
+  // câu từ các nhóm đó, 25 câu/phiên, không lưu tiến độ theo bài (như
+  // Ôn tập tổng hợp) nhưng câu sai vẫn vào kho và phiên vẫn ghi lịch sử.
+  function startMixedQuiz(lessonIds, title) {
+    const pool = allLessons
+      .filter((l) => lessonIds.includes(l.id))
+      .flatMap((l) => l.questions.map((q) => ({ ...q, lessonTitle: l.title })))
+    setQuiz({
+      title,
+      lessonId: null,
+      questions: prepareQuiz(shuffle(pool).slice(0, QUESTIONS_PER_SESSION)),
+      index: 0,
+      input: '',
+      checked: null,
+      score: 0,
+      log: [],
+      finished: false,
+    })
+    setView({ name: 'quiz' })
+  }
+
   // Phiên ôn câu sai: lấy câu từ kho, trả lời đúng thì câu đó tự xóa
   // khỏi kho khi nộp bài (xử lý trong nextQuestion, nhánh finished).
   function startWrongQuiz() {
@@ -1328,6 +1349,15 @@ export default function App() {
               </ClickableCard>
             )
           })}
+          {section === 'conjhub' && (
+            <div className="learn-card">
+              <VStack gap={2}>
+                <SectionLabel icon={<Combine />}>Bài tập tổng hợp: To be & động từ thường</SectionLabel>
+                <Text type="supporting">25 câu trộn từ 2 nhóm: To be và Hiện tại đơn — phân biệt khi nào dùng am/is/are, khi nào dùng động từ thường.</Text>
+                <Button variant="primary" size="lg" label="Bắt đầu làm bài →" onClick={() => startMixedQuiz(['to-be', 'present-simple'], 'Bài tập tổng hợp: To be & động từ thường')} />
+              </VStack>
+            </div>
+          )}
           <div className="learn-card">
             <VStack gap={2}>
               <SectionLabel icon={<Shuffle />}>Ôn tập tổng hợp</SectionLabel>
