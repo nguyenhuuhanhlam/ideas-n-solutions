@@ -428,6 +428,39 @@ export function doorSwing(opening: Opening, wall: Wall): DoorSwing {
   };
 }
 
+/** Một đoạn thẳng: [điểm đầu, điểm cuối]. */
+export type Segment2 = [Point, Point];
+
+/** 4 đường của cửa sổ trên mặt bằng (Y hướng xuống). */
+export interface WindowLines {
+  /** Nét thấy mặt tường phía +n: tường dưới bậu vẫn còn nên 2 mép
+   * tường chạy suốt qua lỗ cửa (tại ±dày/2, trùng viền tường). */
+  facePlus: Segment2;
+  /** Nét thấy mặt tường phía −n. */
+  faceMinus: Segment2;
+  /** Đường khung phía +n (tại ±dày/4). */
+  framePlus: Segment2;
+  /** Đường khung phía −n. */
+  frameMinus: Segment2;
+}
+
+/**
+ * 4 đường song song của cửa sổ: 2 nét thấy 2 mặt tường (±dày/2) +
+ * 2 đường khung (±dày/4), tất cả chạy từ mép đầu `a` tới mép cuối `b`
+ * của lỗ cửa. Theo đúng bản vẽ kỹ thuật, cửa sổ nằm giữa tường không
+ * được mất hẳn 2 nét mép tường: phần tường dưới bậu vẫn hiện ra.
+ */
+export function windowLines(opening: Opening, wall: Wall): WindowLines {
+  const { a, b, nx, ny } = openingFrame(opening, wall);
+  const half = wall.thickness / 2;
+  const q = wall.thickness / 4;
+  const at = (d: number): Segment2 => [
+    { x: a.x + nx * d, y: a.y + ny * d },
+    { x: b.x + nx * d, y: b.y + ny * d },
+  ];
+  return { facePlus: at(half), faceMinus: at(-half), framePlus: at(q), frameMinus: at(-q) };
+}
+
 /**
  * Đổi độ dài một đoạn của chuỗi điểm: giữ points[index] cố định, dời
  * points[index + 1] dọc hướng đoạn tới độ dài mới; các điểm khác giữ nguyên.

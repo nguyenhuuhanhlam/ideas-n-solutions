@@ -5,7 +5,7 @@ import { Arc, Layer, Line, Circle, Rect, Stage, Text } from 'react-konva';
 import Segments from '../components/Segments';
 import WallFill from '../components/WallFill';
 import { elevationBounds, elevationUToOffset, projectOpeningToElevation, projectWallToElevation, sortWallsByDepth, type ElevationView } from '../model/elevation';
-import { distance, doorSwing, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, openingFrame, openingsExceedLength, planBounds, pointsLength, projectPointOnWall, resizeSegment, wallCornerPatches, wallPolygon, wallSegmentPolygons } from '../model/geometry';
+import { distance, doorSwing, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, openingFrame, openingsExceedLength, planBounds, pointsLength, projectPointOnWall, resizeSegment, wallCornerPatches, wallPolygon, wallSegmentPolygons, windowLines } from '../model/geometry';
 import { computeGridSegments, gridStepFor } from '../model/grid';
 import { clampOffset, clampSill } from '../model/openingDrag';
 import type { Opening, Point, Wall } from '../model/schema';
@@ -1113,12 +1113,12 @@ export default function View2D() {
             )),
           )}
 
-          {/* Openings: cửa đi (khoảng trống + cánh + cung mở), cửa sổ (2 đường song song). */}
+          {/* Openings: cửa đi (khoảng trống + cánh + cung mở), cửa sổ (2 nét thấy tường + 2 đường khung). */}
           {effectiveOpenings.map((o) => {
             const wall = effectiveWalls.find((w) => w.id === o.wallId);
             if (!wall) return null;
             const isSel = selectedOpeningSet.has(o.id);
-            const { a, b, nx, ny } = openingFrame(o, wall);
+            const { a } = openingFrame(o, wall);
             const half = wall.thickness / 2;
             const stroke = isSel ? c.selected : c.wallStroke;
             if (o.type === 'door') {
@@ -1168,9 +1168,11 @@ export default function View2D() {
                 </Fragment>
               );
             }
-            // Window: khoét tường tại lỗ cửa (như cửa đi) rồi vẽ 2 đường
-            // khung sậm song song trong lỗ — tường không còn đè lên cửa sổ.
-            const q = wall.thickness / 4;
+            // Window: khoét tường tại lỗ cửa (như cửa đi), rồi vẽ lại
+            // 2 nét thấy của tường (2 mép tường chạy suốt qua lỗ —
+            // tường dưới bậu vẫn còn) + 2 đường khung trong lỗ.
+            const lines = windowLines(o, wall);
+            const seg = (s: [Point, Point]) => [s[0].x, s[0].y, s[1].x, s[1].y];
             return (
               <Fragment key={o.id}>
                 {/* Khoảng trống trên thân tường (che cả viền tường + đường tâm). */}
@@ -1180,14 +1182,28 @@ export default function View2D() {
                   fill={c.bg}
                   listening={false}
                 />
+                {/* Nét thấy 2 mặt tường: cùng nét với viền tường (1/scale). */}
                 <Line
-                  points={[a.x + nx * q, a.y + ny * q, b.x + nx * q, b.y + ny * q]}
+                  points={seg(lines.facePlus)}
+                  stroke={stroke}
+                  strokeWidth={1 / camera.scale}
+                  listening={false}
+                />
+                <Line
+                  points={seg(lines.faceMinus)}
+                  stroke={stroke}
+                  strokeWidth={1 / camera.scale}
+                  listening={false}
+                />
+                {/* 2 đường khung. */}
+                <Line
+                  points={seg(lines.framePlus)}
                   stroke={stroke}
                   strokeWidth={1.5 / camera.scale}
                   listening={false}
                 />
                 <Line
-                  points={[a.x - nx * q, a.y - ny * q, b.x - nx * q, b.y - ny * q]}
+                  points={seg(lines.frameMinus)}
                   stroke={stroke}
                   strokeWidth={1.5 / camera.scale}
                   listening={false}

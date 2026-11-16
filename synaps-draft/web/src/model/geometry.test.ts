@@ -23,6 +23,7 @@ import {
   wallLength,
   wallPolygon,
   wallSegmentPolygons,
+  windowLines,
   type MergedWallPolygon,
 } from './geometry';
 import type { Opening, Point, Wall } from './schema';
@@ -899,5 +900,77 @@ describe('doorSwing', () => {
     const swing = doorSwing(o, eastWall);
     expect(swing.leafEnd).toEqual({ x: 1000, y: 900 });
     expect(swing.arcAngle).toBe(90);
+  });
+});
+
+describe('windowLines', () => {
+  const eastWall = wall({ x: 0, y: 0 }, { x: 4000, y: 0 });
+  const northWall = wall({ x: 0, y: 4000 }, { x: 0, y: 0 });
+  const win = (wallId: string, offset: number, width: number): Opening => ({
+    ...opening(wallId, offset, width),
+    type: 'window',
+    height: 1200,
+    sillHeight: 900,
+  });
+
+  it('tường hướng đông dày 200: 2 nét thấy ở ±100, 2 khung ở ±50, chạy từ a tới b', () => {
+    const lines = windowLines(win('w1', 1000, 900), eastWall);
+    expect(lines.facePlus).toEqual([
+      { x: 1000, y: 100 },
+      { x: 1900, y: 100 },
+    ]);
+    expect(lines.faceMinus).toEqual([
+      { x: 1000, y: -100 },
+      { x: 1900, y: -100 },
+    ]);
+    expect(lines.framePlus).toEqual([
+      { x: 1000, y: 50 },
+      { x: 1900, y: 50 },
+    ]);
+    expect(lines.frameMinus).toEqual([
+      { x: 1000, y: -50 },
+      { x: 1900, y: -50 },
+    ]);
+  });
+
+  it('tường hướng bắc: nét thấy theo pháp tuyến đông/tây', () => {
+    const lines = windowLines(win('w1', 1000, 800), northWall);
+    expect(lines.facePlus).toEqual([
+      { x: 100, y: 3000 },
+      { x: 100, y: 2200 },
+    ]);
+    expect(lines.faceMinus).toEqual([
+      { x: -100, y: 3000 },
+      { x: -100, y: 2200 },
+    ]);
+    expect(lines.framePlus).toEqual([
+      { x: 50, y: 3000 },
+      { x: 50, y: 2200 },
+    ]);
+    expect(lines.frameMinus).toEqual([
+      { x: -50, y: 3000 },
+      { x: -50, y: 2200 },
+    ]);
+  });
+
+  it('tường dày 100: nét thấy ở ±50, khung ở ±25', () => {
+    const thinWall: Wall = { id: 'w1', points: [{ x: 0, y: 0 }, { x: 2000, y: 0 }], thickness: 100 };
+    const lines = windowLines(win('w1', 500, 600), thinWall);
+    expect(lines.facePlus).toEqual([
+      { x: 500, y: 50 },
+      { x: 1100, y: 50 },
+    ]);
+    expect(lines.faceMinus).toEqual([
+      { x: 500, y: -50 },
+      { x: 1100, y: -50 },
+    ]);
+    expect(lines.framePlus).toEqual([
+      { x: 500, y: 25 },
+      { x: 1100, y: 25 },
+    ]);
+    expect(lines.frameMinus).toEqual([
+      { x: 500, y: -25 },
+      { x: 1100, y: -25 },
+    ]);
   });
 });
