@@ -386,9 +386,20 @@ export default function View2D({ onStatus }: { onStatus?: (msg: string) => void 
     state.setFitScale(fit.scale);
   }, [fitRequest, computeFit]);
 
-  // Theo dõi phím Space để pan.
+  // Theo dõi phím Space để pan — nhưng đang gõ trong ô nhập thì Space
+  // là ký tự (kể cả gõ tiếng Việt bằng IME), không phải phím pan.
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
       if (e.code === 'Space' && !e.repeat) {
         spaceRef.current = true;
         e.preventDefault();

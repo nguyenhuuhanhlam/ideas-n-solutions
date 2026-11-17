@@ -40,7 +40,9 @@ export class GeminiError extends Error {
 export const BUILDING_RESPONSE_SCHEMA = {
   type: 'object',
   properties: {
-    version: { type: 'integer', enum: [1] },
+    // Lưu ý: enum của Gemini chỉ nhận giá trị chuỗi — version: 1 được
+    // ép bằng Zod ở phía kiểm tra (kèm vòng sửa lỗi), không ép bằng enum.
+    version: { type: 'integer' },
     levels: {
       type: 'array',
       minItems: 1,
@@ -123,10 +125,40 @@ interface GeminiResponse {
 }
 
 function errorFromStatus(status: number, detail: string): GeminiError {
+  // Google trả kèm lý do thật trong detail — đừng gộp mọi 400/401/403
+  // thành "key sai": lỗi 400 có thể do nội dung yêu cầu, không phải key.
+  const lower = detail.toLowerCase();
+  const shortDetail = detail.length > 300 ? `${detail.slice(0, 300)}…` : detail;
   if (status === 400 || status === 401 || status === 403) {
+    if (
+      lower.includes('api key not valid') ||
+      lower.includes('api_key_invalid') ||
+      lower.includes('api key not found')
+    ) {
+      return new GeminiError(
+        'key',
+        'API key không hợp lệ. Kiểm tra lại key đã copy đúng chưa ở Google AI Studio (key Gemini bắt đầu bằng "AIza", không thừa khoảng trắng).',
+      );
+    }
+    if (lower.includes('has not been used in project') || lower.includes('is disabled')) {
+      return new GeminiError(
+        'key',
+        `Chưa bật Gemini API cho project của key này. Bật ở Google Cloud Console rồi thử lại.${shortDetail ? ` (Google trả về: ${shortDetail})` : ''}`,
+      );
+    }
+    if (lower.includes('blocked') || lower.includes('referer')) {
+      return new GeminiError(
+        'key',
+        `Key này bị giới hạn (theo trang web hoặc IP) nên trình duyệt không gọi được. Vào Google Cloud Console → Credentials, gỡ giới hạn của key rồi thử lại.${shortDetail ? ` (Google trả về: ${shortDetail})` : ''}`,
+      );
+    }
+    if (status === 400 && shortDetail) {
+      // 400 không liên quan key: thường là nội dung yêu cầu bị từ chối.
+      return new GeminiError('other', `Gemini từ chối yêu cầu: ${shortDetail}`);
+    }
     return new GeminiError(
       'key',
-      'API key không hợp lệ hoặc chưa bật Gemini API. Kiểm tra lại key ở Google AI Studio.',
+      `API key không hợp lệ hoặc chưa bật Gemini API. Kiểm tra lại key ở Google AI Studio.${shortDetail ? ` (Google trả về: ${shortDetail})` : ''}`,
     );
   }
   if (status === 429) {

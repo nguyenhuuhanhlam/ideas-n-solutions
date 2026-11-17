@@ -60,6 +60,37 @@ describe('callGeminiJson', () => {
     expect(err.message).toContain('API key');
   });
 
+  it('400 không liên quan key → lỗi other, hiện lý do thật của Google', async () => {
+    mockFetchOnce(400, {
+      error: { message: "Invalid value at 'generation_config.response_schema' (TYPE_STRING), 1" },
+    });
+    const err = await callAndCatchError();
+    expect(err.kind).toBe('other');
+    expect(err.message).toContain('response_schema');
+    expect(err.message).not.toContain('API key không hợp lệ');
+  });
+
+  it('403 chưa bật API → lỗi key, hướng dẫn bật', async () => {
+    mockFetchOnce(403, {
+      error: {
+        message:
+          'Generative Language API has not been used in project 123 before or it is disabled.',
+      },
+    });
+    const err = await callAndCatchError();
+    expect(err.kind).toBe('key');
+    expect(err.message).toContain('Chưa bật Gemini API');
+  });
+
+  it('403 key bị giới hạn referer → lỗi key, hướng dẫn gỡ giới hạn', async () => {
+    mockFetchOnce(403, {
+      error: { message: 'Requests from referer https://example.com/ are blocked.' },
+    });
+    const err = await callAndCatchError();
+    expect(err.kind).toBe('key');
+    expect(err.message).toContain('bị giới hạn');
+  });
+
   it('429 → lỗi quota', async () => {
     mockFetchOnce(429, { error: { message: 'quota' } });
     const err = await callAndCatchError();

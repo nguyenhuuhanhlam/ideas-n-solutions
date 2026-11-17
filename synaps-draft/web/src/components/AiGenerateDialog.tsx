@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Loader2, Sparkles, X } from 'lucide-react';
 import type { Building } from '../model/schema';
 import { generateFloorplan, MAX_ATTEMPTS } from '../ai/generateFloorplan';
@@ -26,14 +26,8 @@ export default function AiGenerateDialog({ onClose, onApply }: AiGenerateDialogP
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  // Đóng bằng Escape — khóa trong lúc đang tạo (bấm Hủy để dừng).
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && phase !== 'generating') onClose();
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [onClose, phase]);
+  // Modal thật: chỉ đóng khi bấm nút Đóng (X) hoặc Hủy — không đóng
+  // khi bấm ra ngoài hay nhấn Escape.
 
   const runGenerate = () => {
     const key = getSavedApiKey()?.trim() ?? '';
@@ -72,19 +66,14 @@ export default function AiGenerateDialog({ onClose, onApply }: AiGenerateDialogP
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4"
-      onClick={() => {
-        if (phase !== 'generating') onClose();
-      }}
-      role="presentation"
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Tạo mặt bằng bằng AI"
         className="w-full max-w-lg rounded-3xl bg-white p-5 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
+        // Phím gõ trong dialog không lọt ra phím tắt app (Space pan, đổi tool…).
+        onKeyDown={(e) => e.nativeEvent.stopPropagation()}
       >
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-2 text-base font-semibold text-syn-ink">
@@ -112,6 +101,7 @@ export default function AiGenerateDialog({ onClose, onApply }: AiGenerateDialogP
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
+              autoFocus
               placeholder="VD: Nhà 1 tầng 8×12m: phòng khách, bếp + ăn, 2 phòng ngủ, 1 phòng tắm, cửa chính hướng nam"
               className={`${inputClass} mt-3 resize-none`}
             />
