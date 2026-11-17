@@ -1,7 +1,8 @@
 /**
  * Gọi Gemini API trực tiếp từ trình duyệt (app là trang tĩnh, không có
  * backend). Key của user lưu ở localStorage, chỉ gửi tới Google.
- * Mô hình: gemini-2.5-flash — bản ổn định có gói miễn phí.
+ * Mô hình: gemini-3.8-flash — bản Flash ổn định hiện tại, có gói miễn
+ * phí (gemini-2.5-flash đã ngừng với user mới; Google trả 404 khi gọi).
  * Endpoint REST: POST /v1beta/models/{model}:generateContent,
  * xác thực bằng header `x-goog-api-key` (không để key trong URL).
  * Trả JSON có cấu trúc: responseMimeType + responseSchema ép model
@@ -10,7 +11,7 @@
  */
 
 /** Mô hình Gemini dùng cho tạo mặt bằng (đổi 1 chỗ này là đổi cả app). */
-export const GEMINI_MODEL = 'gemini-2.5-flash';
+export const GEMINI_MODEL = 'gemini-3.8-flash';
 
 /** Key localStorage lưu API key Gemini của user. */
 export const GEMINI_KEY_STORAGE_KEY = 'synaps-draft-gemini-key';
