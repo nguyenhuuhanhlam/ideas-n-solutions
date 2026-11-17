@@ -168,68 +168,103 @@ function errorFromStatus(status: number, detail: string): GeminiError {
       'Hết lượt miễn phí của Gemini (giới hạn theo phút/ngày). Đợi một lúc rồi thử lại.',
     );
   }
+  if (status === 503) {
+    return new GeminiError(
+      'other',
+      'Gemini đang quá tải (quá nhiều người dùng cùng lúc, thường chỉ tạm thời). Đợi một lúc rồi bấm Thử lại.',
+    );
+  }
   return new GeminiError(
     'other',
     `Gemini trả lỗi HTTP ${status}${detail ? `: ${detail}` : ''}.`,
   );
 }
 
-/** Gọi Gemini, trả về text JSON thô (chưa parse). Ném GeminiError đã dịch. */
+/** Đợi ms, hủy ngay nếu signal abort (để nút Hủy dừng cả lúc chờ thử lại). */
+function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new DOMException('Aborted', 'AbortError'));
+      return;
+    }
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(new DOMException('Aborted', 'AbortError'));
+    };
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort);
+      resolve();
+    }, ms);
+    signal?.addEventListener('abort', onAbort, { once: true });
+  });
+}
+
+/** Gọi Gemini, trả về text JSON thô (chưa parse). Ném GeminiError đã dịch.
+ * Lỗi 500/503 (server Google quá tải/lỗi tạm thời) tự thử lại tối đa 3 lần,
+ * chờ 2s rồi 5s — người dùng không phải bấm Thử lại tay. */
 export async function callGeminiJson({
   apiKey,
   systemInstruction,
   userText,
   signal,
 }: GeminiCallArgs): Promise<string> {
-  let res: Response;
-  try {
-    res = await fetch(GEMINI_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': apiKey,
-      },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemInstruction }] },
-        contents: [{ role: 'user', parts: [{ text: userText }] }],
-        generationConfig: {
-          temperature: 0.2,
-          maxOutputTokens: 8192,
-          responseMimeType: 'application/json',
-          responseSchema: BUILDING_RESPONSE_SCHEMA,
+  const RETRY_DELAYS_MS = [2000, 5000];
+  for (let attempt = 0; ; attempt++) {
+    let res: Response;
+    try {
+      res = await fetch(GEMINI_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey,
         },
-      }),
-      signal,
-    });
-  } catch (err) {
-    if (err instanceof DOMException && err.name === 'AbortError') throw err;
-    throw new GeminiError(
-      'network',
-      'Không kết nối được tới Gemini. Kiểm tra mạng rồi thử lại.',
-    );
-  }
-  const data = (await res.json().catch(() => ({}))) as GeminiResponse;
-  if (!res.ok) {
-    throw errorFromStatus(res.status, data.error?.message ?? '');
-  }
-  const candidate = data.candidates?.[0];
-  const text = candidate?.content?.parts?.map((p) => p.text ?? '').join('');
-  if (candidate?.finishReason === 'MAX_TOKENS') {
-    throw new GeminiError(
-      'truncated',
-      'Kết quả quá dài nên bị cắt giữa chừng. Thử mô tả nhà nhỏ hơn hoặc ít phòng hơn.',
-    );
-  }
-  if (!text) {
-    if (data.promptFeedback?.blockReason) {
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemInstruction }] },
+          contents: [{ role: 'user', parts: [{ text: userText }] }],
+          generationConfig: {
+            temperature: 0.2,
+            maxOutputTokens: 8192,
+            responseMimeType: 'application/json',
+            responseSchema: BUILDING_RESPONSE_SCHEMA,
+          },
+        }),
+        signal,
+      });
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') throw err;
       throw new GeminiError(
-        'blocked',
-        'Gemini từ chối yêu cầu này. Thử diễn đạt lại mô tả.',
+        'network',
+        'Không kết nối được tới Gemini. Kiểm tra mạng rồi thử lại.',
       );
     }
-    throw new GeminiError('empty', 'Gemini không trả về kết quả. Thử lại.');
+    const data = (await res.json().catch(() => ({}))) as GeminiResponse;
+    if (!res.ok) {
+      const retryable = res.status === 500 || res.status === 503;
+      if (retryable && attempt < RETRY_DELAYS_MS.length) {
+        await sleep(RETRY_DELAYS_MS[attempt], signal);
+        continue;
+      }
+      throw errorFromStatus(res.status, data.error?.message ?? '');
+    }
+    const candidate = data.candidates?.[0];
+    const text = candidate?.content?.parts?.map((p) => p.text ?? '').join('');
+    if (candidate?.finishReason === 'MAX_TOKENS') {
+      throw new GeminiError(
+        'truncated',
+        'Kết quả quá dài nên bị cắt giữa chừng. Thử mô tả nhà nhỏ hơn hoặc ít phòng hơn.',
+      );
+    }
+    if (!text) {
+      if (data.promptFeedback?.blockReason) {
+        throw new GeminiError(
+          'blocked',
+          'Gemini từ chối yêu cầu này. Thử diễn đạt lại mô tả.',
+        );
+      }
+      throw new GeminiError('empty', 'Gemini không trả về kết quả. Thử lại.');
+    }
+    return text;
   }
-  return text;
 }
 
 /** Đọc API key đã lưu (null nếu chưa có hoặc localStorage bị chặn). */

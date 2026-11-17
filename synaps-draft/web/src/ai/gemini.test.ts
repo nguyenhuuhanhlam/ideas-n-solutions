@@ -11,6 +11,20 @@ function mockFetchOnce(status: number, body: unknown) {
   return fetchMock;
 }
 
+/** Mock fetch trả lần lượt từng response (cho test tự thử lại). */
+function mockFetchSequence(...responses: [number, unknown][]) {
+  const fetchMock = vi.fn();
+  for (const [status, body] of responses) {
+    fetchMock.mockResolvedValueOnce({
+      ok: status >= 200 && status < 300,
+      status,
+      json: () => Promise.resolve(body),
+    });
+  }
+  vi.stubGlobal('fetch', fetchMock);
+  return fetchMock;
+}
+
 const okBody = (text: string) => ({
   candidates: [{ content: { parts: [{ text }] }, finishReason: 'STOP' }],
 });
@@ -96,6 +110,56 @@ describe('callGeminiJson', () => {
     const err = await callAndCatchError();
     expect(err.kind).toBe('quota');
     expect(err.message).toContain('Hết lượt');
+  });
+
+  it('503 rồi thành công → tự thử lại và trả text', async () => {
+    vi.useFakeTimers();
+    try {
+      const fetchMock = mockFetchSequence(
+        [503, { error: { message: 'high demand' } }],
+        [200, okBody('{"version":1}')],
+      );
+      const promise = callGeminiJson(args);
+      await vi.advanceTimersByTimeAsync(3000);
+      const text = await promise;
+      expect(text).toBe('{"version":1}');
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('500 rồi thành công → tự thử lại và trả text', async () => {
+    vi.useFakeTimers();
+    try {
+      const fetchMock = mockFetchSequence(
+        [500, { error: { message: 'internal' } }],
+        [200, okBody('{"version":1}')],
+      );
+      const promise = callGeminiJson(args);
+      await vi.advanceTimersByTimeAsync(3000);
+      await expect(promise).resolves.toBe('{"version":1}');
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('503 cả 3 lần → lỗi quá tải, đã gọi đủ 3 lần', async () => {
+    vi.useFakeTimers();
+    try {
+      const fetchMock = mockFetchSequence(
+        [503, { error: { message: 'high demand' } }],
+        [503, { error: { message: 'high demand' } }],
+        [503, { error: { message: 'high demand' } }],
+      );
+      const promise = callGeminiJson(args);
+      await vi.advanceTimersByTimeAsync(8000);
+      await expect(promise).rejects.toThrow('quá tải');
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('fetch ném lỗi mạng → lỗi network', async () => {
