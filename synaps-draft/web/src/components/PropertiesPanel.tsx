@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { clampOpeningOffset, wallLength } from '../model/geometry';
+import { wallLength } from '../model/geometry';
+import { maxWidthWithoutOverlap, resolveDragOffset } from '../model/openingDrag';
 import { selectActiveLevel, useBuildingStore, type Unit } from '../store/useBuildingStore';
 
 function fmt(valueMm: number, unit: Unit): string {
@@ -238,10 +239,17 @@ export default function PropertiesPanel() {
               suffix="mm"
               onCommit={(v) => {
                 if (v === undefined) return;
-                const maxW = Math.round(wallLength(openingWall)) - opening.offset;
+                const wallMax = Math.round(wallLength(openingWall)) - opening.offset;
+                const freeMax = maxWidthWithoutOverlap(
+                  level.walls,
+                  level.openings,
+                  opening,
+                  v,
+                );
+                const maxW = Math.min(wallMax, freeMax);
                 if (v > maxW) {
                   setOpeningError(
-                    `Rộng vượt quá tường, đã giới hạn về ${maxW} mm (offset ${opening.offset} mm).`,
+                    `Rộng vượt quá khoảng trống, đã giới hạn về ${maxW} mm (offset ${opening.offset} mm).`,
                   );
                   store().updateOpening(opening.id, { width: Math.max(100, maxW) });
                 } else {
@@ -277,10 +285,16 @@ export default function PropertiesPanel() {
               suffix="mm"
               onCommit={(v) => {
                 if (v === undefined) return;
-                const clamped = clampOpeningOffset(v, opening.width, wallLength(openingWall));
+                const clamped = resolveDragOffset(
+                  level.walls,
+                  level.openings,
+                  opening.id,
+                  opening.offset,
+                  v,
+                );
                 if (clamped !== v) {
                   setOpeningError(
-                    `Offset vượt quá tường, đã giới hạn về ${clamped} mm (tường dài ${Math.round(wallLength(openingWall))} mm).`,
+                    `Đã giới hạn về ${clamped} mm (chạm cửa kề hoặc mép tường).`,
                   );
                 } else setOpeningError(null);
                 store().updateOpening(opening.id, { offset: clamped });

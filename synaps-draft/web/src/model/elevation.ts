@@ -1,6 +1,6 @@
 import type { Level, Opening, Point, Wall } from './schema';
 import { distance, pointAtChainOffset } from './geometry';
-import { clampOffset, clampSill } from './openingDrag';
+import { clampOffsetToWall, clampSill } from './openingDrag';
 
 /** Các view 2D: mặt bằng (Top) và 2 mặt đứng (Left/Right). */
 export type View2d = 'top' | 'left' | 'right';
@@ -129,8 +129,8 @@ export function projectOpeningToElevation(
 /**
  * Chiếu ngược: tọa độ u trên mặt đứng → vị trí dọc tường (offset, chưa kẹp).
  * u(t) tuyến tính từng đoạn nên đảo trong đoạn chứa u. u ngoài phạm vi thì
- * ngoại suy từ đoạn gần nhất (nơi gọi kẹp lại bằng clampOffset — giữ hành vi
- * cũ của tường 1 đoạn). Mọi đoạn đều chiếu thành mép mỏng (u không đổi dọc
+ * ngoại suy từ đoạn gần nhất (nơi gọi kẹp lại bằng resolveDragOffset —
+ * giữ hành vi cũ của tường 1 đoạn). Mọi đoạn đều chiếu thành mép mỏng (u không đổi dọc
  * tường) thì không đảo được → trả NaN.
  */
 export function elevationUToOffset(wall: Wall, view: ElevationView, u: number): number {
@@ -179,7 +179,7 @@ export function elevationPointToOpening(
   return {
     offset: Number.isNaN(raw)
       ? opening.offset
-      : clampOffset(wall, [opening], opening.id, raw),
+      : clampOffsetToWall(wall, opening.width, raw),
     sillHeight: clampSill(wallHeight(wall, level), opening, v - level.elevation),
   };
 }

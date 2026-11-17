@@ -7,7 +7,7 @@ import WallFill from '../components/WallFill';
 import { elevationBounds, elevationUToOffset, projectOpeningToElevation, projectWallToElevation, sortWallsByDepth, type ElevationView } from '../model/elevation';
 import { distance, centerlineSegments, doorSwing, fitScaleFor, mergeWallPolygonsWithHoles, midpoint, offsetFromRefDim, openingFrame, openingRefDims, openingsExceedLength, pinchZoom, planBounds, pointsLength, projectPointOnWall, resizeSegment, wallCornerPatches, wallPolygon, wallSegmentPolygons, windowLines, type OpeningRefDim } from '../model/geometry';
 import { computeGridSegments, gridStepFor } from '../model/grid';
-import { clampOffset, clampSill } from '../model/openingDrag';
+import { canPlaceOpening, clampSill, resolveDragOffset } from '../model/openingDrag';
 import type { Opening, Point, Wall } from '../model/schema';
 import { marqueeSelect, type MarqueeRect } from '../model/selection';
 import { selectActiveLevel, useBuildingStore, type Unit } from '../store/useBuildingStore';
@@ -211,7 +211,7 @@ function openingRefDimView(
   };
 }
 
-export default function View2D() {
+export default function View2D({ onStatus }: { onStatus?: (msg: string) => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
   const [size, setSize] = useState({ w: 800, h: 600 });
@@ -601,12 +601,12 @@ export default function View2D() {
         const wall = walls.find((w) => w.id === elevDrag.wallId);
         const opening = openings.find((o) => o.id === elevDrag.openingId);
         if (!wall || !opening || !level) return;
-        const siblings = openings.filter((o) => o.wallId === wall.id);
         const newOffset = elevDrag.canMoveU
-          ? clampOffset(
-              wall,
-              siblings,
+          ? resolveDragOffset(
+              walls,
+              openings,
               opening.id,
+              elevDrag.origOffset,
               elevDrag.origOffset +
                 (elevationUToOffset(wall, elevDrag.view, u) -
                   elevationUToOffset(wall, elevDrag.view, elevDrag.grabU)),
@@ -652,11 +652,11 @@ export default function View2D() {
         const opening = openings.find((o) => o.id === drag.openingId);
         if (!wall || !opening) return;
         const cursorOffset = projectPointOnWall(raw, wall).offset;
-        const siblings = openings.filter((o) => o.wallId === wall.id);
-        const newOffset = clampOffset(
-          wall,
-          siblings,
+        const newOffset = resolveDragOffset(
+          walls,
+          openings,
           opening.id,
+          drag.origOffset,
           drag.origOffset + (cursorOffset - drag.grabOffset),
         );
         setOpeningPreview({ openingId: opening.id, offset: newOffset, sillHeight: drag.origSill });
@@ -761,11 +761,15 @@ export default function View2D() {
     const state = useBuildingStore.getState();
     const raw = toWorld(pointer.x, pointer.y);
 
-    // Đặt cửa / cửa sổ lên tường gần nhất.
+    // Đặt cửa / cửa sổ lên tường gần nhất (từ chối nếu chồng lên cửa khác).
     if (tool === 'door' || tool === 'window') {
       const hit = findNearestWall(raw, walls, OPENING_PICK_RADIUS_PX / camera.scale);
       if (hit) {
         const opening = createOpening(hit.wall, tool, Math.round(hit.offset));
+        if (!canPlaceOpening(walls, openings, opening)) {
+          onStatus?.('Không đặt được: vị trí này chồng lên cửa khác.');
+          return;
+        }
         state.addOpening(opening);
         state.selectSingle('opening', opening.id);
       }
@@ -1147,8 +1151,8 @@ export default function View2D() {
    * sửa, dời points[i+1] dọc hướng đoạn đó; đoạn kề giữ đầu còn lại cố định
    * nên nó xoay/dài theo. Chặn khi tổng chuỗi mới làm cửa vượt khỏi tường.
    * Với dim tham chiếu của cửa: dời cửa tới khoảng cách đã nhập từ mép
-   * tới góc đoạn, kẹp bằng đúng cơ chế kẹp của kéo-thả cửa (kẹp trong
-   * tường + chặn chồng lấn — vượt giới hạn thì về vị trí hợp lệ gần nhất). */
+   * tới góc đoạn, kẹp bằng đúng cơ chế kẹp của kéo-thả cửa (hitbox +
+   * quét dọc đường đi — vượt giới hạn thì dừng sát vật cản). */
   const commitDimEdit = () => {
     if (!dimEditing) return;
     if (dimEditing.kind === 'opening') {
@@ -1160,12 +1164,7 @@ export default function View2D() {
       const v = Number.parseInt(value, 10);
       if (!Number.isInteger(v) || v < 0) return;
       const desired = offsetFromRefDim(target, wall, side, v);
-      const clamped = clampOffset(
-        wall,
-        openings.filter((o) => o.wallId === wall.id),
-        openingId,
-        desired,
-      );
+      const clamped = resolveDragOffset(walls, openings, openingId, target.offset, desired);
       if (clamped === target.offset) return;
       useBuildingStore.getState().updateOpening(openingId, { offset: clamped });
       return;

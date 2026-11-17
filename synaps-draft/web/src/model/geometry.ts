@@ -601,7 +601,7 @@ export function openingRefDims(opening: Opening, wall: Wall): [OpeningRefDim, Op
 /**
  * Offset mới của cửa khi nhập giá trị cho 1 dim tham chiếu: side 'a' →
  * đầu đoạn + value; side 'b' → cuối đoạn − value − width. Chưa kẹp
- * giới hạn — bên gọi kẹp bằng clampOffset (kẹp trong tường + chặn chồng lấn).
+ * giới hạn — bên gọi kẹp bằng resolveDragOffset (hitbox + quét dọc đường đi).
  */
 export function offsetFromRefDim(
   opening: Opening,

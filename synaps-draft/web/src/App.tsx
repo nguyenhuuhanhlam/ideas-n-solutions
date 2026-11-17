@@ -209,7 +209,7 @@ export default function App() {
       <main className="absolute inset-0 flex">
         {(viewMode === '2d' || viewMode === 'split') && (
           <div className={viewMode === 'split' ? 'h-full w-1/2 border-r border-syn-border' : 'h-full w-full'}>
-            <View2D />
+            <View2D onStatus={flashStatus} />
           </div>
         )}
         {(viewMode === '3d' || viewMode === 'split') && (
