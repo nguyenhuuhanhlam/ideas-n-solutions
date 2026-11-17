@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import ExportDialog from './components/ExportDialog';
+import AiGenerateDialog from './components/AiGenerateDialog';
 import IconToolbar from './components/IconToolbar';
 import SynapsPanel, { type PanelTab } from './components/SynapsPanel';
 import TopActions from './components/TopActions';
@@ -38,6 +39,7 @@ export default function App() {
   const isMobile = useBuildingStore((s) => s.isMobile);
   const [activeTab, setActiveTab] = useState<PanelTab>('properties');
   const [exportOpen, setExportOpen] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
 
   // Chế độ xem mobile (viewport < 768px): theo dõi matchMedia, phản ứng
   // khi resize/xoay màn hình. Vào mobile: ép tool về select (tránh tool
@@ -301,6 +303,7 @@ export default function App() {
             onRedo={() => store().redo()}
             onOpen={() => fileInputRef.current?.click()}
             onExport={() => setExportOpen(true)}
+            onAi={() => setAiOpen(true)}
             onSave={handleSave}
             onNew={handleNew}
           />
@@ -353,6 +356,19 @@ export default function App() {
           openingCount={openingCount}
           onClose={() => setExportOpen(false)}
           onExport={handleExportDxf}
+        />
+      )}
+
+      {/* Dialog tạo mặt bằng bằng AI */}
+      {aiOpen && (
+        <AiGenerateDialog
+          onClose={() => setAiOpen(false)}
+          onApply={(building) => {
+            store().loadBuilding(building);
+            store().requestFit();
+            setAiOpen(false);
+            flashStatus('Đã tạo mặt bằng bằng AI.');
+          }}
         />
       )}
     </div>

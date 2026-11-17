@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { GEMINI_MODEL, getSavedApiKey, saveApiKey } from '../ai/gemini';
 import { wallLength } from '../model/geometry';
 import {
   doorSwingOverlapsOthers,
@@ -166,6 +167,8 @@ export default function PropertiesPanel() {
     : null;
 
   const [levelName, setLevelName] = useState(level?.name ?? '');
+  // API key Gemini cho "Tạo bằng AI": lưu ngay khi gõ (chỉ trong trình duyệt này).
+  const [geminiKey, setGeminiKey] = useState(() => getSavedApiKey() ?? '');
   useEffect(() => {
     setLevelName(level?.name ?? '');
   }, [level?.name]);
@@ -404,6 +407,36 @@ export default function PropertiesPanel() {
               <span className="text-[11px] text-syn-grey">Grid</span>
               <GridToggle on={showGrid} onChange={(v) => store().setShowGrid(v)} />
             </div>
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <SectionTitle>AI</SectionTitle>
+            <label className="block">
+              <span className="mb-1 block text-[11px] text-syn-grey">API key Gemini</span>
+              <input
+                type="password"
+                value={geminiKey}
+                onChange={(e) => {
+                  setGeminiKey(e.target.value);
+                  saveApiKey(e.target.value.trim());
+                }}
+                placeholder="AIza…"
+                autoComplete="off"
+                className={FIELD_CLASS}
+              />
+            </label>
+            <p className="text-[11px] text-syn-grey">
+              Dùng cho “Tạo bằng AI” (mô hình {GEMINI_MODEL}). Key chỉ lưu trong trình duyệt này.{' '}
+              <a
+                href="https://aistudio.google.com/apikey"
+                target="_blank"
+                rel="noreferrer"
+                className="text-syn-accent underline"
+              >
+                Lấy key miễn phí
+              </a>
+              .
+            </p>
           </section>
 
           <section className="flex flex-col gap-3">

@@ -1,4 +1,4 @@
-import { FileDown, FilePlus2, Redo2, Undo2 } from 'lucide-react';
+import { FileDown, FilePlus2, Redo2, Sparkles, Undo2 } from 'lucide-react';
 
 interface TopActionsProps {
   canUndo: boolean;
@@ -7,6 +7,7 @@ interface TopActionsProps {
   onRedo: () => void;
   onOpen: () => void;
   onExport: () => void;
+  onAi: () => void;
   onSave: () => void;
   onNew: () => void;
 }
@@ -24,6 +25,7 @@ export default function TopActions({
   onRedo,
   onOpen,
   onExport,
+  onAi,
   onSave,
   onNew,
 }: TopActionsProps) {
@@ -34,6 +36,15 @@ export default function TopActions({
       </button>
       <button type="button" title="Xuất bản vẽ" onClick={onExport} className={pillButton}>
         Export
+      </button>
+      <button
+        type="button"
+        title="Tạo mặt bằng bằng AI (Gemini)"
+        onClick={onAi}
+        className={`${pillButton} flex items-center gap-1`}
+      >
+        <Sparkles size={14} strokeWidth={1.5} />
+        Tạo bằng AI
       </button>
       <button
         type="button"
