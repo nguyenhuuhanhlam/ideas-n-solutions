@@ -1,4 +1,10 @@
-import { distance, pointAtChainOffset, pointsLength, wallLength } from './geometry';
+import {
+  distance,
+  doorSwingPolygon,
+  pointAtChainOffset,
+  pointsLength,
+  wallLength,
+} from './geometry';
 import type { Opening, Point, Wall } from './schema';
 
 /**
@@ -46,10 +52,10 @@ export function openingHitbox(opening: Opening, wall: Wall): HitboxRect[] {
   return rects;
 }
 
-function projectRect(rect: HitboxRect, ax: number, ay: number): [number, number] {
+function projectPolygon(poly: Point[], ax: number, ay: number): [number, number] {
   let min = Infinity;
   let max = -Infinity;
-  for (const p of rect) {
+  for (const p of poly) {
     const d = p.x * ax + p.y * ay;
     if (d < min) min = d;
     if (d > max) max = d;
@@ -57,20 +63,22 @@ function projectRect(rect: HitboxRect, ax: number, ay: number): [number, number]
   return [min, max];
 }
 
-/** Hai hình chữ nhật (OBB) có chồng nhau không (SAT, 4 trục). Chạm mép = không chồng. */
-function rectsOverlap(a: HitboxRect, b: HitboxRect): boolean {
-  for (const rect of [a, b]) {
-    for (let e = 0; e < 2; e++) {
-      const p = rect[e];
-      const q = rect[e + 1];
+/** Hai đa giác lồi có chồng nhau không (SAT trên pháp tuyến mọi cạnh).
+ * Chạm mép = không chồng. Dùng cho cả rect hitbox (4 đỉnh) và quạt vùng quay. */
+export function convexPolygonsOverlap(a: Point[], b: Point[]): boolean {
+  if (a.length < 3 || b.length < 3) return false;
+  for (const poly of [a, b]) {
+    for (let i = 0; i < poly.length; i++) {
+      const p = poly[i];
+      const q = poly[(i + 1) % poly.length];
       const ex = q.x - p.x;
       const ey = q.y - p.y;
       const len = Math.hypot(ex, ey);
       if (len <= 0) continue;
       const ax = -ey / len;
       const ay = ex / len;
-      const [minA, maxA] = projectRect(a, ax, ay);
-      const [minB, maxB] = projectRect(b, ax, ay);
+      const [minA, maxA] = projectPolygon(a, ax, ay);
+      const [minB, maxB] = projectPolygon(b, ax, ay);
       if (Math.min(maxA, maxB) - Math.max(minA, minB) <= EPS) return false;
     }
   }
@@ -79,29 +87,117 @@ function rectsOverlap(a: HitboxRect, b: HitboxRect): boolean {
 
 /** Hai hitbox (mỗi cái 1+ rect) có chồng nhau không. */
 export function hitboxesOverlap(a: HitboxRect[], b: HitboxRect[]): boolean {
-  return a.some((ra) => b.some((rb) => rectsOverlap(ra, rb)));
+  return a.some((ra) => b.some((rb) => convexPolygonsOverlap(ra, rb)));
 }
 
-function blockerHitboxes(
+/** Vòng bao của 1 đa giác (tâm = trung bình các đỉnh, r = xa nhất) — để loại nhanh. */
+interface BoundingCircle {
+  cx: number;
+  cy: number;
+  r: number;
+}
+
+function boundingCircle(poly: Point[]): BoundingCircle {
+  let cx = 0;
+  let cy = 0;
+  for (const p of poly) {
+    cx += p.x;
+    cy += p.y;
+  }
+  cx /= poly.length;
+  cy /= poly.length;
+  let r = 0;
+  for (const p of poly) {
+    r = Math.max(r, Math.hypot(p.x - cx, p.y - cy));
+  }
+  return { cx, cy, r };
+}
+
+/** Hai vòng bao có thể giao nhau không (loại nhanh trước SAT; chạm nhau = không). */
+function circlesMayOverlap(a: BoundingCircle, b: BoundingCircle): boolean {
+  const dx = a.cx - b.cx;
+  const dy = a.cy - b.cy;
+  const rr = a.r + b.r;
+  return dx * dx + dy * dy < rr * rr;
+}
+
+/** Vùng quay của 1 cửa đi: quạt 90° + vòng bao (tâm = bản lề, r = rộng cửa). */
+interface SwingZone {
+  poly: Point[];
+  circle: BoundingCircle;
+}
+
+function swingZone(opening: Opening, wall: Wall): SwingZone | null {
+  if (opening.type !== 'door') return null;
+  const poly = doorSwingPolygon(opening, wall);
+  if (poly.length < 3) return null;
+  const hinge = poly[0];
+  return { poly, circle: { cx: hinge.x, cy: hinge.y, r: opening.width } };
+}
+
+/**
+ * Dấu chân đầy đủ của 1 opening: các rect lỗ cửa + vùng quay (chỉ cửa đi).
+ * 2 cửa "chồng nhau" khi bất kỳ cặp vùng nào giao nhau: lỗ-lỗ, quay-quay,
+ * quay-lỗ (cánh cửa này quét qua lỗ cửa kia — cánh sẽ chạm cánh kia khi đóng).
+ */
+interface Footprint {
+  gaps: HitboxRect[];
+  gapCircles: BoundingCircle[];
+  swing: SwingZone | null;
+}
+
+function footprint(opening: Opening, wall: Wall): Footprint {
+  const gaps = openingHitbox(opening, wall);
+  return {
+    gaps,
+    gapCircles: gaps.map(boundingCircle),
+    swing: swingZone(opening, wall),
+  };
+}
+
+function swingHitsGaps(
+  zone: SwingZone,
+  gaps: HitboxRect[],
+  gapCircles: BoundingCircle[],
+): boolean {
+  return gaps.some(
+    (g, i) =>
+      circlesMayOverlap(zone.circle, gapCircles[i]) &&
+      convexPolygonsOverlap(zone.poly, g),
+  );
+}
+
+function footprintsOverlap(a: Footprint, b: Footprint): boolean {
+  if (a.gaps.some((ra) => b.gaps.some((rb) => convexPolygonsOverlap(ra, rb)))) return true;
+  if (
+    a.swing &&
+    b.swing &&
+    circlesMayOverlap(a.swing.circle, b.swing.circle) &&
+    convexPolygonsOverlap(a.swing.poly, b.swing.poly)
+  ) {
+    return true;
+  }
+  if (a.swing && swingHitsGaps(a.swing, b.gaps, b.gapCircles)) return true;
+  if (b.swing && swingHitsGaps(b.swing, a.gaps, a.gapCircles)) return true;
+  return false;
+}
+
+function blockerFootprints(
   walls: Wall[],
   openings: Opening[],
   excludeId: string,
-): HitboxRect[][] {
-  const out: HitboxRect[][] = [];
+): Footprint[] {
+  const out: Footprint[] = [];
   for (const o of openings) {
     if (o.id === excludeId) continue;
     const w = walls.find((x) => x.id === o.wallId);
-    if (w) out.push(openingHitbox(o, w));
+    if (w) out.push(footprint(o, w));
   }
   return out;
 }
 
-function collidesWith(mine: HitboxRect[], blockers: HitboxRect[][]): boolean {
-  if (mine.length === 0) return false;
-  return blockers.some((b) => b.length > 0 && hitboxesOverlap(mine, b));
-}
-
-/** Opening (với offset/width đã cho) có chồng lên opening khác nào không. */
+/** Opening (với offset/width đã cho) có chồng lên opening khác nào không
+ * (lỗ-lỗ, quay-quay, quay-lỗ). */
 export function openingOverlapsOthers(
   walls: Wall[],
   openings: Opening[],
@@ -109,10 +205,39 @@ export function openingOverlapsOthers(
 ): boolean {
   const wall = walls.find((w) => w.id === candidate.wallId);
   if (!wall) return false;
-  return collidesWith(
-    openingHitbox(candidate, wall),
-    blockerHitboxes(walls, openings, candidate.id),
+  const mine = footprint(candidate, wall);
+  return blockerFootprints(walls, openings, candidate.id).some((b) =>
+    footprintsOverlap(mine, b),
   );
+}
+
+/** Vùng quay của candidate (cửa đi) có chồng lên opening khác nào không
+ * (vùng quay hoặc lỗ của chúng). Dùng khi đảo chiều mở: lỗ không đổi nên
+ * chỉ cần xét vùng quay mới. Cửa sổ luôn trả false. */
+export function doorSwingOverlapsOthers(
+  walls: Wall[],
+  openings: Opening[],
+  candidate: Opening,
+): boolean {
+  const wall = walls.find((w) => w.id === candidate.wallId);
+  if (!wall) return false;
+  const zone = swingZone(candidate, wall);
+  if (!zone) return false;
+  for (const o of openings) {
+    if (o.id === candidate.id) continue;
+    const ow = walls.find((w) => w.id === o.wallId);
+    if (!ow) continue;
+    const b = footprint(o, ow);
+    if (
+      b.swing &&
+      circlesMayOverlap(zone.circle, b.swing.circle) &&
+      convexPolygonsOverlap(zone.poly, b.swing.poly)
+    ) {
+      return true;
+    }
+    if (swingHitsGaps(zone, b.gaps, b.gapCircles)) return true;
+  }
+  return false;
 }
 
 /** Kẹp offset vào [0, max], làm tròn mm nguyên. */
@@ -148,7 +273,8 @@ function binarySearchContact(
  * tiên trên đường đi (quét dọc đường đi + nhị phân tới điểm tiếp xúc).
  * Không bao giờ xuyên qua opening khác — lỗi "teleport" của cách cũ
  * (chọn ứng viên gần desired nhất, không xét hướng di chuyển).
- * Kiểm tra mọi opening (cùng tường và tường khác) bằng hitbox 2D.
+ * Kiểm tra dấu chân đầy đủ (lỗ cửa + vùng quay cánh, cả tường khác)
+ * nên cửa đi cũng không quét chồng lên cửa khác.
  * Nếu vị trí hiện tại đã chồng (file nạp vào sai), thoát ra chỗ hợp lệ
  * gần desired nhất; nếu không còn chỗ nào thì giữ nguyên.
  */
@@ -166,9 +292,9 @@ export function resolveDragOffset(
   const from = Number.isFinite(fromOffset) ? clampToBounds(fromOffset, max) : me.offset;
   const to = Number.isFinite(desiredOffset) ? clampToBounds(desiredOffset, max) : from;
   if (to === from) return from;
-  const blockers = blockerHitboxes(walls, openings, openingId);
+  const blockers = blockerFootprints(walls, openings, openingId);
   const collides = (offset: number) =>
-    collidesWith(openingHitbox({ ...me, offset }, wall), blockers);
+    blockers.some((b) => footprintsOverlap(footprint({ ...me, offset }, wall), b));
   if (collides(from)) {
     // Vị trí hiện tại đã chồng: tìm chỗ hợp lệ gần `to` nhất trong các
     // ứng viên (mép các opening cùng tường + biên tường).
@@ -223,9 +349,9 @@ export function maxWidthWithoutOverlap(
   if (!wall) return desiredWidth;
   const lo = 100;
   if (desiredWidth <= lo) return desiredWidth;
-  const blockers = blockerHitboxes(walls, openings, opening.id);
+  const blockers = blockerFootprints(walls, openings, opening.id);
   const collides = (width: number) =>
-    collidesWith(openingHitbox({ ...opening, width }, wall), blockers);
+    blockers.some((b) => footprintsOverlap(footprint({ ...opening, width }, wall), b));
   if (!collides(desiredWidth)) return desiredWidth;
   // lo=100 hợp lệ (hitbox con của hitbox hiện tại, vốn không chồng);
   // nhị phân tìm rộng nhất còn hợp lệ.

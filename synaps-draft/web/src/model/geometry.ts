@@ -520,6 +520,29 @@ export function doorSwing(opening: Opening, wall: Wall): DoorSwing {
   };
 }
 
+/**
+ * Vùng quay của cánh cửa đi: hình quạt 90° (đa giác lồi) gồm bản lề +
+ * segments+1 điểm trên cung. Cánh quét vùng này khi mở; 2 vùng quay
+ * chồng nhau = 2 cánh sẽ chạm nhau. Đa giác nội tiếp cung nên hơi nhỏ
+ * hơn quạt tròn thật (segments=16: sai số < 2mm với cửa 900mm).
+ * Chỉ cửa đi có vùng quay (cửa sổ trả []).
+ */
+export function doorSwingPolygon(
+  opening: Opening,
+  wall: Wall,
+  segments = 16,
+): Point[] {
+  if (opening.type !== 'door' || opening.width <= 0) return [];
+  const { hinge, arcRotation, arcAngle } = doorSwing(opening, wall);
+  const r = opening.width;
+  const pts: Point[] = [{ ...hinge }];
+  for (let k = 0; k <= segments; k++) {
+    const t = ((arcRotation + (arcAngle * k) / segments) * Math.PI) / 180;
+    pts.push({ x: hinge.x + r * Math.cos(t), y: hinge.y + r * Math.sin(t) });
+  }
+  return pts;
+}
+
 /** Một đoạn thẳng: [điểm đầu, điểm cuối]. */
 export type Segment2 = [Point, Point];
 

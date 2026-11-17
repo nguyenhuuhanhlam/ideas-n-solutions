@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   canPlaceOpening,
+  doorSwingOverlapsOthers,
   hitboxesOverlap,
   maxWidthWithoutOverlap,
   openingHitbox,
@@ -211,6 +212,69 @@ describe('maxWidthWithoutOverlap', () => {
   it('không có vật cản → giữ nguyên desired', () => {
     const ops = [mk('a', 1000, 900)];
     expect(maxWidthWithoutOverlap([wall], ops, ops[0], 2500)).toBe(2500);
+  });
+});
+
+describe('vùng quay cửa đi (swing)', () => {
+  // Hành lang rộng 1500: tường bắc y=0, tường nam y=1500; 2 cửa mở vào hành lang.
+  const wallN: Wall = { id: 'wn', points: [{ x: 0, y: 0 }, { x: 6000, y: 0 }], thickness: 200 };
+  const wallS: Wall = { id: 'ws', points: [{ x: 0, y: 1500 }, { x: 6000, y: 1500 }], thickness: 200 };
+
+  it('kéo cửa dọc hành lang: dừng khi 2 vùng quay chạm nhau (chưa tới lỗ cửa kia)', () => {
+    const a = mk('a', 1000, 900, 'wn');
+    const b = { ...mk('b', 3000, 900, 'ws'), flip: true };
+    const ops = [a, b];
+    // Tiếp xúc cung-quay lý thuyết ≈ 2194 (lỗ 2 cửa ở 2 tường khác nhau nên
+    // không chặn nhau); đa giác nội tiếp làm lệch vài mm.
+    const got = resolveDragOffset([wallN, wallS], ops, 'a', 1000, 3000);
+    expect(got).toBeGreaterThanOrEqual(2185);
+    expect(got).toBeLessThanOrEqual(2205);
+    expect(openingOverlapsOthers([wallN, wallS], ops, { ...a, offset: got })).toBe(false);
+    expect(openingOverlapsOthers([wallN, wallS], ops, { ...a, offset: got + 100 })).toBe(true);
+  });
+
+  it('2 tường vuông góc (như ảnh user gửi): dừng khi 2 cung quay chạm nhau', () => {
+    const wallA: Wall = { id: 'wa', points: [{ x: 0, y: 0 }, { x: 4000, y: 0 }], thickness: 200 };
+    const wallB: Wall = { id: 'wb', points: [{ x: 4000, y: 0 }, { x: 4000, y: 4000 }], thickness: 200 };
+    const a = mk('a', 2000, 900, 'wa');
+    const b = mk('b', 0, 900, 'wb');
+    const ops = [a, b];
+    // Tiếp xúc lý thuyết ≈ 2106.
+    const got = resolveDragOffset([wallA, wallB], ops, 'a', 2000, 3000);
+    expect(got).toBeGreaterThanOrEqual(2100);
+    expect(got).toBeLessThanOrEqual(2115);
+    expect(openingOverlapsOthers([wallA, wallB], ops, { ...a, offset: got })).toBe(false);
+    expect(openingOverlapsOthers([wallA, wallB], ops, { ...a, offset: got + 100 })).toBe(true);
+  });
+
+  it('đặt cửa mới: lỗ trống nhưng vùng quay chồng → không đặt được', () => {
+    const b = { ...mk('b', 3000, 900, 'ws'), flip: true };
+    expect(canPlaceOpening([wallN, wallS], [b], mk('a', 2500, 900, 'wn'))).toBe(false);
+    expect(canPlaceOpening([wallN, wallS], [b], mk('a', 1000, 900, 'wn'))).toBe(true);
+  });
+
+  it('nới rộng cửa: bị giới hạn bởi vùng quay cửa đối diện', () => {
+    const ops = [mk('a', 1000, 900, 'wn'), { ...mk('b', 3000, 900, 'ws'), flip: true }];
+    // Cung quay chạm nhau khi rộng ≈ 2040.
+    const got = maxWidthWithoutOverlap([wallN, wallS], ops, ops[0], 2500);
+    expect(got).toBeGreaterThanOrEqual(2035);
+    expect(got).toBeLessThanOrEqual(2045);
+  });
+
+  it('đảo chiều mở: vùng quay mới chồng lên cửa đối diện → true; không chồng → false', () => {
+    const a = mk('a', 1000, 900, 'wn');
+    const c = mk('c', 1000, 900, 'ws');
+    const ops = [a, c];
+    expect(doorSwingOverlapsOthers([wallN, wallS], ops, c)).toBe(false);
+    expect(doorSwingOverlapsOthers([wallN, wallS], ops, { ...c, flip: true })).toBe(true);
+  });
+
+  it('cửa sổ không có vùng quay → luôn false', () => {
+    const a = mk('a', 1000, 900, 'wn');
+    const b = { ...mk('b', 3000, 900, 'ws'), flip: true };
+    expect(
+      doorSwingOverlapsOthers([wallN, wallS], [a, b], { ...a, type: 'window' }),
+    ).toBe(false);
   });
 });
 

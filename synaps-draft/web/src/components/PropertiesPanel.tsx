@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { wallLength } from '../model/geometry';
-import { maxWidthWithoutOverlap, resolveDragOffset } from '../model/openingDrag';
+import {
+  doorSwingOverlapsOthers,
+  maxWidthWithoutOverlap,
+  resolveDragOffset,
+} from '../model/openingDrag';
 import { selectActiveLevel, useBuildingStore, type Unit } from '../store/useBuildingStore';
 
 function fmt(valueMm: number, unit: Unit): string {
@@ -307,7 +311,17 @@ export default function PropertiesPanel() {
             {opening.type === 'door' && (
               <button
                 type="button"
-                onClick={() => store().updateOpening(opening.id, { flip: !opening.flip })}
+                onClick={() => {
+                  const flipped = { ...opening, flip: !opening.flip };
+                  if (doorSwingOverlapsOthers(level.walls, level.openings, flipped)) {
+                    setOpeningError(
+                      'Không đảo được: cánh cửa sau khi đảo sẽ chồng lên cửa khác.',
+                    );
+                    return;
+                  }
+                  setOpeningError(null);
+                  store().updateOpening(opening.id, { flip: !opening.flip });
+                }}
                 className="rounded-lg border border-syn-border bg-white px-2 py-1.5 text-xs text-syn-ink hover:bg-syn-field"
               >
                 Đảo chiều mở

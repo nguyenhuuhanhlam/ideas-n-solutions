@@ -5,6 +5,7 @@ import {
   clampOpeningOffset,
   distance,
   doorSwing,
+  doorSwingPolygon,
   fitScaleFor,
   mergeCoincidentWalls,
   mergeWallPolygons,
@@ -905,6 +906,34 @@ describe('doorSwing', () => {
     expect(swing.hinge).toEqual({ x: 1000, y: 100 });
     expect(swing.leafEnd).toEqual({ x: 1000, y: 1000 });
     expect(swing.arcAngle).toBe(90);
+  });
+});
+
+describe('doorSwingPolygon', () => {
+  const eastWall = wall({ x: 0, y: 0 }, { x: 4000, y: 0 });
+
+  it('không flip: quạt 90° từ mép đóng (đông) tới cánh mở (nam), đỉnh đầu là bản lề', () => {
+    const poly = doorSwingPolygon(opening('w1', 1000, 900), eastWall);
+    expect(poly.length).toBe(18); // bản lề + 17 điểm cung (segments=16)
+    expect(poly[0]).toEqual({ x: 1000, y: 100 });
+    expect(poly[1]).toEqual({ x: 1900, y: 100 }); // đầu cánh khi đóng
+    const last = poly[poly.length - 1];
+    expect(last.x).toBeCloseTo(1000, 6);
+    expect(last.y).toBeCloseTo(1000, 6); // đầu cánh khi mở = leafEnd
+  });
+
+  it('flip: quạt về phía bắc, đỉnh cuối là mép đóng', () => {
+    const poly = doorSwingPolygon({ ...opening('w1', 1000, 900), flip: true }, eastWall);
+    expect(poly[0]).toEqual({ x: 1000, y: -100 });
+    expect(poly[1].x).toBeCloseTo(1000, 6);
+    expect(poly[1].y).toBeCloseTo(-1000, 6); // đầu cánh khi mở
+    const last = poly[poly.length - 1];
+    expect(last).toEqual({ x: 1900, y: -100 }); // đầu cánh khi đóng
+  });
+
+  it('cửa sổ không có vùng quay', () => {
+    const win: Opening = { ...opening('w1', 1000, 900), type: 'window' };
+    expect(doorSwingPolygon(win, eastWall)).toEqual([]);
   });
 });
 
