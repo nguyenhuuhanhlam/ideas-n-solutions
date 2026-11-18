@@ -50,6 +50,14 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+/** Mock fetch treo mãi cho tới khi signal abort (mô phỏng Gemini không trả về). */
+const hangingFetch = (_url: unknown, init?: { signal?: AbortSignal }): Promise<never> =>
+  new Promise<never>((_resolve, reject) => {
+    init?.signal?.addEventListener('abort', () => {
+      reject(new DOMException('Aborted', 'AbortError'));
+    });
+  });
+
 describe('callGeminiJson', () => {
   it('thành công: trả text, URL đúng model, key ở header, body có JSON mode + schema', async () => {
     const fetchMock = mockFetchOnce(200, okBody('{"version":1}'));
@@ -60,10 +68,15 @@ describe('callGeminiJson', () => {
     expect(url).not.toContain('AIza-test-key');
     expect((init.headers as Record<string, string>)['x-goog-api-key']).toBe('AIza-test-key');
     const body = JSON.parse(init.body as string) as {
-      generationConfig: { responseMimeType: string; responseSchema: unknown };
+      generationConfig: {
+        responseMimeType: string;
+        responseSchema: unknown;
+        thinkingConfig: { thinkingLevel: string };
+      };
     };
     expect(body.generationConfig.responseMimeType).toBe('application/json');
     expect(body.generationConfig.responseSchema).toBeDefined();
+    expect(body.generationConfig.thinkingConfig.thinkingLevel).toBe('low');
   });
 
   it('400/401/403 → lỗi key', async () => {
@@ -154,8 +167,45 @@ describe('callGeminiJson', () => {
         [503, { error: { message: 'high demand' } }],
       );
       const promise = callGeminiJson(args);
+      promise.catch(() => {}); // tránh unhandled rejection trong lúc chờ fake timers
       await vi.advanceTimersByTimeAsync(8000);
       await expect(promise).rejects.toThrow('quá tải');
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('timeout rồi thành công → tự thử lại và trả text', async () => {
+    vi.useFakeTimers();
+    try {
+      const fetchMock = vi.fn();
+      fetchMock.mockImplementationOnce(hangingFetch);
+      fetchMock.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(okBody('{"version":1}')),
+      });
+      vi.stubGlobal('fetch', fetchMock);
+      const promise = callGeminiJson(args);
+      await vi.advanceTimersByTimeAsync(100_000);
+      const text = await promise;
+      expect(text).toBe('{"version":1}');
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('timeout cả 3 lần → lỗi quá lâu, đã gọi đủ 3 lần', async () => {
+    vi.useFakeTimers();
+    try {
+      const fetchMock = vi.fn().mockImplementation(hangingFetch);
+      vi.stubGlobal('fetch', fetchMock);
+      const promise = callGeminiJson(args);
+      promise.catch(() => {}); // tránh unhandled rejection trong lúc chờ fake timers
+      await vi.advanceTimersByTimeAsync(300_000);
+      await expect(promise).rejects.toThrow('quá lâu');
       expect(fetchMock).toHaveBeenCalledTimes(3);
     } finally {
       vi.useRealTimers();

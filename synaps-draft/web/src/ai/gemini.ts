@@ -201,7 +201,10 @@ function sleep(ms: number, signal?: AbortSignal): Promise<void> {
 
 /** Gọi Gemini, trả về text JSON thô (chưa parse). Ném GeminiError đã dịch.
  * Lỗi 500/503 (server Google quá tải/lỗi tạm thời) tự thử lại tối đa 3 lần,
- * chờ 2s rồi 5s — người dùng không phải bấm Thử lại tay. */
+ * chờ 2s rồi 5s — người dùng không phải bấm Thử lại tay. Mỗi lần gọi có
+ * timeout riêng 90s để không treo vô hạn: hết timeout cũng được thử lại
+ * như lỗi 503. thinkingLevel 'low' để model suy nghĩ ít nhất (mặc định
+ * của 3.8 Flash là 'medium') — mặt bằng vẫn được kiểm tra + sửa lỗi sau đó. */
 export async function callGeminiJson({
   apiKey,
   systemInstruction,
@@ -209,7 +212,13 @@ export async function callGeminiJson({
   signal,
 }: GeminiCallArgs): Promise<string> {
   const RETRY_DELAYS_MS = [2000, 5000];
+  const TIMEOUT_MS = 90_000;
   for (let attempt = 0; ; attempt++) {
+    // Controller riêng cho lần gọi này: hủy khi user bấm Hủy hoặc hết timeout.
+    const controller = new AbortController();
+    const onUserAbort = () => controller.abort();
+    signal?.addEventListener('abort', onUserAbort, { once: true });
+    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
     let res: Response;
     try {
       res = await fetch(GEMINI_API_URL, {
@@ -226,17 +235,34 @@ export async function callGeminiJson({
             maxOutputTokens: 8192,
             responseMimeType: 'application/json',
             responseSchema: BUILDING_RESPONSE_SCHEMA,
+            thinkingConfig: { thinkingLevel: 'low' },
           },
         }),
-        signal,
+        signal: controller.signal,
       });
     } catch (err) {
-      if (err instanceof DOMException && err.name === 'AbortError') throw err;
+      clearTimeout(timer);
+      signal?.removeEventListener('abort', onUserAbort);
+      // User bấm Hủy: ném AbortError gốc để dialog quay về form.
+      if (signal?.aborted) throw err;
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        // Hết timeout (không phải user hủy): lỗi tạm thời, thử lại như 503.
+        if (attempt < RETRY_DELAYS_MS.length) {
+          await sleep(RETRY_DELAYS_MS[attempt], signal);
+          continue;
+        }
+        throw new GeminiError(
+          'other',
+          'Gemini phản hồi quá lâu (quá 90 giây mỗi lần gọi). Thử lại sau một lúc.',
+        );
+      }
       throw new GeminiError(
         'network',
         'Không kết nối được tới Gemini. Kiểm tra mạng rồi thử lại.',
       );
     }
+    clearTimeout(timer);
+    signal?.removeEventListener('abort', onUserAbort);
     const data = (await res.json().catch(() => ({}))) as GeminiResponse;
     if (!res.ok) {
       const retryable = res.status === 500 || res.status === 503;
