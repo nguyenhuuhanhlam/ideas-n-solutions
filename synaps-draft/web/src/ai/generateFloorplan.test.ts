@@ -40,8 +40,23 @@ describe('generateFloorplan', () => {
     });
   });
 
-  it('JSON hỏng lần 1 → sửa lại lần 2, prompt sửa chứa lỗi', async () => {
-    const call = vi
+  it('onHttpRetry được truyền xuống callGemini', async () => {
+    const onHttpRetry = vi.fn();
+    const call: GeminiCall = vi.fn().mockImplementation((callArgs) => {
+      callArgs.onHttpRetry?.({ attempt: 2, maxAttempts: 3, reason: 'server' });
+      return Promise.resolve(EXAMPLE_JSON);
+    });
+    await generateFloorplan({
+      apiKey: 'k',
+      description: 'nhà nhỏ',
+      onHttpRetry,
+      callGemini: call,
+    });
+    expect(onHttpRetry).toHaveBeenCalledTimes(1);
+    expect(onHttpRetry).toHaveBeenCalledWith({ attempt: 2, maxAttempts: 3, reason: 'server' });
+  });
+
+  it('JSON hỏng lần 1 → sửa lại lần 2, prompt sửa chứa lỗi', async () => {    const call = vi
       .fn()
       .mockResolvedValueOnce('not json at all')
       .mockResolvedValueOnce(EXAMPLE_JSON);

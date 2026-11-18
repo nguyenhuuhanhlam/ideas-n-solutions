@@ -1,6 +1,6 @@
 import { parseBuildingJson } from '../export/jsonFile';
 import type { Building } from '../model/schema';
-import { callGeminiJson, type GeminiCall } from './gemini';
+import { callGeminiJson, type GeminiCall, type HttpRetryInfo } from './gemini';
 import {
   FLOORPLAN_SYSTEM_PROMPT,
   buildRepairPrompt,
@@ -22,6 +22,8 @@ export interface GenerateFloorplanArgs {
   signal?: AbortSignal;
   /** Bắn khi bắt đầu mỗi lượt thử (để UI hiện "lần 2/3"). */
   onAttempt?: (attempt: number) => void;
+  /** Bắn trước mỗi lần tự thử lại HTTP (để UI hiện "đang thử lại…"). */
+  onHttpRetry?: (info: HttpRetryInfo) => void;
   /** Chích bản giả cho test; mặc định gọi Gemini thật. */
   callGemini?: GeminiCall;
 }
@@ -42,6 +44,7 @@ export async function generateFloorplan({
   description,
   signal,
   onAttempt,
+  onHttpRetry,
   callGemini = callGeminiJson,
 }: GenerateFloorplanArgs): Promise<GenerateFloorplanResult> {
   let previousJson = '';
@@ -57,6 +60,7 @@ export async function generateFloorplan({
       systemInstruction: FLOORPLAN_SYSTEM_PROMPT,
       userText,
       signal,
+      onHttpRetry,
     });
     const json = extractJson(raw);
     previousJson = json;

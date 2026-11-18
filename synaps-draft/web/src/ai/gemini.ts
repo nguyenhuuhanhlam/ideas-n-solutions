@@ -106,11 +106,21 @@ export const BUILDING_RESPONSE_SCHEMA = {
   required: ['version', 'levels'],
 } as const;
 
+/** Thông tin khi tự thử lại một lần gọi HTTP (để UI hiện cho user biết). */
+export interface HttpRetryInfo {
+  /** Lần thử lại thứ mấy (2, 3…). */
+  attempt: number;
+  maxAttempts: number;
+  reason: 'timeout' | 'server';
+}
+
 export interface GeminiCallArgs {
   apiKey: string;
   systemInstruction: string;
   userText: string;
   signal?: AbortSignal;
+  /** Bắn trước mỗi lần tự thử lại (lỗi 500/503 hoặc hết timeout). */
+  onHttpRetry?: (info: HttpRetryInfo) => void;
 }
 
 /** Kiểu hàm gọi Gemini — bản thật là callGeminiJson; test chích bản giả. */
@@ -180,6 +190,10 @@ function errorFromStatus(status: number, detail: string): GeminiError {
   );
 }
 
+/** Thông báo khi hết timeout cả 3 lần gọi (dùng chung 2 chỗ). */
+const TIMEOUT_ERROR_MESSAGE =
+  'Gemini phản hồi quá lâu (quá 90 giây mỗi lần gọi). Thử lại sau một lúc.';
+
 /** Đợi ms, hủy ngay nếu signal abort (để nút Hủy dừng cả lúc chờ thử lại). */
 function sleep(ms: number, signal?: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -210,9 +224,11 @@ export async function callGeminiJson({
   systemInstruction,
   userText,
   signal,
+  onHttpRetry,
 }: GeminiCallArgs): Promise<string> {
   const RETRY_DELAYS_MS = [2000, 5000];
   const TIMEOUT_MS = 90_000;
+  const MAX_HTTP_ATTEMPTS = RETRY_DELAYS_MS.length + 1;
   for (let attempt = 0; ; attempt++) {
     // Controller riêng cho lần gọi này: hủy khi user bấm Hủy hoặc hết timeout.
     const controller = new AbortController();
@@ -248,25 +264,40 @@ export async function callGeminiJson({
       if (err instanceof DOMException && err.name === 'AbortError') {
         // Hết timeout (không phải user hủy): lỗi tạm thời, thử lại như 503.
         if (attempt < RETRY_DELAYS_MS.length) {
+          onHttpRetry?.({ attempt: attempt + 2, maxAttempts: MAX_HTTP_ATTEMPTS, reason: 'timeout' });
           await sleep(RETRY_DELAYS_MS[attempt], signal);
           continue;
         }
-        throw new GeminiError(
-          'other',
-          'Gemini phản hồi quá lâu (quá 90 giây mỗi lần gọi). Thử lại sau một lúc.',
-        );
+        throw new GeminiError('other', TIMEOUT_ERROR_MESSAGE);
       }
       throw new GeminiError(
         'network',
         'Không kết nối được tới Gemini. Kiểm tra mạng rồi thử lại.',
       );
     }
+    // Timeout vẫn chạy trong lúc đọc body (body kẹt thì cũng phải hủy).
+    let data: GeminiResponse;
+    try {
+      data = (await res.json()) as GeminiResponse;
+    } catch {
+      data = {};
+    }
     clearTimeout(timer);
     signal?.removeEventListener('abort', onUserAbort);
-    const data = (await res.json().catch(() => ({}))) as GeminiResponse;
+    if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+    if (controller.signal.aborted) {
+      // Hết timeout trong lúc đọc body: thử lại như lỗi tạm thời.
+      if (attempt < RETRY_DELAYS_MS.length) {
+        onHttpRetry?.({ attempt: attempt + 2, maxAttempts: MAX_HTTP_ATTEMPTS, reason: 'timeout' });
+        await sleep(RETRY_DELAYS_MS[attempt], signal);
+        continue;
+      }
+      throw new GeminiError('other', TIMEOUT_ERROR_MESSAGE);
+    }
     if (!res.ok) {
       const retryable = res.status === 500 || res.status === 503;
       if (retryable && attempt < RETRY_DELAYS_MS.length) {
+        onHttpRetry?.({ attempt: attempt + 2, maxAttempts: MAX_HTTP_ATTEMPTS, reason: 'server' });
         await sleep(RETRY_DELAYS_MS[attempt], signal);
         continue;
       }

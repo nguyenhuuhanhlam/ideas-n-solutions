@@ -132,11 +132,14 @@ describe('callGeminiJson', () => {
         [503, { error: { message: 'high demand' } }],
         [200, okBody('{"version":1}')],
       );
-      const promise = callGeminiJson(args);
+      const onHttpRetry = vi.fn();
+      const promise = callGeminiJson({ ...args, onHttpRetry });
       await vi.advanceTimersByTimeAsync(3000);
       const text = await promise;
       expect(text).toBe('{"version":1}');
       expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(onHttpRetry).toHaveBeenCalledTimes(1);
+      expect(onHttpRetry).toHaveBeenCalledWith({ attempt: 2, maxAttempts: 3, reason: 'server' });
     } finally {
       vi.useRealTimers();
     }
@@ -187,11 +190,14 @@ describe('callGeminiJson', () => {
         json: () => Promise.resolve(okBody('{"version":1}')),
       });
       vi.stubGlobal('fetch', fetchMock);
-      const promise = callGeminiJson(args);
+      const onHttpRetry = vi.fn();
+      const promise = callGeminiJson({ ...args, onHttpRetry });
       await vi.advanceTimersByTimeAsync(100_000);
       const text = await promise;
       expect(text).toBe('{"version":1}');
       expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(onHttpRetry).toHaveBeenCalledTimes(1);
+      expect(onHttpRetry).toHaveBeenCalledWith({ attempt: 2, maxAttempts: 3, reason: 'timeout' });
     } finally {
       vi.useRealTimers();
     }

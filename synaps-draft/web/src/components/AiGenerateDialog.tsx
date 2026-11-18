@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Loader2, Sparkles, X } from 'lucide-react';
 import type { Building } from '../model/schema';
 import { generateFloorplan, MAX_ATTEMPTS } from '../ai/generateFloorplan';
@@ -22,9 +22,21 @@ export default function AiGenerateDialog({ onClose, onApply }: AiGenerateDialogP
   const [hasKey, setHasKey] = useState(() => Boolean(getSavedApiKey()?.trim()));
   const [phase, setPhase] = useState<Phase>('form');
   const [attempt, setAttempt] = useState(1);
+  // Đếm thời gian chờ + ghi chú thử lại để lúc chờ lâu user biết app vẫn chạy.
+  const [elapsedSec, setElapsedSec] = useState(0);
+  const [httpNote, setHttpNote] = useState<string | null>(null);
   const [result, setResult] = useState<{ building: Building; summary: PlanSummary } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Đếm giây trong lúc đang tạo; đổi phase thì dừng và reset.
+  useEffect(() => {
+    if (phase !== 'generating') return;
+    setElapsedSec(0);
+    setHttpNote(null);
+    const id = setInterval(() => setElapsedSec((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [phase]);
 
   // Modal thật: chỉ đóng khi bấm nút Đóng (X) hoặc Hủy — không đóng
   // khi bấm ra ngoài hay nhấn Escape.
@@ -44,7 +56,17 @@ export default function AiGenerateDialog({ onClose, onApply }: AiGenerateDialogP
       apiKey: key,
       description,
       signal: controller.signal,
-      onAttempt: setAttempt,
+      onAttempt: (n) => {
+        setAttempt(n);
+        setHttpNote(null);
+      },
+      onHttpRetry: (info) => {
+        setHttpNote(
+          info.reason === 'timeout'
+            ? `Chờ quá 90 giây, đang thử lại lần ${info.attempt}/${info.maxAttempts}…`
+            : `Google gặp lỗi tạm thời, đang thử lại lần ${info.attempt}/${info.maxAttempts}…`,
+        );
+      },
     })
       .then(({ building, summary }) => {
         setResult({ building, summary });
@@ -142,11 +164,17 @@ export default function AiGenerateDialog({ onClose, onApply }: AiGenerateDialogP
           <div className="mt-6 flex flex-col items-center gap-3 py-6">
             <Loader2 size={28} strokeWidth={1.5} className="animate-spin text-syn-grey" />
             <p className="text-sm text-syn-ink">
-              Đang tạo mặt bằng… (lần {attempt}/{MAX_ATTEMPTS})
+              Đang tạo mặt bằng… (lần {attempt}/{MAX_ATTEMPTS} · {elapsedSec} giây)
             </p>
-            <p className="text-xs text-syn-grey">
-              Gemini đang vẽ, app sẽ kiểm tra cửa chồng nhau trước khi hiện kết quả.
-            </p>
+            {httpNote ? (
+              <p className="text-xs text-syn-grey">{httpNote}</p>
+            ) : (
+              <p className="text-center text-xs text-syn-grey">
+                Gemini đang vẽ, app sẽ kiểm tra cửa chồng nhau trước khi hiện kết quả.
+                <br />
+                Mỗi lần gọi chờ tối đa 90 giây; nếu Google quá tải, app tự thử lại.
+              </p>
+            )}
             <button
               type="button"
               onClick={cancelGenerate}
