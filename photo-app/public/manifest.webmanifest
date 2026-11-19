@@ -1,0 +1,1 @@
+{"background_color":"#0b0e13","description":"Chụp ảnh và xem ảnh nhóm, lưu trên Cloudinary.","display":"standalone","icons":[{"sizes":"192x192","src":"icon-192.png","type":"image/png"},{"sizes":"512x512","src":"icon-512.png","type":"image/png"}],"id":".","name":"Ảnh nhóm","orientation":"any","scope":".","short_name":"Ảnh nhóm","start_url":".","theme_color":"#0b0e13"}

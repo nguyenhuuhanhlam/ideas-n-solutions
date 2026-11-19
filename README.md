@@ -14,6 +14,7 @@ thư mục mới và một thẻ vào trang chủ ở `index.html`.
 | TuTi Learn English — học tiếng Anh cơ bản qua bài tập có chấm điểm, phân loại bằng tabs (6 bài cơ bản + tab Chia động từ 6 nhóm × 15 câu + tab Tra cứu 47 động từ bất quy tắc, ôn tập tổng hợp) | `english-learning/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/english-learning/ |
 | Form Hub — danh sách form có sẵn + API cho ứng dụng khác (link điền, JSON form, nhúng iframe); chỉ dùng Form Library miễn phí (MIT) | `surveyjs-demo/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/surveyjs-demo/ |
 | Synaps Draft — vẽ kiến trúc: drafting 2D chính xác (tường/cửa/cửa sổ, snap, nhập số, mm) + xem 3D đồng bộ từ cùng Building JSON, undo/redo, lưu/mở JSON; xuất DXF qua API FastAPI (`synaps-draft/api/`, chạy local) | `synaps-draft/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/synaps-draft/ |
+| Ảnh nhóm — chụp ảnh trên mobile up thẳng lên Cloudinary (preset unsigned), cả nhóm xem chung mọi máy; nén trước khi up, trình xem vuốt/pinch zoom | `photo-app/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/photo-app/ |
 
 ## App desktop (không deploy lên Pages)
 

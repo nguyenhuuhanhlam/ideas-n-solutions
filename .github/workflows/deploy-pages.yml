@@ -30,6 +30,7 @@ jobs:
             english-learning/package-lock.json
             surveyjs-demo/package-lock.json
             synaps-draft/web/package-lock.json
+            photo-app/package-lock.json
       # Mỗi app nằm trong thư mục riêng; build với base là subpath Pages của app đó
       - run: npm ci
         working-directory: timeline-projects
@@ -55,15 +56,20 @@ jobs:
         working-directory: synaps-draft/web
       - run: npm run build -- --base=/ideas-n-solutions/synaps-draft/
         working-directory: synaps-draft/web
+      - run: npm ci
+        working-directory: photo-app
+      - run: npm run build -- --base=/ideas-n-solutions/photo-app/
+        working-directory: photo-app
       # Ghép các app + trang chủ ở root thành một site duy nhất
       - run: |
-          mkdir -p _site/timeline-projects _site/team-assistant-sim _site/platformer-game _site/english-learning _site/surveyjs-demo _site/synaps-draft _site/hairline-ui
+          mkdir -p _site/timeline-projects _site/team-assistant-sim _site/platformer-game _site/english-learning _site/surveyjs-demo _site/synaps-draft _site/photo-app _site/hairline-ui
           cp -r timeline-projects/dist/* _site/timeline-projects/
           cp -r team-assistant-sim/dist/* _site/team-assistant-sim/
           cp -r platformer-game/dist/* _site/platformer-game/
           cp -r english-learning/dist/* _site/english-learning/
           cp -r surveyjs-demo/dist/* _site/surveyjs-demo/
           cp -r synaps-draft/web/dist/* _site/synaps-draft/
+          cp -r photo-app/dist/* _site/photo-app/
           cp -r hairline-ui/* _site/hairline-ui/
           cp index.html _site/index.html
       - uses: actions/configure-pages@v5
