@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { isAuthed, setAuthed } from './auth.js'
 import {
   compressImage,
   fetchPhotos,
@@ -6,6 +7,7 @@ import {
   thumbUrl,
   uploadPhoto,
 } from './cloudinary.js'
+import Login from './Login.jsx'
 import Viewer from './Viewer.jsx'
 
 const MAX_PARALLEL_UPLOADS = 3
@@ -37,6 +39,7 @@ function newId() {
 }
 
 export default function App() {
+  const [authed, setAuthedState] = useState(() => isAuthed())
   const [photos, setPhotos] = useState([])
   const [status, setStatus] = useState('loading')
   const [errorMsg, setErrorMsg] = useState('')
@@ -77,8 +80,8 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    loadPhotos(false)
-  }, [loadPhotos])
+    if (authed) loadPhotos(false)
+  }, [authed, loadPhotos])
 
   // Quay lại app thì tải lại để thấy ảnh người khác vừa up.
   useEffect(() => {
@@ -209,6 +212,23 @@ export default function App() {
 
   const openViewer = (i) => setViewerIndex(i)
 
+  const logout = () => {
+    setAuthed(false)
+    setAuthedState(false)
+    setViewerIndex(null)
+  }
+
+  if (!authed) {
+    return (
+      <Login
+        onSuccess={() => {
+          setAuthed(true)
+          setAuthedState(true)
+        }}
+      />
+    )
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -216,6 +236,28 @@ export default function App() {
         <span className="app-count">
           {status === 'ready' ? `${photos.length} ảnh` : ''}
         </span>
+        <button
+          type="button"
+          className="icon-btn"
+          onClick={logout}
+          aria-label="Đăng xuất"
+          title="Đăng xuất"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+        </button>
         <button
           type="button"
           className="icon-btn"

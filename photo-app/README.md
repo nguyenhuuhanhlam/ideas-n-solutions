@@ -25,6 +25,19 @@ trên mọi máy. Không backend — app tĩnh hoàn toàn.
   kéo chuột, phím mũi tên, Esc.
 - PWA: thêm vào màn hình chính dùng như app (`manifest.webmanifest`).
 
+## Đăng nhập tạm thời
+
+App có màn hình đăng nhập trước khi vào xem/up ảnh, để chặn người lạ
+tình cờ mở link trong thời gian kiểm tra. Tài khoản duy nhất cấu hình
+trong `src/auth.js` (tên đăng nhập + hash SHA-256 của mật khẩu, không lưu
+mật khẩu dạng text trong code); đăng nhập xong thì nhớ trong
+localStorage, bấm nút đăng xuất ở header để thoát.
+
+Lưu ý: đây không phải bảo mật thật — app là trang tĩnh, ai đọc code cũng
+có thể qua được cổng này và gọi thẳng API Cloudinary. Khi cần bảo mật
+thật thì phải có backend + đăng nhập phía server và chuyển sang upload
+có chữ ký.
+
 ## Cấu hình
 
 Đổi tài khoản Cloudinary trong `src/config.js` (`CLOUD_NAME`,
