@@ -1,14 +1,18 @@
 :root {
-  --bg: #0b0e13;
-  --surface: #141a24;
-  --surface-2: #1c2431;
-  --line: #262f3d;
-  --text: #e8ecf3;
-  --muted: #8b95a9;
-  --accent: #ffd166;
-  --accent-text: #1a1405;
-  --danger: #ff8a8a;
-  --ok: #7ddb9b;
+  /* Giao diện sáng kiểu Facebook: nền xám nhạt, thẻ trắng, accent xanh. */
+  --bg: #f0f2f5;
+  --surface: #ffffff;
+  --surface-2: #f0f2f5;
+  --btn-gray: #e4e6eb;
+  --btn-gray-active: #d8dadf;
+  --line: #ced0d4;
+  --text: #050505;
+  --muted: #65676b;
+  --accent: #1877f2;
+  --accent-dark: #166fe5;
+  --accent-text: #ffffff;
+  --danger: #d32f2f;
+  --ok: #31a24c;
   --radius: 12px;
 }
 
@@ -65,7 +69,7 @@ img {
   align-items: center;
   gap: 10px;
   padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
-  background: rgba(11, 14, 19, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
@@ -169,7 +173,7 @@ img {
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: 4px;
-  background: var(--surface);
+  background: var(--btn-gray);
   padding: 0;
 }
 
@@ -255,11 +259,11 @@ img {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--surface-2);
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 8px 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 .upload-thumb {
@@ -337,7 +341,7 @@ img {
   display: flex;
   gap: 10px;
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
-  background: rgba(11, 14, 19, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(10px);
   border-top: 1px solid var(--line);
 }
@@ -350,14 +354,14 @@ img {
   justify-content: center;
   gap: 8px;
   border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--surface);
+  border: 1px solid transparent;
+  background: var(--btn-gray);
   font-weight: 600;
   font-size: 16px;
 }
 
 .action-btn:active {
-  background: var(--surface-2);
+  background: var(--btn-gray-active);
 }
 
 .action-btn--primary {
@@ -367,7 +371,7 @@ img {
 }
 
 .action-btn--primary:active {
-  background: #f5bd45;
+  background: var(--accent-dark);
 }
 
 @media (min-width: 700px) {
@@ -398,10 +402,15 @@ img {
 /* Trình xem ảnh */
 
 .viewer {
+  /* Trình xem giữ nền đen như khi xem ảnh trên Facebook. */
+  --muted: #b0b3b8;
+  --line: #3a3b3c;
+  --surface-2: rgba(255, 255, 255, 0.12);
   position: fixed;
   inset: 0;
   z-index: 50;
   background-color: rgba(0, 0, 0, 1);
+  color: #fff;
   display: flex;
   flex-direction: column;
   touch-action: none;
