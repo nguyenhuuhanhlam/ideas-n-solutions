@@ -1,20 +1,52 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Camera, ImagePlus, Images, LogOut, RefreshCw, X } from 'lucide-react'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
+import { Banner } from '@astryxdesign/core/Banner'
+import { Button } from '@astryxdesign/core/Button'
+import { Card } from '@astryxdesign/core/Card'
+import { EmptyState } from '@astryxdesign/core/EmptyState'
+import { Heading } from '@astryxdesign/core/Heading'
+import { HStack } from '@astryxdesign/core/HStack'
+import { IconButton } from '@astryxdesign/core/IconButton'
+import { ProgressBar } from '@astryxdesign/core/ProgressBar'
+import { Spinner } from '@astryxdesign/core/Spinner'
+import { StackItem } from '@astryxdesign/core/Stack'
+import { Text } from '@astryxdesign/core/Text'
+import { VStack } from '@astryxdesign/core/VStack'
 import { isAuthed, setAuthed } from './auth.js'
 import {
   compressImage,
   fetchPhotos,
+  originalUrl,
   photoFromUpload,
   thumbUrl,
   uploadPhoto,
+  viewUrl,
 } from './cloudinary.js'
 import Login from './Login.jsx'
-import Viewer from './Viewer.jsx'
 
 const MAX_PARALLEL_UPLOADS = 3
 const RECENT_KEEP_MS = 10 * 60 * 1000
 
+// Lightbox (kèm hệ thống gesture) khá nặng nên tách chunk riêng, chỉ tải
+// khi mở trình xem — giữ bundle ban đầu nhẹ cho mobile.
+const Lightbox = lazy(() =>
+  import('@astryxdesign/core/Lightbox').then((m) => ({ default: m.Lightbox })),
+)
+const preloadLightbox = () => import('@astryxdesign/core/Lightbox')
+
 function keyOf(p) {
   return p.asset_id || p.public_id
+}
+
+function formatDate(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  const dd = String(d.getDate()).padStart(2, '0')
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const yyyy = d.getFullYear()
+  const hh = String(d.getHours()).padStart(2, '0')
+  const min = String(d.getMinutes()).padStart(2, '0')
+  return `${dd}-${mm}-${yyyy} ${hh}:${min}`
 }
 
 /**
@@ -212,6 +244,21 @@ export default function App() {
 
   const openViewer = (i) => setViewerIndex(i)
 
+  // Tải trước chunk Lightbox khi trình duyệt rảnh, để chạm ảnh là mở ngay.
+  useEffect(() => {
+    if (status !== 'ready') return
+    const idle =
+      window.requestIdleCallback ||
+      ((cb) => setTimeout(cb, 1500))
+    const handle = idle(() => {
+      preloadLightbox().catch(() => {})
+    })
+    return () => {
+      if (window.cancelIdleCallback) window.cancelIdleCallback(handle)
+      else clearTimeout(handle)
+    }
+  }, [status])
+
   const logout = () => {
     setAuthed(false)
     setAuthedState(false)
@@ -232,103 +279,111 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Ảnh nhóm</h1>
-        <span className="app-count">
-          {status === 'ready' ? `${photos.length} ảnh` : ''}
-        </span>
-        <button
-          type="button"
-          className="icon-btn"
-          onClick={logout}
-          aria-label="Đăng xuất"
-          title="Đăng xuất"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="20"
-            height="20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-        </button>
-        <button
-          type="button"
-          className="icon-btn"
-          onClick={() => loadPhotos(true)}
-          disabled={refreshing}
-          aria-label="Làm mới"
-          title="Làm mới"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="20"
-            height="20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={refreshing ? 'spin' : ''}
-          >
-            <polyline points="23 4 23 10 17 10" />
-            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-          </svg>
-        </button>
+        <div className="app-header-inner">
+          <HStack gap={2} vAlign="center">
+            <StackItem size="fill">
+              <VStack gap={0}>
+                <Heading level={2}>Ảnh nhóm</Heading>
+                <Text type="supporting">
+                  {status === 'ready' ? `${photos.length} ảnh` : ' '}
+                </Text>
+              </VStack>
+            </StackItem>
+            <IconButton
+              label="Làm mới"
+              icon={<RefreshCw size={20} />}
+              variant="ghost"
+              tooltip="Làm mới"
+              isLoading={refreshing}
+              onClick={() => loadPhotos(true)}
+            />
+            <IconButton
+              label="Đăng xuất"
+              icon={<LogOut size={20} />}
+              variant="ghost"
+              tooltip="Đăng xuất"
+              onClick={logout}
+            />
+          </HStack>
+        </div>
       </header>
 
       <div
         className="pull-indicator"
-        style={{ height: pull > 0 || refreshing ? `${Math.max(pull, refreshing ? 44 : 0)}px` : 0 }}
+        style={{
+          height:
+            pull > 0 || refreshing
+              ? `${Math.max(pull, refreshing ? 44 : 0)}px`
+              : 0,
+        }}
       >
-        <span>{pull >= 70 ? 'Thả để làm mới' : 'Kéo xuống để làm mới'}</span>
+        <span className="pull-label">
+          {refreshing && <Spinner size="sm" />}
+          <Text type="supporting">
+            {refreshing
+              ? 'Đang làm mới…'
+              : pull >= 70
+                ? 'Thả để làm mới'
+                : 'Kéo xuống để làm mới'}
+          </Text>
+        </span>
       </div>
 
-      {notice && <div className="notice">{notice}</div>}
+      {notice && (
+        <div className="notice-wrap">
+          <Banner
+            status="error"
+            title={notice}
+            isDismissable
+            onDismiss={() => setNotice('')}
+          />
+        </div>
+      )}
 
       <main className="gallery-wrap">
         {status === 'loading' && (
-          <div className="state state--loading">
-            <div className="spinner" />
-            <p>Đang tải ảnh…</p>
+          <div className="page-state">
+            <Spinner size="lg" label="Đang tải ảnh…" />
           </div>
         )}
 
         {status === 'error' && (
-          <div className="state">
-            <p>Không tải được ảnh.</p>
-            <p className="state-sub">{errorMsg}</p>
-            <button
-              type="button"
-              className="btn"
+          <div className="page-state">
+            <Heading level={2}>Không tải được ảnh.</Heading>
+            <Text type="supporting">{errorMsg}</Text>
+            <Button
+              label="Thử lại"
+              variant="secondary"
               onClick={() => {
                 setStatus('loading')
                 loadPhotos(false)
               }}
-            >
-              Thử lại
-            </button>
+            />
           </div>
         )}
 
         {status === 'ready' && photos.length === 0 && (
-          <div className="state">
-            <p>Chưa có ảnh nào.</p>
-            <p className="state-sub">Chụp ảnh đầu tiên cho nhóm nhé.</p>
-            <button
-              type="button"
-              className="btn btn--primary"
-              onClick={() => cameraRef.current?.click()}
-            >
-              Chụp ảnh
-            </button>
-          </div>
+          <EmptyState
+            title="Chưa có ảnh nào"
+            description="Chụp hoặc chọn ảnh để bắt đầu album nhóm."
+            icon={<Images size={48} />}
+            actions={
+              <>
+                <Button
+                  label="Chụp ảnh"
+                  variant="primary"
+                  icon={<Camera size={20} />}
+                  onClick={() => cameraRef.current?.click()}
+                />
+                <Button
+                  label="Chọn ảnh"
+                  variant="secondary"
+                  icon={<ImagePlus size={20} />}
+                  onClick={() => pickerRef.current?.click()}
+                />
+              </>
+            }
+          />
         )}
 
         {status === 'ready' && photos.length > 0 && (
@@ -347,88 +402,99 @@ export default function App() {
           </div>
         )}
 
-        <p className="footnote">Ảnh lưu trên Cloudinary · Chạm ảnh để xem, vuốt để chuyển</p>
+        <div className="footnote">
+          <Text type="supporting">
+            Ảnh lưu trên Cloudinary · Chạm ảnh để xem, vuốt để chuyển
+          </Text>
+        </div>
       </main>
 
       {uploads.length > 0 && (
         <div className="upload-tray">
-          {uploads.map((u) => (
-            <div key={u.id} className="upload-item">
-              <img src={u.preview} alt="" className="upload-thumb" />
-              <div className="upload-info">
-                <span className="upload-name">{u.name}</span>
-                {u.status === 'error' ? (
-                  <span className="upload-error">{u.error}</span>
-                ) : u.status === 'done' ? (
-                  <span className="upload-done">Đã up xong</span>
-                ) : (
-                  <div className="progress">
-                    <div
-                      className="progress-bar"
-                      style={{
-                        width: `${u.status === 'uploading' ? u.progress : 0}%`,
-                      }}
+          <Card elevation="low">
+            <VStack gap={3}>
+              {uploads.map((u) => (
+                <HStack key={u.id} gap={2} vAlign="center">
+                  <img src={u.preview} alt="" className="upload-thumb" />
+                  <StackItem size="fill">
+                    <VStack gap={1}>
+                      <Text maxLines={1}>{u.name}</Text>
+                      <ProgressBar
+                        label={`Up ${u.name}`}
+                        value={u.status === 'done' ? 100 : u.progress}
+                        variant={
+                          u.status === 'error'
+                            ? 'error'
+                            : u.status === 'done'
+                              ? 'success'
+                              : 'accent'
+                        }
+                        isIndeterminate={
+                          u.status === 'queued' || u.status === 'compressing'
+                        }
+                        isLabelHidden
+                        hasValueLabel={u.status !== 'queued' && u.status !== 'compressing'}
+                      />
+                      {u.status === 'error' ? (
+                        <span className="upload-error-text">{u.error}</span>
+                      ) : u.status === 'done' ? (
+                        <Text type="supporting">Đã up xong</Text>
+                      ) : u.status === 'compressing' ? (
+                        <Text type="supporting">Đang nén…</Text>
+                      ) : u.status === 'queued' ? (
+                        <Text type="supporting">Đang chờ…</Text>
+                      ) : null}
+                    </VStack>
+                  </StackItem>
+                  {u.status === 'error' && (
+                    <Button
+                      label="Thử lại"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => retryUpload(u)}
                     />
-                  </div>
-                )}
-                {u.status !== 'done' && u.status !== 'error' && (
-                  <span className="upload-status">
-                    {u.status === 'compressing'
-                      ? 'Đang nén…'
-                      : u.status === 'uploading'
-                        ? `Đang up… ${u.progress}%`
-                        : 'Đang chờ…'}
-                  </span>
-                )}
-              </div>
-              {u.status === 'error' && (
-                <button
-                  type="button"
-                  className="mini-btn"
-                  onClick={() => retryUpload(u)}
-                >
-                  Thử lại
-                </button>
-              )}
-              {(u.status === 'error' || u.status === 'done') && (
-                <button
-                  type="button"
-                  className="mini-btn mini-btn--ghost"
-                  onClick={() => dismissUpload(u)}
-                  aria-label="Ẩn"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-          ))}
+                  )}
+                  {(u.status === 'error' || u.status === 'done') && (
+                    <IconButton
+                      label="Ẩn"
+                      icon={<X size={16} />}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => dismissUpload(u)}
+                    />
+                  )}
+                </HStack>
+              ))}
+            </VStack>
+          </Card>
         </div>
       )}
 
       <nav className="action-bar">
-        <button
-          type="button"
-          className="action-btn action-btn--primary"
-          onClick={() => cameraRef.current?.click()}
-        >
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-            <circle cx="12" cy="13" r="4" />
-          </svg>
-          Chụp ảnh
-        </button>
-        <button
-          type="button"
-          className="action-btn"
-          onClick={() => pickerRef.current?.click()}
-        >
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-            <circle cx="8.5" cy="8.5" r="1.5" />
-            <polyline points="21 15 16 10 5 21" />
-          </svg>
-          Chọn ảnh
-        </button>
+        <div className="action-bar-inner">
+          <HStack gap={2}>
+            <StackItem size="fill">
+              <Button
+                label="Chụp ảnh"
+                variant="primary"
+                size="lg"
+                width="100%"
+                icon={<Camera size={20} />}
+                onClick={() => cameraRef.current?.click()}
+              />
+            </StackItem>
+            <StackItem size="fill">
+              <Button
+                label="Chọn ảnh"
+                variant="secondary"
+                size="lg"
+                width="100%"
+                icon={<ImagePlus size={20} />}
+                onClick={() => pickerRef.current?.click()}
+              />
+            </StackItem>
+          </HStack>
+        </div>
       </nav>
 
       <input
@@ -454,13 +520,31 @@ export default function App() {
         }}
       />
 
-      {viewerIndex !== null && photos[viewerIndex] && (
-        <Viewer
-          photos={photos}
-          index={viewerIndex}
-          onClose={() => setViewerIndex(null)}
-          onNavigate={setViewerIndex}
-        />
+      {viewerIndex !== null && (
+        <Suspense fallback={null}>
+          <Lightbox
+            isOpen
+            onOpenChange={(open) => {
+              if (!open) setViewerIndex(null)
+            }}
+            media={photos.map((p, i) => ({
+              src: viewUrl(p),
+              alt: `Ảnh ${i + 1} trong album nhóm`,
+              caption: (
+                <span className="lightbox-caption">
+                  {formatDate(p.created_at)}
+                  {' · '}
+                  <a href={originalUrl(p)} target="_blank" rel="noreferrer">
+                    Mở ảnh gốc
+                  </a>
+                </span>
+              ),
+            }))}
+            index={viewerIndex}
+            onIndexChange={setViewerIndex}
+            hasZoom
+          />
+        </Suspense>
       )}
     </div>
   )

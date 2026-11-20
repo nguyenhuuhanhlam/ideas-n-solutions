@@ -3,6 +3,18 @@
 Web app mobile-first: chụp ảnh up thẳng lên Cloudinary, cả nhóm cùng xem
 trên mọi máy. Không backend — app tĩnh hoàn toàn.
 
+UI dựng trên design system Astryx (`@astryxdesign/core` 0.7.16 + theme
+Neutral) với icon Lucide: đăng nhập dùng Card + TextInput + Button,
+thư viện dùng Heading/Text/IconButton, trạng thái rỗng dùng EmptyState,
+lỗi dùng Banner, tải dùng Spinner, tiến trình up dùng ProgressBar,
+trình xem ảnh dùng Lightbox (vuốt chuyển ảnh, pinch/double-tap zoom,
+vuốt xuống để đóng). Lightbox được tách chunk riêng (lazy + tải trước
+khi trình duyệt rảnh) để bundle ban đầu nhẹ cho mobile. Nền trình xem
+giữ màu đen bằng cách ghi đè token `--color-overlay` trên dialog
+(theme mặc định chỉ phủ đen 50%, nhìn xám). CSS riêng trong
+`src/index.css` chỉ còn khung app, lưới ảnh, thanh nút dưới, khay
+upload và chỉ báo kéo-làm-mới.
+
 ## Cách hoạt động
 
 - **Up ảnh:** trực tiếp từ trình duyệt bằng upload preset unsigned
@@ -20,9 +32,9 @@ trên mọi máy. Không backend — app tĩnh hoàn toàn.
 - Chụp bằng camera sau (`capture="environment"`) hoặc chọn nhiều ảnh.
 - Tiến trình up từng ảnh (tối đa 3 ảnh song song), up lỗi có nút thử lại.
 - Lưới ảnh mới nhất trước; kéo xuống để làm mới; quay lại app tự tải lại.
-- Trình xem: vuốt trái/phải chuyển ảnh, vuốt xuống để đóng, pinch 2 ngón
-  hoặc double-tap để phóng to, chạm để ẩn/hiện thanh công cụ. Desktop:
-  kéo chuột, phím mũi tên, Esc.
+- Trình xem (Astryx Lightbox): vuốt trái/phải chuyển ảnh, vuốt xuống để
+  đóng, pinch 2 ngón hoặc double-tap để phóng to, chú thích hiện ngày
+  chụp + link "Mở ảnh gốc". Desktop: phím mũi tên, Esc, phím 0 thu nhỏ.
 - PWA: thêm vào màn hình chính dùng như app (`manifest.webmanifest`).
 
 ## Đăng nhập tạm thời
@@ -49,8 +61,14 @@ cloud name đều là thông tin public.
 ```sh
 npm install
 npm run dev      # http://localhost:5173
-npm run build -- --base=/ideas-n-solutions/photo-app/
+npm run build
 ```
 
-Deploy lên GitHub Pages qua workflow ở root repo (build với base là
-subpath Pages của app).
+Base `/ideas-n-solutions/photo-app/` nằm cố định trong `vite.config.js`
+(không dựa vào flag `--base` khi build — flag qua `npm run` đã từng bị
+rớt khiến build ra base `/` và app trắng trang). Deploy lên GitHub Pages
+qua workflow ở root repo.
+
+Kiểm chứng local: `~/workspace/photo-app-check/check.mjs` (Playwright +
+Chromium headless shell, mock Cloudinary qua route interception) +
+server tĩnh phục vụ `photo-app-check/site/` ở cổng 8901.

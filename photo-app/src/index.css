@@ -1,24 +1,7 @@
-:root {
-  /* Giao diện sáng kiểu Facebook: nền xám nhạt, thẻ trắng, accent xanh. */
-  --bg: #f0f2f5;
-  --surface: #ffffff;
-  --surface-2: #f0f2f5;
-  --btn-gray: #e4e6eb;
-  --btn-gray-active: #d8dadf;
-  --line: #ced0d4;
-  --text: #050505;
-  --muted: #65676b;
-  --accent: #1877f2;
-  --accent-dark: #166fe5;
-  --accent-text: #ffffff;
-  --danger: #d32f2f;
-  --ok: #31a24c;
-  --radius: 12px;
-}
-
-* {
-  box-sizing: border-box;
-}
+/* Chỉ giữ CSS cho những phần Astryx không có sẵn: khung app, lưới ảnh,
+   thanh nút dưới, khay upload, chỉ báo kéo-làm-mới, trang đăng nhập.
+   Nút, ô nhập, thẻ, thanh tiến trình, trình xem ảnh đều là component
+   Astryx; màu dùng token của theme Neutral. */
 
 html,
 body {
@@ -27,27 +10,10 @@ body {
 }
 
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
+  background: var(--color-background-body);
+  color: var(--color-text-primary);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: contain;
-}
-
-button {
-  font: inherit;
-  color: inherit;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-button:disabled {
-  opacity: 0.4;
-  cursor: default;
 }
 
 img {
@@ -65,51 +31,15 @@ img {
   position: sticky;
   top: 0;
   z-index: 10;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--line);
+  background: var(--color-background-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
-.app-header h1 {
-  font-size: 20px;
-  line-height: 1.2;
-  margin: 0;
-  font-weight: 700;
-}
-
-.app-count {
-  color: var(--muted);
-  font-size: 14px;
-  margin-right: auto;
-}
-
-.icon-btn {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  color: var(--text);
-}
-
-.icon-btn:active {
-  background: var(--surface-2);
-}
-
-.spin {
-  animation: spin 0.9s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.app-header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 10px 16px;
 }
 
 /* Kéo xuống để làm mới */
@@ -119,23 +49,26 @@ img {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  color: var(--muted);
-  font-size: 13px;
   transition: height 0.2s ease;
 }
 
-.pull-indicator span {
+.pull-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding-bottom: 10px;
 }
 
-.notice {
-  margin: 10px 16px 0;
-  padding: 10px 12px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  font-size: 14px;
-  color: var(--muted);
+.notice-wrap {
+  margin: 12px 12px 0;
+}
+
+@media (min-width: 1000px) {
+  .notice-wrap {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 /* Lưới ảnh */
@@ -173,7 +106,7 @@ img {
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: 4px;
-  background: var(--btn-gray);
+  background: var(--color-background-muted);
   padding: 0;
 }
 
@@ -189,55 +122,18 @@ img {
 
 .footnote {
   text-align: center;
-  color: var(--muted);
-  font-size: 13px;
   margin: 24px 0 8px;
 }
 
-/* Trạng thái rỗng / tải / lỗi */
+/* Trạng thái tải / lỗi toàn trang */
 
-.state {
+.page-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
   text-align: center;
   padding: 72px 24px;
-  color: var(--text);
-}
-
-.state p {
-  margin: 0 0 8px;
-}
-
-.state-sub {
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.state--loading p {
-  color: var(--muted);
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  margin: 0 auto 16px;
-  border: 3px solid var(--line);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.9s linear infinite;
-}
-
-.btn {
-  margin-top: 16px;
-  padding: 12px 24px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  font-weight: 600;
-}
-
-.btn--primary {
-  background: var(--accent);
-  color: var(--accent-text);
-  border-color: var(--accent);
 }
 
 /* Khay upload */
@@ -248,22 +144,8 @@ img {
   right: 12px;
   bottom: calc(92px + env(safe-area-inset-bottom, 0px));
   z-index: 20;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
   max-height: 40dvh;
   overflow-y: auto;
-}
-
-.upload-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 8px 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 .upload-thumb {
@@ -274,60 +156,9 @@ img {
   flex-shrink: 0;
 }
 
-.upload-info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.upload-name {
-  font-size: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.upload-status {
+.upload-error-text {
   font-size: 12px;
-  color: var(--muted);
-}
-
-.upload-error {
-  font-size: 12px;
-  color: var(--danger);
-}
-
-.upload-done {
-  font-size: 12px;
-  color: var(--ok);
-}
-
-.progress {
-  height: 4px;
-  background: var(--line);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.progress-bar {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 2px;
-  transition: width 0.2s ease;
-}
-
-.mini-btn {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--accent);
-  padding: 8px 6px;
-  flex-shrink: 0;
-}
-
-.mini-btn--ghost {
-  color: var(--muted);
+  color: var(--color-text-error);
 }
 
 /* Thanh nút dưới cùng */
@@ -338,51 +169,17 @@ img {
   right: 0;
   bottom: 0;
   z-index: 20;
-  display: flex;
-  gap: 10px;
+  background: var(--color-background-surface);
+  border-top: 1px solid var(--color-border);
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid var(--line);
 }
 
-.action-btn {
-  flex: 1;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  background: var(--btn-gray);
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.action-btn:active {
-  background: var(--btn-gray-active);
-}
-
-.action-btn--primary {
-  background: var(--accent);
-  color: var(--accent-text);
-  border-color: var(--accent);
-}
-
-.action-btn--primary:active {
-  background: var(--accent-dark);
+.action-bar-inner {
+  max-width: 680px;
+  margin: 0 auto;
 }
 
 @media (min-width: 700px) {
-  .action-bar {
-    justify-content: center;
-  }
-
-  .action-btn {
-    flex: 0 1 320px;
-  }
-
   .upload-tray {
     left: 50%;
     right: auto;
@@ -399,134 +196,21 @@ img {
   pointer-events: none;
 }
 
-/* Trình xem ảnh */
-
-.viewer {
-  /* Trình xem giữ nền đen như khi xem ảnh trên Facebook. */
-  --muted: #b0b3b8;
-  --line: #3a3b3c;
-  --surface-2: rgba(255, 255, 255, 0.12);
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  background-color: rgba(0, 0, 0, 1);
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  overscroll-behavior: contain;
+/* Trình xem ảnh giữ nền đen như trước: theme Neutral mặc định chỉ phủ
+   đen 50% (::backdrop dùng --color-overlay), nhìn xám và ảnh không nổi
+   trên nền trang sáng. Ghi đè token ngay trên dialog; hiệu ứng mờ dần
+   khi vuốt đóng vẫn chạy vì nó animate opacity của backdrop, không
+   chạm màu nền. */
+dialog.astryx-lightbox {
+  --color-overlay: rgba(0, 0, 0, 0.94);
 }
 
-.viewer-top,
-.viewer-bottom {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-left: 12px;
-  padding-right: 12px;
-  flex-shrink: 0;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
+/* Chú thích trong Lightbox: link "Mở ảnh gốc" */
 
-.viewer-top {
-  padding-top: calc(10px + env(safe-area-inset-top, 0px));
-  padding-bottom: 8px;
-}
-
-.viewer-top--hidden {
-  opacity: 0;
-  transform: translateY(-8px);
-  pointer-events: none;
-}
-
-.viewer-counter {
-  font-size: 15px;
-  font-weight: 600;
-  min-width: 56px;
-}
-
-.viewer-date {
-  color: var(--muted);
-  font-size: 13px;
-  margin-right: auto;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.viewer-top-actions {
-  display: flex;
-  gap: 2px;
-}
-
-.viewer-top .icon-btn {
-  color: #fff;
-}
-
-.viewer-stage {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.viewer-imgwrap {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  will-change: transform;
-}
-
-.viewer-img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.viewer-img--loaded {
-  opacity: 1;
-}
-
-.viewer-loading {
-  position: absolute;
-  width: 32px;
-  height: 32px;
-  border: 3px solid var(--line);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.9s linear infinite;
-}
-
-.viewer-bottom {
-  padding-top: 8px;
-  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-  justify-content: space-between;
-}
-
-.viewer-bottom--hidden {
-  opacity: 0;
-  transform: translateY(8px);
-  pointer-events: none;
-}
-
-.viewer-bottom .icon-btn {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.viewer-hint {
-  color: var(--muted);
-  font-size: 12px;
-  text-align: center;
+.lightbox-caption a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 /* Đăng nhập tạm thời */
@@ -539,93 +223,18 @@ img {
   padding: 24px 16px calc(24px + env(safe-area-inset-bottom, 0px));
 }
 
-.login-card {
-  width: 100%;
-  max-width: 380px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 32px 24px 24px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  text-align: center;
-}
-
 .login-icon {
   width: 64px;
   height: 64px;
-  margin: 0 auto 16px;
+  margin: 0 auto;
   border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.login-card h1 {
-  font-size: 24px;
-  margin: 0 0 4px;
-}
-
-.login-sub {
-  color: var(--muted);
-  font-size: 14px;
-  margin: 0 0 24px;
-}
-
-.login-field {
-  display: block;
-  text-align: left;
-  margin-bottom: 12px;
-}
-
-.login-field span {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-}
-
-.login-field input {
-  width: 100%;
-  height: 48px;
-  padding: 0 14px;
-  font: inherit;
-  font-size: 16px;
-  color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  outline: none;
-}
-
-.login-field input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
-}
-
-.login-error {
-  color: var(--danger);
-  font-size: 14px;
-  margin: 4px 0 12px;
-}
-
-.login-btn {
-  width: 100%;
-  height: 48px;
-  margin-top: 4px;
-  border-radius: 999px;
-  background: var(--accent);
-  color: #fff;
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.login-btn:active {
-  background: var(--accent-dark);
-}
-
-.login-btn:disabled {
-  opacity: 0.6;
+.login-head {
+  text-align: center;
 }

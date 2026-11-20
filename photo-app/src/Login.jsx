@@ -1,4 +1,11 @@
+import { Camera } from 'lucide-react'
 import { useState } from 'react'
+import { Button } from '@astryxdesign/core/Button'
+import { Card } from '@astryxdesign/core/Card'
+import { Heading } from '@astryxdesign/core/Heading'
+import { Text } from '@astryxdesign/core/Text'
+import { TextInput } from '@astryxdesign/core/TextInput'
+import { VStack } from '@astryxdesign/core/VStack'
 import { verifyCredentials } from './auth.js'
 
 export default function Login({ onSuccess }) {
@@ -28,49 +35,50 @@ export default function Login({ onSuccess }) {
 
   return (
     <div className="login-page">
-      <form className="login-card" onSubmit={submit}>
-        <div className="login-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-            <circle cx="12" cy="13" r="4" />
-          </svg>
-        </div>
-        <h1>Ảnh nhóm</h1>
-        <p className="login-sub">Đăng nhập để xem và up ảnh</p>
-        <label className="login-field">
-          <span>Tên đăng nhập</span>
-          <input
-            type="text"
-            value={user}
-            onChange={(e) => setUser(e.target.value)}
-            autoComplete="username"
-            autoFocus
-            placeholder="Tên đăng nhập"
-          />
-        </label>
-        <label className="login-field">
-          <span>Mật khẩu</span>
-          <input
-            type="password"
-            value={pass}
-            onChange={(e) => setPass(e.target.value)}
-            autoComplete="current-password"
-            placeholder="Mật khẩu"
-          />
-        </label>
-        {error && (
-          <p className="login-error" role="alert">
-            {error}
-          </p>
-        )}
-        <button
-          type="submit"
-          className="login-btn"
-          disabled={checking || user.trim() === '' || pass === ''}
-        >
-          {checking ? 'Đang kiểm tra…' : 'Đăng nhập'}
-        </button>
-      </form>
+      <Card width="100%" maxWidth={380} elevation="low">
+        <form onSubmit={submit}>
+          <VStack gap={4}>
+            <div className="login-icon" aria-hidden="true">
+              <Camera size={30} />
+            </div>
+            <div className="login-head">
+              <Heading level={1}>Ảnh nhóm</Heading>
+              <Text type="supporting">Đăng nhập để xem và up ảnh</Text>
+            </div>
+            <TextInput
+              label="Tên đăng nhập"
+              value={user}
+              onChange={setUser}
+              autoComplete="username"
+              hasAutoFocus
+              hasAutoCorrect={false}
+              enterKeyHint="next"
+              width="100%"
+            />
+            <TextInput
+              label="Mật khẩu"
+              type="password"
+              value={pass}
+              onChange={setPass}
+              autoComplete="current-password"
+              enterKeyHint="go"
+              width="100%"
+              status={
+                error ? { type: 'error', message: error } : undefined
+              }
+            />
+            <Button
+              label="Đăng nhập"
+              type="submit"
+              variant="primary"
+              size="lg"
+              width="100%"
+              isLoading={checking}
+              isDisabled={user.trim() === '' || pass === ''}
+            />
+          </VStack>
+        </form>
+      </Card>
     </div>
   )
 }
