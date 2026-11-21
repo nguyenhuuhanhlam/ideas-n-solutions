@@ -1,8 +1,9 @@
-import { Camera, ImagePlus, Images, LogOut, RefreshCw, X } from 'lucide-react'
+import { Camera, EyeOff, ImagePlus, Images, LogOut, RefreshCw, X } from 'lucide-react'
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import { Banner } from '@astryxdesign/core/Banner'
 import { Button } from '@astryxdesign/core/Button'
 import { Card } from '@astryxdesign/core/Card'
+import { Dialog, DialogHeader } from '@astryxdesign/core/Dialog'
 import { EmptyState } from '@astryxdesign/core/EmptyState'
 import { Heading } from '@astryxdesign/core/Heading'
 import { HStack } from '@astryxdesign/core/HStack'
@@ -15,10 +16,13 @@ import { VStack } from '@astryxdesign/core/VStack'
 import { isAuthed, setAuthed } from './auth.js'
 import {
   compressImage,
+  fetchHiddenIds,
   fetchPhotos,
+  markerPublicId,
   originalUrl,
   photoFromUpload,
   thumbUrl,
+  uploadHideMarker,
   uploadPhoto,
   viewUrl,
 } from './cloudinary.js'
@@ -73,11 +77,16 @@ function newId() {
 export default function App() {
   const [authed, setAuthedState] = useState(() => isAuthed())
   const [photos, setPhotos] = useState([])
+  const [hiddenIds, setHiddenIds] = useState(new Set())
   const [status, setStatus] = useState('loading')
   const [errorMsg, setErrorMsg] = useState('')
-  const [notice, setNotice] = useState('')
+  const [notice, setNotice] = useState(null)
   const [uploads, setUploads] = useState([])
   const [viewerIndex, setViewerIndex] = useState(null)
+  const [hideTarget, setHideTarget] = useState(null)
+  const [hiding, setHiding] = useState(false)
+  const [hideError, setHideError] = useState('')
+  const [showHidden, setShowHidden] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const [pull, setPull] = useState(0)
 
@@ -94,8 +103,13 @@ export default function App() {
   const loadPhotos = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true)
     try {
-      const list = await fetchPhotos()
+      // Danh sách ẩn tải kèm; lỗi thì mở hết (hiện tất cả) để không kẹt app.
+      const [list, hidden] = await Promise.all([
+        fetchPhotos(),
+        fetchHiddenIds().catch(() => new Set()),
+      ])
       setPhotos((prev) => mergePhotos(prev, list))
+      setHiddenIds(hidden)
       setStatus('ready')
       setErrorMsg('')
     } catch (err) {
@@ -103,13 +117,35 @@ export default function App() {
         setStatus('error')
         setErrorMsg(err.message)
       } else {
-        setNotice('Không làm mới được, đang hiện ảnh cũ')
-        setTimeout(() => setNotice(''), 4000)
+        setNotice({ text: 'Không làm mới được, đang hiện ảnh cũ', status: 'error' })
+        setTimeout(() => setNotice(null), 4000)
       }
     } finally {
       setRefreshing(false)
     }
   }, [])
+
+  // Ảnh ẩn vẫn nằm trong `photos` (còn trên Cloudinary) — chỉ lọc khi hiện.
+  const visiblePhotos = photos.filter((p) => !hiddenIds.has(p.public_id))
+  const hiddenPhotos = photos.filter((p) => hiddenIds.has(p.public_id))
+
+  const confirmHide = async () => {
+    if (!hideTarget || hiding) return
+    setHiding(true)
+    setHideError('')
+    try {
+      await uploadHideMarker(hideTarget.public_id)
+      setHiddenIds((prev) => new Set(prev).add(hideTarget.public_id))
+      setViewerIndex(null)
+      setHideTarget(null)
+      setNotice({ text: 'Đã ẩn ảnh khỏi album trên mọi máy.', status: 'success' })
+      setTimeout(() => setNotice(null), 5000)
+    } catch (err) {
+      setHideError(err.message || 'Ẩn ảnh lỗi, thử lại sau')
+    } finally {
+      setHiding(false)
+    }
+  }
 
   useEffect(() => {
     if (authed) loadPhotos(false)
@@ -263,6 +299,8 @@ export default function App() {
     setAuthed(false)
     setAuthedState(false)
     setViewerIndex(null)
+    setHideTarget(null)
+    setShowHidden(false)
   }
 
   if (!authed) {
@@ -285,7 +323,7 @@ export default function App() {
               <VStack gap={0}>
                 <Heading level={2}>Ảnh nhóm</Heading>
                 <Text type="supporting">
-                  {status === 'ready' ? `${photos.length} ảnh` : ' '}
+                  {status === 'ready' ? `${visiblePhotos.length} ảnh` : ' '}
                 </Text>
               </VStack>
             </StackItem>
@@ -332,10 +370,10 @@ export default function App() {
       {notice && (
         <div className="notice-wrap">
           <Banner
-            status="error"
-            title={notice}
+            status={notice.status}
+            title={notice.text}
             isDismissable
-            onDismiss={() => setNotice('')}
+            onDismiss={() => setNotice(null)}
           />
         </div>
       )}
@@ -362,33 +400,53 @@ export default function App() {
           </div>
         )}
 
-        {status === 'ready' && photos.length === 0 && (
-          <EmptyState
-            title="Chưa có ảnh nào"
-            description="Chụp hoặc chọn ảnh để bắt đầu album nhóm."
-            icon={<Images size={48} />}
-            actions={
-              <>
-                <Button
-                  label="Chụp ảnh"
-                  variant="primary"
-                  icon={<Camera size={20} />}
-                  onClick={() => cameraRef.current?.click()}
-                />
-                <Button
-                  label="Chọn ảnh"
-                  variant="secondary"
-                  icon={<ImagePlus size={20} />}
-                  onClick={() => pickerRef.current?.click()}
-                />
-              </>
-            }
-          />
-        )}
+        {status === 'ready' &&
+          visiblePhotos.length === 0 &&
+          hiddenPhotos.length === 0 && (
+            <EmptyState
+              title="Chưa có ảnh nào"
+              description="Chụp hoặc chọn ảnh để bắt đầu album nhóm."
+              icon={<Images size={48} />}
+              actions={
+                <>
+                  <Button
+                    label="Chụp ảnh"
+                    variant="primary"
+                    icon={<Camera size={20} />}
+                    onClick={() => cameraRef.current?.click()}
+                  />
+                  <Button
+                    label="Chọn ảnh"
+                    variant="secondary"
+                    icon={<ImagePlus size={20} />}
+                    onClick={() => pickerRef.current?.click()}
+                  />
+                </>
+              }
+            />
+          )}
 
-        {status === 'ready' && photos.length > 0 && (
+        {status === 'ready' &&
+          visiblePhotos.length === 0 &&
+          hiddenPhotos.length > 0 && (
+            <div className="page-state">
+              <Heading level={2}>Tất cả ảnh đang ẩn.</Heading>
+              <Text type="supporting">
+                Ảnh vẫn còn trên Cloudinary — mở danh sách ảnh đã ẩn để xem
+                lại.
+              </Text>
+              <Button
+                label={`Xem ảnh đã ẩn (${hiddenPhotos.length})`}
+                variant="secondary"
+                icon={<EyeOff size={20} />}
+                onClick={() => setShowHidden(true)}
+              />
+            </div>
+          )}
+
+        {status === 'ready' && visiblePhotos.length > 0 && (
           <div className="grid">
-            {photos.map((p, i) => (
+            {visiblePhotos.map((p, i) => (
               <button
                 key={keyOf(p)}
                 type="button"
@@ -406,6 +464,15 @@ export default function App() {
           <Text type="supporting">
             Ảnh lưu trên Cloudinary · Chạm ảnh để xem, vuốt để chuyển
           </Text>
+          {hiddenPhotos.length > 0 && (
+            <Button
+              label={`Ảnh đã ẩn (${hiddenPhotos.length})`}
+              variant="ghost"
+              size="sm"
+              icon={<EyeOff size={16} />}
+              onClick={() => setShowHidden(true)}
+            />
+          )}
         </div>
       </main>
 
@@ -527,7 +594,7 @@ export default function App() {
             onOpenChange={(open) => {
               if (!open) setViewerIndex(null)
             }}
-            media={photos.map((p, i) => ({
+            media={visiblePhotos.map((p, i) => ({
               src: viewUrl(p),
               alt: `Ảnh ${i + 1} trong album nhóm`,
               caption: (
@@ -537,6 +604,17 @@ export default function App() {
                   <a href={originalUrl(p)} target="_blank" rel="noreferrer">
                     Mở ảnh gốc
                   </a>
+                  {' · '}
+                  <button
+                    type="button"
+                    className="caption-button"
+                    onClick={() => {
+                      setHideError('')
+                      setHideTarget(p)
+                    }}
+                  >
+                    Ẩn ảnh
+                  </button>
                 </span>
               ),
             }))}
@@ -545,6 +623,94 @@ export default function App() {
             hasZoom
           />
         </Suspense>
+      )}
+
+      {hideTarget && (
+        <Dialog
+          isOpen
+          onOpenChange={(open) => {
+            if (!open && !hiding) setHideTarget(null)
+          }}
+          padding={4}
+        >
+          <DialogHeader
+            title="Ẩn ảnh này?"
+            subtitle="Ảnh biến khỏi album trên mọi máy."
+            onOpenChange={() => {
+              if (!hiding) setHideTarget(null)
+            }}
+          />
+          <VStack gap={3}>
+            <Text type="supporting">
+              Ảnh vẫn còn trên Cloudinary — để xóa hẳn, xóa ảnh trong
+              Cloudinary Console. Muốn hiện lại ảnh, xóa ảnh mốc{' '}
+              {markerPublicId(hideTarget.public_id)} trong Console.
+            </Text>
+            {hideError && <Banner status="error" title={hideError} />}
+            <HStack gap={2}>
+              <StackItem size="fill">
+                <Button
+                  label="Hủy"
+                  variant="secondary"
+                  width="100%"
+                  isDisabled={hiding}
+                  onClick={() => setHideTarget(null)}
+                />
+              </StackItem>
+              <StackItem size="fill">
+                <Button
+                  label="Ẩn ảnh"
+                  variant="primary"
+                  width="100%"
+                  isLoading={hiding}
+                  onClick={confirmHide}
+                />
+              </StackItem>
+            </HStack>
+          </VStack>
+        </Dialog>
+      )}
+
+      {showHidden && (
+        <Dialog
+          isOpen
+          onOpenChange={setShowHidden}
+          width={480}
+          padding={4}
+        >
+          <DialogHeader
+            title={`Ảnh đã ẩn (${hiddenPhotos.length})`}
+            subtitle="Ảnh vẫn còn trên Cloudinary."
+            onOpenChange={setShowHidden}
+          />
+          <VStack gap={3}>
+            <Text type="supporting">
+              Để hiện lại một ảnh, xóa ảnh mốc của nó trong Cloudinary
+              Console (Media Library, tìm theo tên mốc). Để xóa hẳn ảnh,
+              xóa chính ảnh đó trong Console.
+            </Text>
+            <div className="hidden-list">
+              {hiddenPhotos.map((p) => (
+                <HStack key={keyOf(p)} gap={2} vAlign="center">
+                  <img
+                    src={thumbUrl(p)}
+                    alt=""
+                    className="hidden-thumb"
+                    loading="lazy"
+                  />
+                  <StackItem size="fill">
+                    <VStack gap={0}>
+                      <Text>{formatDate(p.created_at)}</Text>
+                      <Text type="supporting">
+                        Mốc: {markerPublicId(p.public_id)}
+                      </Text>
+                    </VStack>
+                  </StackItem>
+                </HStack>
+              ))}
+            </div>
+          </VStack>
+        </Dialog>
       )}
     </div>
   )

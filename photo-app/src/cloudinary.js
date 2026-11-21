@@ -1,6 +1,8 @@
 import {
   CLOUD_NAME,
+  HIDDEN_TAG,
   JPEG_QUALITY,
+  MARKER_PREFIX,
   MAX_DIMENSION,
   TAG,
   UPLOAD_PRESET,
@@ -133,4 +135,69 @@ export function uploadPhoto(blob, filename, onProgress) {
 
 export function photoFromUpload(data) {
   return normalize(data)
+}
+
+/** public_id của ảnh mốc ẩn cho 1 ảnh gốc (mã hóa khứ hồi bằng tiền tố). */
+export function markerPublicId(targetPublicId) {
+  return `${MARKER_PREFIX}${targetPublicId}`
+}
+
+/**
+ * Đọc danh sách ảnh đang ẩn qua list JSON của tag mốc: public_id mốc trừ
+ * tiền tố = public_id ảnh gốc. 404 nghĩa là chưa có mốc nào. Mốc trỏ tới
+ * ảnh không còn trong lưới chính thì tự vô hiệu (không khớp ảnh nào).
+ */
+export async function fetchHiddenIds() {
+  const res = await fetch(
+    `https://res.cloudinary.com/${CLOUD_NAME}/image/list/${HIDDEN_TAG}.json`,
+    { cache: 'no-store' },
+  )
+  if (res.status === 404) return new Set()
+  if (!res.ok) throw new Error(`Không tải được danh sách ảnh ẩn (${res.status})`)
+  const data = await res.json()
+  const ids = new Set()
+  for (const r of data.resources || []) {
+    if (
+      typeof r.public_id === 'string' &&
+      r.public_id.startsWith(MARKER_PREFIX)
+    ) {
+      ids.add(r.public_id.slice(MARKER_PREFIX.length))
+    }
+  }
+  return ids
+}
+
+/** Ảnh mốc 1×1 trong suốt, tạo bằng canvas — không cần file kèm theo. */
+function markerBlob() {
+  const canvas = document.createElement('canvas')
+  canvas.width = 1
+  canvas.height = 1
+  return new Promise((resolve, reject) =>
+    canvas.toBlob(
+      (b) => (b ? resolve(b) : reject(new Error('Không tạo được ảnh mốc'))),
+      'image/png',
+    ),
+  )
+}
+
+/**
+ * Ẩn ảnh bằng cách up 1 ảnh mốc mang tag riêng qua preset unsigned (giống
+ * up ảnh thường, không cần secret). Dùng fetch vì không cần tiến trình.
+ */
+export async function uploadHideMarker(targetPublicId) {
+  const blob = await markerBlob()
+  const form = new FormData()
+  form.append('file', blob, 'marker.png')
+  form.append('upload_preset', UPLOAD_PRESET)
+  form.append('tags', HIDDEN_TAG)
+  form.append('public_id', markerPublicId(targetPublicId))
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+    { method: 'POST', body: form },
+  )
+  const data = await res.json().catch(() => null)
+  if (!res.ok) {
+    throw new Error(data?.error?.message || `Ẩn ảnh lỗi (${res.status})`)
+  }
+  return data
 }

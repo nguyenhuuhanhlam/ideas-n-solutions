@@ -121,8 +121,29 @@ img {
 }
 
 .footnote {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   text-align: center;
   margin: 24px 0 8px;
+}
+
+/* Danh sách ảnh đã ẩn trong Dialog */
+.hidden-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 45dvh;
+  overflow-y: auto;
+}
+
+.hidden-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
 }
 
 /* Trạng thái tải / lỗi toàn trang */
@@ -205,12 +226,23 @@ dialog.astryx-lightbox {
   --color-overlay: rgba(0, 0, 0, 0.94);
 }
 
-/* Chú thích trong Lightbox: link "Mở ảnh gốc" */
+/* Chú thích trong Lightbox: link "Mở ảnh gốc" + nút "Ẩn ảnh" */
 
 .lightbox-caption a {
   color: inherit;
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+.lightbox-caption button.caption-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
 }
 
 /* Đăng nhập tạm thời */

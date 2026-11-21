@@ -34,8 +34,30 @@ upload và chỉ báo kéo-làm-mới.
 - Lưới ảnh mới nhất trước; kéo xuống để làm mới; quay lại app tự tải lại.
 - Trình xem (Astryx Lightbox): vuốt trái/phải chuyển ảnh, vuốt xuống để
   đóng, pinch 2 ngón hoặc double-tap để phóng to, chú thích hiện ngày
-  chụp + link "Mở ảnh gốc". Desktop: phím mũi tên, Esc, phím 0 thu nhỏ.
+  chụp + link "Mở ảnh gốc" + nút "Ẩn ảnh". Desktop: phím mũi tên, Esc,
+  phím 0 thu nhỏ.
+- Ẩn ảnh cho mọi máy (xem "Ẩn ảnh" dưới đây).
 - PWA: thêm vào màn hình chính dùng như app (`manifest.webmanifest`).
+
+## Ẩn ảnh
+
+App tĩnh không xóa được ảnh trên Cloudinary (xóa cần chữ ký bằng API
+secret, không được để trong code trình duyệt), nên tính năng ẩn dùng
+"ảnh mốc": mỗi lần ẩn, app up 1 ảnh 1×1 trong suốt mang tag riêng
+`photo_app_hidden`, public_id = `hidden--` + public_id ảnh gốc. Mốc chỉ
+mang tag ẩn nên không hiện trong lưới chính. App đọc list JSON của tag
+mốc (`image/list/photo_app_hidden.json`) và lọc ảnh ẩn khỏi lưới trên
+mọi máy — máy vừa ẩn thấy ngay, máy khác thấy sau khi tải lại (list
+cache ~60s).
+
+- **Ẩn:** trong trình xem, bấm "Ẩn ảnh" trong chú thích rồi xác nhận.
+  Ảnh biến khỏi album trên mọi máy nhưng vẫn còn trên Cloudinary.
+- **Xem ảnh đã ẩn:** nút "Ảnh đã ẩn (n)" dưới lưới — liệt kê ảnh đã ẩn
+  kèm tên mốc của từng ảnh.
+- **Bỏ ẩn:** xóa ảnh mốc trong Cloudinary Console (Media Library, tìm
+  theo tên mốc `hidden--…`).
+- **Xóa hẳn ảnh:** xóa chính ảnh đó trong Cloudinary Console; mốc thừa
+  (trỏ tới ảnh không còn) tự vô hiệu vì không khớp ảnh nào.
 
 ## Đăng nhập tạm thời
 
