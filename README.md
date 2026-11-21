@@ -15,6 +15,7 @@ thư mục mới và một thẻ vào trang chủ ở `index.html`.
 | Form Hub — danh sách form có sẵn + API cho ứng dụng khác (link điền, JSON form, nhúng iframe); chỉ dùng Form Library miễn phí (MIT) | `surveyjs-demo/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/surveyjs-demo/ |
 | Synaps Draft — vẽ kiến trúc: drafting 2D chính xác (tường/cửa/cửa sổ, snap, nhập số, mm) + xem 3D đồng bộ từ cùng Building JSON, undo/redo, lưu/mở JSON; xuất DXF qua API FastAPI (`synaps-draft/api/`, chạy local) | `synaps-draft/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/synaps-draft/ |
 | Ảnh nhóm — chụp ảnh trên mobile up thẳng lên Cloudinary (preset unsigned), cả nhóm xem chung mọi máy; nén trước khi up, trình xem vuốt/pinch zoom | `photo-app/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/photo-app/ |
+| MIENTAY Website Demo — bản demo tái thiết kế mientay.com.vn theo bố cục tạp chí kienviet.net (giữ xanh dương + logo Mientay): hero 5 dự án nổi bật, đủ 34 dự án thật, lọc theo dịch vụ và Nhà nước/Tư nhân, trang chi tiết có bảng Thông tin dự án | `mientay-demo/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/mientay-demo/ |
 
 ## App desktop (không deploy lên Pages)
 

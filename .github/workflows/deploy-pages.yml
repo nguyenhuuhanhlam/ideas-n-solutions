@@ -62,7 +62,7 @@ jobs:
         working-directory: photo-app
       # Ghép các app + trang chủ ở root thành một site duy nhất
       - run: |
-          mkdir -p _site/timeline-projects _site/team-assistant-sim _site/platformer-game _site/english-learning _site/surveyjs-demo _site/synaps-draft _site/photo-app _site/hairline-ui
+          mkdir -p _site/timeline-projects _site/team-assistant-sim _site/platformer-game _site/english-learning _site/surveyjs-demo _site/synaps-draft _site/photo-app _site/hairline-ui _site/mientay-demo
           cp -r timeline-projects/dist/* _site/timeline-projects/
           cp -r team-assistant-sim/dist/* _site/team-assistant-sim/
           cp -r platformer-game/dist/* _site/platformer-game/
@@ -71,6 +71,7 @@ jobs:
           cp -r synaps-draft/web/dist/* _site/synaps-draft/
           cp -r photo-app/dist/* _site/photo-app/
           cp -r hairline-ui/* _site/hairline-ui/
+          cp -r mientay-demo/* _site/mientay-demo/
           cp index.html _site/index.html
       - uses: actions/configure-pages@v5
         with:
