@@ -41,7 +41,8 @@
       /* ---------- Header ---------- */
       .utilbar{ border-bottom:1px solid var(--line); font-size:12.5px; color:var(--gray); }
       .utilbar .wrap{ display:flex; justify-content:space-between; align-items:center; gap:16px; min-height:34px; padding-top:4px; padding-bottom:4px; }
-      .utilbar .u-left{ display:flex; gap:18px; flex-wrap:wrap; }
+      .utilbar .u-left{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+      .u-sep{ color:#c4c4c4; }
       .utilbar a:hover{ color:var(--blue); }
       .utilbar .u-right{ font-weight:400; color:var(--blue); white-space:nowrap; }
       .u-right-wrap{ display:flex; align-items:center; gap:16px; }
@@ -288,11 +289,13 @@
       <div class="wrap">
         <div class="u-left">
           <span>Số 10 Thiên Hộ Dương, phường Bình Đức, tỉnh An Giang</span>
+          <span class="u-sep" aria-hidden="true">|</span>
           <a href="tel:+842963955339">Tel: (0296) 3955 339</a>
+          <span class="u-sep" aria-hidden="true">|</span>
           <a href="mailto:info@mientay.com.vn">info@mientay.com.vn</a>
         </div>
         <div class="u-right-wrap">
-          <div class="u-right">Thiết Kế – Qui Hoạch – Kiểm Định &amp; Giám Sát</div>
+          <div class="u-right">Thiết Kế <span class="u-sep" aria-hidden="true">|</span> Qui Hoạch <span class="u-sep" aria-hidden="true">|</span> Kiểm Định &amp; Giám Sát</div>
           <div class="socials socials-head">
             <a class="social-btn fb" href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Facebook của MIENTAY" title="Facebook"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15.5 3.5h-2.6c-2 0-3.4 1.7-3.4 3.9v2.1H7v3.1h2.5v7.9h3.1v-7.9h2.5l.5-3.1h-3V7.6c0-.7.4-1.1 1.1-1.1h1.8V3.5z"/></svg></a>
             <a class="social-btn yt" href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="Kênh YouTube của MIENTAY" title="YouTube"><svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" aria-hidden="true"><path d="M5.5 5.5h13a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-13a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3zM10 9.3v5.4L14.8 12 10 9.3z"/></svg></a>
