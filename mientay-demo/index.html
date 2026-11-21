@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
     <style>
       :root{
         --blue:#005ca9;
@@ -215,6 +216,22 @@
       form.demo-form textarea{ min-height:130px; resize:vertical; }
       .demo-note{ background:#fdf6e0; border:1px solid #f0d48a; color:#6b5200; font-size:13.5px; padding:11px 14px; margin-bottom:18px; line-height:1.55; }
       .form-done{ background:#eef6ee; border:1px solid #bcd8bc; color:#24501f; font-size:14.5px; padding:13px 16px; margin-top:16px; display:none; }
+
+      /* ---------- Flipbook (StPageFlip) ---------- */
+      .flip-note{ font-size:13.5px; color:var(--gray); margin:6px 0 0; }
+      .flipbook-wrap{ background:var(--panel); padding:26px 20px 22px; margin-top:6px; }
+      .flipbook-stage{ max-width:880px; margin:0 auto; }
+      #flipbook{ margin:0 auto; }
+      #flipbook .stf__item{ background:#fff; }
+      .flip-fallback{ max-width:440px; margin:0 auto; border:1px solid var(--line); background:#fff; }
+      .flip-fallback img{ width:100%; height:auto; }
+      .flip-fallback p{ font-size:14px; color:var(--gray); padding:12px 16px; margin:0; text-align:center; }
+      .flip-controls{ display:flex; align-items:center; justify-content:center; gap:14px; margin-top:18px; flex-wrap:wrap; }
+      .flip-btn{ border:1px solid var(--line); background:#fff; color:var(--ink); font-size:14px; font-weight:400; padding:8px 18px; min-height:40px; }
+      .flip-btn:hover:not(:disabled){ border-color:var(--blue); color:var(--blue); }
+      .flip-btn:disabled{ opacity:.45; cursor:default; }
+      .flip-status{ font-size:14px; color:var(--gray); min-width:110px; text-align:center; }
+      .flip-actions{ text-align:center; margin-top:14px; }
 
       /* ---------- CTA band ---------- */
       .cta-band{ margin-top:52px; background:var(--blue); color:#fff; }
@@ -717,16 +734,77 @@
         '<tr><th>Mã số ĐKKD</th><td>1600839222 (thay đổi lần 10, ngày 07/01/2026)</td></tr>' +
         '<tr><th>Điện thoại</th><td><a href="tel:+842963955339">02963 955 339</a></td></tr>' +
         '<tr><th>Email</th><td><a href="mailto:mientay.ptn@gmail.com">mientay.ptn@gmail.com</a></td></tr>' +
-        '<tr><th>Tài liệu năng lực</th><td>Bảng danh mục các chỉ tiêu thí nghiệm (flipbook 64 trang) trên website hiện tại</td></tr></table>' +
+        '<tr><th>Tài liệu năng lực</th><td>Bản công bố công khai thông tin về năng lực hoạt động thí nghiệm chuyên ngành xây dựng, Số 39/2026/CBNL — trình xem lật trang 64 trang bên dưới</td></tr></table>' +
         '<h3 style="font-size:19px;font-weight:700;color:var(--ink);margin:8px 0 6px">Giấy tờ &amp; chứng nhận</h3>' +
         '<ul class="doc-list">' + LAB_DOCS.map(function(d){ return '<li>' + d + '</li>'; }).join("") + '</ul>' +
         '<a class="btn-outline" href="https://mientay.com.vn/thi-nghiem/" target="_blank" rel="noopener">Xem trang Thí nghiệm trên site cũ ↗</a>' +
         '</div>' +
         '<aside><div class="side-box"><h3>Dự án thí nghiệm gần đây</h3><ul>' + tn.slice(0,5).map(function(x){ return '<li><a href="#/du-an/' + x.slug + '">' + esc(x.title) + '</a></li>'; }).join("") + '</ul></div></aside>' +
         '</div></section>';
+      /* Trình xem lật trang — bản công bố năng lực (PDF mẫu từ site cũ, flipbook df_6663) */
+      h += '<section class="section">' + sectionHead("Bản công bố năng lực Phòng thí nghiệm LAS-XD 339") +
+        '<p class="flip-note" style="margin:-14px 0 18px">Số 39/2026/CBNL — An Giang, ngày 12/04/2026 — 64 trang. Kéo hoặc bấm góc trang để lật như sách thật.</p>' +
+        '<div class="flipbook-wrap"><div class="flipbook-stage"><div id="flipbook"></div></div>' +
+        '<div class="flip-controls">' +
+        '<button class="flip-btn" id="flipPrev" type="button">← Trang trước</button>' +
+        '<span class="flip-status" id="flipStatus">Đang tải…</span>' +
+        '<button class="flip-btn" id="flipNext" type="button">Trang sau →</button></div>' +
+        '<div class="flip-actions"><a class="btn-outline" style="margin-top:0" href="https://mientay.com.vn/wp-content/uploads/2026/04/01.-BAN-CONG-BO-PTN.signed-da-ky.pdf" target="_blank" rel="noopener">Tải file PDF gốc ↗</a></div>' +
+        '</div></section>';
       h += '<section class="section">' + sectionHead("Dự án Kiểm định &amp; Thí nghiệm", "#/danh-muc/kiem-dinh") + '<div class="grid3">' + byType("kiem-dinh").slice(0,6).map(function(p){ return card(p); }).join("") + '</div></section>';
       h += '</div>';
+      setTimeout(initFlipbook, 0);
       return h;
+    }
+
+    /* ======== Flipbook: StPageFlip + 64 ảnh trang render từ PDF gốc ======== */
+    var FLIP_TOTAL = 64;
+    var labFlip = null;
+    function flipSrc(n){ return "assets/flipbook/cong-bo-ptn-" + (n < 10 ? "0" : "") + n + ".jpg"; }
+    function initFlipbook(){
+      var el = document.getElementById("flipbook");
+      var status = document.getElementById("flipStatus");
+      var prevBtn = document.getElementById("flipPrev");
+      var nextBtn = document.getElementById("flipNext");
+      if (!el) return;
+      if (!window.St || !St.PageFlip){
+        el.innerHTML = '<div class="flip-fallback"><img src="' + flipSrc(1) + '" alt="Trang 1 — Bản công bố năng lực LAS-XD 339"><p>Không tải được thư viện lật trang. Bạn vẫn có thể xem toàn bộ tài liệu trong file PDF gốc bên dưới.</p></div>';
+        if (status) status.textContent = "Trang 1 / " + FLIP_TOTAL;
+        if (prevBtn) prevBtn.disabled = true;
+        if (nextBtn) nextBtn.disabled = true;
+        return;
+      }
+      var pages = [];
+      for (var i = 1; i <= FLIP_TOTAL; i++) pages.push(flipSrc(i));
+      labFlip = new St.PageFlip(el, {
+        width: 550, height: 778,
+        size: "stretch",
+        minWidth: 300, maxWidth: 1000,
+        minHeight: 424, maxHeight: 1414,
+        maxShadowOpacity: 0.5,
+        showCover: true,
+        usePortrait: true,
+        flippingTime: 700,
+        drawShadow: true,
+        autoSize: true,
+        swipeDistance: 30,
+        clickEventZoom: false,
+        showPageCorners: true
+      });
+      function syncUI(){
+        if (!labFlip || !status) return;
+        var idx = labFlip.getCurrentPageIndex();
+        status.textContent = "Trang " + (idx + 1) + " / " + FLIP_TOTAL;
+        if (prevBtn) prevBtn.disabled = idx <= 0;
+        if (nextBtn) nextBtn.disabled = idx >= FLIP_TOTAL - 1;
+      }
+      labFlip.on("flip", syncUI);
+      labFlip.on("changeOrientation", syncUI);
+      labFlip.on("init", syncUI);
+      labFlip.loadFromImages(pages);
+      if (prevBtn) prevBtn.addEventListener("click", function(){ if (labFlip) labFlip.flipPrev(); });
+      if (nextBtn) nextBtn.addEventListener("click", function(){ if (labFlip) labFlip.flipNext(); });
+      setTimeout(syncUI, 60);
     }
 
     /* ================= TUYỂN DỤNG ================= */
@@ -881,6 +959,7 @@
       else if (parts[0] === "tag" && parts[1]){ html = viewTag(parts[1]); }
       else if (parts[0] === "tim-kiem"){ html = viewSearch(query); }
       else { html = viewNotFound(); }
+      if (labFlip){ try { labFlip.destroy(); } catch(e){} labFlip = null; }
       app.innerHTML = html;
       setNav(navKey);
       document.getElementById("mainNav").classList.remove("open");
