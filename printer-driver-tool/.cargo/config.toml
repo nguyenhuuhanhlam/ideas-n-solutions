@@ -1,0 +1,5 @@
+# Build chéo sang Windows từ Linux: dùng linker MinGW.
+# Trên máy Windows build bình thường bằng MSVC thì mục này
+# không ảnh hưởng (chỉ áp dụng cho target windows-gnu).
+[target.x86_64-pc-windows-gnu]
+linker = "x86_64-w64-mingw32-gcc"
