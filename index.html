@@ -12,11 +12,12 @@
         font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
         display: flex; align-items: flex-start; justify-content: center; padding: 48px 20px;
       }
-      main { width: 100%; max-width: 760px; }
+      main { width: 100%; max-width: 1120px; }
       h1 { font-size: 28px; margin: 0 0 6px; }
       .sub { color: #8b95a9; font-size: 14.5px; line-height: 1.6; margin-bottom: 28px; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
       .card {
-        display: block; text-decoration: none; color: inherit;
+        display: flex; flex-direction: column; text-decoration: none; color: inherit;
         background: #171b24; border: 1px solid rgba(255, 255, 255, 0.14);
         border-radius: 14px; padding: 20px 22px; transition: border-color 0.15s;
       }
@@ -24,7 +25,7 @@
       .card--static:hover { border-color: rgba(255, 255, 255, 0.14); cursor: default; }
       .card h2 { font-size: 18px; margin: 0 0 6px; color: #ffd166; }
       .card p { margin: 0 0 14px; color: #c6cdd9; font-size: 14px; line-height: 1.6; }
-      .open { font-size: 13.5px; color: #8ab8ff; }
+      .open { font-size: 13.5px; color: #8ab8ff; margin-top: auto; }
       .note { margin-top: 24px; color: #8b95a9; font-size: 13px; line-height: 1.6; }
     </style>
   </head>
@@ -32,60 +33,62 @@
     <main>
       <h1>Ideas &amp; Solutions</h1>
       <p class="sub">Kho chứa các bản mẫu test ý tưởng và giải pháp. Mỗi app nằm trong một thư mục riêng trong repo này.</p>
+      <div class="grid">
       <a class="card" href="./timeline-projects/">
         <h2>Timeline Projects</h2>
         <p>Quản lý dự án trên một trục thời gian ngang duy nhất: nhiều project xếp chồng từng lớp, zoom phóng nhanh và kéo chuột là thao tác chính, chi tiết đổi theo mức zoom, kéo thả dời lịch, sửa task và task con trực tiếp.</p>
         <span class="open">Mở bản mẫu →</span>
       </a>
-      <a class="card" href="./team-assistant-sim/" style="margin-top: 14px;">
+      <a class="card" href="./team-assistant-sim/">
         <h2>Team Assistant — Mô phỏng trợ lý trung tâm</h2>
         <p>Dạng sơ đồ node: giả lập cách 1 trợ lý trung tâm nhận lệnh từ kênh riêng của từng member team kiến trúc (10 người), tách việc giao cho các AI chuyên môn, trả bản nháp về đúng người yêu cầu, qua cổng duyệt lai (AI tự duyệt / chờ quản lý), leo thang khi mâu thuẫn, chỉ ghi nhận vào workspace chung sau khi duyệt, và báo lên nhóm bằng tin ngắn. Task chạy thành token vàng lướt trên các edge.</p>
         <span class="open">Mở bản mẫu →</span>
       </a>
-      <a class="card" href="./english-learning/" style="margin-top: 14px;">
+      <a class="card" href="./english-learning/">
         <h2>TuTi Learn English</h2>
         <p>Học tiếng Anh cơ bản bằng cách làm bài tập là chính, phân loại bằng tabs: bài cơ bản, tab Chia động từ (to be, hiện tại đơn, hiện tại tiếp diễn, quá khứ -ed, quá khứ bất quy tắc, tương lai — mỗi nhóm 15 câu), và tab Tra cứu 47 động từ bất quy tắc. Chấm điểm ngay sau mỗi câu, cuối bài có tổng điểm, số sao và danh sách câu sai để ôn lại.</p>
         <span class="open">Mở bản mẫu →</span>
       </a>
-      <a class="card" href="./platformer-game/" style="margin-top: 14px;">
+      <a class="card" href="./platformer-game/">
         <h2>PixeLab</h2>
         <p>Game 2D side-scroller chặt chém có yếu tố RPG, dựng bằng Phaser + TypeScript + Vite, khung hình 960x540: đi bộ/chạy/nhảy/chém combo, vật lý Arcade, mặt đất và platform nổi bằng Tileset, camera bám theo nhân vật, nút cảm ứng kiểu tay NES.</p>
         <span class="open">Mở bản mẫu →</span>
       </a>
-      <a class="card" href="./surveyjs-demo/" style="margin-top: 14px;">
+      <a class="card" href="./surveyjs-demo/">
         <h2>Form Hub</h2>
         <p>Liệt kê các form có sẵn (Đơn nghỉ phép, Khảo sát hài lòng, Đăng ký sự kiện), cho điền form trực tiếp, và công bố API cho ứng dụng khác: link điền từng form, file JSON định nghĩa form, và mã nhúng iframe. Chỉ dùng SurveyJS Form Library miễn phí (MIT).</p>
         <span class="open">Mở bản mẫu →</span>
       </a>
-      <a class="card" href="./synaps-draft/" style="margin-top: 14px;">
+      <a class="card" href="./synaps-draft/">
         <h2>Synaps Draft</h2>
         <p>Vẽ kiến trúc kiểu Synaps: drafting 2D chính xác (tường, cửa, cửa sổ, snap, nhập số chiều dài, đơn vị mm), xem 3D đồng bộ từ cùng một Building JSON, undo/redo, lưu/mở JSON. Xuất DXF qua API FastAPI chạy local (bản demo web chưa có API nên nút Xuất DXF sẽ báo lỗi).</p>
         <span class="open">Mở bản mẫu →</span>
       </a>
-      <a class="card" href="./photo-app/" style="margin-top: 14px;">
+      <a class="card" href="./photo-app/">
         <h2>Ảnh nhóm</h2>
         <p>Chụp ảnh bằng điện thoại và up thẳng lên Cloudinary, cả nhóm cùng xem trên mọi máy. Ưu tiên mobile: chụp/chọn nhiều ảnh, nén trước khi up để tiết kiệm credit, lưới ảnh kèm trình xem vuốt trái/phải, pinch zoom, vuốt xuống để đóng, kéo xuống để làm mới.</p>
         <span class="open">Mở bản mẫu →</span>
       </a>
-      <a class="card" href="./mientay-demo/" style="margin-top: 14px;">
+      <a class="card" href="./mientay-demo/">
         <h2>MIENTAY — Website demo</h2>
         <p>Bản demo tái thiết kế website mientay.com.vn (Cty TNHH Kiểm định và tư vấn đầu tư xây dựng Miền Tây, An Giang) theo bố cục tạp chí của kienviet.net, giữ màu xanh dương và logo Mientay: trang chủ hero 5 dự án nổi bật, đủ 34 dự án thật chia theo Thiết kế / Kiểm định / Giám sát / Thí nghiệm, lọc theo Nhà nước / Tư nhân, trang chi tiết có bảng Thông tin dự án, cùng các trang Về chúng tôi, Phòng thí nghiệm LAS-XD 339, Tuyển dụng và Liên hệ.</p>
         <span class="open">Mở bản mẫu →</span>
       </a>
-      <a class="card" href="./hairline-ui/demo.html" style="margin-top: 14px;">
+      <a class="card" href="./hairline-ui/demo.html">
         <h2>Hairline UI</h2>
         <p>Bộ kit giao diện dùng lại cho các app khác: phong cách hairline grid — mọi phân tách chỉ bằng line 1px, không card nổi, không shadow, không bo góc — gồm CSS và JS vanilla dùng chung: sidebar co dãn, section thu gọn, chọn màu nền cho các vùng, icon Lucide nét 1px.</p>
         <span class="open">Mở bản mẫu →</span>
       </a>
-      <div class="card card--static" style="margin-top: 14px;">
+      <div class="card card--static">
         <h2>Clipboard Tool</h2>
         <p>Tool tray thường trú trên Windows, viết bằng Rust, chỉ xử lý text thuần: mỗi lần copy, các module chạy tự động và ghi đè clipboard — phát hiện và chuẩn hoá link http/https, loại bỏ tham số fbclid nhưng giữ tất cả tham số còn lại. Không lưu clipboard xuống đĩa, tắt máy là hết; chỉnh module và tham số trong cửa sổ Settings Win32.</p>
         <span class="open" style="color: #8b95a9;">Ứng dụng Windows desktop — không có bản demo web</span>
       </div>
-      <div class="card card--static" style="margin-top: 14px;">
+      <div class="card card--static">
         <h2>File Watcher</h2>
         <p>CLI viết bằng Rust, lắng nghe thay đổi file trong 1 hoặc nhiều thư mục qua API của hệ điều hành (không polling): tạo, sửa, xóa, đổi tên đều ghi 1 dòng log có giờ, kèm user và PC ID để gom log nhiều máy vẫn phân biệt được. Debounce gộp các event dồn dập của 1 lần lưu file, lọc theo đuôi file, chạy lệnh tùy chọn hoặc in JSON để pipe sang tool khác. Giao diện web local luôn bật để cấu hình thư mục và xem log theo thời gian thực, theo phong cách hairline grid.</p>
         <span class="open" style="color: #8b95a9;">Ứng dụng dòng lệnh + giao diện web local — không có bản demo web</span>
+      </div>
       </div>
       <p class="note">Các ý tưởng và giải pháp khác sẽ xuất hiện tại đây khi được thêm vào repo.</p>
     </main>
