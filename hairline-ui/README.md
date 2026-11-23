@@ -7,7 +7,7 @@
 > component, hành vi — để sau này tách ra thành thư viện dùng chung
 > mà không phải đoán lại từ đầu.
 >
-> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.11.1.
+> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.11.2.
 
 ## Nguồn gốc
 
@@ -415,10 +415,10 @@ sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
 
 > Đã làm (2026-11-13–14): bước 1, 2, 3, 5 — starter kit
 > `hairline.css` + `hairline.js` + `demo.html` trong thư mục này,
-> đồng bộ tới File Watcher 0.11.0 (kể cả bộ icon Lucide 22 icon
+> đồng bộ tới File Watcher 0.11.2 (kể cả bộ icon Lucide 22 icon
 > với `loader-circle` cho trạng thái đang chạy, hover nhuộm tint
-> có Hover lift và section thu gọn trong sidebar, File Watcher
-> nhúng sprite của kit vào `ui.html`). Còn lại:
+> có Hover lift, section thu gọn trong sidebar và padding trên
+> của khung log, File Watcher nhúng sprite của kit vào `ui.html`). Còn lại:
 > bước 4 (quy ước đặt
 > tên, quyết sau khi có ứng dụng thứ hai), bước 6 (repo/package
 > riêng khi có từ 2 ứng dụng dùng trở lên).
@@ -469,6 +469,7 @@ sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
 | 0.10.0 | 2026-11-14 | Webhook n8n khi đổi tên file: thêm ô `n8n webhook URL` (field + hint chuẩn trong section Settings, không thêm component mới); đổi tên file thành `tên--ACTION.ext` thì app POST JSON event (+ `"action"`) tới webhook, gửi bằng `curl` ở thread nền. |
 | 0.11.0 | 2026-11-15 | Trạng thái webhook trên dòng event (sending/sent/failed + nút Re-send khi lỗi, tiêu đề nhóm gom trạng thái tệ nhất): icon `loader-circle` mới trong sprite (22 icon) cho trạng thái đang gửi (xoay bằng CSS), `circle-check`/`circle-alert` cho sent/failed, `refresh-cw` cho nút Re-send; trạng thái đi qua cùng kênh log/SSE dưới dạng entry riêng, không tính vào số đếm event. |
 | 0.11.1 | 2026-11-15 | Sửa rename bị double trên macOS: FSEvents báo 1 lần đổi tên thành 2 event Any kề nhau (tên cũ + tên mới) — app ghép thành 1 dòng `cũ -> mới` khi cùng thư mục và đúng 1 tên còn tồn tại (tên còn tồn tại là tên mới); webhook chỉ gửi 1 lần theo tên mới. Không đủ chắc chắn thì giữ 2 dòng. |
+| 0.11.2 | 2026-11-23 | Khung log (`#log`) có padding trên 8px để hàng log đầu tiên không sát thanh tabs (port từ kit, đã kiểm chứng trên demo). |
 
 ## Tham chiếu
 
