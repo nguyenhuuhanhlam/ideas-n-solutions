@@ -11,19 +11,19 @@ thư mục mới và một thẻ vào trang chủ ở `index.html`.
 | Timeline Projects — quản lý dự án trên 1 trục thời gian | `timeline-projects/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/timeline-projects/ |
 | Team Assistant — mô phỏng trợ lý trung tâm cho team kiến trúc | `team-assistant-sim/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/team-assistant-sim/ |
 | Platformer Game — prototype màn 1 kiểu NES, Canvas 2D + JS thuần, 1 file HTML tĩnh (không cần build) | `platformer-game/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/platformer-game/ |
-| TuTi Learn English — học tiếng Anh cơ bản qua bài tập có chấm điểm, phân loại bằng tabs (6 bài cơ bản + tab Chia động từ 6 nhóm × 15 câu + tab Tra cứu 47 động từ bất quy tắc, ôn tập tổng hợp) | `english-learning/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/english-learning/ |
-| Form Hub — danh sách form có sẵn + API cho ứng dụng khác (link điền, JSON form, nhúng iframe); chỉ dùng Form Library miễn phí (MIT) | `surveyjs-demo/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/surveyjs-demo/ |
-| Synaps Draft — vẽ kiến trúc: drafting 2D chính xác (tường/cửa/cửa sổ, snap, nhập số, mm) + xem 3D đồng bộ từ cùng Building JSON, undo/redo, lưu/mở JSON; xuất DXF qua API FastAPI (`synaps-draft/api/`, chạy local) | `synaps-draft/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/synaps-draft/ |
-| Ảnh nhóm — chụp ảnh trên mobile up thẳng lên Cloudinary (preset unsigned), cả nhóm xem chung mọi máy; nén trước khi up, trình xem vuốt/pinch zoom | `photo-app/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/photo-app/ |
-| MIENTAY Website Demo — bản demo tái thiết kế mientay.com.vn theo bố cục tạp chí kienviet.net (giữ xanh dương + logo Mientay): hero 5 dự án nổi bật, đủ 34 dự án thật, lọc theo dịch vụ và Nhà nước/Tư nhân, trang chi tiết có bảng Thông tin dự án | `mientay-demo/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/mientay-demo/ |
-| Hairline UI — bộ kit giao diện dùng lại: phong cách hairline grid (chỉ line 1px, không card/shadow/bo góc), CSS + JS vanilla dùng chung (sidebar co dãn, section thu gọn, chọn màu nền, icon Lucide nét 1px) | `hairline-ui/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/hairline-ui/demo.html |
+| TuTi Learn English — học tiếng Anh cơ bản qua bài tập có chấm điểm (bài cơ bản + chia động từ 6 nhóm + tra cứu 47 động từ bất quy tắc) | `english-learning/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/english-learning/ |
+| Form Hub — điền form trực tiếp + API cho ứng dụng khác (link điền, JSON form, nhúng iframe) | `surveyjs-demo/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/surveyjs-demo/ |
+| Synaps Draft — vẽ kiến trúc: drafting 2D chính xác (tường/cửa/cửa sổ, snap, mm) + xem 3D đồng bộ; xuất DXF qua API FastAPI local | `synaps-draft/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/synaps-draft/ |
+| Ảnh nhóm — chụp ảnh trên mobile up thẳng lên Cloudinary, cả nhóm xem chung mọi máy; trình xem vuốt/pinch zoom | `photo-app/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/photo-app/ |
+| MIENTAY Website Demo — bản demo tái thiết kế mientay.com.vn theo bố cục tạp chí kienviet.net: đủ 34 dự án thật, lọc theo dịch vụ | `mientay-demo/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/mientay-demo/ |
+| Hairline UI — bộ kit giao diện dùng lại: phong cách hairline grid (chỉ line 1px, không card/shadow/bo góc), CSS + JS vanilla dùng chung | `hairline-ui/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/hairline-ui/demo.html |
 
 ## App desktop (không deploy lên Pages)
 
 | App | Thư mục | Chạy |
 | --- | --- | --- |
-| Clipboard Tool — tool tray trên Windows, nghe clipboard text thuần, chạy module Rust tự động (phát hiện link http/https, loại bỏ `fbclid`, giữ các param còn lại); không lưu clipboard xuống đĩa | `clipboard-tool/` | Windows: `cargo build --release` rồi chạy `target/release/clipboard-tool.exe` (xem `clipboard-tool/README.md`) |
-| File Watcher — CLI Rust lắng nghe thay đổi file trong 1 hoặc nhiều thư mục qua API hệ điều hành (không polling), ghi log có giờ + user/PC ID, debounce gộp event dồn dập, lọc đuôi file, chạy lệnh hoặc in JSON; giao diện web local luôn bật để cấu hình thư mục và xem log realtime theo phong cách hairline grid | `file-watcher/` | `cargo build --release` rồi chạy `target/release/file-watcher` (Windows: `file-watcher.exe`) (xem `file-watcher/README.md`) |
+| Clipboard Tool — tool tray Windows, nghe clipboard text thuần: chuẩn hoá link, loại bỏ `fbclid`; không lưu xuống đĩa | `clipboard-tool/` | Windows: `cargo build --release` rồi chạy `target/release/clipboard-tool.exe` (xem `clipboard-tool/README.md`) |
+| File Watcher — CLI Rust nghe thay đổi file qua API hệ điều hành (không polling), ghi log kèm user/PC ID; giao diện web local xem log realtime | `file-watcher/` | `cargo build --release` rồi chạy `target/release/file-watcher` (Windows: `file-watcher.exe`) (xem `file-watcher/README.md`) |
 
 Các app này chỉ có thẻ mô tả tĩnh ở trang chủ `index.html` (không có
 bản demo web) và không có bước build trong workflow Pages, vì chúng là
