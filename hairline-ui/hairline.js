@@ -1,4 +1,4 @@
-/* Hairline UI — shared JS helpers (starter kit, synced with File Watcher 0.11.3)
+/* Hairline UI — shared JS helpers (starter kit, synced with File Watcher 0.11.4)
    Plain vanilla, no framework. Call Hairline.init({...}) or use pieces.
    Spec: hairline-ui/README.md */
 (function (global) {

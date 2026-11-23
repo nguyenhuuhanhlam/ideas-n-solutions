@@ -176,11 +176,14 @@ không truy cập được từ máy khác trong mạng.
   focus). Nút ‹ ở đầu topbar thu gọn hẳn sidebar, bấm › để mở lại.
   Chiều rộng và trạng thái thu gọn lưu trong trình duyệt nên mở
   lại vẫn giữ. Các section trong sidebar (Watched folders,
-  Settings, Background color, Info) thu gọn/mở ra bằng cách bấm
-  tiêu đề của nó (từ 0.9.9, component dùng lại từ kit
-  `hairline-ui/`): mặc định đóng trừ Watched folders, trạng thái
-  từng section lưu trong trình duyệt, bấm Enter/Space khi tiêu
-  đề đang focus cũng đổi trạng thái.
+  Settings, Background color, Layout, Info) thu gọn/mở ra
+  bằng cách bấm tiêu đề của nó (từ 0.9.9, component dùng lại
+  từ kit `hairline-ui/`): mặc định đóng trừ Watched folders,
+  trạng thái từng section lưu trong trình duyệt, bấm
+  Enter/Space khi tiêu đề đang focus cũng đổi trạng thái.
+  Section Layout (từ 0.11.4) có 3 checkbox ẩn/hiện dải Stats,
+  Toolbar, Tabs trên log; bỏ chọn thì dải đó ẩn hẳn, log dãn
+  ra chiếm chỗ, trạng thái lưu trong trình duyệt.
 - **Cuộn không thanh trượt:** sidebar và log đều ẩn thanh cuộn;
   khi còn nội dung phía trên/dưới thì mép tương ứng hiện vệt mờ
   nhạt, mờ dần khi cuộn tới cuối. Cuộn bằng chuột/bàn phím như

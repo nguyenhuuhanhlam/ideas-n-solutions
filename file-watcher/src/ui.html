@@ -506,6 +506,13 @@
       </div>
       <p class="hint">The background color only applies to the surrounding areas (sidebar, topbar, stat strip, toolbar, tabs). The log area always keeps the original background for readability.</p>
     </div>
+    <h6 data-section="layout">Layout</h6>
+    <div class="sideblock">
+      <label class="checkrow"><input type="checkbox" id="showStats" checked> Stats</label>
+      <label class="checkrow"><input type="checkbox" id="showToolbar" checked> Toolbar</label>
+      <label class="checkrow"><input type="checkbox" id="showTabs" checked> Tabs</label>
+      <p class="hint">Show or hide the three strips above the log.</p>
+    </div>
     <h6 data-section="info">Info</h6>
     <div class="sideblock foot">
       <p>Config file: <code id="cfgFile">—</code></p>
@@ -950,6 +957,35 @@
       head.addEventListener("keydown", function (e) {
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open = !open; apply(true); }
       });
+      apply(false);
+    });
+  })();
+
+  // Ẩn/hiện dải nội dung (từ 0.11.4; component dùng lại, bản gốc
+  // ở kit: Hairline.initVisibilityToggles trong
+  // hairline-ui/hairline.js). Mỗi checkbox trong section Layout
+  // điều khiển một dải trên log (Stats, Toolbar, Tabs): bỏ chọn
+  // thì dải đó ẩn hẳn (thuộc tính hidden, log dãn ra chiếm chỗ),
+  // chọn lại thì hiện. Trạng thái lưu localStorage, mặc định
+  // hiện. Không cần onToggle như demo (demo phải quay về tab All
+  // khi ẩn Tabs để khỏi kẹt ở gallery icon — app này không có
+  // gallery nên không có bẫy đó).
+  (function initVisibilityToggles() {
+    var prefix = "file-watcher-strip-";
+    [
+      { id: "stats", checkbox: document.getElementById("showStats"), target: document.querySelector(".stats") },
+      { id: "toolbar", checkbox: document.getElementById("showToolbar"), target: document.querySelector(".toolbar") },
+      { id: "tabs", checkbox: document.getElementById("showTabs"), target: document.querySelector(".tabs") }
+    ].forEach(function (item) {
+      if (!item.checkbox || !item.target) return;
+      var saved = storeGet(prefix + item.id);
+      var visible = saved == null || saved === "1";
+      function apply(save) {
+        item.target.hidden = !visible;
+        item.checkbox.checked = visible;
+        if (save) storeSet(prefix + item.id, visible ? "1" : "0");
+      }
+      item.checkbox.addEventListener("change", function () { visible = item.checkbox.checked; apply(true); });
       apply(false);
     });
   })();
