@@ -334,8 +334,7 @@ lại dãn ra), chọn lại thì hiện.
   `opts.storagePrefix` đổi tiền tố khóa;
   `opts.onToggle(id, visible)` chạy sau mỗi lần đổi.
 - Demo: section Layout trong sidebar có 3 checkbox Stats /
-  Toolbar / Tabs. Ẩn Tabs thì demo tự quay về tab All để
-  không kẹt ở gallery icon khi không còn tab để bấm lại.
+  Toolbar / Tabs.
 
 ### Vệt mờ báo cuộn (thay thanh trượt)
 
@@ -372,9 +371,8 @@ sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
   icon + chữ dùng thêm class `.btn-icon`. Màu icon ăn theo
   `currentColor` như chữ.
 - **Thêm icon:** thêm tên Lucide vào mảng `ICONS` trong
-  `icons/build-sprite.mjs` rồi chạy lại script; sprite và
-  gallery trong demo tự khớp (demo có tab Icons liệt kê toàn
-  bộ sprite).
+  `icons/build-sprite.mjs` rồi chạy lại script; sprite cập
+  nhật theo.
 - **Lưu ý:** sprite ngoài cần phục vụ qua http(s) — mở file
   HTML trực tiếp (`file://`) có trình duyệt sẽ chặn `<use>`
   trỏ file ngoài. App một file (như File Watcher) thì nhúng
