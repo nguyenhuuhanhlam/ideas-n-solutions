@@ -211,7 +211,8 @@ trong tab: mono 12px, opacity .75.
 - Hàng: flex, gap 10px, padding `5px 14px`, mono 13px,
   `white-space: pre-wrap`, `word-break: break-all`,
   `border-bottom` 1px (hàng cuối không viền), hover đổi nền
-  `--hover`.
+  `--hover`. Khung log (`.hl-log`) có `padding-top` 8px để
+  hàng đầu không sát thanh tabs.
 - **Thời gian:** muted, không co. **Loại event:** rộng cố định
   82px, dạng tag — chữ 11px semibold, **viền 1px cùng màu chữ,
   không nền** (`border: 1px solid currentColor`, padding

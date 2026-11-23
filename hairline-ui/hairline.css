@@ -94,7 +94,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .tabbtn.active { color: var(--fg); box-shadow: inset 0 -2px 0 var(--accent); }
 .tabbtn .tabcount { opacity: .75; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
 .logwrap { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.hl-log, #log { flex: 1; overflow-y: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+.hl-log, #log { flex: 1; overflow-y: auto; padding-top: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
 .row { display: flex; gap: 10px; padding: 5px 14px; border-bottom: 1px solid var(--line); align-items: center; }
 .row:last-child { border-bottom: 0; } .row:hover { background: var(--hover); }
 .row .time { color: var(--muted); flex-shrink: 0; }
