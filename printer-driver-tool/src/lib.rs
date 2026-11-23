@@ -6,6 +6,7 @@
 
 pub mod backup;
 pub mod format;
+pub mod json;
 #[cfg(windows)]
 pub mod win;
 
@@ -134,6 +135,27 @@ pub fn list_printers(server: Option<&str>) -> Result<Vec<PrinterInfo>, String> {
 /// Ngoài Windows: trả lỗi rõ ràng.
 #[cfg(not(windows))]
 pub fn list_printers(_server: Option<&str>) -> Result<Vec<PrinterInfo>, String> {
+    Err("Tool này chỉ chạy trên Windows (cần Print Spooler API).".to_string())
+}
+
+/// Cài driver lên máy local (hoặc máy chủ từ xa) từ bộ file đã giải
+/// quyết trong thư mục backup. Cần quyền administrator.
+#[cfg(windows)]
+pub fn install_driver(
+    driver: &PrinterDriver,
+    files: &ResolvedDriverFiles,
+    server: Option<&str>,
+) -> Result<(), String> {
+    win::install_driver(driver, files, server)
+}
+
+/// Ngoài Windows: trả lỗi rõ ràng.
+#[cfg(not(windows))]
+pub fn install_driver(
+    _driver: &PrinterDriver,
+    _files: &ResolvedDriverFiles,
+    _server: Option<&str>,
+) -> Result<(), String> {
     Err("Tool này chỉ chạy trên Windows (cần Print Spooler API).".to_string())
 }
 
@@ -266,6 +288,288 @@ pub fn find_drivers_by_name<'a>(
         .collect()
 }
 
+/// Tên file (phần sau dấu \ hoặc / cuối cùng). Dùng riêng thay cho
+/// `Path::file_name` vì trên Linux, `Path` không hiểu dấu \ của
+/// đường dẫn Windows trong manifest.
+pub fn windows_file_name(path: &str) -> &str {
+    match path.rfind(|c| c == '/' || c == '\\') {
+        Some(i) => &path[i + 1..],
+        None => path,
+    }
+}
+
+/// Đổi ngày "dd-mm-yyyy" ngược lại thành FILETIME ticks (100ns từ
+/// 01-01-1601, giờ UTC). Trả None khi sai định dạng hoặc ngày không
+/// có thật (vd 31-02-2024) — dùng khi dựng lại DRIVER_INFO_6 để restore.
+pub fn parse_driver_date(s: &str) -> Option<u64> {
+    let mut parts = s.split('-');
+    let d: u32 = parts.next()?.parse().ok()?;
+    let m: u32 = parts.next()?.parse().ok()?;
+    let y: i64 = parts.next()?.parse().ok()?;
+    if parts.next().is_some() {
+        return None;
+    }
+    if !(1970..=2100).contains(&y) || !(1..=12).contains(&m) {
+        return None;
+    }
+    if d < 1 || d > days_in_month(y, m) {
+        return None;
+    }
+    let days = days_from_civil(y, m, d);
+    let unix_seconds = days * 86_400;
+    Some(((unix_seconds + 11_644_473_600) as u64) * 10_000_000)
+}
+
+/// Số ngày trong tháng, tính cả năm nhuận.
+fn days_in_month(y: i64, m: u32) -> u32 {
+    match m {
+        1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
+        4 | 6 | 9 | 11 => 30,
+        2 => {
+            if (y % 4 == 0 && y % 100 != 0) || y % 400 == 0 {
+                29
+            } else {
+                28
+            }
+        }
+        _ => 0,
+    }
+}
+
+/// Đổi (năm, tháng, ngày) thành số ngày kể từ 01-01-1970.
+/// Thuật toán days-from-civil của Howard Hinnant (ngược của civil_from_days).
+fn days_from_civil(y: i64, m: u32, d: u32) -> i64 {
+    let y = if m <= 2 { y - 1 } else { y };
+    let era = if y >= 0 { y } else { y - 399 } / 400;
+    let yoe = y - era * 400; // [0, 399]
+    let mp = if m > 2 { m - 3 } else { m + 9 } as i64; // [0, 11]
+    let doy = (153 * mp + 2) / 5 + d as i64 - 1; // [0, 365]
+    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy; // [0, 146096]
+    era * 146_097 + doe - 719_468
+}
+
+/// Đổi phiên bản "a.b.c.d" ngược lại thành u64 đóng gói (mỗi phần 16 bit).
+/// Trả 0 khi chuỗi rỗng hoặc sai định dạng — 0 nghĩa là "không rõ phiên bản".
+pub fn parse_driver_version(s: &str) -> u64 {
+    if s.is_empty() {
+        return 0;
+    }
+    let mut parts = [0u64; 4];
+    for (i, p) in s.split('.').enumerate() {
+        if i >= 4 {
+            return 0;
+        }
+        match p.parse::<u64>() {
+            Ok(v) if v <= 0xFFFF => parts[i] = v,
+            _ => return 0,
+        }
+    }
+    (parts[0] << 48) | (parts[1] << 32) | (parts[2] << 16) | parts[3]
+}
+
+// ---------------------------------------------------------------------------
+// Đọc manifest backup (lệnh restore)
+// ---------------------------------------------------------------------------
+
+fn manifest_str(v: &json::JsonValue, key: &str) -> String {
+    v.get(key)
+        .and_then(|f| f.as_str())
+        .unwrap_or("")
+        .to_string()
+}
+
+fn manifest_req_str(v: &json::JsonValue, key: &str) -> Result<String, String> {
+    match v.get(key).and_then(|f| f.as_str()) {
+        Some(s) if !s.is_empty() => Ok(s.to_string()),
+        _ => Err(format!("manifest thiếu trường bắt buộc: {key}")),
+    }
+}
+
+fn manifest_str_array(v: &json::JsonValue, key: &str) -> Vec<String> {
+    v.get(key)
+        .and_then(|f| f.as_array())
+        .map(|items| {
+            items
+                .iter()
+                .filter_map(|i| i.as_str().map(|s| s.to_string()))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// Đọc manifest `driver-info.json` thành (driver, file map).
+/// File map là danh sách (đường dẫn gốc, tên file trong thư mục backup),
+/// chỉ có ở manifest v2 (từ bản 0.2.0). Manifest v1 (bản 0.1.0, không có
+/// trường "files") vẫn đọc được, file map rỗng — restore sẽ tìm file
+/// theo tên (xem `find_backup_file`).
+pub fn parse_manifest(text: &str) -> Result<(PrinterDriver, Vec<(String, String)>), String> {
+    let v = json::parse(text).map_err(|e| format!("manifest không phải JSON hợp lệ: {e}"))?;
+    if !matches!(v, json::JsonValue::Object(_)) {
+        return Err("manifest phải là 1 JSON object".to_string());
+    }
+    let version = v
+        .get("version")
+        .and_then(|f| f.as_u64())
+        .ok_or("manifest thiếu trường bắt buộc: version")? as u32;
+    let driver_date = match v.get("driver_date") {
+        Some(f) if f.is_null() => None,
+        Some(f) => f.as_str().map(|s| s.to_string()),
+        None => None,
+    };
+    let driver = PrinterDriver {
+        name: manifest_req_str(&v, "name")?,
+        environment: manifest_str(&v, "environment"),
+        version,
+        driver_path: manifest_str(&v, "driver_path"),
+        data_file: manifest_str(&v, "data_file"),
+        config_file: manifest_str(&v, "config_file"),
+        help_file: manifest_str(&v, "help_file"),
+        dependent_files: manifest_str_array(&v, "dependent_files"),
+        monitor_name: manifest_str(&v, "monitor_name"),
+        default_data_type: manifest_str(&v, "default_data_type"),
+        previous_names: manifest_str_array(&v, "previous_names"),
+        driver_date,
+        driver_version: manifest_str(&v, "driver_version"),
+        manufacturer: manifest_str(&v, "manufacturer"),
+        oem_url: manifest_str(&v, "oem_url"),
+    };
+    let mut file_map = Vec::new();
+    if let Some(files) = v.get("files").and_then(|f| f.as_array()) {
+        for item in files {
+            if let (Some(src), Some(file)) = (
+                item.get("source").and_then(|f| f.as_str()),
+                item.get("file").and_then(|f| f.as_str()),
+            ) {
+                file_map.push((src.to_string(), file.to_string()));
+            }
+        }
+    }
+    Ok((driver, file_map))
+}
+
+/// Tìm file backup theo đường dẫn gốc: khớp đúng tên file trước,
+/// nếu không có thì thử các tên đổi hậu tố `__2`, `__3`... (do backup
+/// đổi tên khi trùng). Dùng cho manifest v1 không có file map.
+pub fn find_backup_file(dir: &std::path::Path, original_path: &str) -> Option<std::path::PathBuf> {
+    let base = windows_file_name(original_path);
+    if base.is_empty() {
+        return None;
+    }
+    let exact = dir.join(base);
+    if exact.is_file() {
+        return Some(exact);
+    }
+    let (stem, ext) = match base.rfind('.') {
+        Some(i) if i > 0 => (&base[..i], Some(&base[i..])),
+        _ => (base, None),
+    };
+    for n in 2..=100u32 {
+        let candidate = match ext {
+            Some(e) => format!("{stem}__{n}{e}"),
+            None => format!("{stem}__{n}"),
+        };
+        let p = dir.join(candidate);
+        if p.is_file() {
+            return Some(p);
+        }
+    }
+    None
+}
+
+/// Đường dẫn đầy đủ tới từng file driver trong thư mục backup,
+/// đã giải quyết xong (đường dẫn rỗng nghĩa là manifest không có file đó).
+#[derive(Debug, Clone)]
+pub struct ResolvedDriverFiles {
+    pub driver_path: std::path::PathBuf,
+    pub data_file: std::path::PathBuf,
+    pub config_file: std::path::PathBuf,
+    pub help_file: std::path::PathBuf,
+    pub dependent_files: Vec<std::path::PathBuf>,
+}
+
+impl ResolvedDriverFiles {
+    /// Số file thực sự có (không tính đường dẫn rỗng).
+    pub fn count(&self) -> usize {
+        let mut n = 0;
+        if !self.driver_path.as_os_str().is_empty() {
+            n += 1;
+        }
+        if !self.data_file.as_os_str().is_empty() {
+            n += 1;
+        }
+        if !self.config_file.as_os_str().is_empty() {
+            n += 1;
+        }
+        if !self.help_file.as_os_str().is_empty() {
+            n += 1;
+        }
+        n + self.dependent_files.len()
+    }
+}
+
+/// Giải quyết toàn bộ file của driver trong thư mục backup:
+/// ưu tiên file map (manifest v2), nếu không có thì tìm theo tên
+/// (`find_backup_file`). Trả Err liệt kê file thiếu — restore không
+/// cài dở dang khi thiếu file.
+pub fn resolve_restore_files(
+    driver: &PrinterDriver,
+    file_map: &[(String, String)],
+    dir: &std::path::Path,
+) -> Result<ResolvedDriverFiles, String> {
+    let mut missing: Vec<String> = Vec::new();
+    let resolve_one = |original: &str, missing: &mut Vec<String>| -> std::path::PathBuf {
+        if original.is_empty() {
+            return std::path::PathBuf::new();
+        }
+        // Ưu tiên file map v2 (khớp đúng đường dẫn gốc).
+        if let Some((_, file)) = file_map.iter().find(|(src, _)| src == original) {
+            let p = dir.join(file);
+            if p.is_file() {
+                return p;
+            }
+            missing.push(format!(
+                "{original} (manifest ghi file {file} nhưng không có trong thư mục backup)"
+            ));
+            return std::path::PathBuf::new();
+        }
+        // Fallback v1: tìm theo tên file.
+        match find_backup_file(dir, original) {
+            Some(p) => p,
+            None => {
+                missing.push(original.to_string());
+                std::path::PathBuf::new()
+            }
+        }
+    };
+
+    let resolved = ResolvedDriverFiles {
+        driver_path: resolve_one(&driver.driver_path, &mut missing),
+        data_file: resolve_one(&driver.data_file, &mut missing),
+        config_file: resolve_one(&driver.config_file, &mut missing),
+        help_file: resolve_one(&driver.help_file, &mut missing),
+        dependent_files: driver
+            .dependent_files
+            .iter()
+            .map(|f| resolve_one(f, &mut missing))
+            .filter(|p| !p.as_os_str().is_empty())
+            .collect(),
+    };
+    if !missing.is_empty() {
+        let mut msg = format!(
+            "Thiếu {} file trong thư mục backup, không thể restore:\n",
+            missing.len()
+        );
+        for f in &missing {
+            msg.push_str(&format!("  - {f}\n"));
+        }
+        return Err(msg);
+    }
+    if resolved.driver_path.as_os_str().is_empty() {
+        return Err("Manifest không có file driver chính (driver_path rỗng).".to_string());
+    }
+    Ok(resolved)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -392,5 +696,147 @@ mod tests {
             1
         );
         assert!(find_drivers_by_name(&drivers, "khong co").is_empty());
+    }
+
+    #[test]
+    fn windows_file_name_cases() {
+        assert_eq!(windows_file_name("C:\\Windows\\x.dll"), "x.dll");
+        assert_eq!(windows_file_name("\\\\MAY\\share\\a.inf"), "a.inf");
+        assert_eq!(windows_file_name("/tmp/x.dll"), "x.dll");
+        assert_eq!(windows_file_name("plain.dll"), "plain.dll");
+        assert_eq!(windows_file_name("C:\\Windows\\"), "");
+    }
+
+    #[test]
+    fn driver_date_round_trip() {
+        // format_filetime và parse_driver_date phải ngược nhau.
+        let ticks = (1705276800u64 + 11_644_473_600) * 10_000_000; // 15-01-2024
+        let text = format_filetime(ticks).unwrap();
+        assert_eq!(text, "15-01-2024");
+        assert_eq!(parse_driver_date(&text), Some(ticks));
+        // Năm nhuận.
+        let ticks = (1709164800u64 + 11_644_473_600) * 10_000_000; // 29-02-2024
+        assert_eq!(parse_driver_date("29-02-2024"), Some(ticks));
+        // Ngày không có thật.
+        assert_eq!(parse_driver_date("31-02-2024"), None);
+        assert_eq!(parse_driver_date("29-02-2023"), None);
+        assert_eq!(parse_driver_date("15-13-2024"), None);
+        assert_eq!(parse_driver_date("15/01/2024"), None);
+        assert_eq!(parse_driver_date(""), None);
+    }
+
+    #[test]
+    fn driver_version_round_trip() {
+        let v = (10u64 << 48) | (0u64 << 32) | (19041u64 << 16) | 1;
+        assert_eq!(parse_driver_version(&format_driver_version(v)), v);
+        assert_eq!(parse_driver_version(""), 0);
+        assert_eq!(parse_driver_version("10.0.99999.1"), 0);
+        assert_eq!(parse_driver_version("a.b.c.d"), 0);
+        assert_eq!(parse_driver_version("1.2.3.4.5"), 0);
+    }
+
+    #[test]
+    fn manifest_v2_parses_with_file_map() {
+        let text = r#"{"name": "Test Driver", "environment": "Windows x64",
+            "model": "v4", "version": 4, "driver_date": "15-01-2024",
+            "driver_version": "10.0.19041.1", "manufacturer": "Hãng",
+            "oem_url": "", "driver_path": "C:\\drv\\test.dll",
+            "data_file": "C:\\drv\\test.inf", "config_file": "",
+            "help_file": "", "dependent_files": ["a.dll"],
+            "monitor_name": "", "default_data_type": "RAW",
+            "previous_names": [],
+            "files": [{"source": "C:\\drv\\test.dll", "file": "test.dll"},
+                      {"source": "C:\\drv\\test.inf", "file": "test__2.inf"},
+                      {"source": "a.dll", "file": "a.dll"}]}"#;
+        let (d, map) = parse_manifest(text).unwrap();
+        assert_eq!(d.name, "Test Driver");
+        assert_eq!(d.version, 4);
+        assert_eq!(d.driver_date.as_deref(), Some("15-01-2024"));
+        assert_eq!(d.dependent_files, vec!["a.dll"]);
+        assert_eq!(map.len(), 3);
+        assert_eq!(
+            map[1],
+            ("C:\\drv\\test.inf".to_string(), "test__2.inf".to_string())
+        );
+    }
+
+    #[test]
+    fn manifest_v1_parses_without_file_map() {
+        // Manifest bản 0.1.0: không có trường "files".
+        let text = r#"{"name": "Old", "environment": "Windows x64",
+            "model": "v3", "version": 3, "driver_date": null,
+            "driver_version": "", "manufacturer": "", "oem_url": "",
+            "driver_path": "C:\\drv\\old.dll", "data_file": "",
+            "config_file": "", "help_file": "", "dependent_files": [],
+            "monitor_name": "", "default_data_type": "RAW",
+            "previous_names": []}"#;
+        let (d, map) = parse_manifest(text).unwrap();
+        assert_eq!(d.name, "Old");
+        assert_eq!(d.driver_date, None);
+        assert!(map.is_empty());
+    }
+
+    #[test]
+    fn manifest_rejects_bad_input() {
+        assert!(parse_manifest("không phải json").is_err());
+        assert!(parse_manifest("[1, 2]").is_err());
+        assert!(
+            parse_manifest("{}").is_err(),
+            "thiếu name + version phải lỗi"
+        );
+        assert!(parse_manifest(r#"{"name": "X"}"#).is_err());
+    }
+
+    #[test]
+    fn find_backup_file_exact_then_suffixed() {
+        let dir = std::env::temp_dir().join("pdt-test-find");
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("a.dll"), b"x").unwrap();
+        std::fs::write(dir.join("b__2.dll"), b"x").unwrap();
+
+        assert_eq!(
+            find_backup_file(&dir, "C:\\drv\\a.dll").unwrap(),
+            dir.join("a.dll")
+        );
+        // b.dll không có bản đúng tên -> lấy b__2.dll.
+        assert_eq!(
+            find_backup_file(&dir, "C:\\drv\\b.dll").unwrap(),
+            dir.join("b__2.dll")
+        );
+        assert!(find_backup_file(&dir, "C:\\drv\\c.dll").is_none());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn resolve_prefers_file_map_over_name_match() {
+        let dir = std::env::temp_dir().join("pdt-test-resolve");
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("drv.dll"), b"x").unwrap();
+        std::fs::write(dir.join("drv__2.dll"), b"y").unwrap();
+
+        let mut d = sample_driver();
+        d.driver_path = "C:\\drv\\drv.dll".to_string();
+        d.data_file = String::new();
+        d.config_file = String::new();
+        d.help_file = String::new();
+        d.dependent_files = vec![];
+        // File map chỉ rõ drv.dll gốc nằm ở drv__2.dll.
+        let map = vec![("C:\\drv\\drv.dll".to_string(), "drv__2.dll".to_string())];
+        let r = resolve_restore_files(&d, &map, &dir).unwrap();
+        assert_eq!(r.driver_path, dir.join("drv__2.dll"));
+        assert_eq!(r.count(), 1);
+
+        // Không có file map: khớp đúng tên.
+        let r = resolve_restore_files(&d, &[], &dir).unwrap();
+        assert_eq!(r.driver_path, dir.join("drv.dll"));
+
+        // Thiếu file: lỗi liệt kê rõ.
+        let mut d2 = d.clone();
+        d2.data_file = "C:\\drv\\khong-co.inf".to_string();
+        let err = resolve_restore_files(&d2, &[], &dir).unwrap_err();
+        assert!(err.contains("khong-co.inf"));
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

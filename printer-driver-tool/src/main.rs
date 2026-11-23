@@ -9,7 +9,10 @@ use printer_driver_tool::format::{
     driver_detail, drivers_table, drivers_to_csv, drivers_to_json, printers_table, printers_to_csv,
     printers_to_json,
 };
-use printer_driver_tool::{find_drivers_by_name, list_drivers, list_printers, DriverQuery};
+use printer_driver_tool::{
+    find_drivers_by_name, install_driver, list_drivers, list_printers, parse_manifest,
+    resolve_restore_files, DriverQuery,
+};
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -25,8 +28,11 @@ LỆNH:
   export                      Xuất danh sách driver (mặc định JSON)
   backup <tên driver> <thư mục>  Sao lưu toàn bộ file của 1 driver
                               (+ manifest driver-info.json)
+  restore <thư mục backup>    Cài driver từ bản backup lên máy này
+                              (cần quyền administrator)
 
 TÙY CHỌN CHUNG:
+  --force                     restore: cài đè khi driver đã tồn tại
   --server \\\\MAY             Máy chủ in từ xa (mặc định: máy này)
   --env \"Windows x64\"        Môi trường driver (mặc định: môi trường
                               hiện tại; các giá trị thường gặp:
@@ -43,14 +49,20 @@ VÍ DỤ:
   printer-driver-tool printers
   printer-driver-tool export --format csv --out drivers.csv
   printer-driver-tool backup \"HP LaserJet Pro\" D:\\driver-backup
+  printer-driver-tool restore D:\\driver-backup
   printer-driver-tool list --server \\\\MAY-CHU-IN --json
 
 GHI CHÚ:
   - Liệt kê không cần quyền admin. Sao lưu có thể cần chạy terminal
     với quyền administrator nếu file driver nằm trong thư mục hệ thống
-    bị khóa đọc.
+    bị khóa đọc. Restore BẮT BUỘC chạy với quyền administrator
+    (Windows yêu cầu quyền SeLoadDriverPrivilege để cài driver).
   - Driver v4 (Windows 11, IPP) thường dùng chung file hệ thống nên
     bản sao lưu có thể gồm file dùng chung, không chỉ file riêng.
+  - Restore chỉ cài driver, chưa tạo máy in — muốn in được còn phải
+    thêm máy in và cổng (bằng tay hoặc lệnh Add-Printer của PowerShell).
+  - Backup từ máy x64 thì restore lên máy x64. Driver v4/inbox như
+    Microsoft IPP Class Driver thì khỏi restore, máy Win 11 nào cũng có.
 ";
 
 /// Định dạng xuất.
@@ -70,6 +82,7 @@ struct Args {
     env: Option<String>,
     format: Option<OutputFormat>,
     out: Option<String>,
+    force: bool,
     help: bool,
     version: bool,
 }
@@ -84,6 +97,7 @@ fn parse_args(argv: &[String]) -> Result<Args, String> {
         match a.as_str() {
             "-h" | "--help" => args.help = true,
             "-V" | "--version" => args.version = true,
+            "--force" => args.force = true,
             "--json" => args.format = Some(OutputFormat::Json),
             "--csv" => args.format = Some(OutputFormat::Csv),
             "--server" | "--env" | "--out" | "--format" => {
@@ -291,6 +305,81 @@ fn cmd_backup(args: &Args) -> Result<(), String> {
     Ok(())
 }
 
+fn cmd_restore(args: &Args) -> Result<(), String> {
+    let dir = args
+        .positionals
+        .first()
+        .ok_or("Thiếu thư mục backup. Ví dụ: restore D:\\driver-backup")?;
+    let dir_path = std::path::Path::new(dir);
+    let manifest_path = dir_path.join("driver-info.json");
+    let text = std::fs::read_to_string(&manifest_path).map_err(|e| {
+        if e.kind() == std::io::ErrorKind::NotFound {
+            format!(
+                "Không thấy driver-info.json trong {dir} — đây có phải thư mục backup của printer-driver-tool không?"
+            )
+        } else {
+            format!("Không đọc được {}: {e}", manifest_path.display())
+        }
+    })?;
+    let (driver, file_map) = parse_manifest(&text)?;
+    let files = resolve_restore_files(&driver, &file_map, dir_path)?;
+
+    // Driver đã tồn tại thì từ chối, trừ khi có --force.
+    let query = DriverQuery {
+        server: args.server.clone(),
+        environment: None,
+    };
+    let existing = list_drivers(&query)?;
+    let already = existing.iter().any(|d| {
+        d.name.eq_ignore_ascii_case(&driver.name)
+            && (driver.environment.is_empty() || d.environment == driver.environment)
+    });
+    if already && !args.force {
+        return Err(format!(
+            "Driver \"{}\" đã được cài sẵn{}. Dùng --force để cài đè.",
+            driver.name,
+            if driver.environment.is_empty() {
+                String::new()
+            } else {
+                format!(" (môi trường {})", driver.environment)
+            }
+        ));
+    }
+
+    eprintln!(
+        "Đang cài driver \"{}\" (môi trường {}, kiểu {}, {} file)...",
+        driver.name,
+        if driver.environment.is_empty() {
+            "mặc định"
+        } else {
+            &driver.environment
+        },
+        driver.model(),
+        files.count(),
+    );
+    install_driver(&driver, &files, args.server.as_deref())?;
+
+    // Kiểm chứng: liệt kê lại, driver phải xuất hiện.
+    let after = list_drivers(&query)?;
+    let found = after.iter().any(|d| {
+        d.name.eq_ignore_ascii_case(&driver.name)
+            && (driver.environment.is_empty() || d.environment == driver.environment)
+    });
+    if found {
+        println!(
+            "Đã cài xong driver \"{}\" ({} file). Chạy `list` để xem, rồi thêm máy in để dùng.",
+            driver.name,
+            files.count()
+        );
+        Ok(())
+    } else {
+        Err(format!(
+            "AddPrinterDriverEx báo thành công nhưng không thấy driver \"{}\" khi liệt kê lại. Thử chạy `list` để kiểm tra.",
+            driver.name
+        ))
+    }
+}
+
 fn run(argv: &[String]) -> Result<(), String> {
     let args = parse_args(argv)?;
     if args.help {
@@ -307,6 +396,7 @@ fn run(argv: &[String]) -> Result<(), String> {
         "printers" => cmd_printers(&args),
         "export" => cmd_export(&args),
         "backup" => cmd_backup(&args),
+        "restore" => cmd_restore(&args),
         other => Err(format!(
             "Lệnh không rõ: {other}\nChạy `printer-driver-tool --help` để xem các lệnh."
         )),
@@ -325,7 +415,8 @@ fn main() {
                 || msg.starts_with("Định dạng không hỗ trợ")
                 || msg.starts_with("Lệnh không rõ")
                 || msg.starts_with("Thiếu tên driver")
-                || msg.starts_with("Thiếu thư mục đích");
+                || msg.starts_with("Thiếu thư mục đích")
+                || msg.starts_with("Thiếu thư mục backup");
             eprintln!("Lỗi: {msg}");
             std::process::exit(if usage_error { 2 } else { 1 });
         }
@@ -383,5 +474,19 @@ mod tests {
     fn run_rejects_unknown_command() {
         let err = run(&argv(&["delete"])).unwrap_err();
         assert!(err.contains("Lệnh không rõ"));
+    }
+
+    #[test]
+    fn parse_restore_with_force() {
+        let a = parse_args(&argv(&["restore", "D:\\bk", "--force"])).unwrap();
+        assert_eq!(a.command.as_deref(), Some("restore"));
+        assert!(a.force);
+        assert_eq!(a.positionals, vec!["D:\\bk"]);
+    }
+
+    #[test]
+    fn run_restore_requires_dir() {
+        let err = run(&argv(&["restore"])).unwrap_err();
+        assert!(err.contains("Thiếu thư mục backup"));
     }
 }

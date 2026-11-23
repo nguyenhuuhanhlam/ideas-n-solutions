@@ -219,18 +219,19 @@ fn json_str_array(items: &[String]) -> String {
     format!("[{}]", parts.join(", "))
 }
 
-/// 1 driver thành object JSON (1 dòng, không thụt đầu dòng).
-pub fn driver_to_json(d: &PrinterDriver) -> String {
+/// Các field của 1 driver, dạng `"key": value, ...` (không có ngoặc
+/// nhọn ngoài), để `driver_to_json` và `backup_manifest_json` dùng chung.
+fn driver_fields_json(d: &PrinterDriver) -> String {
     let date = match &d.driver_date {
         Some(v) => json_str(v),
         None => "null".to_string(),
     };
     format!(
-        "{{\"name\": {}, \"environment\": {}, \"model\": {}, \"version\": {}, \
+        "\"name\": {}, \"environment\": {}, \"model\": {}, \"version\": {}, \
          \"driver_date\": {}, \"driver_version\": {}, \"manufacturer\": {}, \
          \"oem_url\": {}, \"driver_path\": {}, \"data_file\": {}, \
          \"config_file\": {}, \"help_file\": {}, \"dependent_files\": {}, \
-         \"monitor_name\": {}, \"default_data_type\": {}, \"previous_names\": {}}}",
+         \"monitor_name\": {}, \"default_data_type\": {}, \"previous_names\": {}",
         json_str(&d.name),
         json_str(&d.environment),
         json_str(d.model()),
@@ -248,6 +249,31 @@ pub fn driver_to_json(d: &PrinterDriver) -> String {
         json_str(&d.default_data_type),
         json_str_array(&d.previous_names),
     )
+}
+
+/// 1 driver thành object JSON (1 dòng, không thụt đầu dòng).
+pub fn driver_to_json(d: &PrinterDriver) -> String {
+    format!("{{{}}}", driver_fields_json(d))
+}
+
+/// Manifest backup v2: object JSON của driver + mảng "files" ánh xạ
+/// từng đường dẫn gốc sang tên file thật trong thư mục backup
+/// (kể cả file đã bị đổi tên thành `__2` do trùng tên).
+/// `files`: (đường dẫn gốc, tên file trong thư mục backup).
+pub fn backup_manifest_json(d: &PrinterDriver, files: &[(String, String)]) -> String {
+    let mut files_json = String::from("[");
+    for (i, (source, file)) in files.iter().enumerate() {
+        if i > 0 {
+            files_json.push_str(", ");
+        }
+        files_json.push_str(&format!(
+            "{{\"source\": {}, \"file\": {}}}",
+            json_str(source),
+            json_str(file)
+        ));
+    }
+    files_json.push(']');
+    format!("{{{}, \"files\": {}}}", driver_fields_json(d), files_json)
 }
 
 /// Danh sách driver thành JSON array, mỗi object 1 dòng.
@@ -428,6 +454,21 @@ mod tests {
         let mut d = sample_driver();
         d.driver_date = None;
         assert!(driver_to_json(&d).contains("\"driver_date\": null"));
+    }
+
+    #[test]
+    fn manifest_round_trip() {
+        // Manifest v2 do backup_manifest_json ghi ra phải đọc lại được
+        // nguyên vẹn bằng parse_manifest (kể cả chuỗi có " và \).
+        let d = sample_driver();
+        let files = vec![
+            ("C:\\drv\\test.dll".to_string(), "test.dll".to_string()),
+            ("C:\\drv\\test.inf".to_string(), "test__2.inf".to_string()),
+        ];
+        let text = backup_manifest_json(&d, &files);
+        let (back, map) = crate::parse_manifest(&text).unwrap();
+        assert_eq!(back, d);
+        assert_eq!(map, files);
     }
 
     #[test]

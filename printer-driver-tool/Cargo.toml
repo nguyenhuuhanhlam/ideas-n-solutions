@@ -1,6 +1,6 @@
 [package]
 name = "printer-driver-tool"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "Windows 11 CLI: list installed printer drivers, show details, export and back up driver files"
 license = "MIT"

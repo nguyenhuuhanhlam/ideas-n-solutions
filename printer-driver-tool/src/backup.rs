@@ -5,7 +5,7 @@
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
-use crate::format::driver_to_json;
+use crate::format::backup_manifest_json;
 use crate::{resolve_driver_file, PrinterDriver};
 
 /// Kết quả sao lưu 1 driver.
@@ -75,6 +75,10 @@ pub fn backup_driver(driver: &PrinterDriver, dest_dir: &Path) -> Result<BackupRe
         ..Default::default()
     };
     let mut used: HashSet<String> = HashSet::new();
+    // (đường dẫn gốc, tên file thật trong thư mục backup) — chỉ gồm
+    // file copy thành công; restore dùng map này để tìm đúng file
+    // kể cả khi tên đã bị đổi thành __2 do trùng.
+    let mut file_map: Vec<(String, String)> = Vec::new();
 
     for source in driver.all_files() {
         let src_path = resolve_driver_file(&source, &driver_dir);
@@ -85,7 +89,10 @@ pub fn backup_driver(driver: &PrinterDriver, dest_dir: &Path) -> Result<BackupRe
         let dest_name = unique_dest_name(&mut used, &file_name);
         let dest_path = dest_dir.join(&dest_name);
         match std::fs::copy(&src_path, &dest_path) {
-            Ok(bytes) => report.copied.push((dest_name, bytes)),
+            Ok(bytes) => {
+                file_map.push((source.clone(), dest_name.clone()));
+                report.copied.push((dest_name, bytes));
+            }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
                 report.missing.push(src_path.display().to_string());
             }
@@ -95,9 +102,9 @@ pub fn backup_driver(driver: &PrinterDriver, dest_dir: &Path) -> Result<BackupRe
         }
     }
 
-    // Manifest: mô tả driver để sau này biết file này của driver nào.
+    // Manifest v2: mô tả driver + file map để lệnh restore đọc lại.
     let manifest = dest_dir.join("driver-info.json");
-    std::fs::write(&manifest, driver_to_json(driver))
+    std::fs::write(&manifest, backup_manifest_json(driver, &file_map))
         .map_err(|e| format!("Không ghi được {}: {e}", manifest.display()))?;
 
     Ok(report)
@@ -195,8 +202,15 @@ mod tests {
         assert_eq!(report.missing.len(), 1);
         assert!(dst.join("drv.dll").exists());
         assert!(dst.join("driver-info.json").exists());
+        // Manifest v2 đọc lại được và file map khớp đúng file đã copy.
         let manifest = std::fs::read_to_string(dst.join("driver-info.json")).unwrap();
-        assert!(manifest.contains("Test Driver"));
+        let (back, map) = crate::parse_manifest(&manifest).unwrap();
+        assert_eq!(back.name, "Test Driver");
+        assert_eq!(map.len(), 2, "chỉ file copy thành công mới vào map");
+        assert!(map.iter().any(|(_, f)| f == "drv.dll"));
+        // File thiếu (khong-co.dll) không có trong map -> resolve báo thiếu.
+        let err = crate::resolve_restore_files(&back, &map, &dst).unwrap_err();
+        assert!(err.contains("khong-co.dll"));
         let _ = std::fs::remove_dir_all(&base);
     }
 }

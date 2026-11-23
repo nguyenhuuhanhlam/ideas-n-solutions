@@ -1,22 +1,27 @@
 //! Gọi Print Spooler API (winspool.drv) qua crate `windows`.
 //!
-//! Chỉ biên dịch trên Windows. Hai API chính:
+//! Chỉ biên dịch trên Windows. Ba API chính:
 //! - `EnumPrinterDriversW` (level 6 -> DRIVER_INFO_6): toàn bộ thông tin
 //!   driver, kể cả ngày/phiên bản/hãng và danh sách file phụ thuộc.
 //! - `EnumPrintersW` (level 2 -> PRINTER_INFO_2): máy in nào dùng driver nào.
+//! - `AddPrinterDriverExW` (level 6): cài driver từ bộ file trong thư mục
+//!   backup (lệnh restore).
 //!
-//! Cả hai đều dùng mẫu gọi 2 lần: lần 1 với buffer rỗng để hỏi kích thước
-//! cần thiết (trả lỗi ERROR_INSUFFICIENT_BUFFER là bình thường), lần 2 với
-//! buffer vừa đủ.
+//! Các API Enum* đều dùng mẫu gọi 2 lần: lần 1 với buffer rỗng để hỏi kích
+//! thước cần thiết (trả lỗi ERROR_INSUFFICIENT_BUFFER là bình thường),
+//! lần 2 với buffer vừa đủ.
 
-use windows::core::{HSTRING, PCWSTR};
+use windows::core::{HSTRING, PCWSTR, PWSTR};
+use windows::Win32::Foundation::FILETIME;
 use windows::Win32::Graphics::Printing::{
-    EnumPrinterDriversW, EnumPrintersW, DRIVER_INFO_6W, PRINTER_ENUM_CONNECTIONS,
-    PRINTER_ENUM_LOCAL, PRINTER_INFO_2W,
+    AddPrinterDriverExW, EnumPrinterDriversW, EnumPrintersW, APD_COPY_ALL_FILES,
+    APD_COPY_FROM_DIRECTORY, DRIVER_INFO_6W, PRINTER_ENUM_CONNECTIONS, PRINTER_ENUM_LOCAL,
+    PRINTER_INFO_2W,
 };
 
 use crate::{
-    format_driver_version, format_filetime, parse_multi_sz, DriverQuery, PrinterDriver, PrinterInfo,
+    format_driver_version, format_filetime, parse_driver_date, parse_driver_version,
+    parse_multi_sz, DriverQuery, PrinterDriver, PrinterInfo, ResolvedDriverFiles,
 };
 
 /// Đổi chuỗi PWSTR (có thể null) thành String. Chuỗi lỗi UTF-16 được
@@ -208,4 +213,174 @@ pub fn list_printers(server: Option<&str>) -> Result<Vec<PrinterInfo>, String> {
     }
     out.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
     Ok(out)
+}
+
+// ---------------------------------------------------------------------------
+// Cài driver (lệnh restore)
+// ---------------------------------------------------------------------------
+
+/// Đổi HSTRING thành PWSTR trỏ tới buffer của nó.
+fn pwstr_of(h: &HSTRING) -> PWSTR {
+    PWSTR(h.as_ptr() as *mut u16)
+}
+
+/// Đổi danh sách chuỗi thành multi-sz (mỗi chuỗi + \0, kết thúc bằng \0).
+fn multi_sz(items: &[String]) -> Vec<u16> {
+    let mut out = Vec::new();
+    for s in items {
+        out.extend(s.encode_utf16());
+        out.push(0);
+    }
+    out.push(0);
+    out
+}
+
+fn filetime_from_ticks(ticks: u64) -> FILETIME {
+    FILETIME {
+        dwLowDateTime: ticks as u32,
+        dwHighDateTime: (ticks >> 32) as u32,
+    }
+}
+
+/// DRIVER_INFO_6W kèm bộ nhớ sở hữu cho các chuỗi trỏ tới.
+///
+/// Các HSTRING/Vec<u16> cấp phát trên heap nên địa chỉ buffer của chúng
+/// không đổi khi struct ngoài bị di chuyển — các PWSTR trong `info`
+/// vẫn trỏ đúng. Chỉ đọc `info` qua `as_ptr()` sau khi dựng xong,
+/// không sửa các buffer sau đó.
+struct DriverInfo6Owned {
+    _name: HSTRING,
+    _environment: Option<HSTRING>,
+    _driver_path: HSTRING,
+    _data_file: HSTRING,
+    _config_file: HSTRING,
+    _help_file: HSTRING,
+    _dependent_files: Vec<u16>,
+    _monitor_name: HSTRING,
+    _default_data_type: HSTRING,
+    _previous_names: Vec<u16>,
+    _manufacturer: HSTRING,
+    _oem_url: HSTRING,
+    info: DRIVER_INFO_6W,
+}
+
+impl DriverInfo6Owned {
+    fn new(driver: &PrinterDriver, files: &ResolvedDriverFiles) -> Self {
+        let name = HSTRING::from(driver.name.as_str());
+        let environment = if driver.environment.is_empty() {
+            // NULL = môi trường hiện tại của máy gọi (theo tài liệu MS).
+            None
+        } else {
+            Some(HSTRING::from(driver.environment.as_str()))
+        };
+        let driver_path = HSTRING::from(files.driver_path.to_string_lossy().as_ref());
+        let data_file = HSTRING::from(files.data_file.to_string_lossy().as_ref());
+        let config_file = HSTRING::from(files.config_file.to_string_lossy().as_ref());
+        let help_file = HSTRING::from(files.help_file.to_string_lossy().as_ref());
+        let dependent_strings: Vec<String> = files
+            .dependent_files
+            .iter()
+            .map(|p| p.to_string_lossy().into_owned())
+            .collect();
+        let dependent_files: Option<Vec<u16>> = if dependent_strings.is_empty() {
+            None // NULL = không có file phụ thuộc.
+        } else {
+            Some(multi_sz(&dependent_strings))
+        };
+        let monitor_name = HSTRING::from(driver.monitor_name.as_str());
+        let default_data_type = HSTRING::from(driver.default_data_type.as_str());
+        let previous_names: Option<Vec<u16>> = if driver.previous_names.is_empty() {
+            None
+        } else {
+            Some(multi_sz(&driver.previous_names))
+        };
+        let manufacturer = HSTRING::from(driver.manufacturer.as_str());
+        let oem_url = HSTRING::from(driver.oem_url.as_str());
+
+        let ticks = driver
+            .driver_date
+            .as_deref()
+            .and_then(parse_driver_date)
+            .unwrap_or(0);
+        let info = DRIVER_INFO_6W {
+            cVersion: driver.version,
+            pName: pwstr_of(&name),
+            pEnvironment: environment.as_ref().map_or(PWSTR::null(), pwstr_of),
+            pDriverPath: pwstr_of(&driver_path),
+            pDataFile: pwstr_of(&data_file),
+            pConfigFile: pwstr_of(&config_file),
+            pHelpFile: pwstr_of(&help_file),
+            pDependentFiles: dependent_files
+                .as_ref()
+                .map_or(PWSTR::null(), |v| PWSTR(v.as_ptr() as *mut u16)),
+            pMonitorName: pwstr_of(&monitor_name),
+            pDefaultDataType: pwstr_of(&default_data_type),
+            pszzPreviousNames: previous_names
+                .as_ref()
+                .map_or(PWSTR::null(), |v| PWSTR(v.as_ptr() as *mut u16)),
+            ftDriverDate: filetime_from_ticks(ticks),
+            dwlDriverVersion: parse_driver_version(&driver.driver_version),
+            pszMfgName: pwstr_of(&manufacturer),
+            pszOEMUrl: pwstr_of(&oem_url),
+            // Hardware ID / Provider chỉ dùng cho PnP matching, không cần
+            // khi cài bằng file.
+            pszHardwareID: PWSTR::null(),
+            pszProvider: PWSTR::null(),
+        };
+        DriverInfo6Owned {
+            _name: name,
+            _environment: environment,
+            _driver_path: driver_path,
+            _data_file: data_file,
+            _config_file: config_file,
+            _help_file: help_file,
+            _dependent_files: dependent_files.unwrap_or_default(),
+            _monitor_name: monitor_name,
+            _default_data_type: default_data_type,
+            _previous_names: previous_names.unwrap_or_default(),
+            _manufacturer: manufacturer,
+            _oem_url: oem_url,
+            info,
+        }
+    }
+
+    fn as_ptr(&self) -> *const u8 {
+        &self.info as *const DRIVER_INFO_6W as *const u8
+    }
+}
+
+/// Cài driver lên máy local (hoặc máy chủ từ xa) từ bộ file đã giải
+/// quyết trong thư mục backup.
+///
+/// Cờ dùng: APD_COPY_ALL_FILES | APD_COPY_FROM_DIRECTORY — theo tài liệu
+/// Microsoft, APD_COPY_FROM_DIRECTORY nghĩa là "dùng tên file đầy đủ
+/// trong DRIVER_INFO_6", spooler tự copy toàn bộ file vào thư mục
+/// driver của hệ thống; thiếu file ở đúng đường dẫn đã khai thì lỗi.
+///
+/// Cần quyền administrator (SeLoadDriverPrivilege); không đủ quyền thì
+/// API trả lỗi 5 và thông báo sẽ nói rõ.
+pub fn install_driver(
+    driver: &PrinterDriver,
+    files: &ResolvedDriverFiles,
+    server: Option<&str>,
+) -> Result<(), String> {
+    let owned = DriverInfo6Owned::new(driver, files);
+    let server_h = server.and_then(crate::normalize_server).map(HSTRING::from);
+    let server_param = opt_pcwstr(&server_h);
+    let flags = APD_COPY_ALL_FILES | APD_COPY_FROM_DIRECTORY;
+    let ok = unsafe { AddPrinterDriverExW(server_param, 6, owned.as_ptr(), flags) };
+    if ok.as_bool() {
+        return Ok(());
+    }
+    let err = windows::core::Error::from_win32();
+    let code = win32_code(&err);
+    let mut msg = format!(
+        "Không cài được driver \"{}\": {}",
+        driver.name,
+        win32_message(err)
+    );
+    if code == 5 {
+        msg.push_str(" (cần chạy terminal với quyền administrator)");
+    }
+    Err(msg)
 }
