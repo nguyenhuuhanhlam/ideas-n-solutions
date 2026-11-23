@@ -14,7 +14,7 @@
   <div class="sidewrap">
     <nav class="side" id="side">
       <h6 data-section="components" data-default="open">Components</h6>
-      <div class="sideblock"><p class="hint">This page is a living showcase for the Hairline system: app shell, draggable sidebar (160–480px), collapsible sidebar sections, stats, toolbar, tabs, log rows, path badge, toast, fades, tint, tinted hover. Source of truth: <code>README.md</code> in this folder.</p></div>
+      <div class="sideblock"><p class="hint">This page is a living showcase for the Hairline system: app shell, draggable sidebar (160–480px), collapsible sidebar sections, show/hide strips, stats, toolbar, tabs, log rows, path badge, toast, fades, tint, tinted hover. Source of truth: <code>README.md</code> in this folder.</p></div>
       <h6 data-section="background">Background color (tint)</h6>
       <div class="sideblock">
         <div class="swatches" id="tintSwatches">
@@ -35,6 +35,13 @@
           <input id="hoverLift" type="range" min="0" max="12" step="1" value="5" disabled>
         </div>
         <p class="hint">Only the surrounding areas are tinted; the log keeps its original background.</p>
+      </div>
+      <h6 data-section="layout">Layout</h6>
+      <div class="sideblock">
+        <label class="checkrow"><input type="checkbox" id="showStats" checked> Stats</label>
+        <label class="checkrow"><input type="checkbox" id="showToolbar" checked> Toolbar</label>
+        <label class="checkrow"><input type="checkbox" id="showTabs" checked> Tabs</label>
+        <p class="hint">Show or hide the three strips above the log.</p>
       </div>
       <h6 data-section="sample-form">Sample form</h6>
       <div class="sideblock">
@@ -115,6 +122,20 @@
   Hairline.initFades(document.getElementById("side"), document.getElementById("sideFadeTop"), document.getElementById("sideFadeBottom"));
   Hairline.initFades(document.getElementById("log"), document.getElementById("logFadeTop"), document.getElementById("logFadeBottom"));
   Hairline.initTint(app, Array.prototype.slice.call(document.querySelectorAll("#tintSwatches .swatch")), document.getElementById("tintOpacity"), document.getElementById("tintOpacityVal"), document.getElementById("hoverLift"), document.getElementById("hoverLiftVal"));
+  var logWrap = document.querySelector(".logwrap"), gallery = document.getElementById("iconGallery");
+  function showTab(name) {
+    document.querySelectorAll(".tabbtn").forEach(function (x) { x.classList.toggle("active", x.getAttribute("data-tab") === name); });
+    var showIcons = name === "icons";
+    logWrap.hidden = showIcons; gallery.hidden = !showIcons;
+  }
+  /* Layout toggles (sidebar): show/hide the three strips above the
+     log. Hiding the tabs also returns to the log view, so the user
+     is never stuck on the icon gallery with no tabs to go back. */
+  Hairline.initVisibilityToggles([
+    { id: "stats", checkbox: document.getElementById("showStats"), target: document.querySelector(".stats") },
+    { id: "toolbar", checkbox: document.getElementById("showToolbar"), target: document.querySelector(".toolbar") },
+    { id: "tabs", checkbox: document.getElementById("showTabs"), target: document.querySelector(".tabs") }
+  ], { onToggle: function (id, visible) { if (id === "tabs" && !visible) showTab("all"); } });
   var toastEl = document.getElementById("toast");
   document.getElementById("toastBtn").addEventListener("click", function () { Hairline.toast(toastEl, "Toast — 1px border, no rounded corners"); });
   document.querySelectorAll(".pathbadge").forEach(function (b) {
@@ -124,13 +145,8 @@
       else Hairline.toast(toastEl, p);
     });
   });
-  var logWrap = document.querySelector(".logwrap"), gallery = document.getElementById("iconGallery");
   document.querySelectorAll(".tabbtn").forEach(function (t) {
-    t.addEventListener("click", function () {
-      document.querySelectorAll(".tabbtn").forEach(function (x) { x.classList.toggle("active", x === t); });
-      var showIcons = t.getAttribute("data-tab") === "icons";
-      logWrap.hidden = showIcons; gallery.hidden = !showIcons;
-    });
+    t.addEventListener("click", function () { showTab(t.getAttribute("data-tab")); });
   });
 })();
 </script>

@@ -314,8 +314,28 @@ trong sidebar thu gọn/mở ra bằng chính tiêu đề của nó.
   `opts.onToggle(id, open)` chạy sau mỗi lần đổi trạng
   thái. Sau mỗi lần toggle (và lúc init) component phát
   sự kiện `resize` để vệt mờ báo cuộn tính lại.
-- Demo: section Components mở sẵn (giới thiệu trang), 3
+- Demo: section Components mở sẵn (giới thiệu trang), 4
   section còn lại đóng mặc định.
+
+### Show/hide toggles — ẩn/hiện vùng nội dung
+
+Component dùng lại: một checkbox điều khiển việc ẩn/hiện
+một vùng (dải stats, toolbar, tabs...) — bỏ chọn thì vùng
+đó ẩn hẳn khỏi layout (thuộc tính `hidden`, nội dung còn
+lại dãn ra), chọn lại thì hiện.
+
+- JS: `Hairline.initVisibilityToggles(items, opts)` với
+  `items` là mảng `{ id, checkbox, target }` (mỗi item một
+  checkbox + vùng đích). Không cần thêm CSS: checkbox dùng
+  `.checkrow` sẵn có, vùng đích ẩn bằng `[hidden]`.
+- Trạng thái lưu `localStorage` (`hairline-strip-<id>`,
+  `"1"` hiện / `"0"` ẩn) nên mở lại vẫn giữ; mặc định
+  hiện, thêm `defaultVisible: false` vào item để ẩn sẵn.
+  `opts.storagePrefix` đổi tiền tố khóa;
+  `opts.onToggle(id, visible)` chạy sau mỗi lần đổi.
+- Demo: section Layout trong sidebar có 3 checkbox Stats /
+  Toolbar / Tabs. Ẩn Tabs thì demo tự quay về tab All để
+  không kẹt ở gallery icon khi không còn tab để bấm lại.
 
 ### Vệt mờ báo cuộn (thay thanh trượt)
 

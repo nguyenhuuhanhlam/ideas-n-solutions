@@ -3,7 +3,7 @@
    Spec: hairline-ui/README.md */
 (function (global) {
   "use strict";
-  var LS_W = "hairline-side-w", LS_C = "hairline-side-collapsed", LS_T = "hairline-tint", LS_TO = "hairline-tint-opacity", LS_HL = "hairline-hover-lift", LS_S = "hairline-section-";
+  var LS_W = "hairline-side-w", LS_C = "hairline-side-collapsed", LS_T = "hairline-tint", LS_TO = "hairline-tint-opacity", LS_HL = "hairline-hover-lift", LS_S = "hairline-section-", LS_V = "hairline-strip-";
   var DEFAULT_W = 320, MIN_W = 160, MAX_W = 480;
   function lsGet(k, d) { try { var v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -222,10 +222,34 @@
     });
   }
 
+  /* Show/hide toggles: each item { id, checkbox, target } binds a
+     checkbox to a strip or region — unchecking hides the target
+     (via the hidden property, so it leaves the layout and the
+     remaining content expands), checking shows it again. State
+     persists in localStorage ("1" visible / "0" hidden), default
+     visible unless item.defaultVisible === false.
+     opts: { storagePrefix, onToggle(id, visible) }. */
+  function initVisibilityToggles(items, opts) {
+    opts = opts || {};
+    var prefix = opts.storagePrefix || LS_V;
+    items.forEach(function (item) {
+      if (!item.checkbox || !item.target) return;
+      var visible = lsGet(prefix + item.id, item.defaultVisible === false ? "0" : "1") === "1";
+      function apply(save) {
+        item.target.hidden = !visible;
+        item.checkbox.checked = visible;
+        if (save) lsSet(prefix + item.id, visible ? "1" : "0");
+        if (opts.onToggle) opts.onToggle(item.id, visible);
+      }
+      item.checkbox.addEventListener("change", function () { visible = item.checkbox.checked; apply(true); });
+      apply(false);
+    });
+  }
+
   function toast(el, msg, ms) {
     el.textContent = msg; el.classList.add("show");
     clearTimeout(el._t); el._t = setTimeout(function () { el.classList.remove("show"); }, ms || 1600);
   }
 
-  global.Hairline = { initSidebar: initSidebar, initFades: initFades, initTint: initTint, initCollapsibleSections: initCollapsibleSections, toast: toast, DEFAULT_W: DEFAULT_W };
+  global.Hairline = { initSidebar: initSidebar, initFades: initFades, initTint: initTint, initCollapsibleSections: initCollapsibleSections, initVisibilityToggles: initVisibilityToggles, toast: toast, DEFAULT_W: DEFAULT_W };
 })(typeof window !== "undefined" ? window : this);
