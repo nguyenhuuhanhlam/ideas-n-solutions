@@ -135,7 +135,7 @@ không truy cập được từ máy khác trong mạng.
   màu theo loại (tạo/sửa/xóa/đổi tên), có lọc theo loại + tìm theo
   tên file, tạm dừng, tự cuộn, xóa log hiển thị. Trang tải lần đầu
   nhận tối đa 1000 dòng log gần nhất. Khung log có padding trên
-  8px để hàng đầu không sát thanh tabs (từ 0.11.2).
+  11px để hàng đầu cách thanh tabs 16px (từ 0.11.3).
 - **Badge thư mục cha:** mỗi dòng log chỉ hiện tên file kèm badge
   là 2 đoạn cuối của thư mục cha (vd: `…/project/src`) thay vì
   full path dài. Rê chuột vào badge thấy full path, bấm vào badge

@@ -7,7 +7,7 @@
 > component, hành vi — để sau này tách ra thành thư viện dùng chung
 > mà không phải đoán lại từ đầu.
 >
-> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.11.2.
+> Ghi ngày: 2026-11-13. Bản tham chiếu: File Watcher 0.11.3.
 
 ## Nguồn gốc
 
@@ -211,8 +211,9 @@ trong tab: mono 12px, opacity .75.
 - Hàng: flex, gap 10px, padding `5px 14px`, mono 13px,
   `white-space: pre-wrap`, `word-break: break-all`,
   `border-bottom` 1px (hàng cuối không viền), hover đổi nền
-  `--hover`. Khung log (`.hl-log`) có `padding-top` 8px để
-  hàng đầu không sát thanh tabs.
+  `--hover`. Khung log (`.hl-log`) có `padding-top` 11px để
+  hàng đầu cách thanh tabs 16px (11px padding + 5px padding
+  trên của hàng).
 - **Thời gian:** muted, không co. **Loại event:** rộng cố định
   82px, dạng tag — chữ 11px semibold, **viền 1px cùng màu chữ,
   không nền** (`border: 1px solid currentColor`, padding
@@ -415,7 +416,7 @@ sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
 
 > Đã làm (2026-11-13–14): bước 1, 2, 3, 5 — starter kit
 > `hairline.css` + `hairline.js` + `demo.html` trong thư mục này,
-> đồng bộ tới File Watcher 0.11.2 (kể cả bộ icon Lucide 22 icon
+> đồng bộ tới File Watcher 0.11.3 (kể cả bộ icon Lucide 22 icon
 > với `loader-circle` cho trạng thái đang chạy, hover nhuộm tint
 > có Hover lift, section thu gọn trong sidebar và padding trên
 > của khung log, File Watcher nhúng sprite của kit vào `ui.html`). Còn lại:
@@ -470,6 +471,7 @@ sprite); ký tự `×`/`‹` chỉ còn là fallback khi không có sprite.
 | 0.11.0 | 2026-11-15 | Trạng thái webhook trên dòng event (sending/sent/failed + nút Re-send khi lỗi, tiêu đề nhóm gom trạng thái tệ nhất): icon `loader-circle` mới trong sprite (22 icon) cho trạng thái đang gửi (xoay bằng CSS), `circle-check`/`circle-alert` cho sent/failed, `refresh-cw` cho nút Re-send; trạng thái đi qua cùng kênh log/SSE dưới dạng entry riêng, không tính vào số đếm event. |
 | 0.11.1 | 2026-11-15 | Sửa rename bị double trên macOS: FSEvents báo 1 lần đổi tên thành 2 event Any kề nhau (tên cũ + tên mới) — app ghép thành 1 dòng `cũ -> mới` khi cùng thư mục và đúng 1 tên còn tồn tại (tên còn tồn tại là tên mới); webhook chỉ gửi 1 lần theo tên mới. Không đủ chắc chắn thì giữ 2 dòng. |
 | 0.11.2 | 2026-11-23 | Khung log (`#log`) có padding trên 8px để hàng log đầu tiên không sát thanh tabs (port từ kit, đã kiểm chứng trên demo). |
+| 0.11.3 | 2026-11-23 | Padding trên của khung log tăng từ 8px lên 11px để hàng đầu cách thanh tabs 16px (user ngắm thấy 13px chưa đủ thoáng). |
 
 ## Tham chiếu
 
