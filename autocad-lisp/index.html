@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="../timeline-projects/favicon.svg" />
+    <title>AutoCAD LISP — Ideas &amp; Solutions</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; min-height: 100vh; background: #11141a; color: #e8ecf3;
+        font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+        display: flex; align-items: flex-start; justify-content: center; padding: 48px 20px;
+      }
+      main { width: 100%; max-width: 880px; }
+      .back { color: #8ab8ff; text-decoration: none; font-size: 14px; }
+      .back:hover { text-decoration: underline; }
+      h1 { font-size: 28px; margin: 14px 0 6px; }
+      .sub { color: #8b95a9; font-size: 14.5px; line-height: 1.6; margin-bottom: 28px; }
+      .item {
+        background: #171b24; border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 14px; padding: 20px 22px; margin-bottom: 14px;
+      }
+      .item summary { cursor: pointer; list-style: none; }
+      .item summary::-webkit-details-marker { display: none; }
+      .item h2 { font-size: 18px; margin: 0 0 6px; color: #ffd166; display: inline; }
+      .item .desc { margin: 6px 0 0; color: #c6cdd9; font-size: 14px; line-height: 1.6; }
+      .hint { font-size: 13.5px; color: #8ab8ff; display: inline-block; margin-top: 10px; }
+      .item[open ] .hint { display: none; }
+      .detail { border-top: 1px solid rgba(255, 255, 255, 0.12); margin-top: 16px; padding-top: 6px; }
+      .detail h3 { font-size: 15px; margin: 18px 0 6px; color: #e8ecf3; }
+      .detail p, .detail li { color: #c6cdd9; font-size: 14px; line-height: 1.65; }
+      .detail ul, .detail ol { margin: 4px 0 8px; padding-left: 22px; }
+      .detail li { margin-bottom: 3px; }
+      code {
+        background: #0d1017; border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 6px; padding: 1px 6px; font-size: 13px;
+        font-family: "Cascadia Mono", Consolas, monospace; color: #ffd166;
+      }
+      .dl {
+        display: inline-block; margin-top: 14px; color: #8ab8ff; text-decoration: none;
+        border: 1px solid rgba(138, 184, 255, 0.5); border-radius: 10px; padding: 8px 14px; font-size: 14px;
+      }
+      .dl:hover { border-color: #8ab8ff; }
+      .note { margin-top: 24px; color: #8b95a9; font-size: 13px; line-height: 1.6; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="back" href="../">← Trang chủ</a>
+      <h1>AutoCAD LISP</h1>
+      <p class="sub">Các LISP tiện ích cho AutoCAD 2022, đã kiểm chứng trên bản vẽ thật. Bấm vào từng mục để xem hướng dẫn sử dụng chi tiết và tải file về.</p>
+
+      <details class="item">
+        <summary>
+          <h2>PLOTPDF — In hàng loạt khung rectang ra PDF</h2>
+          <p class="desc">Chọn nhiều rectang trong model space, mỗi rectang in ra 1 file PDF riêng, đúng theo thứ tự click chọn.</p>
+          <span class="hint">Xem hướng dẫn sử dụng ▾</span>
+        </summary>
+        <div class="detail">
+          <h3>Lệnh</h3>
+          <p><code>PLOTPDF</code> — in hàng loạt. &nbsp;<code>PLOTPDFRESET</code> — xóa danh sách rectang đã in để in lại từ đầu.</p>
+          <h3>Chuẩn bị trước</h3>
+          <ul>
+            <li>Mỗi khung in là 1 polyline khép kín (rectang). Polyline chưa khép kín sẽ bị bỏ qua khi chọn.</li>
+            <li>Cấu hình in được khai sẵn trong hàm <code>pp-plot-one</code> của file: máy <code>DWG To PDF - NO PREVIEW.pc3</code>, giấy <code>ISO A4 (297.00 x 210.00 MM)</code>, đơn vị Millimeters, tỷ lệ Fit, căn giữa (Center), plot style <code>monochrome.ctb</code>. Nếu máy hoặc bản vẽ của bạn dùng cấu hình khác, sửa các giá trị này trong file trước khi nạp.</li>
+            <li>Lệnh chạy ở model space (hoặc paper space của layout). Đang ở trong viewport của layout thì lệnh sẽ dừng và báo thoát ra ngoài trước.</li>
+          </ul>
+          <h3>Cách dùng</h3>
+          <ol>
+            <li>Nạp file: gõ <code>APPLOAD</code>, chọn <code>plotpdf.lsp</code> (hoặc kéo thả file vào cửa sổ AutoCAD).</li>
+            <li>Gõ <code>PLOTPDF</code>.</li>
+            <li>Click từng rectang theo đúng thứ tự muốn in. Rectang vừa chọn sẽ hiện khung đỏ ảo kèm số thứ tự to ở giữa. Bấm Enter để kết thúc chọn.</li>
+            <li>Chọn thư mục lưu PDF trong hộp thoại hiện ra (mỗi lần chạy chọn lại).</li>
+            <li>Chờ in xong: dòng lệnh báo từng file kèm dung lượng. File được đặt tên <code>&lt;tên bản vẽ&gt;_01.pdf</code>, <code>_02.pdf</code>… theo thứ tự đã chọn.</li>
+          </ol>
+          <h3>Lưu ý</h3>
+          <ul>
+            <li>Rectang đã in thành công ở lần chạy trước (trong cùng phiên mở bản vẽ) sẽ tự bị bỏ qua khi click lại, tránh in trùng. Muốn in lại các khung đó, chạy <code>PLOTPDFRESET</code> trước. Rectang in lỗi thì không bị ghi nhớ, chọn lại in lại bình thường.</li>
+            <li>Khung đỏ và số thứ tự là đồ họa tạm, không phải entity trong bản vẽ — chạy <code>REGEN</code> (hoặc <code>REDRAW</code>) là tự mất.</li>
+            <li>Hướng giấy ngang/dọc tự chọn theo chiều của rectang. Page setup của bản vẽ không bị thay đổi sau khi in (lệnh luôn trả lời "Save changes: No"). Khung nhìn (view) cũng được giữ nguyên như trước khi chạy lệnh.</li>
+            <li>Nếu dòng lệnh báo 1 file chỉ 1353 bytes kèm chú thích "(trang trang?)", file đó bị trắng — cần xem kỹ lại cấu hình in và vùng khung.</li>
+          </ul>
+          <a class="dl" href="./plotpdf.lsp" download>Tải plotpdf.lsp</a>
+        </div>
+      </details>
+
+      <details class="item">
+        <summary>
+          <h2>HATCHSOLID — Chuyển toàn bộ hatch thành SOLID</h2>
+          <p class="desc">Đổi mọi hatch trong bản vẽ sang fill SOLID: bản trong suốt 60% hoặc bản đục hoàn toàn, giữ nguyên màu từng hatch. Đã kiểm chứng trên bản vẽ thật 1191 hatch.</p>
+          <span class="hint">Xem hướng dẫn sử dụng ▾</span>
+        </summary>
+        <div class="detail">
+          <h3>Lệnh</h3>
+          <p><code>HATCHSOLID</code> — SOLID trong suốt 60% (nhìn xuyên qua được 60%). &nbsp;<code>HATCHSOLIDDUC</code> — SOLID đục hoàn toàn, không trong suốt.</p>
+          <h3>Cách dùng</h3>
+          <ol>
+            <li>Nạp file: gõ <code>APPLOAD</code>, chọn <code>hatchsolid.lsp</code> (hoặc kéo thả file vào cửa sổ AutoCAD).</li>
+            <li>Gõ <code>HATCHSOLID</code> hoặc <code>HATCHSOLIDDUC</code>.</li>
+            <li>Đọc báo cáo cuối lệnh: số hatch đã đổi, số hatch bị bỏ qua (do layer khóa) và số lỗi nếu có.</li>
+          </ol>
+          <h3>Lưu ý</h3>
+          <ul>
+            <li>Áp dụng cho hatch ở model space và các layout. Hatch nằm trong định nghĩa block thì không đổi.</li>
+            <li>Màu của từng hatch được giữ nguyên. Hatch dạng gradient sẽ bị tắt gradient khi đổi sang SOLID.</li>
+            <li>Hatch trên layer đang khóa được bỏ qua (không báo lỗi) và được đếm trong báo cáo cuối lệnh.</li>
+            <li>Toàn bộ thao tác được gom thành 1 bước Undo — bấm Ctrl+Z một lần là hoàn tác cả loạt.</li>
+            <li>Muốn đổi mức trong suốt của <code>HATCHSOLID</code>: sửa biến <code>*hs-transparency*</code> ở đầu file (mặc định 60; ví dụ muốn đục 60% thì đặt 40) rồi nạp lại file.</li>
+          </ul>
+          <a class="dl" href="./hatchsolid.lsp" download>Tải hatchsolid.lsp</a>
+        </div>
+      </details>
+
+      <p class="note">Các LISP khác sẽ xuất hiện tại đây khi hoàn thiện và được kiểm chứng.</p>
+    </main>
+  </body>
+</html>
