@@ -80,8 +80,38 @@
             <li>Khung đỏ và số thứ tự là đồ họa tạm, không phải entity trong bản vẽ — chạy <code>REGEN</code> (hoặc <code>REDRAW</code>) là tự mất.</li>
             <li>Hướng giấy ngang/dọc tự chọn theo chiều của rectang. Page setup của bản vẽ không bị thay đổi sau khi in (lệnh luôn trả lời "Save changes: No"). Khung nhìn (view) cũng được giữ nguyên như trước khi chạy lệnh.</li>
             <li>Nếu dòng lệnh báo 1 file chỉ 1353 bytes kèm chú thích "(trang trang?)", file đó bị trắng — cần xem kỹ lại cấu hình in và vùng khung.</li>
+            <li>File chạy được cả trên AutoCAD for Mac, nhưng tên máy in khai sẵn ở trên là pc3 tự chế phía Windows — trên Mac nên dùng bản PLOTPDFM ở mục dưới.</li>
           </ul>
           <a class="dl" href="./plotpdf.lsp" download>Tải plotpdf.lsp</a>
+        </div>
+      </details>
+
+      <details class="item">
+        <summary>
+          <h2>PLOTPDF-MAC — In hàng loạt ra PDF theo cấu hình của từng máy</h2>
+          <p class="desc">Giống hệt PLOTPDF, chỉ khác một điểm: không khai cứng tên máy in và khổ giấy — lệnh giữ nguyên cấu hình in hiện tại của bản vẽ trên máy đang chạy. Hợp khi in trên nhiều máy khác nhau, gồm cả AutoCAD for Mac.</p>
+          <span class="hint">Xem hướng dẫn sử dụng ▾</span>
+        </summary>
+        <div class="detail">
+          <h3>Lệnh</h3>
+          <p><code>PLOTPDFM</code> — in hàng loạt. &nbsp;<code>PLOTPDFMRESET</code> — xóa danh sách rectang đã in để in lại từ đầu.</p>
+          <h3>Chuẩn bị trước</h3>
+          <ul>
+            <li>Page setup hiện tại của bản vẽ phải trỏ sẵn về máy in PDF của máy đang dùng (trên Mac: máy in PDF có sẵn của AutoCAD for Mac, đặt một lần trong Page Setup). Lệnh chỉ khai vùng Window, tỷ lệ Fit, căn giữa và plot style <code>monochrome.ctb</code>; máy in và khổ giấy lấy theo cấu hình sẵn đó.</li>
+            <li>Mỗi khung in là 1 polyline khép kín (rectang), giống PLOTPDF. Lệnh chạy ở model space (hoặc paper space của layout).</li>
+          </ul>
+          <h3>Cách dùng</h3>
+          <ol>
+            <li>Nạp file: gõ <code>APPLOAD</code>, chọn <code>plotpdf-mac.lsp</code> (hoặc kéo thả file vào cửa sổ AutoCAD).</li>
+            <li>Gõ <code>PLOTPDFM</code> và click từng rectang theo thứ tự muốn in, Enter để kết thúc chọn, rồi chọn thư mục lưu — các bước còn lại giống hệt PLOTPDF.</li>
+          </ol>
+          <h3>Lưu ý</h3>
+          <ul>
+            <li>Đánh đổi của bản này: bản vẽ nào page setup đang sai (máy in không phải PDF, khổ giấy lạ) thì in sai theo mà không có cảnh báo — kiểm tra file PDF đầu tiên trước khi in cả loạt.</li>
+            <li>Danh sách rectang đã in của PLOTPDFM tách riêng với PLOTPDF. Hai file nạp chung trong một phiên không đụng nhau: gõ lệnh nào chạy bản đó.</li>
+            <li>Đã kiểm chứng chạy tốt trên AutoCAD for Mac (không dùng ActiveX; biến hệ thống BACKGROUNDPLOT mà Mac từ chối đặt được bỏ qua an toàn).</li>
+          </ul>
+          <a class="dl" href="./plotpdf-mac.lsp" download>Tải plotpdf-mac.lsp</a>
         </div>
       </details>
 

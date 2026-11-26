@@ -25,6 +25,20 @@
 ;;;   Đổi máy in/khổ/style thì sửa các giá trị trong pp-plot-one.
 ;;;   Trả lời "Save changes: No" nên page setup của bản vẽ không
 ;;;   bị thay đổi sau khi in.
+;;; - Chạy được cả trên AutoCAD for Mac (sửa 2026-11-26): Mac
+;;;   không có ActiveX/COM — tài liệu Autodesk ghi rõ vl-load-com
+;;;   và các hàm vla-/vlax-/vlr- chỉ có trên Windows — nên file
+;;;   tránh ActiveX: khung bao tính từ đỉnh polyline, chọn thư mục
+;;;   trên Mac lùi về getfiled. Riêng tên máy in trong pp-plot-one
+;;;   là pc3 tự chế phía Windows, máy Mac sẽ không có — chạy trên
+;;;   Mac thì sửa tên máy/khổ giấy trong pp-plot-one theo máy Mac.
+;;;   Thêm nữa (test Mac tối 26-11): biến BACKGROUNDPLOT bị Mac
+;;;   từ chối đặt ("AutoCAD variable setting rejected") vì Mac
+;;;   không có in nền — lỗi đó từng làm lệnh chết ngay sau bước
+;;;   chọn thư mục, chưa in được file nào. Nay mọi lần đọc/đặt
+;;;   biến hệ thống đều đi qua pp-getvar/pp-setvar có bắt lỗi:
+;;;   biến bị từ chối thì bỏ qua (trên Mac in luôn ở tiền cảnh
+;;;   nên bước kiểm chứng file PDF sau khi in vẫn đáng tin).
 ;;; - Khung nhìn (view) được giữ nguyên như trước khi chạy lệnh.
 ;;; - Rectang trên layer khóa vẫn in bình thường (in không sửa entity).
 ;;;
@@ -49,7 +63,11 @@
 ;;; Bài học áp dụng từ HATCHSOLID: *error* luôn in ra thông báo lỗi
 ;;; thật; mỗi rectang xử lý riêng, một rectang lỗi không chết cả lệnh.
 
-(vl-load-com)
+;; vl-load-com chỉ để nạp hỗ trợ ActiveX cho hộp chọn thư mục kiểu
+;; Windows (pp-pick-folder). AutoCAD for Mac không có ActiveX —
+;; gọi thẳng sẽ văng lỗi "vl-load-com not supported" và file nạp
+;; dở dang, nên bọc catch-all: Windows nạp bình thường, Mac bỏ qua.
+(vl-catch-all-apply 'vl-load-com nil)
 
 (defun pp-pad (i width / s)
   ;; Đệm số 0 ở trước: 1 -> "01" khi width = 2
@@ -60,25 +78,60 @@
   s
 )
 
-(defun pp-pick-folder (/ shell folder item path)
-  ;; Hộp chọn thư mục của Windows. Hủy thì trả nil.
-  (setq shell (vlax-create-object "Shell.Application"))
-  (if shell
+(defun pp-getvar (name / v)
+  ;; getvar co bat loi: bien khong ton tai / khong doc duoc -> nil.
+  (setq v (vl-catch-all-apply 'getvar (list name)))
+  (if (vl-catch-all-error-p v) nil v)
+)
+
+(defun pp-setvar (name val)
+  ;; setvar co bat loi. Ly do: AutoCAD for Mac TU CHOI dat bien
+  ;; BACKGROUNDPLOT ("AutoCAD variable setting rejected") vi Mac
+  ;; khong co in nen — neu khong bat loi, loi do lam chet ca lenh
+  ;; ngay truoc khi in. Bo qua loi la an toan: tren Mac in luon
+  ;; o tien canh nen khong can dat bien nay; tren Windows loi
+  ;; khong xay ra, hanh vi giu nguyen.
+  (vl-catch-all-apply 'setvar (list name val))
+)
+
+(defun pp-pick-folder (/ shell folder item path f)
+  ;; Chọn thư mục lưu PDF. Hủy thì trả nil.
+  ;; Cách 1 (Windows): hộp chọn thư mục Shell.Application qua COM.
+  ;; Toàn bộ bọc trong catch-all: trên Mac các hàm vlax- không tồn
+  ;; tại, lỗi bị bắt lại, path giữ nil để lùi sang cách 2.
+  (setq path nil)
+  (vl-catch-all-apply
+    '(lambda ()
+       (setq shell (vlax-create-object "Shell.Application"))
+       (if shell
+         (progn
+           (setq folder (vlax-invoke-method shell 'BrowseForFolder
+                          0 "Chon thu muc luu PDF" 0))
+           (vlax-release-object shell)
+           (if folder
+             (progn
+               (setq item (vlax-get-property folder 'Self)
+                     path (vlax-get-property item 'Path))
+               (vlax-release-object item)
+               (vlax-release-object folder)
+             )
+           )
+         )
+       )
+     )
+    nil)
+  ;; Cách 2 (Mac, hoặc khi cách 1 không dùng được): getfiled có
+  ;; trên cả Windows lẫn Mac — mở hộp chọn file trong thư mục
+  ;; muốn lưu, giữ nguyên tên file tạm gợi ý rồi OK; lệnh chỉ lấy
+  ;; thư mục chứa file đó, không tạo file thật.
+  (if (not path)
     (progn
-      (setq folder (vlax-invoke-method shell 'BrowseForFolder
-                     0 "Chon thu muc luu PDF" 0))
-      (vlax-release-object shell)
-      (if folder
-        (progn
-          (setq item (vlax-get-property folder 'Self)
-                path (vlax-get-property item 'Path))
-          (vlax-release-object item)
-          (vlax-release-object folder)
-          path
-        )
-      )
+      (setq f (getfiled "Chon thu muc luu PDF: vao thu muc roi OK (ten file chi la tam)"
+                        "plotpdf.pdf" "pdf" 1))
+      (if f (setq path (vl-filename-directory f)))
     )
   )
+  path
 )
 
 ;; Danh sách rectang đã in được giữ trong biến toàn cục
@@ -92,6 +145,42 @@
   ;; tái sử dụng sau khi entity bị xóa).
   (strcat (getvar "DWGPREFIX") (getvar "DWGNAME") "|"
           (cdr (assoc 5 (entget en))))
+)
+
+(defun pp-bbox (en / data elev pt x x1 y1 x2 y2 e vd)
+  ;; Khung bao của polyline: ((x1 y1) (x2 y2)) = góc dưới-trái và
+  ;; góc trên-phải. Tính thuần từ tọa độ đỉnh, thay cho ActiveX
+  ;; GetBoundingBox để chạy được trên Mac (Mac không có vla-/vlax-).
+  ;; LWPOLYLINE: các điểm group 10 nằm trong entget, thuộc hệ OCS
+  ;; nên đổi sang WCS bằng trans với cao độ group 38.
+  ;; POLYLINE cũ: điểm 10 của từng VERTEX đã là tọa độ WCS.
+  (setq data (entget en) x1 nil)
+  (if (= (cdr (assoc 0 data)) "LWPOLYLINE")
+    (progn
+      (setq elev (cond ((cdr (assoc 38 data))) (0.0)))
+      (foreach x data
+        (if (= (car x) 10)
+          (setq pt (trans (list (cadr x) (caddr x) elev) en 0)
+                x1 (if x1 (min x1 (car pt)) (car pt))
+                y1 (if y1 (min y1 (cadr pt)) (cadr pt))
+                x2 (if x2 (max x2 (car pt)) (car pt))
+                y2 (if y2 (max y2 (cadr pt)) (cadr pt)))
+        )
+      )
+    )
+    (progn
+      (setq e (entnext en))
+      (while (and e (= (cdr (assoc 0 (setq vd (entget e)))) "VERTEX"))
+        (setq pt (cdr (assoc 10 vd))
+              x1 (if x1 (min x1 (car pt)) (car pt))
+              y1 (if y1 (min y1 (cadr pt)) (cadr pt))
+              x2 (if x2 (max x2 (car pt)) (car pt))
+              y2 (if y2 (max y2 (cadr pt)) (cadr pt))
+              e (entnext e))
+      )
+    )
+  )
+  (list (list x1 y1) (list x2 y2))
 )
 
 (defun pp-digit (ch)
@@ -180,12 +269,12 @@
   (if (vl-file-systime fpath) 0 2)
 )
 
-(defun c:PLOTPDF (/ *error* ent i en data mn mx rects notclosed
+(defun c:PLOTPDF (/ *error* ent i en data mn mx bb sep rects notclosed
                    folder dwgbase pad bg fd r res ok fail vctr vsize fpath
                    go)
   (defun *error* (msg)
-    (if bg (setvar "BACKGROUNDPLOT" bg))
-    (if fd (setvar "FILEDIA" fd))
+    (if bg (pp-setvar "BACKGROUNDPLOT" bg))
+    (if fd (pp-setvar "FILEDIA" fd))
     (if vctr
       (vl-catch-all-apply
         '(lambda () (command "_.ZOOM" "_C" vctr vsize)) nil)
@@ -224,9 +313,9 @@
           ((member (pp-key en) *pp-printed*)
            (princ "\nRectang nay da in roi o lan chay truoc — bo qua, chon tiep."))
           (T
-           (vla-GetBoundingBox (vlax-ename->vla-object en) 'mn 'mx)
-           (setq mn (vlax-safearray->list mn)
-                 mx (vlax-safearray->list mx))
+           (setq bb (pp-bbox en)
+                 mn (car bb)
+                 mx (cadr bb))
            (setq rects (append rects
                                (list (list en (car mn) (cadr mn)
                                            (car mx) (cadr mx)))))
@@ -252,18 +341,20 @@
               ;; --- In từng rectang theo thứ tự đã chọn ---
               (setq dwgbase (vl-filename-base (getvar "DWGNAME"))
                     pad (strlen (itoa (length rects)))
-                    bg (getvar "BACKGROUNDPLOT")
-                    fd (getvar "FILEDIA"))
+                    bg (pp-getvar "BACKGROUNDPLOT")
+                    fd (pp-getvar "FILEDIA"))
               ;; In tiền cảnh + tắt hộp thoại chọn file để -PLOT
               ;; nhận tên file ngay trên dòng lệnh
-              (setvar "BACKGROUNDPLOT" 0)
-              (setvar "FILEDIA" 0)
+              (pp-setvar "BACKGROUNDPLOT" 0)
+              (pp-setvar "FILEDIA" 0)
               (setq ok 0 fail 0 i 0)
               (foreach r rects
                 (setq i (1+ i)
+                      sep (if (vl-string-search "\\" folder) "\\" "/")
                       fpath (strcat folder
-                                    (if (= (substr folder (strlen folder) 1) "\\")
-                                      "" "\\")
+                                    (if (member (substr folder (strlen folder) 1)
+                                                '("\\" "/"))
+                                      "" sep)
                                     dwgbase "_" (pp-pad i pad) ".pdf"))
                 (setq res (vl-catch-all-apply
                             'pp-plot-one
@@ -284,8 +375,8 @@
                   (T (setq fail (1+ fail)))
                 )
               )
-              (setvar "BACKGROUNDPLOT" bg)
-              (setvar "FILEDIA" fd)
+              (pp-setvar "BACKGROUNDPLOT" bg)
+              (pp-setvar "FILEDIA" fd)
               ;; --- Báo cáo ---
               (princ (strcat "\nDa in " (itoa ok) "/" (itoa (length rects))
                              " file vao thu muc: " folder))
