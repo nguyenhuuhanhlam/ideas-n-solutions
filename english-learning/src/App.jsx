@@ -177,6 +177,16 @@ function normalize(text) {
     .join(' ')
 }
 
+// Bỏ dấu tiếng Việt + hạ chữ thường để ô tìm bài học không cần gõ dấu:
+// "so sanh hon" khớp "So sánh hơn", "qua khu" khớp "Quá khứ".
+function foldText(s) {
+  return String(s || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+}
+
 function shuffle(arr) {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
@@ -616,6 +626,7 @@ export default function App() {
   const [view, setView] = useState({ name: 'home' }) // home | lesson | quiz
   const [quiz, setQuiz] = useState(null)
   const [section, setSection] = useState('basic') // basic | conjhub | lookup | history | settings (không còn mục 'tất cả' để danh sách khỏi quá dài khi thêm bài mới)
+  const [lessonQuery, setLessonQuery] = useState('') // ô tìm bài học: có chữ thì tìm trên cả 2 mục Bài cơ bản + Chia động từ
   const [fontSize, setFontSize] = useState(() => {
     try { return localStorage.getItem(SETTINGS_KEY) || 'medium' } catch { return 'medium' }
   })
@@ -1189,6 +1200,16 @@ export default function App() {
   const basicLessons = allLessons.filter((l) => !isConjLesson(l))
   const conjLessons = allLessons.filter((l) => isConjLesson(l))
   const shownLessons = section === 'basic' ? basicLessons : conjLessons
+  // Tìm bài học: tách từ khóa thành từng từ, bài khớp khi MỌI từ đều xuất
+  // hiện trong tên/chủ đề/mô tả (không dấu, không phân biệt thứ tự từ).
+  const queryWords = foldText(lessonQuery.trim()).split(/\s+/).filter(Boolean)
+  const searching = queryWords.length > 0
+  const displayedLessons = searching
+    ? allLessons.filter((l) => {
+        const hay = foldText(`${l.title} ${l.topic} ${l.description}`)
+        return queryWords.every((w) => hay.includes(w))
+      })
+    : shownLessons
   const listTitle = section === 'basic' ? 'Bài cơ bản' : 'Chia động từ'
   return (
     <Frame
@@ -1332,24 +1353,38 @@ export default function App() {
       {(section === 'basic' || section === 'conjhub') && (
         <VStack gap={3}>
           <SectionLabel icon={<List />}>{listTitle}</SectionLabel>
-          <Text type="supporting">Mỗi lần làm bài lấy ngẫu nhiên 25 câu, mỗi câu 1 điểm.</Text>
-          {shownLessons.map((lesson) => {
+          <Text type="supporting">{searching ? `Tìm thấy ${displayedLessons.length} bài khớp với “${lessonQuery.trim()}” (tìm trên cả 2 mục Bài cơ bản và Chia động từ).` : 'Mỗi lần làm bài lấy ngẫu nhiên 25 câu, mỗi câu 1 điểm.'}</Text>
+          <TextInput
+            label="Tìm bài học"
+            isLabelHidden
+            placeholder="Tìm bài học… (ví dụ: so sánh, quá khứ, đồ ăn)"
+            value={lessonQuery}
+            onChange={(v) => setLessonQuery(v)}
+          />
+          {searching && displayedLessons.length === 0 && (
+            <VStack gap={2}>
+              <Text type="supporting">Không tìm thấy bài nào. Thử từ ngắn hơn, ví dụ “quá khứ”, “to be” hoặc “đồ ăn” — không cần gõ dấu.</Text>
+              <Button variant="secondary" label="Xóa tìm kiếm" onClick={() => setLessonQuery('')} />
+            </VStack>
+          )}
+          {displayedLessons.map((lesson) => {
             const best = progress[lesson.id]?.best || 0
             const done = best >= 70
             return (
-              <ClickableCard key={lesson.id} label={lesson.title} onClick={() => openLesson(lesson, section)}>
+              <ClickableCard key={lesson.id} label={lesson.title} onClick={() => openLesson(lesson, searching ? (isConjLesson(lesson) ? 'conjhub' : 'basic') : section)}>
                 <VStack gap={1}>
                   <Heading level={4} weight="bold">{lesson.title}</Heading>
                   <Text type="supporting">{lesson.description}</Text>
                   <HStack gap={2} wrap="wrap">
                     <Badge variant="neutral" label={`${lesson.questions.length} câu`} />
+                    {searching && <Badge variant="neutral" label={categoryLabel(lesson)} />}
                     {best > 0 && <Badge variant={done ? 'success' : 'neutral'} label={`Cao nhất: ${best}%`} />}
                   </HStack>
                 </VStack>
               </ClickableCard>
             )
           })}
-          {section === 'conjhub' && (
+          {!searching && section === 'conjhub' && (
             <div className="learn-card">
               <VStack gap={2}>
                 <SectionLabel icon={<Combine />}>Bài tập tổng hợp: To be & động từ thường</SectionLabel>
@@ -1358,6 +1393,7 @@ export default function App() {
               </VStack>
             </div>
           )}
+          {!searching && (
           <div className="learn-card">
             <VStack gap={2}>
               <SectionLabel icon={<Shuffle />}>Ôn tập tổng hợp</SectionLabel>
@@ -1365,6 +1401,8 @@ export default function App() {
               <Button variant="primary" size="lg" label="Bắt đầu ôn tập →" onClick={() => startQuiz(null, true)} />
             </VStack>
           </div>
+          )}
+          {!searching && (
           <div className="learn-card">
             <VStack gap={2}>
               <SectionLabel icon={<NotebookPen />}>Câu sai cần ôn lại</SectionLabel>
@@ -1376,6 +1414,8 @@ export default function App() {
               <Button variant="primary" size="lg" label={wrongBank.length > 0 ? `Xem ${wrongBank.length} câu sai →` : 'Mở mục Câu sai →'} onClick={openWrongBank} />
             </VStack>
           </div>
+          )}
+          {!searching && (
           <div className="learn-card learn-achievement">
             <VStack gap={2}>
               <SectionLabel icon={<Flame />}>Thành tích</SectionLabel>
@@ -1390,6 +1430,7 @@ export default function App() {
               <Button variant="secondary" label="Xem lịch sử & huy hiệu →" onClick={() => setSection('history')} />
             </VStack>
           </div>
+          )}
         </VStack>
       )}
     </Frame>
