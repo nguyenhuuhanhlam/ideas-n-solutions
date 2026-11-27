@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { loadLibrary, saveLibrary, relayoutRoot, resetLibrary } from './data/store'
+import { loadLibrary, saveLibrary, relayoutRootVisible, resetLibrary, loadSettings, saveSettings } from './data/store'
 import {
   nodeSize, childrenOf, visibleNodes, subtreeIds, hiddenCount,
   treeBounds, placeholders, fillPlaceholders, foldText, LEVEL_GAP_X, NODE_GAP_Y,
@@ -33,6 +33,15 @@ export default function App() {
   const [toast, setToast] = useState('')
   const [fillReq, setFillReq] = useState(null) // { node, values }
   const [newRootTitle, setNewRootTitle] = useState('')
+  const [settings, setSettings] = useState(() => loadSettings())
+  const settingsRef = useRef(settings)
+
+  const updateSettings = (patch) => {
+    const next = { ...settings, ...patch }
+    settingsRef.current = next
+    setSettings(next)
+    saveSettings(next)
+  }
 
   const canvasRef = useRef(null)
   const wrapRef = useRef(null)
@@ -200,6 +209,7 @@ export default function App() {
   }, [draw])
 
   useEffect(() => { fitView() }, []) // eslint-disable-line
+  useEffect(() => { window.__cmdmap = { cameraRef, libRef } }, [])
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
     const onChange = () => draw()
@@ -280,7 +290,14 @@ export default function App() {
     if (hit?.zone === 'badge') {
       const nodes = libRef.current.nodes.map((x) =>
         x.id === hit.node.id ? { ...x, collapsed: !x.collapsed } : x)
-      commit({ ...libRef.current, nodes })
+      let next = { ...libRef.current, nodes }
+      if (settingsRef.current.autoLayoutOnToggle) {
+        next = relayoutRootVisible(next, activeRootRef.current)
+        commit(next)
+        requestAnimationFrame(() => fitView())
+      } else {
+        commit(next)
+      }
       return
     }
     if (hit) {
@@ -453,10 +470,14 @@ export default function App() {
     // mở mọi node cha đang thu gọn trên đường tới node đích
     const chain = ancestorsOf(libRef.current.nodes, r.node)
     const chainIds = new Set(chain.slice(0, -1).map((x) => x.id))
-    commit({
+    let next = {
       ...libRef.current,
       nodes: libRef.current.nodes.map((x) => chainIds.has(x.id) ? { ...x, collapsed: false } : x),
-    })
+    }
+    if (settingsRef.current.autoLayoutOnToggle) {
+      next = relayoutRootVisible(next, r.node.rootId)
+    }
+    commit(next)
     highlightRef.current = r.node.id
     setHighlightId(r.node.id)
     switchRoot(r.node.rootId, r.node.id)
@@ -533,6 +554,17 @@ export default function App() {
             <button className="btn btn-icon" onClick={addRoot}><Icon name="plus" />Root</button>
           </div>
 
+          <div className="side-head"><span>Cài đặt</span></div>
+          <label className="checkrow">
+            <input
+              type="checkbox"
+              checked={settings.autoLayoutOnToggle}
+              onChange={(e) => updateSettings({ autoLayoutOnToggle: e.target.checked })}
+            />
+            <span>Tự sắp xếp lại cây khi mở / đóng nhánh</span>
+          </label>
+          <div className="settings-hint">Bật: mỗi lần bung hoặc thu một nhánh, cây tự dàn lại cho gọn (vị trí kéo tay sẽ bị sắp lại). Tắt: giữ nguyên vị trí như bản trước.</div>
+
           <div className="side-foot">
             <button className="btn block" onClick={exportJson}>Xuất JSON</button>
             <label className="btn block file-btn">
@@ -551,7 +583,7 @@ export default function App() {
             <span className="toolbar-sub">{activeNodes.length} node · {countOf(activeRootId)} lệnh</span>
             <div className="spacer" />
             <button className="btn btn-icon" onClick={() => addChild(activeNodes.find((x) => !x.parentId))}><Icon name="plus" />Node con vào gốc</button>
-            <button className="btn btn-icon" onClick={() => { commit(relayoutRoot(libRef.current, activeRootId)); requestAnimationFrame(() => fitView()) }}><Icon name="refresh-cw" />Sắp xếp lại cây</button>
+            <button className="btn btn-icon" onClick={() => { commit(relayoutRootVisible(libRef.current, activeRootId)); requestAnimationFrame(() => fitView()) }}><Icon name="refresh-cw" />Sắp xếp lại cây</button>
             <button className="btn" onClick={() => fitView()}>Vừa khung</button>
             <div className="zoom-ctl">
               <button className="btn" onClick={() => zoomBy(1 / 1.2)}>−</button>

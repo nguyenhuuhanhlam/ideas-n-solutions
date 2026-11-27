@@ -10,7 +10,7 @@
 // }
 
 import { seedLibrary, collapseTopLevel } from './seed'
-import { layoutTree } from '../lib/geometry'
+import { layoutTree, layoutVisible } from '../lib/geometry'
 
 const KEY = 'command-map-demo-v1'
 const COLLAPSE_FLAG = 'command-map-default-collapse-v1'
@@ -53,6 +53,29 @@ export function relayoutRoot(lib, rootId) {
   const laid = layoutTree(mine)
   const byId = new Map(laid.map((x) => [x.id, x]))
   return { ...lib, nodes: lib.nodes.map((x) => byId.get(x.id) || x) }
+}
+
+export function relayoutRootVisible(lib, rootId) {
+  const mine = lib.nodes.filter((x) => x.rootId === rootId)
+  const laid = layoutVisible(mine)
+  const byId = new Map(laid.map((x) => [x.id, x]))
+  return { ...lib, nodes: lib.nodes.map((x) => byId.get(x.id) || x) }
+}
+
+// Cài đặt của app (lưu local; khi nối Firebase sẽ chuyển thành cài đặt theo tài khoản)
+const SETTINGS_KEY = 'command-map-settings-v1'
+export const DEFAULT_SETTINGS = { autoLayoutOnToggle: true }
+
+export function loadSettings() {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY)
+    if (raw) return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) }
+  } catch { /* bỏ qua */ }
+  return { ...DEFAULT_SETTINGS }
+}
+
+export function saveSettings(settings) {
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)) } catch { /* bỏ qua */ }
 }
 
 export function saveLibrary(lib) {

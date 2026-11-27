@@ -48,18 +48,22 @@ export function hiddenCount(nodes, id) {
   return subtreeIds(nodes, id).length - 1
 }
 
-// Dàn cây lần đầu (hoặc khi bấm "Sắp xếp lại"): gốc ở trái, nhánh tỏa sang
-// phải, lá xếp đều theo chiều dọc. Vị trí sau đó do người dùng kéo tự do.
-export function layoutTree(input) {
+// Dàn cây: gốc ở trái, nhánh tỏa sang phải, lá xếp đều theo chiều dọc.
+// onlyVisible=false: bố trí MỌI node (dùng khi tạo dữ liệu lần đầu).
+// onlyVisible=true: chỉ bố trí node đang hiện cho gọn khung hình; node ẩn
+// trong nhánh đóng được "đỗ" cạnh node cha (vẫn có tọa độ hợp lệ để khi
+// bung nhánh mà không dàn lại cũng không chồng nhau).
+function layoutInternal(input, onlyVisible) {
   const nodes = input.map((x) => ({ ...x }))
   const root = rootNodeOf(nodes)
   if (!root) return nodes
+  const byId = new Map(nodes.map((x) => [x.id, x]))
+  const assigned = new Set()
   let cursorY = 40
   const place = (node, depth) => {
     node.x = 40 + depth * LEVEL_GAP_X
-    // Bố trí cho MỌI node kể cả node đang ẩn trong nhánh đóng — nếu bỏ qua,
-    // node ẩn sẽ không có tọa độ và khi bung nhánh ra sẽ hỏng vị trí.
-    const kids = childrenOf(nodes, node.id)
+    assigned.add(node.id)
+    const kids = onlyVisible && node.collapsed ? [] : childrenOf(nodes, node.id)
     if (!kids.length) {
       node.y = cursorY
       cursorY += NODE_GAP_Y
@@ -69,7 +73,35 @@ export function layoutTree(input) {
     }
   }
   place(root, 0)
+  if (onlyVisible) {
+    // Đỗ node chưa được bố trí (đang ẩn) cạnh cha của chúng, theo thứ tự anh em.
+    // Duyệt BFS từ gốc để cha luôn có tọa độ trước con.
+    const queue = [root]
+    const seen = new Set([root.id])
+    while (queue.length) {
+      const cur = queue.shift()
+      const kids = childrenOf(nodes, cur.id)
+      for (const k of kids) {
+        if (seen.has(k.id)) continue
+        seen.add(k.id)
+        if (!assigned.has(k.id)) {
+          k.x = cur.x + LEVEL_GAP_X
+          k.y = cur.y + kids.findIndex((x) => x.id === k.id) * NODE_GAP_Y
+          assigned.add(k.id)
+        }
+        queue.push(k)
+      }
+    }
+  }
   return nodes
+}
+
+export function layoutTree(input) {
+  return layoutInternal(input, false)
+}
+
+export function layoutVisible(input) {
+  return layoutInternal(input, true)
 }
 
 export function treeBounds(nodes) {

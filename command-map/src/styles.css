@@ -125,7 +125,11 @@ button:disabled { opacity: .45; cursor: default; }
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 .add-root input:focus { outline: 1px solid var(--accent); }
-.side-foot { padding: 0 14px 14px; }
+/* Hàng checkbox cài đặt theo kit (.checkrow) */
+.checkrow { display: flex; align-items: flex-start; gap: 8px; padding: 10px 14px 4px; cursor: pointer; line-height: 1.45; }
+.checkrow input { margin-top: 1px; accent-color: var(--accent); }
+.settings-hint { color: var(--muted); font-size: 12.5px; line-height: 1.5; padding: 0 14px 12px; border-bottom: 1px solid var(--line); }
+.side-foot { padding: 10px 14px 14px; }
 .hint { color: var(--muted); font-size: 12.5px; line-height: 1.5; }
 
 /* Stage + toolbar */
