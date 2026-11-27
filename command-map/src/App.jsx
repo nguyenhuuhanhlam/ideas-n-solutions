@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { loadLibrary, saveLibrary, relayoutRootVisible, resetLibrary, loadSettings, saveSettings } from './data/store'
+import { diffLibraries, diffIsEmpty } from './lib/syncdiff'
+import { DELETE_ROOT_CODE } from './lib/security'
 import {
   nodeSize, childrenOf, visibleNodes, subtreeIds, hiddenCount,
   treeBounds, placeholders, fillPlaceholders, foldText, LEVEL_GAP_X, NODE_GAP_Y,
@@ -46,6 +48,17 @@ export default function App() {
   const [newRootTitle, setNewRootTitle] = useState('')
   const [settings, setSettings] = useState(() => loadSettings())
   const settingsRef = useRef(settings)
+  const [user, setUser] = useState(null)
+  const userRef = useRef(null)
+  const [syncState, setSyncState] = useState('local') // local | syncing | synced | error
+  const [syncMsg, setSyncMsg] = useState('')
+  const fbRef = useRef(null)
+  const cloudBaseRef = useRef(null) // trạng thái mây gần nhất đã biết
+  const cloudReadyRef = useRef(false)
+  const pushChainRef = useRef(Promise.resolve())
+  const [rootDelReq, setRootDelReq] = useState(null)
+  const [delCode, setDelCode] = useState('')
+  const [delCodeErr, setDelCodeErr] = useState('')
 
   const updateSettings = (patch) => {
     const next = { ...settings, ...patch }
@@ -75,11 +88,29 @@ export default function App() {
     toastTimer.current = setTimeout(() => setToast(''), 1800)
   }, [])
 
+  const schedulePush = useCallback((next) => {
+    const fb = fbRef.current
+    const u = userRef.current
+    if (!fb || !u || !cloudReadyRef.current) return
+    setSyncState('syncing')
+    pushChainRef.current = pushChainRef.current.then(async () => {
+      try {
+        await fb.pushDiff(u.uid, cloudBaseRef.current, next)
+        cloudBaseRef.current = next
+        setSyncState('synced')
+      } catch (e) {
+        setSyncState('error')
+        setSyncMsg(fb.syncErrorText(e))
+      }
+    })
+  }, [])
+
   const commit = useCallback((next) => {
     libRef.current = next
     setLibUi(next)
     saveLibrary(next)
-  }, [])
+    schedulePush(next)
+  }, [schedulePush])
 
   // ---------- Vẽ canvas ----------
   const draw = useCallback(() => {
@@ -220,6 +251,82 @@ export default function App() {
   }, [draw])
 
   useEffect(() => { fitView() }, []) // eslint-disable-line
+
+  // Áp dữ liệu từ mây xuống (không đẩy ngược lên): sắp lại nếu tuỳ chọn bật,
+  // sửa root đang mở nếu root đó đã biến mất trên mây.
+  const applyRemote = useCallback((cloudLib) => {
+    let next = cloudLib
+    if (settingsRef.current.autoLayoutOnToggle) {
+      for (const r of cloudLib.roots) next = relayoutRootVisible(next, r.id)
+    }
+    libRef.current = next
+    setLibUi(next)
+    saveLibrary(next)
+    if (!next.roots.find((r) => r.id === activeRootRef.current)) {
+      if (next.roots[0]) {
+        activeRootRef.current = next.roots[0].id
+        setActiveRootId(next.roots[0].id)
+      }
+    }
+    requestAnimationFrame(() => fitView())
+  }, [fitView])
+
+  useEffect(() => {
+    let cancelled = false
+    let unsubAuth = null
+    let unsubLib = null
+    import('./lib/firebase.js').then((fb) => {
+      if (cancelled) return
+      fbRef.current = fb
+      unsubAuth = fb.listenAuth((u) => {
+        userRef.current = u
+        setUser(u)
+        if (unsubLib) { unsubLib(); unsubLib = null }
+        cloudReadyRef.current = false
+        cloudBaseRef.current = null
+        if (!u) { setSyncState('local'); setSyncMsg(''); return }
+        setSyncState('syncing')
+        unsubLib = fb.subscribeLibrary(u.uid, (cloudLib) => {
+          if (!cloudReadyRef.current) {
+            cloudReadyRef.current = true
+            if (!cloudLib.roots.length && !cloudLib.nodes.length) {
+              // Mây còn trống: đẩy dữ liệu local hiện tại lên làm bản chính đầu tiên
+              cloudBaseRef.current = { roots: [], nodes: [] }
+              schedulePush(libRef.current)
+              setSyncState('synced')
+              return
+            }
+            cloudBaseRef.current = cloudLib
+            applyRemote(cloudLib)
+            setSyncState('synced')
+            return
+          }
+          // Bỏ qua echo của chính lần ghi của mình; chỉ áp thay đổi từ máy khác
+          if (cloudBaseRef.current && diffIsEmpty(diffLibraries(cloudBaseRef.current, cloudLib))) {
+            cloudBaseRef.current = cloudLib
+            return
+          }
+          cloudBaseRef.current = cloudLib
+          applyRemote(cloudLib)
+          setSyncState('synced')
+        }, (e) => { setSyncState('error'); setSyncMsg(fb.syncErrorText(e)) })
+      })
+    }).catch(() => { /* không tải được Firebase thì cứ chạy chế độ local */ })
+    return () => { cancelled = true; if (unsubAuth) unsubAuth(); if (unsubLib) unsubLib() }
+  }, [applyRemote, schedulePush])
+
+  const onSignIn = async () => {
+    try {
+      if (!fbRef.current) fbRef.current = await import('./lib/firebase.js')
+      await fbRef.current.signInWithGoogle()
+    } catch (e) {
+      showToast(fbRef.current?.syncErrorText(e) || 'Không đăng nhập được — thử lại sau.')
+    }
+  }
+
+  const onSignOut = async () => {
+    try { await fbRef.current?.signOutUser() } catch { /* bỏ qua */ }
+  }
   useEffect(() => { window.__cmdmap = { cameraRef, libRef } }, [])
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
@@ -358,8 +465,7 @@ export default function App() {
     if (!d) return
     if (d.kind === 'node') {
       if (d.moved) {
-        setLibUi(libRef.current)
-        saveLibrary(libRef.current)
+        commit(libRef.current)
       } else if (d.zone === 'command') {
         copyCommand(d.node)
       }
@@ -427,14 +533,28 @@ export default function App() {
     switchRoot(rootId)
   }
 
+  // Xoá root phải nhập đúng mã bảo mật tạm thời (xem lib/security.js)
   const deleteRoot = (root) => {
-    if (!window.confirm(`Xoá root "${root.title}" và toàn bộ cây của nó?`)) return
+    setDelCode('')
+    setDelCodeErr('')
+    setRootDelReq(root)
+  }
+
+  const confirmDeleteRoot = () => {
+    const root = rootDelReq
+    if (!root) return
+    if (delCode.trim() !== DELETE_ROOT_CODE) {
+      setDelCodeErr('Mã bảo mật chưa đúng — chưa xoá gì cả.')
+      return
+    }
     const next = {
       roots: libRef.current.roots.filter((x) => x.id !== root.id),
       nodes: libRef.current.nodes.filter((x) => x.rootId !== root.id),
     }
+    setRootDelReq(null)
     commit(next)
     if (activeRootId === root.id && next.roots[0]) switchRoot(next.roots[0].id)
+    showToast(`Đã xoá root "${root.title}"`)
   }
 
   const exportJson = () => {
@@ -513,10 +633,16 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand"><i />Command Map</div>
-        <em className="tag demo-tag">UI DEMO</em>
-        <span className="status"><span className="dot" />Dữ liệu mẫu, lưu tạm trên trình duyệt này · bản chính dùng Firebase</span>
+        <span className="status">
+          <span className={`dot ${user && syncState !== 'error' ? 'ok' : ''}`} />
+          {user
+            ? (syncState === 'error' ? syncMsg : `${user.email} · ${syncState === 'syncing' ? 'đang đồng bộ…' : 'đã đồng bộ Firebase'}`)
+            : 'Chế độ local — đăng nhập Google để đồng bộ trên mọi máy'}
+        </span>
         <div className="spacer" />
-        <button className="btn" disabled title="Có ở bản chính">Đăng nhập Google (bản chính)</button>
+        {user
+          ? <button className="btn" onClick={onSignOut}>Đăng xuất</button>
+          : <button className="btn" onClick={onSignIn}>Đăng nhập Google</button>}
       </header>
 
       <div className="main">
@@ -676,6 +802,34 @@ export default function App() {
           )}
         </aside>
       </div>
+
+      {rootDelReq && (
+        <div className="modal-backdrop" onClick={() => setRootDelReq(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-title">Xoá root "{rootDelReq.title}"?</div>
+            <p className="modal-text">
+              Toàn bộ cây lệnh của root này sẽ bị xoá{user ? ' trên mọi máy đã đồng bộ' : ''}.
+              Nhập mã bảo mật để xác nhận:
+            </p>
+            <input
+              type="password"
+              autoFocus
+              value={delCode}
+              placeholder="Mã bảo mật"
+              onChange={(e) => { setDelCode(e.target.value); setDelCodeErr('') }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') confirmDeleteRoot()
+                if (e.key === 'Escape') setRootDelReq(null)
+              }}
+            />
+            {delCodeErr && <div className="modal-err">{delCodeErr}</div>}
+            <div className="fill-actions">
+              <button className="btn" onClick={() => setRootDelReq(null)}>Huỷ</button>
+              <button className="btn danger" onClick={confirmDeleteRoot}>Xoá root</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
