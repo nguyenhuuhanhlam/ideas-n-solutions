@@ -20,7 +20,18 @@ function ancestorsOf(nodes, node) {
 }
 
 export default function App() {
-  const [libUi, setLibUi] = useState(() => loadLibrary())
+  const [libUi, setLibUi] = useState(() => {
+    const loaded = loadLibrary()
+    // Khi mở trang: nếu tuỳ chọn tự sắp xếp đang bật, cây phải ở dạng đã
+    // sắp gọn ngay từ đầu (không hiện vị trí kéo tay còn lưu từ phiên trước)
+    if (loadSettings().autoLayoutOnToggle) {
+      let arranged = loaded
+      for (const r of loaded.roots) arranged = relayoutRootVisible(arranged, r.id)
+      saveLibrary(arranged)
+      return arranged
+    }
+    return loaded
+  })
   const libRef = useRef(libUi)
   const [activeRootId, setActiveRootId] = useState(libUi.roots[0]?.id)
   const activeRootRef = useRef(activeRootId)
