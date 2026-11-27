@@ -9,22 +9,31 @@
 //   nodes: [{ id, rootId, parentId, title, command, note, x, y, collapsed, updatedAt }],
 // }
 
-import { seedLibrary } from './seed'
+import { seedLibrary, collapseTopLevel } from './seed'
 import { layoutTree } from '../lib/geometry'
 
 const KEY = 'command-map-demo-v1'
+const COLLAPSE_FLAG = 'command-map-default-collapse-v1'
 
 export function loadLibrary() {
   try {
     const raw = localStorage.getItem(KEY)
     if (raw) {
       const lib = JSON.parse(raw)
-      if (lib && Array.isArray(lib.roots) && Array.isArray(lib.nodes)) return lib
+      if (lib && Array.isArray(lib.roots) && Array.isArray(lib.nodes)) {
+        if (!localStorage.getItem(COLLAPSE_FLAG)) {
+          lib.nodes = layoutAll({ ...lib, nodes: collapseTopLevel(lib.nodes) })
+          saveLibrary(lib)
+          localStorage.setItem(COLLAPSE_FLAG, '1')
+        }
+        return lib
+      }
     }
   } catch { /* dữ liệu hỏng thì quay về seed */ }
   const lib = seedLibrary()
   lib.nodes = layoutAll(lib)
   saveLibrary(lib)
+  try { localStorage.setItem(COLLAPSE_FLAG, '1') } catch { /* bỏ qua */ }
   return lib
 }
 

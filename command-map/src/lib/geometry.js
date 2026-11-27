@@ -57,7 +57,9 @@ export function layoutTree(input) {
   let cursorY = 40
   const place = (node, depth) => {
     node.x = 40 + depth * LEVEL_GAP_X
-    const kids = node.collapsed ? [] : childrenOf(nodes, node.id)
+    // Bố trí cho MỌI node kể cả node đang ẩn trong nhánh đóng — nếu bỏ qua,
+    // node ẩn sẽ không có tọa độ và khi bung nhánh ra sẽ hỏng vị trí.
+    const kids = childrenOf(nodes, node.id)
     if (!kids.length) {
       node.y = cursorY
       cursorY += NODE_GAP_Y

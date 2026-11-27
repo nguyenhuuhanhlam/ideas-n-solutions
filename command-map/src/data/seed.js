@@ -87,10 +87,19 @@ function dockerTree() {
   }
 }
 
+// Mặc định khi mở app: chỉ hiện node gốc + các node cận gốc,
+// các nhánh ở trạng thái đóng (collapsed) — bấm nút +N mới bung ra.
+export function collapseTopLevel(nodes) {
+  const rootIds = new Set(nodes.filter((x) => !x.parentId).map((x) => x.id))
+  const hasKids = new Set(nodes.map((x) => x.parentId).filter(Boolean))
+  return nodes.map((x) =>
+    rootIds.has(x.parentId) && hasKids.has(x.id) ? { ...x, collapsed: true } : x)
+}
+
 export function seedLibrary() {
   const trees = [npmTree(), gitTree(), dockerTree()]
   return {
     roots: trees.map((t) => t.root),
-    nodes: trees.flatMap((t) => t.nodes),
+    nodes: collapseTopLevel(trees.flatMap((t) => t.nodes)),
   }
 }
