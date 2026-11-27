@@ -3,7 +3,7 @@
 // Hàm thuần, không gọi mạng, test được độc lập.
 
 const FIELDS_ROOT = ['id', 'title', 'description']
-const FIELDS_NODE = ['id', 'rootId', 'parentId', 'title', 'command', 'note', 'x', 'y', 'collapsed', 'updatedAt']
+const FIELDS_NODE = ['id', 'rootId', 'parentId', 'title', 'command', 'note', 'x', 'y', 'collapsed', 'mark', 'updatedAt']
 
 function pick(obj, fields) {
   const out = {}

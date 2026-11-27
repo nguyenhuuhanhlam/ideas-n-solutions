@@ -96,10 +96,20 @@ export function collapseTopLevel(nodes) {
     rootIds.has(x.parentId) && hasKids.has(x.id) ? { ...x, collapsed: true } : x)
 }
 
+// Vài lệnh hay dùng được đánh dấu màu sẵn làm ví dụ cho tính năng mark
+const SEED_MARKS = {
+  'Gói global đã cài': 'green',
+  'Trạng thái': 'red',
+  'Đẩy lên remote': 'blue',
+  'Tất cả container': 'purple',
+}
+
 export function seedLibrary() {
   const trees = [npmTree(), gitTree(), dockerTree()]
+  const nodes = collapseTopLevel(trees.flatMap((t) => t.nodes))
+    .map((x) => (SEED_MARKS[x.title] ? { ...x, mark: SEED_MARKS[x.title] } : x))
   return {
     roots: trees.map((t) => t.root),
-    nodes: collapseTopLevel(trees.flatMap((t) => t.nodes)),
+    nodes,
   }
 }

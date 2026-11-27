@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { loadLibrary, saveLibrary, relayoutRootVisible, resetLibrary, loadSettings, saveSettings } from './data/store'
 import { diffLibraries, diffIsEmpty } from './lib/syncdiff'
 import { DELETE_ROOT_CODE } from './lib/security'
+import { MARK_OPTIONS, markHex } from './lib/marks'
 import {
   nodeSize, childrenOf, visibleNodes, subtreeIds, hiddenCount,
   treeBounds, placeholders, fillPlaceholders, foldText, LEVEL_GAP_X, NODE_GAP_Y,
@@ -203,6 +204,14 @@ export default function App() {
         ctx.fillStyle = P.muted
         ctx.font = '10px system-ui, sans-serif'
         ctx.fillText('⧉', node.x + w - 18, node.y + 44)
+      }
+      // chấm tròn solid đánh dấu màu (lệnh hay dùng)
+      if (node.mark) {
+        const hex = markHex(node.mark, dark)
+        if (hex) {
+          ctx.fillStyle = hex
+          ctx.beginPath(); ctx.arc(node.x + w - 12, node.y + 12, 5, 0, Math.PI * 2); ctx.fill()
+        }
       }
       // nút thu/mở nhánh
       const kids = childrenOf(nodes, node.id)
@@ -793,6 +802,22 @@ export default function App() {
               <textarea className="mono" rows={3} value={selected.command} onChange={(e) => updateNode(selected, { command: e.target.value })} placeholder="vd: npm list -g --depth=0" />
               <label>Ghi chú</label>
               <textarea rows={4} value={selected.note} onChange={(e) => updateNode(selected, { note: e.target.value })} />
+              <label>Đánh dấu màu (lưu ý lệnh hay dùng)</label>
+              <div className="mark-row">
+                <button
+                  className={`btn mark-none ${!selected.mark ? 'on' : ''}`}
+                  onClick={() => updateNode(selected, { mark: null })}
+                >Không</button>
+                {MARK_OPTIONS.map((m) => (
+                  <button
+                    key={m.key}
+                    className={`mark-dot ${selected.mark === m.key ? 'on' : ''}`}
+                    title={m.label}
+                    style={{ background: `var(${m.varName})` }}
+                    onClick={() => updateNode(selected, { mark: selected.mark === m.key ? null : m.key })}
+                  />
+                ))}
+              </div>
               <div className="insp-actions">
                 <button className="btn btn-icon" onClick={() => addChild(selected)}><Icon name="plus" />Node con</button>
                 {selected.command && <button className="btn btn-icon" onClick={() => copyCommand(selected)}><Icon name="copy" />Copy lệnh</button>}
