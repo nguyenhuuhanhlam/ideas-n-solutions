@@ -9,14 +9,14 @@ thư mục mới và một thẻ vào trang chủ ở `index.html`.
 | App | Thư mục | Demo |
 | --- | --- | --- |
 | Timeline Projects — quản lý dự án trên trục thời gian: kéo thả dời lịch, sửa task trực tiếp | `timeline-projects/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/timeline-projects/ |
-| Team Assistant — mô phỏng trợ lý trung tâm cho team kiến trúc: tách việc cho AI qua cổng duyệt | `team-assistant-sim/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/team-assistant-sim/ |
+| Team Assistant Simulator — mô phỏng trợ lý trung tâm cho team kiến trúc: tách việc cho AI qua cổng duyệt | `team-assistant-sim/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/team-assistant-sim/ |
 | Platformer Game — game 2D chặt chém kiểu NES, 1 file HTML tĩnh không cần build | `platformer-game/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/platformer-game/ |
 | TuTi Learn English — học tiếng Anh cơ bản qua bài tập chấm điểm, chia động từ 7 nhóm | `english-learning/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/english-learning/ |
 | Form Hub — điền form trực tiếp + công bố API (link điền, JSON form, nhúng iframe) | `surveyjs-demo/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/surveyjs-demo/ |
 | Synaps Draft — vẽ kiến trúc 2D chính xác theo mm, xem 3D đồng bộ, xuất DXF qua API local | `synaps-draft/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/synaps-draft/ |
-| Ảnh nhóm — chụp ảnh mobile up lên Cloudinary, cả nhóm xem chung mọi máy | `photo-app/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/photo-app/ |
+| Group Photos — chụp ảnh mobile up lên Cloudinary, cả nhóm xem chung mọi máy | `photo-app/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/photo-app/ |
 | Command Map — kho lệnh dạng mindmap, bấm lệnh là copy, đồng bộ Firebase qua đăng nhập Google | `command-map/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/command-map/ |
-| MIENTAY Website Demo — demo tái thiết kế mientay.com.vn theo bố cục kienviet.net, đủ 34 dự án thật | `mientay-demo/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/mientay-demo/ |
+| Mientay Website — demo tái thiết kế mientay.com.vn theo bố cục kienviet.net, đủ 34 dự án thật | `mientay-demo/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/mientay-demo/ |
 | Hairline UI — kit giao diện hairline grid dùng lại: chỉ line 1px, không card/shadow/bo góc | `hairline-ui/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/hairline-ui/demo.html |
 
 ## App desktop (không deploy lên Pages)
