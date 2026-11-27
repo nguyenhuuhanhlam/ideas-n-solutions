@@ -469,7 +469,7 @@ function ConjugationGuide({ guide, scale }) {
   return (
     <VStack gap={6}>
       <VStack gap={2}>
-        <SectionLabel icon={<Compass />}>Sơ đồ chia động từ</SectionLabel>
+        <SectionLabel icon={<Compass />}>{guide.tableTitle || 'Sơ đồ chia động từ'}</SectionLabel>
         <Table
           data={guide.table.rows}
           idKey={guide.table.idKey}
@@ -493,7 +493,7 @@ function ConjugationGuide({ guide, scale }) {
         </VStack>
       </VStack>
       <VStack gap={2}>
-        <SectionLabel icon={<TriangleAlert />}>Số ít / Số nhiều — ví dụ đặc biệt</SectionLabel>
+        <SectionLabel icon={<TriangleAlert />}>{guide.specialsTitle || 'Số ít / Số nhiều — ví dụ đặc biệt'}</SectionLabel>
         <VStack gap={2}>
           {guide.specials.map((sp, i) => (
             <VStack key={i} gap={1}>

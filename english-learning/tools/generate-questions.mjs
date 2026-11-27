@@ -69,6 +69,79 @@ function edForm(v) {
   return v + 'ed'
 }
 
+// ---- So sánh hơn: bảng tính từ theo lớp (dùng cho ngân hàng + câu sai) ----
+// Lớp quyết định cách tạo dạng so sánh hơn và các dạng sai hay gặp:
+// short (+ -er), e (chỉ + -r), double (gấp đôi phụ âm), y (đổi y -> i),
+// long (more + tính từ), irregular (đổi hẳn từ).
+const COMP_ADJS = [
+  { cls: 'short', items: [['tall', 'taller'], ['short', 'shorter'], ['long', 'longer'], ['fast', 'faster'], ['slow', 'slower'], ['high', 'higher'], ['low', 'lower'], ['old', 'older'], ['young', 'younger'], ['new', 'newer'], ['small', 'smaller'], ['strong', 'stronger'], ['weak', 'weaker'], ['cheap', 'cheaper'], ['clean', 'cleaner'], ['cold', 'colder'], ['warm', 'warmer'], ['cool', 'cooler'], ['hard', 'harder'], ['light', 'lighter'], ['dark', 'darker'], ['rich', 'richer'], ['poor', 'poorer'], ['kind', 'kinder'], ['quick', 'quicker'], ['soft', 'softer'], ['loud', 'louder'], ['bright', 'brighter'], ['deep', 'deeper'], ['thick', 'thicker']] },
+  { cls: 'e', items: [['nice', 'nicer'], ['large', 'larger'], ['safe', 'safer'], ['late', 'later'], ['close', 'closer'], ['wide', 'wider'], ['brave', 'braver'], ['cute', 'cuter']] },
+  { cls: 'double', items: [['big', 'bigger'], ['hot', 'hotter'], ['thin', 'thinner'], ['fat', 'fatter'], ['sad', 'sadder'], ['wet', 'wetter'], ['red', 'redder']] },
+  { cls: 'y', items: [['happy', 'happier'], ['easy', 'easier'], ['busy', 'busier'], ['funny', 'funnier'], ['heavy', 'heavier'], ['pretty', 'prettier'], ['early', 'earlier'], ['hungry', 'hungrier'], ['noisy', 'noisier'], ['sunny', 'sunnier'], ['rainy', 'rainier'], ['cloudy', 'cloudier'], ['windy', 'windier'], ['healthy', 'healthier'], ['dirty', 'dirtier'], ['lucky', 'luckier'], ['angry', 'angrier'], ['sleepy', 'sleepier'], ['friendly', 'friendlier'], ['tidy', 'tidier']] },
+  { cls: 'long', items: [['beautiful', 'more beautiful'], ['interesting', 'more interesting'], ['expensive', 'more expensive'], ['difficult', 'more difficult'], ['important', 'more important'], ['careful', 'more careful'], ['popular', 'more popular'], ['comfortable', 'more comfortable'], ['dangerous', 'more dangerous'], ['exciting', 'more exciting'], ['boring', 'more boring'], ['famous', 'more famous'], ['delicious', 'more delicious'], ['useful', 'more useful'], ['modern', 'more modern']] },
+  { cls: 'irregular', items: [['good', 'better'], ['bad', 'worse'], ['far', 'farther']] },
+]
+const COMP_MAP = {}
+for (const g of COMP_ADJS) for (const [adj, comp] of g.items) COMP_MAP[adj] = { comp, cls: g.cls }
+function compWrongs(adj, comp, cls) {
+  if (cls === 'short') return ['more ' + adj, adj, adj + 'est']
+  if (cls === 'e') return ['more ' + adj, adj + 'er', adj + 'est']
+  if (cls === 'double') return ['more ' + adj, adj + 'er', comp.slice(0, -2) + 'est']
+  if (cls === 'y') return ['more ' + adj, adj + 'er', adj.slice(0, -1) + 'iest']
+  if (cls === 'long') return [adj + 'er', adj, 'most ' + adj]
+  if (adj === 'good') return ['gooder', 'more good', 'best']
+  if (adj === 'bad') return ['badder', 'more bad', 'worst']
+  return ['farrer', 'more far', 'farthest']
+}
+function compNote(adj, comp, cls) {
+  const cap = adj[0].toUpperCase() + adj.slice(1)
+  if (cls === 'short') return `${cap} là tính từ ngắn → thêm -er: ${comp}.`
+  if (cls === 'e') return `${cap} tận cùng là -e → chỉ thêm -r: ${comp}.`
+  if (cls === 'double') return `${cap} có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: ${comp}.`
+  if (cls === 'y') return `${cap} tận cùng phụ âm + y → đổi y thành i: ${comp}.`
+  if (cls === 'long') return `${cap} là tính từ dài → dùng more: ${comp}.`
+  return `${cap} là từ bất quy tắc: ${adj} → ${comp}.`
+}
+// Cảnh so sánh tự nhiên: [bên A, tính từ, bên B, câu tiếng Việt].
+const COMP_SCENES = [
+  ['Tom', 'tall', 'Jack', 'Tom cao hơn Jack.'],
+  ['An elephant', 'big', 'a dog', 'Con voi to hơn con chó.'],
+  ['A horse', 'fast', 'a cow', 'Con ngựa nhanh hơn con bò.'],
+  ['A giraffe', 'tall', 'a horse', 'Con hươu cao cổ cao hơn con ngựa.'],
+  ['A turtle', 'slow', 'a rabbit', 'Con rùa chậm hơn con thỏ.'],
+  ['A lion', 'strong', 'a dog', 'Con sư tử khỏe hơn con chó.'],
+  ['A dog', 'small', 'an elephant', 'Con chó nhỏ hơn con voi.'],
+  ['This book', 'interesting', 'that book', 'Quyển sách này hay hơn quyển sách kia.'],
+  ['This book', 'good', 'that book', 'Quyển sách này tốt hơn quyển sách kia.'],
+  ['The red bag', 'expensive', 'the blue bag', 'Cái túi đỏ đắt hơn cái túi xanh.'],
+  ['The blue bag', 'cheap', 'the red bag', 'Cái túi xanh rẻ hơn cái túi đỏ.'],
+  ['Today', 'hot', 'yesterday', 'Hôm nay nóng hơn hôm qua.'],
+  ['Winter', 'cold', 'summer', 'Mùa đông lạnh hơn mùa hè.'],
+  ['Today', 'sunny', 'yesterday', 'Hôm nay nắng hơn hôm qua.'],
+  ['This flower', 'beautiful', 'that flower', 'Bông hoa này đẹp hơn bông hoa kia.'],
+  ['This flower', 'pretty', 'that flower', 'Bông hoa này xinh hơn bông hoa kia.'],
+  ['A car', 'fast', 'a bike', 'Ô tô nhanh hơn xe đạp.'],
+  ['A car', 'expensive', 'a bike', 'Ô tô đắt hơn xe đạp.'],
+  ['This film', 'boring', 'that film', 'Bộ phim này chán hơn bộ phim kia.'],
+  ['This cake', 'delicious', 'that cake', 'Bánh này ngon hơn bánh kia.'],
+  ['A tiger', 'dangerous', 'a cat', 'Con hổ nguy hiểm hơn con mèo.'],
+  ['My room', 'clean', 'your room', 'Phòng của tôi sạch hơn phòng của bạn.'],
+  ['This lesson', 'easy', 'that lesson', 'Bài học này dễ hơn bài học kia.'],
+  ['This question', 'difficult', 'that question', 'Câu hỏi này khó hơn câu hỏi kia.'],
+  ['This dog', 'friendly', 'that dog', 'Con chó này thân thiện hơn con chó kia.'],
+  ['This street', 'long', 'that street', 'Con đường này dài hơn con đường kia.'],
+  ['His house', 'large', 'my house', 'Nhà của anh ấy rộng hơn nhà của tôi.'],
+  ['She', 'busy', 'her sister', 'Cô ấy bận hơn chị gái của cô ấy.'],
+  ['Lan', 'happy', 'Hoa', 'Lan vui hơn Hoa.'],
+  ['His bag', 'heavy', 'my bag', 'Cặp của anh ấy nặng hơn cặp của tôi.'],
+  ['Today', 'bad', 'yesterday', 'Hôm nay tệ hơn hôm qua.'],
+  ['This chair', 'comfortable', 'that chair', 'Ghế này thoải mái hơn ghế kia.'],
+  ['Summer', 'warm', 'winter', 'Mùa hè ấm hơn mùa đông.'],
+  ['The sun', 'bright', 'the moon', 'Mặt trời sáng hơn mặt trăng.'],
+  ['My father', 'old', 'my mother', 'Bố tôi lớn tuổi hơn mẹ tôi.'],
+  ['My mother', 'young', 'my father', 'Mẹ tôi trẻ hơn bố tôi.'],
+]
+
 // ---- Khung chung cho mọi bài: từ vựng sẵn có + câu hỏi viết tay cũ ----
 function generic(lesson, add) {
   const v = lesson.vocab
@@ -583,6 +656,27 @@ function extraConj(lesson, add) {
     add(choice('Chọn dạng đúng: I ______ help you! (quyết định ngay lúc nói)', 'will', ['am going to', 'will to', 'going to'], 'I will help you! = Tôi sẽ giúp bạn!'))
     add(choice('Chọn dạng đúng: We ______ travel next month. (kế hoạch đã định)', 'are going to', ['will', 'are going', 'will to'], 'We are going to travel next month. = Chúng tôi định đi du lịch tháng tới.'))
   }
+  if (lesson.id === 'comparative') {
+    // Hỏi trực tiếp dạng so sánh hơn của từng tính từ (trắc nghiệm + điền).
+    for (const g of COMP_ADJS) {
+      for (const [adj, comp] of g.items) {
+        add(choice(`Dạng so sánh hơn của "${adj}" là gì?`, comp, compWrongs(adj, comp, g.cls), compNote(adj, comp, g.cls)))
+        add(fill(`Điền dạng so sánh hơn: ${adj} → ______`, comp, compNote(adj, comp, g.cls)))
+      }
+    }
+    // Câu so sánh hoàn chỉnh từ các cảnh tự nhiên (trắc nghiệm + điền + dịch).
+    for (const [a, adj, b, vi] of COMP_SCENES) {
+      const { comp, cls } = COMP_MAP[adj]
+      const sentence = `${a} is ${comp} than ${b}.`
+      add(choice(`${a} is ______ than ${b}. (${adj})`, comp, compWrongs(adj, comp, cls), `${sentence} ${compNote(adj, comp, cls)}`))
+      add(fill(`Chia tính từ: ${a} is ______ (${adj}) than ${b}.`, comp, sentence))
+      if (vi) add(translate(`Dịch sang tiếng Anh: "${vi}"`, sentence.toLowerCase().replace(/\.$/, ''), sentence))
+    }
+    // Điền "than" — từ hay bị quên nhất trong câu so sánh.
+    for (const [a, comp, b] of [['Tom', 'taller', 'Jack'], ['An elephant', 'bigger', 'a dog'], ['She', 'happier', 'her sister']]) {
+      add(fill(`Điền từ còn thiếu: ${a} is ${comp} ______ ${b}.`, 'than', `Câu so sánh hơn dùng than: ${a} is ${comp} than ${b}.`))
+    }
+  }
 }
 
 // ---- Bài nâng cao: tìm câu sai ----
@@ -790,6 +884,40 @@ function errorPairGroups(id) {
     const goingS = SUBJ_ALL.flatMap((s) => verbs.slice(0, 4).map(([v, o]) => P(`${s} ${BE_RIGHT[s]} going to ${v} ${o}.`, `${s} ${BE_RIGHT[s]} going to ${sForm(v)} ${o}.`, `Sau be going to, động từ giữ nguyên thể (${v}).`)))
     const wont = SUBJ_3RD.flatMap((s) => verbs.slice(0, 4).map(([v, o]) => P(`${s} won't ${v} ${o}.`, `${s} won't ${sForm(v)} ${o}.`, `Sau won't, động từ giữ nguyên thể (${v}).`)))
     return [willS, willIng, goingBe, goingS, wont]
+  }
+  if (id === 'comparative') {
+    const cap = (w) => w[0].toUpperCase() + w.slice(1)
+    const S = (a, form, b) => `${a} is ${form} than ${b}.`
+    const scenesOf = (cls) => COMP_SCENES.filter(([, adj]) => COMP_MAP[adj].cls === cls)
+    // Thêm vài cảnh chỉ dùng cho câu sai (lớp gấp đôi phụ âm ít cảnh sẵn).
+    const extraScenes = [['A pig', 'fat', 'a dog'], ['A cat', 'thin', 'a dog'], ['This hat', 'red', 'that hat']]
+    const allScenes = [...COMP_SCENES, ...extraScenes]
+    const moreShort = allScenes
+      .filter(([, adj]) => !['long', 'irregular'].includes(COMP_MAP[adj].cls))
+      .map(([a, adj, b]) => P(S(a, COMP_MAP[adj].comp, b), S(a, 'more ' + adj, b), `Tính từ ngắn ${adj} thêm -er (${COMP_MAP[adj].comp}), không dùng more.`))
+    const noDouble = [...scenesOf('double'), ...extraScenes]
+      .map(([a, adj, b]) => P(S(a, COMP_MAP[adj].comp, b), S(a, adj + 'er', b), `${cap(adj)} gấp đôi phụ âm cuối: ${COMP_MAP[adj].comp} (không phải ${adj}er).`))
+    const yKeep = scenesOf('y')
+      .map(([a, adj, b]) => P(S(a, COMP_MAP[adj].comp, b), S(a, adj + 'er', b), `${cap(adj)} đổi y thành i: ${COMP_MAP[adj].comp} (không phải ${adj}er).`))
+    const longEr = scenesOf('long')
+      .map(([a, adj, b]) => P(S(a, COMP_MAP[adj].comp, b), S(a, adj + 'er', b), `${cap(adj)} là tính từ dài → ${COMP_MAP[adj].comp} (không phải ${adj}er).`))
+    const irreg = scenesOf('irregular').flatMap(([a, adj, b]) => [
+      P(S(a, COMP_MAP[adj].comp, b), S(a, adj === 'good' ? 'gooder' : 'badder', b), `${cap(adj)} là từ bất quy tắc → ${COMP_MAP[adj].comp}.`),
+      P(S(a, COMP_MAP[adj].comp, b), S(a, 'more ' + adj, b), `${cap(adj)} là từ bất quy tắc → ${COMP_MAP[adj].comp}, không dùng more ${adj}.`),
+    ])
+    const moreComp = allScenes
+      .filter(([, adj]) => ['short', 'double', 'y'].includes(COMP_MAP[adj].cls))
+      .map(([a, adj, b]) => P(S(a, COMP_MAP[adj].comp, b), S(a, 'more ' + COMP_MAP[adj].comp, b), `Chỉ dùng 1 cách: ${COMP_MAP[adj].comp}, không dùng "more ${COMP_MAP[adj].comp}".`))
+    const noThan = COMP_SCENES.slice(0, 10)
+      .map(([a, adj, b]) => P(S(a, COMP_MAP[adj].comp, b), `${a} is ${COMP_MAP[adj].comp} ${b}.`, `Câu so sánh hơn phải có than: ${S(a, COMP_MAP[adj].comp, b)}`))
+    const superForm = allScenes
+      .filter(([, adj]) => ['short', 'double', 'y'].includes(COMP_MAP[adj].cls))
+      .slice(0, 8)
+      .map(([a, adj, b]) => {
+        const sup = compWrongs(adj, COMP_MAP[adj].comp, COMP_MAP[adj].cls)[2]
+        return P(S(a, COMP_MAP[adj].comp, b), S(a, sup, b), `Câu có than dùng so sánh hơn (${COMP_MAP[adj].comp}), không dùng dạng nhất (${sup}).`)
+      })
+    return [moreShort, noDouble, yKeep, longEr, irreg, moreComp, noThan, superForm]
   }
   return []
 }

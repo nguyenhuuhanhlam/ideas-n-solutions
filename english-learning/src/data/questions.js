@@ -30592,6 +30592,2940 @@ export const questionBanks = {
       "answer": "are going to",
       "explanation": "We are going to travel next month. = Chúng tôi định đi du lịch tháng tới."
     }
+  ],
+  "comparative": [
+    {
+      "type": "choice",
+      "prompt": "\"tall → taller\" có nghĩa là gì?",
+      "options": [
+        "đắt hơn",
+        "tệ hơn, xấu hơn",
+        "cao hơn",
+        "nhanh hơn"
+      ],
+      "answer": "cao hơn",
+      "explanation": "tall → taller = cao hơn."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền từ còn thiếu: Tom is ______ than Jack. (cao hơn)",
+      "answers": [
+        "taller"
+      ],
+      "explanation": "Câu đầy đủ: Tom is taller than Jack."
+    },
+    {
+      "type": "choice",
+      "prompt": "\"big → bigger\" có nghĩa là gì?",
+      "options": [
+        "to hơn",
+        "vui hơn",
+        "đắt hơn",
+        "tệ hơn, xấu hơn"
+      ],
+      "answer": "to hơn",
+      "explanation": "big → bigger = to hơn."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền từ còn thiếu: An elephant is ______ than a dog. (to hơn)",
+      "answers": [
+        "bigger"
+      ],
+      "explanation": "Câu đầy đủ: An elephant is bigger than a dog."
+    },
+    {
+      "type": "choice",
+      "prompt": "\"fast → faster\" có nghĩa là gì?",
+      "options": [
+        "nhanh hơn",
+        "to hơn",
+        "cao hơn",
+        "đẹp hơn"
+      ],
+      "answer": "nhanh hơn",
+      "explanation": "fast → faster = nhanh hơn."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền từ còn thiếu: A cheetah is ______ than a turtle. (nhanh hơn)",
+      "answers": [
+        "faster"
+      ],
+      "explanation": "Câu đầy đủ: A cheetah is faster than a turtle."
+    },
+    {
+      "type": "choice",
+      "prompt": "\"happy → happier\" có nghĩa là gì?",
+      "options": [
+        "tệ hơn, xấu hơn",
+        "tốt hơn",
+        "cao hơn",
+        "vui hơn"
+      ],
+      "answer": "vui hơn",
+      "explanation": "happy → happier = vui hơn."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền từ còn thiếu: She is ______ today. (vui hơn)",
+      "answers": [
+        "happier"
+      ],
+      "explanation": "Câu đầy đủ: She is happier today."
+    },
+    {
+      "type": "choice",
+      "prompt": "\"beautiful → more beautiful\" có nghĩa là gì?",
+      "options": [
+        "đẹp hơn",
+        "tốt hơn",
+        "nhanh hơn",
+        "đắt hơn"
+      ],
+      "answer": "đẹp hơn",
+      "explanation": "beautiful → more beautiful = đẹp hơn."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền từ còn thiếu: This flower is more ______ than that flower. (đẹp hơn)",
+      "answers": [
+        "beautiful"
+      ],
+      "explanation": "Câu đầy đủ: This flower is more beautiful than that flower."
+    },
+    {
+      "type": "choice",
+      "prompt": "\"expensive → more expensive\" có nghĩa là gì?",
+      "options": [
+        "đẹp hơn",
+        "đắt hơn",
+        "cao hơn",
+        "tốt hơn"
+      ],
+      "answer": "đắt hơn",
+      "explanation": "expensive → more expensive = đắt hơn."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền từ còn thiếu: The red bag is more ______ than the blue bag. (đắt hơn)",
+      "answers": [
+        "expensive"
+      ],
+      "explanation": "Câu đầy đủ: The red bag is more expensive than the blue bag."
+    },
+    {
+      "type": "choice",
+      "prompt": "\"good → better\" có nghĩa là gì?",
+      "options": [
+        "tệ hơn, xấu hơn",
+        "đẹp hơn",
+        "đắt hơn",
+        "tốt hơn"
+      ],
+      "answer": "tốt hơn",
+      "explanation": "good → better = tốt hơn."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền từ còn thiếu: This book is ______ than that book. (tốt hơn)",
+      "answers": [
+        "better"
+      ],
+      "explanation": "Câu đầy đủ: This book is better than that book."
+    },
+    {
+      "type": "choice",
+      "prompt": "\"bad → worse\" có nghĩa là gì?",
+      "options": [
+        "vui hơn",
+        "nhanh hơn",
+        "tốt hơn",
+        "tệ hơn, xấu hơn"
+      ],
+      "answer": "tệ hơn, xấu hơn",
+      "explanation": "bad → worse = tệ hơn, xấu hơn."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền từ còn thiếu: The weather is ______ today. (tệ hơn, xấu hơn)",
+      "answers": [
+        "worse"
+      ],
+      "explanation": "Câu đầy đủ: The weather is worse today."
+    },
+    {
+      "type": "choice",
+      "prompt": "An elephant is ______ than a dog.",
+      "options": [
+        "bigger",
+        "more big",
+        "biger",
+        "big"
+      ],
+      "answer": "bigger",
+      "explanation": "Big gấp đôi phụ âm g rồi thêm -er: bigger."
+    },
+    {
+      "type": "choice",
+      "prompt": "Tom is ______ than Jack.",
+      "options": [
+        "taller",
+        "tall",
+        "more tall",
+        "tallest"
+      ],
+      "answer": "taller",
+      "explanation": "Tall là tính từ ngắn, thêm -er: taller."
+    },
+    {
+      "type": "choice",
+      "prompt": "This book is ______ than that book. (interesting)",
+      "options": [
+        "more interesting",
+        "interestinger",
+        "interesting",
+        "most interesting"
+      ],
+      "answer": "more interesting",
+      "explanation": "Interesting là tính từ dài → more interesting."
+    },
+    {
+      "type": "choice",
+      "prompt": "She is ______ today. (happy)",
+      "options": [
+        "happier",
+        "happyer",
+        "more happy",
+        "happy"
+      ],
+      "answer": "happier",
+      "explanation": "Happy: đổi y thành i rồi thêm -er: happier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"good\" là gì?",
+      "options": [
+        "better",
+        "gooder",
+        "more good",
+        "best"
+      ],
+      "answer": "better",
+      "explanation": "Good là từ bất quy tắc: good → better."
+    },
+    {
+      "type": "choice",
+      "prompt": "A car is ______ than a bike.",
+      "options": [
+        "more expensive",
+        "expensiver",
+        "expensive",
+        "most expensive"
+      ],
+      "answer": "more expensive",
+      "explanation": "Expensive là tính từ dài → more expensive."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: A cheetah is ______ (fast) than a turtle.",
+      "answers": [
+        "faster"
+      ],
+      "explanation": "Fast → faster (thêm -er)."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: Today is ______ (hot) than yesterday.",
+      "answers": [
+        "hotter"
+      ],
+      "explanation": "Hot gấp đôi phụ âm t: hotter."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: My bag is ______ (heavy) than your bag.",
+      "answers": [
+        "heavier"
+      ],
+      "explanation": "Heavy: đổi y thành i: heavier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: This film is ______ (boring) than that film.",
+      "answers": [
+        "more boring"
+      ],
+      "explanation": "Boring là tính từ dài → more boring."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền từ còn thiếu: She is taller ______ me.",
+      "answers": [
+        "than"
+      ],
+      "explanation": "Câu so sánh hơn dùng than: taller than me."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: His house is ______ (big) than my house.",
+      "answers": [
+        "bigger"
+      ],
+      "explanation": "Big → bigger (gấp đôi phụ âm g)."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Con voi to hơn con chó.\"",
+      "answers": [
+        "an elephant is bigger than a dog"
+      ],
+      "explanation": "An elephant is bigger than a dog. = Con voi to hơn con chó."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Tom cao hơn Jack.\"",
+      "answers": [
+        "tom is taller than jack"
+      ],
+      "explanation": "Tom is taller than Jack. = Tom cao hơn Jack."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Bông hoa này đẹp hơn bông hoa kia.\"",
+      "answers": [
+        "this flower is more beautiful than that flower"
+      ],
+      "explanation": "This flower is more beautiful than that flower. = Bông hoa này đẹp hơn bông hoa kia."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"tall\" là gì?",
+      "options": [
+        "more tall",
+        "tallest",
+        "tall",
+        "taller"
+      ],
+      "answer": "taller",
+      "explanation": "Tall là tính từ ngắn → thêm -er: taller."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: tall → ______",
+      "answers": [
+        "taller"
+      ],
+      "explanation": "Tall là tính từ ngắn → thêm -er: taller."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"short\" là gì?",
+      "options": [
+        "more short",
+        "short",
+        "shorter",
+        "shortest"
+      ],
+      "answer": "shorter",
+      "explanation": "Short là tính từ ngắn → thêm -er: shorter."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: short → ______",
+      "answers": [
+        "shorter"
+      ],
+      "explanation": "Short là tính từ ngắn → thêm -er: shorter."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"long\" là gì?",
+      "options": [
+        "longer",
+        "long",
+        "more long",
+        "longest"
+      ],
+      "answer": "longer",
+      "explanation": "Long là tính từ ngắn → thêm -er: longer."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: long → ______",
+      "answers": [
+        "longer"
+      ],
+      "explanation": "Long là tính từ ngắn → thêm -er: longer."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"fast\" là gì?",
+      "options": [
+        "fast",
+        "faster",
+        "more fast",
+        "fastest"
+      ],
+      "answer": "faster",
+      "explanation": "Fast là tính từ ngắn → thêm -er: faster."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: fast → ______",
+      "answers": [
+        "faster"
+      ],
+      "explanation": "Fast là tính từ ngắn → thêm -er: faster."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"slow\" là gì?",
+      "options": [
+        "slower",
+        "slowest",
+        "slow",
+        "more slow"
+      ],
+      "answer": "slower",
+      "explanation": "Slow là tính từ ngắn → thêm -er: slower."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: slow → ______",
+      "answers": [
+        "slower"
+      ],
+      "explanation": "Slow là tính từ ngắn → thêm -er: slower."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"high\" là gì?",
+      "options": [
+        "high",
+        "higher",
+        "more high",
+        "highest"
+      ],
+      "answer": "higher",
+      "explanation": "High là tính từ ngắn → thêm -er: higher."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: high → ______",
+      "answers": [
+        "higher"
+      ],
+      "explanation": "High là tính từ ngắn → thêm -er: higher."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"low\" là gì?",
+      "options": [
+        "more low",
+        "low",
+        "lower",
+        "lowest"
+      ],
+      "answer": "lower",
+      "explanation": "Low là tính từ ngắn → thêm -er: lower."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: low → ______",
+      "answers": [
+        "lower"
+      ],
+      "explanation": "Low là tính từ ngắn → thêm -er: lower."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"old\" là gì?",
+      "options": [
+        "oldest",
+        "older",
+        "old",
+        "more old"
+      ],
+      "answer": "older",
+      "explanation": "Old là tính từ ngắn → thêm -er: older."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: old → ______",
+      "answers": [
+        "older"
+      ],
+      "explanation": "Old là tính từ ngắn → thêm -er: older."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"young\" là gì?",
+      "options": [
+        "younger",
+        "youngest",
+        "young",
+        "more young"
+      ],
+      "answer": "younger",
+      "explanation": "Young là tính từ ngắn → thêm -er: younger."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: young → ______",
+      "answers": [
+        "younger"
+      ],
+      "explanation": "Young là tính từ ngắn → thêm -er: younger."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"new\" là gì?",
+      "options": [
+        "more new",
+        "new",
+        "newer",
+        "newest"
+      ],
+      "answer": "newer",
+      "explanation": "New là tính từ ngắn → thêm -er: newer."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: new → ______",
+      "answers": [
+        "newer"
+      ],
+      "explanation": "New là tính từ ngắn → thêm -er: newer."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"small\" là gì?",
+      "options": [
+        "smallest",
+        "small",
+        "smaller",
+        "more small"
+      ],
+      "answer": "smaller",
+      "explanation": "Small là tính từ ngắn → thêm -er: smaller."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: small → ______",
+      "answers": [
+        "smaller"
+      ],
+      "explanation": "Small là tính từ ngắn → thêm -er: smaller."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"strong\" là gì?",
+      "options": [
+        "more strong",
+        "strong",
+        "stronger",
+        "strongest"
+      ],
+      "answer": "stronger",
+      "explanation": "Strong là tính từ ngắn → thêm -er: stronger."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: strong → ______",
+      "answers": [
+        "stronger"
+      ],
+      "explanation": "Strong là tính từ ngắn → thêm -er: stronger."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"weak\" là gì?",
+      "options": [
+        "weaker",
+        "weak",
+        "more weak",
+        "weakest"
+      ],
+      "answer": "weaker",
+      "explanation": "Weak là tính từ ngắn → thêm -er: weaker."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: weak → ______",
+      "answers": [
+        "weaker"
+      ],
+      "explanation": "Weak là tính từ ngắn → thêm -er: weaker."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"cheap\" là gì?",
+      "options": [
+        "more cheap",
+        "cheapest",
+        "cheap",
+        "cheaper"
+      ],
+      "answer": "cheaper",
+      "explanation": "Cheap là tính từ ngắn → thêm -er: cheaper."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: cheap → ______",
+      "answers": [
+        "cheaper"
+      ],
+      "explanation": "Cheap là tính từ ngắn → thêm -er: cheaper."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"clean\" là gì?",
+      "options": [
+        "more clean",
+        "cleaner",
+        "cleanest",
+        "clean"
+      ],
+      "answer": "cleaner",
+      "explanation": "Clean là tính từ ngắn → thêm -er: cleaner."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: clean → ______",
+      "answers": [
+        "cleaner"
+      ],
+      "explanation": "Clean là tính từ ngắn → thêm -er: cleaner."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"cold\" là gì?",
+      "options": [
+        "more cold",
+        "cold",
+        "coldest",
+        "colder"
+      ],
+      "answer": "colder",
+      "explanation": "Cold là tính từ ngắn → thêm -er: colder."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: cold → ______",
+      "answers": [
+        "colder"
+      ],
+      "explanation": "Cold là tính từ ngắn → thêm -er: colder."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"warm\" là gì?",
+      "options": [
+        "more warm",
+        "warm",
+        "warmer",
+        "warmest"
+      ],
+      "answer": "warmer",
+      "explanation": "Warm là tính từ ngắn → thêm -er: warmer."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: warm → ______",
+      "answers": [
+        "warmer"
+      ],
+      "explanation": "Warm là tính từ ngắn → thêm -er: warmer."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"cool\" là gì?",
+      "options": [
+        "more cool",
+        "coolest",
+        "cool",
+        "cooler"
+      ],
+      "answer": "cooler",
+      "explanation": "Cool là tính từ ngắn → thêm -er: cooler."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: cool → ______",
+      "answers": [
+        "cooler"
+      ],
+      "explanation": "Cool là tính từ ngắn → thêm -er: cooler."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"hard\" là gì?",
+      "options": [
+        "harder",
+        "hardest",
+        "more hard",
+        "hard"
+      ],
+      "answer": "harder",
+      "explanation": "Hard là tính từ ngắn → thêm -er: harder."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: hard → ______",
+      "answers": [
+        "harder"
+      ],
+      "explanation": "Hard là tính từ ngắn → thêm -er: harder."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"light\" là gì?",
+      "options": [
+        "lighter",
+        "light",
+        "more light",
+        "lightest"
+      ],
+      "answer": "lighter",
+      "explanation": "Light là tính từ ngắn → thêm -er: lighter."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: light → ______",
+      "answers": [
+        "lighter"
+      ],
+      "explanation": "Light là tính từ ngắn → thêm -er: lighter."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"dark\" là gì?",
+      "options": [
+        "darker",
+        "more dark",
+        "darkest",
+        "dark"
+      ],
+      "answer": "darker",
+      "explanation": "Dark là tính từ ngắn → thêm -er: darker."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: dark → ______",
+      "answers": [
+        "darker"
+      ],
+      "explanation": "Dark là tính từ ngắn → thêm -er: darker."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"rich\" là gì?",
+      "options": [
+        "richer",
+        "rich",
+        "more rich",
+        "richest"
+      ],
+      "answer": "richer",
+      "explanation": "Rich là tính từ ngắn → thêm -er: richer."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: rich → ______",
+      "answers": [
+        "richer"
+      ],
+      "explanation": "Rich là tính từ ngắn → thêm -er: richer."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"poor\" là gì?",
+      "options": [
+        "poorer",
+        "poor",
+        "more poor",
+        "poorest"
+      ],
+      "answer": "poorer",
+      "explanation": "Poor là tính từ ngắn → thêm -er: poorer."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: poor → ______",
+      "answers": [
+        "poorer"
+      ],
+      "explanation": "Poor là tính từ ngắn → thêm -er: poorer."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"kind\" là gì?",
+      "options": [
+        "kindest",
+        "more kind",
+        "kinder",
+        "kind"
+      ],
+      "answer": "kinder",
+      "explanation": "Kind là tính từ ngắn → thêm -er: kinder."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: kind → ______",
+      "answers": [
+        "kinder"
+      ],
+      "explanation": "Kind là tính từ ngắn → thêm -er: kinder."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"quick\" là gì?",
+      "options": [
+        "quicker",
+        "more quick",
+        "quickest",
+        "quick"
+      ],
+      "answer": "quicker",
+      "explanation": "Quick là tính từ ngắn → thêm -er: quicker."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: quick → ______",
+      "answers": [
+        "quicker"
+      ],
+      "explanation": "Quick là tính từ ngắn → thêm -er: quicker."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"soft\" là gì?",
+      "options": [
+        "softest",
+        "soft",
+        "more soft",
+        "softer"
+      ],
+      "answer": "softer",
+      "explanation": "Soft là tính từ ngắn → thêm -er: softer."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: soft → ______",
+      "answers": [
+        "softer"
+      ],
+      "explanation": "Soft là tính từ ngắn → thêm -er: softer."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"loud\" là gì?",
+      "options": [
+        "more loud",
+        "loud",
+        "louder",
+        "loudest"
+      ],
+      "answer": "louder",
+      "explanation": "Loud là tính từ ngắn → thêm -er: louder."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: loud → ______",
+      "answers": [
+        "louder"
+      ],
+      "explanation": "Loud là tính từ ngắn → thêm -er: louder."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"bright\" là gì?",
+      "options": [
+        "brightest",
+        "brighter",
+        "bright",
+        "more bright"
+      ],
+      "answer": "brighter",
+      "explanation": "Bright là tính từ ngắn → thêm -er: brighter."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: bright → ______",
+      "answers": [
+        "brighter"
+      ],
+      "explanation": "Bright là tính từ ngắn → thêm -er: brighter."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"deep\" là gì?",
+      "options": [
+        "deepest",
+        "deep",
+        "deeper",
+        "more deep"
+      ],
+      "answer": "deeper",
+      "explanation": "Deep là tính từ ngắn → thêm -er: deeper."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: deep → ______",
+      "answers": [
+        "deeper"
+      ],
+      "explanation": "Deep là tính từ ngắn → thêm -er: deeper."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"thick\" là gì?",
+      "options": [
+        "more thick",
+        "thickest",
+        "thick",
+        "thicker"
+      ],
+      "answer": "thicker",
+      "explanation": "Thick là tính từ ngắn → thêm -er: thicker."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: thick → ______",
+      "answers": [
+        "thicker"
+      ],
+      "explanation": "Thick là tính từ ngắn → thêm -er: thicker."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"nice\" là gì?",
+      "options": [
+        "more nice",
+        "nicer",
+        "niceest",
+        "niceer"
+      ],
+      "answer": "nicer",
+      "explanation": "Nice tận cùng là -e → chỉ thêm -r: nicer."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: nice → ______",
+      "answers": [
+        "nicer"
+      ],
+      "explanation": "Nice tận cùng là -e → chỉ thêm -r: nicer."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"large\" là gì?",
+      "options": [
+        "larger",
+        "largeer",
+        "more large",
+        "largeest"
+      ],
+      "answer": "larger",
+      "explanation": "Large tận cùng là -e → chỉ thêm -r: larger."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: large → ______",
+      "answers": [
+        "larger"
+      ],
+      "explanation": "Large tận cùng là -e → chỉ thêm -r: larger."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"safe\" là gì?",
+      "options": [
+        "more safe",
+        "safer",
+        "safeest",
+        "safeer"
+      ],
+      "answer": "safer",
+      "explanation": "Safe tận cùng là -e → chỉ thêm -r: safer."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: safe → ______",
+      "answers": [
+        "safer"
+      ],
+      "explanation": "Safe tận cùng là -e → chỉ thêm -r: safer."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"late\" là gì?",
+      "options": [
+        "later",
+        "more late",
+        "lateest",
+        "lateer"
+      ],
+      "answer": "later",
+      "explanation": "Late tận cùng là -e → chỉ thêm -r: later."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: late → ______",
+      "answers": [
+        "later"
+      ],
+      "explanation": "Late tận cùng là -e → chỉ thêm -r: later."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"close\" là gì?",
+      "options": [
+        "closer",
+        "closeest",
+        "closeer",
+        "more close"
+      ],
+      "answer": "closer",
+      "explanation": "Close tận cùng là -e → chỉ thêm -r: closer."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: close → ______",
+      "answers": [
+        "closer"
+      ],
+      "explanation": "Close tận cùng là -e → chỉ thêm -r: closer."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"wide\" là gì?",
+      "options": [
+        "wideer",
+        "wider",
+        "wideest",
+        "more wide"
+      ],
+      "answer": "wider",
+      "explanation": "Wide tận cùng là -e → chỉ thêm -r: wider."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: wide → ______",
+      "answers": [
+        "wider"
+      ],
+      "explanation": "Wide tận cùng là -e → chỉ thêm -r: wider."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"brave\" là gì?",
+      "options": [
+        "more brave",
+        "braver",
+        "braveest",
+        "braveer"
+      ],
+      "answer": "braver",
+      "explanation": "Brave tận cùng là -e → chỉ thêm -r: braver."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: brave → ______",
+      "answers": [
+        "braver"
+      ],
+      "explanation": "Brave tận cùng là -e → chỉ thêm -r: braver."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"cute\" là gì?",
+      "options": [
+        "cuteest",
+        "more cute",
+        "cuteer",
+        "cuter"
+      ],
+      "answer": "cuter",
+      "explanation": "Cute tận cùng là -e → chỉ thêm -r: cuter."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: cute → ______",
+      "answers": [
+        "cuter"
+      ],
+      "explanation": "Cute tận cùng là -e → chỉ thêm -r: cuter."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"big\" là gì?",
+      "options": [
+        "biggest",
+        "bigger",
+        "more big",
+        "biger"
+      ],
+      "answer": "bigger",
+      "explanation": "Big có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: bigger."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: big → ______",
+      "answers": [
+        "bigger"
+      ],
+      "explanation": "Big có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: bigger."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"hot\" là gì?",
+      "options": [
+        "hottest",
+        "more hot",
+        "hoter",
+        "hotter"
+      ],
+      "answer": "hotter",
+      "explanation": "Hot có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: hotter."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: hot → ______",
+      "answers": [
+        "hotter"
+      ],
+      "explanation": "Hot có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: hotter."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"thin\" là gì?",
+      "options": [
+        "more thin",
+        "thinnest",
+        "thiner",
+        "thinner"
+      ],
+      "answer": "thinner",
+      "explanation": "Thin có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: thinner."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: thin → ______",
+      "answers": [
+        "thinner"
+      ],
+      "explanation": "Thin có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: thinner."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"fat\" là gì?",
+      "options": [
+        "fatter",
+        "fater",
+        "fattest",
+        "more fat"
+      ],
+      "answer": "fatter",
+      "explanation": "Fat có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: fatter."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: fat → ______",
+      "answers": [
+        "fatter"
+      ],
+      "explanation": "Fat có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: fatter."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"sad\" là gì?",
+      "options": [
+        "sader",
+        "saddest",
+        "sadder",
+        "more sad"
+      ],
+      "answer": "sadder",
+      "explanation": "Sad có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: sadder."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: sad → ______",
+      "answers": [
+        "sadder"
+      ],
+      "explanation": "Sad có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: sadder."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"wet\" là gì?",
+      "options": [
+        "wetter",
+        "more wet",
+        "weter",
+        "wettest"
+      ],
+      "answer": "wetter",
+      "explanation": "Wet có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: wetter."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: wet → ______",
+      "answers": [
+        "wetter"
+      ],
+      "explanation": "Wet có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: wetter."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"red\" là gì?",
+      "options": [
+        "reder",
+        "redder",
+        "more red",
+        "reddest"
+      ],
+      "answer": "redder",
+      "explanation": "Red có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: redder."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: red → ______",
+      "answers": [
+        "redder"
+      ],
+      "explanation": "Red có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: redder."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"happy\" là gì?",
+      "options": [
+        "happyer",
+        "happiest",
+        "more happy",
+        "happier"
+      ],
+      "answer": "happier",
+      "explanation": "Happy tận cùng phụ âm + y → đổi y thành i: happier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: happy → ______",
+      "answers": [
+        "happier"
+      ],
+      "explanation": "Happy tận cùng phụ âm + y → đổi y thành i: happier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"easy\" là gì?",
+      "options": [
+        "easiest",
+        "more easy",
+        "easier",
+        "easyer"
+      ],
+      "answer": "easier",
+      "explanation": "Easy tận cùng phụ âm + y → đổi y thành i: easier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: easy → ______",
+      "answers": [
+        "easier"
+      ],
+      "explanation": "Easy tận cùng phụ âm + y → đổi y thành i: easier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"busy\" là gì?",
+      "options": [
+        "busier",
+        "more busy",
+        "busyer",
+        "busiest"
+      ],
+      "answer": "busier",
+      "explanation": "Busy tận cùng phụ âm + y → đổi y thành i: busier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: busy → ______",
+      "answers": [
+        "busier"
+      ],
+      "explanation": "Busy tận cùng phụ âm + y → đổi y thành i: busier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"funny\" là gì?",
+      "options": [
+        "more funny",
+        "funnier",
+        "funnyer",
+        "funniest"
+      ],
+      "answer": "funnier",
+      "explanation": "Funny tận cùng phụ âm + y → đổi y thành i: funnier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: funny → ______",
+      "answers": [
+        "funnier"
+      ],
+      "explanation": "Funny tận cùng phụ âm + y → đổi y thành i: funnier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"heavy\" là gì?",
+      "options": [
+        "heavier",
+        "heaviest",
+        "heavyer",
+        "more heavy"
+      ],
+      "answer": "heavier",
+      "explanation": "Heavy tận cùng phụ âm + y → đổi y thành i: heavier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: heavy → ______",
+      "answers": [
+        "heavier"
+      ],
+      "explanation": "Heavy tận cùng phụ âm + y → đổi y thành i: heavier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"pretty\" là gì?",
+      "options": [
+        "prettier",
+        "prettiest",
+        "prettyer",
+        "more pretty"
+      ],
+      "answer": "prettier",
+      "explanation": "Pretty tận cùng phụ âm + y → đổi y thành i: prettier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: pretty → ______",
+      "answers": [
+        "prettier"
+      ],
+      "explanation": "Pretty tận cùng phụ âm + y → đổi y thành i: prettier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"early\" là gì?",
+      "options": [
+        "earlyer",
+        "earlier",
+        "earliest",
+        "more early"
+      ],
+      "answer": "earlier",
+      "explanation": "Early tận cùng phụ âm + y → đổi y thành i: earlier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: early → ______",
+      "answers": [
+        "earlier"
+      ],
+      "explanation": "Early tận cùng phụ âm + y → đổi y thành i: earlier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"hungry\" là gì?",
+      "options": [
+        "hungryer",
+        "more hungry",
+        "hungrier",
+        "hungriest"
+      ],
+      "answer": "hungrier",
+      "explanation": "Hungry tận cùng phụ âm + y → đổi y thành i: hungrier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: hungry → ______",
+      "answers": [
+        "hungrier"
+      ],
+      "explanation": "Hungry tận cùng phụ âm + y → đổi y thành i: hungrier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"noisy\" là gì?",
+      "options": [
+        "more noisy",
+        "noisyer",
+        "noisier",
+        "noisiest"
+      ],
+      "answer": "noisier",
+      "explanation": "Noisy tận cùng phụ âm + y → đổi y thành i: noisier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: noisy → ______",
+      "answers": [
+        "noisier"
+      ],
+      "explanation": "Noisy tận cùng phụ âm + y → đổi y thành i: noisier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"sunny\" là gì?",
+      "options": [
+        "sunniest",
+        "sunnyer",
+        "sunnier",
+        "more sunny"
+      ],
+      "answer": "sunnier",
+      "explanation": "Sunny tận cùng phụ âm + y → đổi y thành i: sunnier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: sunny → ______",
+      "answers": [
+        "sunnier"
+      ],
+      "explanation": "Sunny tận cùng phụ âm + y → đổi y thành i: sunnier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"rainy\" là gì?",
+      "options": [
+        "rainyer",
+        "rainier",
+        "more rainy",
+        "rainiest"
+      ],
+      "answer": "rainier",
+      "explanation": "Rainy tận cùng phụ âm + y → đổi y thành i: rainier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: rainy → ______",
+      "answers": [
+        "rainier"
+      ],
+      "explanation": "Rainy tận cùng phụ âm + y → đổi y thành i: rainier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"cloudy\" là gì?",
+      "options": [
+        "cloudier",
+        "more cloudy",
+        "cloudyer",
+        "cloudiest"
+      ],
+      "answer": "cloudier",
+      "explanation": "Cloudy tận cùng phụ âm + y → đổi y thành i: cloudier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: cloudy → ______",
+      "answers": [
+        "cloudier"
+      ],
+      "explanation": "Cloudy tận cùng phụ âm + y → đổi y thành i: cloudier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"windy\" là gì?",
+      "options": [
+        "more windy",
+        "windyer",
+        "windiest",
+        "windier"
+      ],
+      "answer": "windier",
+      "explanation": "Windy tận cùng phụ âm + y → đổi y thành i: windier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: windy → ______",
+      "answers": [
+        "windier"
+      ],
+      "explanation": "Windy tận cùng phụ âm + y → đổi y thành i: windier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"healthy\" là gì?",
+      "options": [
+        "more healthy",
+        "healthyer",
+        "healthiest",
+        "healthier"
+      ],
+      "answer": "healthier",
+      "explanation": "Healthy tận cùng phụ âm + y → đổi y thành i: healthier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: healthy → ______",
+      "answers": [
+        "healthier"
+      ],
+      "explanation": "Healthy tận cùng phụ âm + y → đổi y thành i: healthier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"dirty\" là gì?",
+      "options": [
+        "dirtiest",
+        "more dirty",
+        "dirtier",
+        "dirtyer"
+      ],
+      "answer": "dirtier",
+      "explanation": "Dirty tận cùng phụ âm + y → đổi y thành i: dirtier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: dirty → ______",
+      "answers": [
+        "dirtier"
+      ],
+      "explanation": "Dirty tận cùng phụ âm + y → đổi y thành i: dirtier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"lucky\" là gì?",
+      "options": [
+        "luckier",
+        "luckyer",
+        "luckiest",
+        "more lucky"
+      ],
+      "answer": "luckier",
+      "explanation": "Lucky tận cùng phụ âm + y → đổi y thành i: luckier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: lucky → ______",
+      "answers": [
+        "luckier"
+      ],
+      "explanation": "Lucky tận cùng phụ âm + y → đổi y thành i: luckier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"angry\" là gì?",
+      "options": [
+        "angrier",
+        "angryer",
+        "more angry",
+        "angriest"
+      ],
+      "answer": "angrier",
+      "explanation": "Angry tận cùng phụ âm + y → đổi y thành i: angrier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: angry → ______",
+      "answers": [
+        "angrier"
+      ],
+      "explanation": "Angry tận cùng phụ âm + y → đổi y thành i: angrier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"sleepy\" là gì?",
+      "options": [
+        "sleepier",
+        "sleepyer",
+        "more sleepy",
+        "sleepiest"
+      ],
+      "answer": "sleepier",
+      "explanation": "Sleepy tận cùng phụ âm + y → đổi y thành i: sleepier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: sleepy → ______",
+      "answers": [
+        "sleepier"
+      ],
+      "explanation": "Sleepy tận cùng phụ âm + y → đổi y thành i: sleepier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"friendly\" là gì?",
+      "options": [
+        "more friendly",
+        "friendlyer",
+        "friendliest",
+        "friendlier"
+      ],
+      "answer": "friendlier",
+      "explanation": "Friendly tận cùng phụ âm + y → đổi y thành i: friendlier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: friendly → ______",
+      "answers": [
+        "friendlier"
+      ],
+      "explanation": "Friendly tận cùng phụ âm + y → đổi y thành i: friendlier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"tidy\" là gì?",
+      "options": [
+        "more tidy",
+        "tidyer",
+        "tidier",
+        "tidiest"
+      ],
+      "answer": "tidier",
+      "explanation": "Tidy tận cùng phụ âm + y → đổi y thành i: tidier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: tidy → ______",
+      "answers": [
+        "tidier"
+      ],
+      "explanation": "Tidy tận cùng phụ âm + y → đổi y thành i: tidier."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"beautiful\" là gì?",
+      "options": [
+        "more beautiful",
+        "most beautiful",
+        "beautifuler",
+        "beautiful"
+      ],
+      "answer": "more beautiful",
+      "explanation": "Beautiful là tính từ dài → dùng more: more beautiful."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: beautiful → ______",
+      "answers": [
+        "more beautiful"
+      ],
+      "explanation": "Beautiful là tính từ dài → dùng more: more beautiful."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"interesting\" là gì?",
+      "options": [
+        "more interesting",
+        "interestinger",
+        "most interesting",
+        "interesting"
+      ],
+      "answer": "more interesting",
+      "explanation": "Interesting là tính từ dài → dùng more: more interesting."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: interesting → ______",
+      "answers": [
+        "more interesting"
+      ],
+      "explanation": "Interesting là tính từ dài → dùng more: more interesting."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"expensive\" là gì?",
+      "options": [
+        "expensiveer",
+        "expensive",
+        "more expensive",
+        "most expensive"
+      ],
+      "answer": "more expensive",
+      "explanation": "Expensive là tính từ dài → dùng more: more expensive."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: expensive → ______",
+      "answers": [
+        "more expensive"
+      ],
+      "explanation": "Expensive là tính từ dài → dùng more: more expensive."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"difficult\" là gì?",
+      "options": [
+        "more difficult",
+        "most difficult",
+        "difficult",
+        "difficulter"
+      ],
+      "answer": "more difficult",
+      "explanation": "Difficult là tính từ dài → dùng more: more difficult."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: difficult → ______",
+      "answers": [
+        "more difficult"
+      ],
+      "explanation": "Difficult là tính từ dài → dùng more: more difficult."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"important\" là gì?",
+      "options": [
+        "more important",
+        "important",
+        "importanter",
+        "most important"
+      ],
+      "answer": "more important",
+      "explanation": "Important là tính từ dài → dùng more: more important."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: important → ______",
+      "answers": [
+        "more important"
+      ],
+      "explanation": "Important là tính từ dài → dùng more: more important."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"careful\" là gì?",
+      "options": [
+        "careful",
+        "carefuler",
+        "most careful",
+        "more careful"
+      ],
+      "answer": "more careful",
+      "explanation": "Careful là tính từ dài → dùng more: more careful."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: careful → ______",
+      "answers": [
+        "more careful"
+      ],
+      "explanation": "Careful là tính từ dài → dùng more: more careful."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"popular\" là gì?",
+      "options": [
+        "popular",
+        "more popular",
+        "popularer",
+        "most popular"
+      ],
+      "answer": "more popular",
+      "explanation": "Popular là tính từ dài → dùng more: more popular."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: popular → ______",
+      "answers": [
+        "more popular"
+      ],
+      "explanation": "Popular là tính từ dài → dùng more: more popular."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"comfortable\" là gì?",
+      "options": [
+        "more comfortable",
+        "comfortable",
+        "most comfortable",
+        "comfortableer"
+      ],
+      "answer": "more comfortable",
+      "explanation": "Comfortable là tính từ dài → dùng more: more comfortable."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: comfortable → ______",
+      "answers": [
+        "more comfortable"
+      ],
+      "explanation": "Comfortable là tính từ dài → dùng more: more comfortable."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"dangerous\" là gì?",
+      "options": [
+        "most dangerous",
+        "dangerouser",
+        "more dangerous",
+        "dangerous"
+      ],
+      "answer": "more dangerous",
+      "explanation": "Dangerous là tính từ dài → dùng more: more dangerous."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: dangerous → ______",
+      "answers": [
+        "more dangerous"
+      ],
+      "explanation": "Dangerous là tính từ dài → dùng more: more dangerous."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"exciting\" là gì?",
+      "options": [
+        "most exciting",
+        "excitinger",
+        "more exciting",
+        "exciting"
+      ],
+      "answer": "more exciting",
+      "explanation": "Exciting là tính từ dài → dùng more: more exciting."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: exciting → ______",
+      "answers": [
+        "more exciting"
+      ],
+      "explanation": "Exciting là tính từ dài → dùng more: more exciting."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"boring\" là gì?",
+      "options": [
+        "most boring",
+        "boring",
+        "more boring",
+        "boringer"
+      ],
+      "answer": "more boring",
+      "explanation": "Boring là tính từ dài → dùng more: more boring."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: boring → ______",
+      "answers": [
+        "more boring"
+      ],
+      "explanation": "Boring là tính từ dài → dùng more: more boring."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"famous\" là gì?",
+      "options": [
+        "more famous",
+        "famous",
+        "most famous",
+        "famouser"
+      ],
+      "answer": "more famous",
+      "explanation": "Famous là tính từ dài → dùng more: more famous."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: famous → ______",
+      "answers": [
+        "more famous"
+      ],
+      "explanation": "Famous là tính từ dài → dùng more: more famous."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"delicious\" là gì?",
+      "options": [
+        "most delicious",
+        "delicious",
+        "more delicious",
+        "deliciouser"
+      ],
+      "answer": "more delicious",
+      "explanation": "Delicious là tính từ dài → dùng more: more delicious."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: delicious → ______",
+      "answers": [
+        "more delicious"
+      ],
+      "explanation": "Delicious là tính từ dài → dùng more: more delicious."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"useful\" là gì?",
+      "options": [
+        "most useful",
+        "usefuler",
+        "more useful",
+        "useful"
+      ],
+      "answer": "more useful",
+      "explanation": "Useful là tính từ dài → dùng more: more useful."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: useful → ______",
+      "answers": [
+        "more useful"
+      ],
+      "explanation": "Useful là tính từ dài → dùng more: more useful."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"modern\" là gì?",
+      "options": [
+        "moderner",
+        "more modern",
+        "most modern",
+        "modern"
+      ],
+      "answer": "more modern",
+      "explanation": "Modern là tính từ dài → dùng more: more modern."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: modern → ______",
+      "answers": [
+        "more modern"
+      ],
+      "explanation": "Modern là tính từ dài → dùng more: more modern."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: good → ______",
+      "answers": [
+        "better"
+      ],
+      "explanation": "Good là từ bất quy tắc: good → better."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"bad\" là gì?",
+      "options": [
+        "worse",
+        "badder",
+        "more bad",
+        "worst"
+      ],
+      "answer": "worse",
+      "explanation": "Bad là từ bất quy tắc: bad → worse."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: bad → ______",
+      "answers": [
+        "worse"
+      ],
+      "explanation": "Bad là từ bất quy tắc: bad → worse."
+    },
+    {
+      "type": "choice",
+      "prompt": "Dạng so sánh hơn của \"far\" là gì?",
+      "options": [
+        "farther",
+        "farthest",
+        "farrer",
+        "more far"
+      ],
+      "answer": "farther",
+      "explanation": "Far là từ bất quy tắc: far → farther."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền dạng so sánh hơn: far → ______",
+      "answers": [
+        "farther"
+      ],
+      "explanation": "Far là từ bất quy tắc: far → farther."
+    },
+    {
+      "type": "choice",
+      "prompt": "Tom is ______ than Jack. (tall)",
+      "options": [
+        "more tall",
+        "tall",
+        "taller",
+        "tallest"
+      ],
+      "answer": "taller",
+      "explanation": "Tom is taller than Jack. Tall là tính từ ngắn → thêm -er: taller."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: Tom is ______ (tall) than Jack.",
+      "answers": [
+        "taller"
+      ],
+      "explanation": "Tom is taller than Jack."
+    },
+    {
+      "type": "choice",
+      "prompt": "An elephant is ______ than a dog. (big)",
+      "options": [
+        "bigger",
+        "more big",
+        "biger",
+        "biggest"
+      ],
+      "answer": "bigger",
+      "explanation": "An elephant is bigger than a dog. Big có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: bigger."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: An elephant is ______ (big) than a dog.",
+      "answers": [
+        "bigger"
+      ],
+      "explanation": "An elephant is bigger than a dog."
+    },
+    {
+      "type": "choice",
+      "prompt": "A horse is ______ than a cow. (fast)",
+      "options": [
+        "fastest",
+        "fast",
+        "more fast",
+        "faster"
+      ],
+      "answer": "faster",
+      "explanation": "A horse is faster than a cow. Fast là tính từ ngắn → thêm -er: faster."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: A horse is ______ (fast) than a cow.",
+      "answers": [
+        "faster"
+      ],
+      "explanation": "A horse is faster than a cow."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Con ngựa nhanh hơn con bò.\"",
+      "answers": [
+        "a horse is faster than a cow"
+      ],
+      "explanation": "A horse is faster than a cow."
+    },
+    {
+      "type": "choice",
+      "prompt": "A giraffe is ______ than a horse. (tall)",
+      "options": [
+        "more tall",
+        "tall",
+        "taller",
+        "tallest"
+      ],
+      "answer": "taller",
+      "explanation": "A giraffe is taller than a horse. Tall là tính từ ngắn → thêm -er: taller."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: A giraffe is ______ (tall) than a horse.",
+      "answers": [
+        "taller"
+      ],
+      "explanation": "A giraffe is taller than a horse."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Con hươu cao cổ cao hơn con ngựa.\"",
+      "answers": [
+        "a giraffe is taller than a horse"
+      ],
+      "explanation": "A giraffe is taller than a horse."
+    },
+    {
+      "type": "choice",
+      "prompt": "A turtle is ______ than a rabbit. (slow)",
+      "options": [
+        "more slow",
+        "slower",
+        "slow",
+        "slowest"
+      ],
+      "answer": "slower",
+      "explanation": "A turtle is slower than a rabbit. Slow là tính từ ngắn → thêm -er: slower."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: A turtle is ______ (slow) than a rabbit.",
+      "answers": [
+        "slower"
+      ],
+      "explanation": "A turtle is slower than a rabbit."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Con rùa chậm hơn con thỏ.\"",
+      "answers": [
+        "a turtle is slower than a rabbit"
+      ],
+      "explanation": "A turtle is slower than a rabbit."
+    },
+    {
+      "type": "choice",
+      "prompt": "A lion is ______ than a dog. (strong)",
+      "options": [
+        "strong",
+        "strongest",
+        "stronger",
+        "more strong"
+      ],
+      "answer": "stronger",
+      "explanation": "A lion is stronger than a dog. Strong là tính từ ngắn → thêm -er: stronger."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: A lion is ______ (strong) than a dog.",
+      "answers": [
+        "stronger"
+      ],
+      "explanation": "A lion is stronger than a dog."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Con sư tử khỏe hơn con chó.\"",
+      "answers": [
+        "a lion is stronger than a dog"
+      ],
+      "explanation": "A lion is stronger than a dog."
+    },
+    {
+      "type": "choice",
+      "prompt": "A dog is ______ than an elephant. (small)",
+      "options": [
+        "more small",
+        "small",
+        "smallest",
+        "smaller"
+      ],
+      "answer": "smaller",
+      "explanation": "A dog is smaller than an elephant. Small là tính từ ngắn → thêm -er: smaller."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: A dog is ______ (small) than an elephant.",
+      "answers": [
+        "smaller"
+      ],
+      "explanation": "A dog is smaller than an elephant."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Con chó nhỏ hơn con voi.\"",
+      "answers": [
+        "a dog is smaller than an elephant"
+      ],
+      "explanation": "A dog is smaller than an elephant."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: This book is ______ (interesting) than that book.",
+      "answers": [
+        "more interesting"
+      ],
+      "explanation": "This book is more interesting than that book."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Quyển sách này hay hơn quyển sách kia.\"",
+      "answers": [
+        "this book is more interesting than that book"
+      ],
+      "explanation": "This book is more interesting than that book."
+    },
+    {
+      "type": "choice",
+      "prompt": "This book is ______ than that book. (good)",
+      "options": [
+        "better",
+        "best",
+        "gooder",
+        "more good"
+      ],
+      "answer": "better",
+      "explanation": "This book is better than that book. Good là từ bất quy tắc: good → better."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: This book is ______ (good) than that book.",
+      "answers": [
+        "better"
+      ],
+      "explanation": "This book is better than that book."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Quyển sách này tốt hơn quyển sách kia.\"",
+      "answers": [
+        "this book is better than that book"
+      ],
+      "explanation": "This book is better than that book."
+    },
+    {
+      "type": "choice",
+      "prompt": "The red bag is ______ than the blue bag. (expensive)",
+      "options": [
+        "more expensive",
+        "expensive",
+        "most expensive",
+        "expensiveer"
+      ],
+      "answer": "more expensive",
+      "explanation": "The red bag is more expensive than the blue bag. Expensive là tính từ dài → dùng more: more expensive."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: The red bag is ______ (expensive) than the blue bag.",
+      "answers": [
+        "more expensive"
+      ],
+      "explanation": "The red bag is more expensive than the blue bag."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Cái túi đỏ đắt hơn cái túi xanh.\"",
+      "answers": [
+        "the red bag is more expensive than the blue bag"
+      ],
+      "explanation": "The red bag is more expensive than the blue bag."
+    },
+    {
+      "type": "choice",
+      "prompt": "The blue bag is ______ than the red bag. (cheap)",
+      "options": [
+        "cheaper",
+        "cheap",
+        "more cheap",
+        "cheapest"
+      ],
+      "answer": "cheaper",
+      "explanation": "The blue bag is cheaper than the red bag. Cheap là tính từ ngắn → thêm -er: cheaper."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: The blue bag is ______ (cheap) than the red bag.",
+      "answers": [
+        "cheaper"
+      ],
+      "explanation": "The blue bag is cheaper than the red bag."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Cái túi xanh rẻ hơn cái túi đỏ.\"",
+      "answers": [
+        "the blue bag is cheaper than the red bag"
+      ],
+      "explanation": "The blue bag is cheaper than the red bag."
+    },
+    {
+      "type": "choice",
+      "prompt": "Today is ______ than yesterday. (hot)",
+      "options": [
+        "more hot",
+        "hotter",
+        "hoter",
+        "hottest"
+      ],
+      "answer": "hotter",
+      "explanation": "Today is hotter than yesterday. Hot có 1 nguyên âm + 1 phụ âm ở cuối → gấp đôi phụ âm: hotter."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Hôm nay nóng hơn hôm qua.\"",
+      "answers": [
+        "today is hotter than yesterday"
+      ],
+      "explanation": "Today is hotter than yesterday."
+    },
+    {
+      "type": "choice",
+      "prompt": "Winter is ______ than summer. (cold)",
+      "options": [
+        "more cold",
+        "cold",
+        "coldest",
+        "colder"
+      ],
+      "answer": "colder",
+      "explanation": "Winter is colder than summer. Cold là tính từ ngắn → thêm -er: colder."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: Winter is ______ (cold) than summer.",
+      "answers": [
+        "colder"
+      ],
+      "explanation": "Winter is colder than summer."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Mùa đông lạnh hơn mùa hè.\"",
+      "answers": [
+        "winter is colder than summer"
+      ],
+      "explanation": "Winter is colder than summer."
+    },
+    {
+      "type": "choice",
+      "prompt": "Today is ______ than yesterday. (sunny)",
+      "options": [
+        "sunnier",
+        "sunnyer",
+        "more sunny",
+        "sunniest"
+      ],
+      "answer": "sunnier",
+      "explanation": "Today is sunnier than yesterday. Sunny tận cùng phụ âm + y → đổi y thành i: sunnier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: Today is ______ (sunny) than yesterday.",
+      "answers": [
+        "sunnier"
+      ],
+      "explanation": "Today is sunnier than yesterday."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Hôm nay nắng hơn hôm qua.\"",
+      "answers": [
+        "today is sunnier than yesterday"
+      ],
+      "explanation": "Today is sunnier than yesterday."
+    },
+    {
+      "type": "choice",
+      "prompt": "This flower is ______ than that flower. (beautiful)",
+      "options": [
+        "most beautiful",
+        "beautifuler",
+        "beautiful",
+        "more beautiful"
+      ],
+      "answer": "more beautiful",
+      "explanation": "This flower is more beautiful than that flower. Beautiful là tính từ dài → dùng more: more beautiful."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: This flower is ______ (beautiful) than that flower.",
+      "answers": [
+        "more beautiful"
+      ],
+      "explanation": "This flower is more beautiful than that flower."
+    },
+    {
+      "type": "choice",
+      "prompt": "This flower is ______ than that flower. (pretty)",
+      "options": [
+        "more pretty",
+        "prettier",
+        "prettiest",
+        "prettyer"
+      ],
+      "answer": "prettier",
+      "explanation": "This flower is prettier than that flower. Pretty tận cùng phụ âm + y → đổi y thành i: prettier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: This flower is ______ (pretty) than that flower.",
+      "answers": [
+        "prettier"
+      ],
+      "explanation": "This flower is prettier than that flower."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Bông hoa này xinh hơn bông hoa kia.\"",
+      "answers": [
+        "this flower is prettier than that flower"
+      ],
+      "explanation": "This flower is prettier than that flower."
+    },
+    {
+      "type": "choice",
+      "prompt": "A car is ______ than a bike. (fast)",
+      "options": [
+        "faster",
+        "fastest",
+        "fast",
+        "more fast"
+      ],
+      "answer": "faster",
+      "explanation": "A car is faster than a bike. Fast là tính từ ngắn → thêm -er: faster."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: A car is ______ (fast) than a bike.",
+      "answers": [
+        "faster"
+      ],
+      "explanation": "A car is faster than a bike."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Ô tô nhanh hơn xe đạp.\"",
+      "answers": [
+        "a car is faster than a bike"
+      ],
+      "explanation": "A car is faster than a bike."
+    },
+    {
+      "type": "choice",
+      "prompt": "A car is ______ than a bike. (expensive)",
+      "options": [
+        "more expensive",
+        "expensiveer",
+        "most expensive",
+        "expensive"
+      ],
+      "answer": "more expensive",
+      "explanation": "A car is more expensive than a bike. Expensive là tính từ dài → dùng more: more expensive."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: A car is ______ (expensive) than a bike.",
+      "answers": [
+        "more expensive"
+      ],
+      "explanation": "A car is more expensive than a bike."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Ô tô đắt hơn xe đạp.\"",
+      "answers": [
+        "a car is more expensive than a bike"
+      ],
+      "explanation": "A car is more expensive than a bike."
+    },
+    {
+      "type": "choice",
+      "prompt": "This film is ______ than that film. (boring)",
+      "options": [
+        "most boring",
+        "boring",
+        "more boring",
+        "boringer"
+      ],
+      "answer": "more boring",
+      "explanation": "This film is more boring than that film. Boring là tính từ dài → dùng more: more boring."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Bộ phim này chán hơn bộ phim kia.\"",
+      "answers": [
+        "this film is more boring than that film"
+      ],
+      "explanation": "This film is more boring than that film."
+    },
+    {
+      "type": "choice",
+      "prompt": "This cake is ______ than that cake. (delicious)",
+      "options": [
+        "more delicious",
+        "delicious",
+        "deliciouser",
+        "most delicious"
+      ],
+      "answer": "more delicious",
+      "explanation": "This cake is more delicious than that cake. Delicious là tính từ dài → dùng more: more delicious."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: This cake is ______ (delicious) than that cake.",
+      "answers": [
+        "more delicious"
+      ],
+      "explanation": "This cake is more delicious than that cake."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Bánh này ngon hơn bánh kia.\"",
+      "answers": [
+        "this cake is more delicious than that cake"
+      ],
+      "explanation": "This cake is more delicious than that cake."
+    },
+    {
+      "type": "choice",
+      "prompt": "A tiger is ______ than a cat. (dangerous)",
+      "options": [
+        "dangerous",
+        "dangerouser",
+        "most dangerous",
+        "more dangerous"
+      ],
+      "answer": "more dangerous",
+      "explanation": "A tiger is more dangerous than a cat. Dangerous là tính từ dài → dùng more: more dangerous."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: A tiger is ______ (dangerous) than a cat.",
+      "answers": [
+        "more dangerous"
+      ],
+      "explanation": "A tiger is more dangerous than a cat."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Con hổ nguy hiểm hơn con mèo.\"",
+      "answers": [
+        "a tiger is more dangerous than a cat"
+      ],
+      "explanation": "A tiger is more dangerous than a cat."
+    },
+    {
+      "type": "choice",
+      "prompt": "My room is ______ than your room. (clean)",
+      "options": [
+        "more clean",
+        "clean",
+        "cleanest",
+        "cleaner"
+      ],
+      "answer": "cleaner",
+      "explanation": "My room is cleaner than your room. Clean là tính từ ngắn → thêm -er: cleaner."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: My room is ______ (clean) than your room.",
+      "answers": [
+        "cleaner"
+      ],
+      "explanation": "My room is cleaner than your room."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Phòng của tôi sạch hơn phòng của bạn.\"",
+      "answers": [
+        "my room is cleaner than your room"
+      ],
+      "explanation": "My room is cleaner than your room."
+    },
+    {
+      "type": "choice",
+      "prompt": "This lesson is ______ than that lesson. (easy)",
+      "options": [
+        "easiest",
+        "easier",
+        "more easy",
+        "easyer"
+      ],
+      "answer": "easier",
+      "explanation": "This lesson is easier than that lesson. Easy tận cùng phụ âm + y → đổi y thành i: easier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: This lesson is ______ (easy) than that lesson.",
+      "answers": [
+        "easier"
+      ],
+      "explanation": "This lesson is easier than that lesson."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Bài học này dễ hơn bài học kia.\"",
+      "answers": [
+        "this lesson is easier than that lesson"
+      ],
+      "explanation": "This lesson is easier than that lesson."
+    },
+    {
+      "type": "choice",
+      "prompt": "This question is ______ than that question. (difficult)",
+      "options": [
+        "more difficult",
+        "difficulter",
+        "most difficult",
+        "difficult"
+      ],
+      "answer": "more difficult",
+      "explanation": "This question is more difficult than that question. Difficult là tính từ dài → dùng more: more difficult."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: This question is ______ (difficult) than that question.",
+      "answers": [
+        "more difficult"
+      ],
+      "explanation": "This question is more difficult than that question."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Câu hỏi này khó hơn câu hỏi kia.\"",
+      "answers": [
+        "this question is more difficult than that question"
+      ],
+      "explanation": "This question is more difficult than that question."
+    },
+    {
+      "type": "choice",
+      "prompt": "This dog is ______ than that dog. (friendly)",
+      "options": [
+        "more friendly",
+        "friendliest",
+        "friendlyer",
+        "friendlier"
+      ],
+      "answer": "friendlier",
+      "explanation": "This dog is friendlier than that dog. Friendly tận cùng phụ âm + y → đổi y thành i: friendlier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: This dog is ______ (friendly) than that dog.",
+      "answers": [
+        "friendlier"
+      ],
+      "explanation": "This dog is friendlier than that dog."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Con chó này thân thiện hơn con chó kia.\"",
+      "answers": [
+        "this dog is friendlier than that dog"
+      ],
+      "explanation": "This dog is friendlier than that dog."
+    },
+    {
+      "type": "choice",
+      "prompt": "This street is ______ than that street. (long)",
+      "options": [
+        "longer",
+        "longest",
+        "long",
+        "more long"
+      ],
+      "answer": "longer",
+      "explanation": "This street is longer than that street. Long là tính từ ngắn → thêm -er: longer."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: This street is ______ (long) than that street.",
+      "answers": [
+        "longer"
+      ],
+      "explanation": "This street is longer than that street."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Con đường này dài hơn con đường kia.\"",
+      "answers": [
+        "this street is longer than that street"
+      ],
+      "explanation": "This street is longer than that street."
+    },
+    {
+      "type": "choice",
+      "prompt": "His house is ______ than my house. (large)",
+      "options": [
+        "more large",
+        "largeer",
+        "largeest",
+        "larger"
+      ],
+      "answer": "larger",
+      "explanation": "His house is larger than my house. Large tận cùng là -e → chỉ thêm -r: larger."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: His house is ______ (large) than my house.",
+      "answers": [
+        "larger"
+      ],
+      "explanation": "His house is larger than my house."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Nhà của anh ấy rộng hơn nhà của tôi.\"",
+      "answers": [
+        "his house is larger than my house"
+      ],
+      "explanation": "His house is larger than my house."
+    },
+    {
+      "type": "choice",
+      "prompt": "She is ______ than her sister. (busy)",
+      "options": [
+        "busyer",
+        "busier",
+        "busiest",
+        "more busy"
+      ],
+      "answer": "busier",
+      "explanation": "She is busier than her sister. Busy tận cùng phụ âm + y → đổi y thành i: busier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: She is ______ (busy) than her sister.",
+      "answers": [
+        "busier"
+      ],
+      "explanation": "She is busier than her sister."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Cô ấy bận hơn chị gái của cô ấy.\"",
+      "answers": [
+        "she is busier than her sister"
+      ],
+      "explanation": "She is busier than her sister."
+    },
+    {
+      "type": "choice",
+      "prompt": "Lan is ______ than Hoa. (happy)",
+      "options": [
+        "happiest",
+        "more happy",
+        "happier",
+        "happyer"
+      ],
+      "answer": "happier",
+      "explanation": "Lan is happier than Hoa. Happy tận cùng phụ âm + y → đổi y thành i: happier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: Lan is ______ (happy) than Hoa.",
+      "answers": [
+        "happier"
+      ],
+      "explanation": "Lan is happier than Hoa."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Lan vui hơn Hoa.\"",
+      "answers": [
+        "lan is happier than hoa"
+      ],
+      "explanation": "Lan is happier than Hoa."
+    },
+    {
+      "type": "choice",
+      "prompt": "His bag is ______ than my bag. (heavy)",
+      "options": [
+        "heavier",
+        "more heavy",
+        "heavyer",
+        "heaviest"
+      ],
+      "answer": "heavier",
+      "explanation": "His bag is heavier than my bag. Heavy tận cùng phụ âm + y → đổi y thành i: heavier."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: His bag is ______ (heavy) than my bag.",
+      "answers": [
+        "heavier"
+      ],
+      "explanation": "His bag is heavier than my bag."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Cặp của anh ấy nặng hơn cặp của tôi.\"",
+      "answers": [
+        "his bag is heavier than my bag"
+      ],
+      "explanation": "His bag is heavier than my bag."
+    },
+    {
+      "type": "choice",
+      "prompt": "Today is ______ than yesterday. (bad)",
+      "options": [
+        "more bad",
+        "worse",
+        "badder",
+        "worst"
+      ],
+      "answer": "worse",
+      "explanation": "Today is worse than yesterday. Bad là từ bất quy tắc: bad → worse."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: Today is ______ (bad) than yesterday.",
+      "answers": [
+        "worse"
+      ],
+      "explanation": "Today is worse than yesterday."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Hôm nay tệ hơn hôm qua.\"",
+      "answers": [
+        "today is worse than yesterday"
+      ],
+      "explanation": "Today is worse than yesterday."
+    },
+    {
+      "type": "choice",
+      "prompt": "This chair is ______ than that chair. (comfortable)",
+      "options": [
+        "comfortable",
+        "more comfortable",
+        "comfortableer",
+        "most comfortable"
+      ],
+      "answer": "more comfortable",
+      "explanation": "This chair is more comfortable than that chair. Comfortable là tính từ dài → dùng more: more comfortable."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: This chair is ______ (comfortable) than that chair.",
+      "answers": [
+        "more comfortable"
+      ],
+      "explanation": "This chair is more comfortable than that chair."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Ghế này thoải mái hơn ghế kia.\"",
+      "answers": [
+        "this chair is more comfortable than that chair"
+      ],
+      "explanation": "This chair is more comfortable than that chair."
+    },
+    {
+      "type": "choice",
+      "prompt": "Summer is ______ than winter. (warm)",
+      "options": [
+        "warm",
+        "more warm",
+        "warmest",
+        "warmer"
+      ],
+      "answer": "warmer",
+      "explanation": "Summer is warmer than winter. Warm là tính từ ngắn → thêm -er: warmer."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: Summer is ______ (warm) than winter.",
+      "answers": [
+        "warmer"
+      ],
+      "explanation": "Summer is warmer than winter."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Mùa hè ấm hơn mùa đông.\"",
+      "answers": [
+        "summer is warmer than winter"
+      ],
+      "explanation": "Summer is warmer than winter."
+    },
+    {
+      "type": "choice",
+      "prompt": "The sun is ______ than the moon. (bright)",
+      "options": [
+        "bright",
+        "brighter",
+        "more bright",
+        "brightest"
+      ],
+      "answer": "brighter",
+      "explanation": "The sun is brighter than the moon. Bright là tính từ ngắn → thêm -er: brighter."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: The sun is ______ (bright) than the moon.",
+      "answers": [
+        "brighter"
+      ],
+      "explanation": "The sun is brighter than the moon."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Mặt trời sáng hơn mặt trăng.\"",
+      "answers": [
+        "the sun is brighter than the moon"
+      ],
+      "explanation": "The sun is brighter than the moon."
+    },
+    {
+      "type": "choice",
+      "prompt": "My father is ______ than my mother. (old)",
+      "options": [
+        "more old",
+        "old",
+        "oldest",
+        "older"
+      ],
+      "answer": "older",
+      "explanation": "My father is older than my mother. Old là tính từ ngắn → thêm -er: older."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: My father is ______ (old) than my mother.",
+      "answers": [
+        "older"
+      ],
+      "explanation": "My father is older than my mother."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Bố tôi lớn tuổi hơn mẹ tôi.\"",
+      "answers": [
+        "my father is older than my mother"
+      ],
+      "explanation": "My father is older than my mother."
+    },
+    {
+      "type": "choice",
+      "prompt": "My mother is ______ than my father. (young)",
+      "options": [
+        "youngest",
+        "more young",
+        "younger",
+        "young"
+      ],
+      "answer": "younger",
+      "explanation": "My mother is younger than my father. Young là tính từ ngắn → thêm -er: younger."
+    },
+    {
+      "type": "fill",
+      "prompt": "Chia tính từ: My mother is ______ (young) than my father.",
+      "answers": [
+        "younger"
+      ],
+      "explanation": "My mother is younger than my father."
+    },
+    {
+      "type": "translate",
+      "prompt": "Dịch sang tiếng Anh: \"Mẹ tôi trẻ hơn bố tôi.\"",
+      "answers": [
+        "my mother is younger than my father"
+      ],
+      "explanation": "My mother is younger than my father."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền từ còn thiếu: Tom is taller ______ Jack.",
+      "answers": [
+        "than"
+      ],
+      "explanation": "Câu so sánh hơn dùng than: Tom is taller than Jack."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền từ còn thiếu: An elephant is bigger ______ a dog.",
+      "answers": [
+        "than"
+      ],
+      "explanation": "Câu so sánh hơn dùng than: An elephant is bigger than a dog."
+    },
+    {
+      "type": "fill",
+      "prompt": "Điền từ còn thiếu: She is happier ______ her sister.",
+      "answers": [
+        "than"
+      ],
+      "explanation": "Câu so sánh hơn dùng than: She is happier than her sister."
+    }
   ]
 }
 export const errorBanks = {
@@ -30600,10 +33534,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am nine years old.",
-        "I am eleven years old.",
+        "She is my teacher.",
+        "This is my friend Nam.",
         "Hello, my name are Nam.",
-        "I am seven years old."
+        "Hello, my name is An."
       ],
       "answer": "Hello, my name are Nam.",
       "explanation": "My name đi với is."
@@ -30621,10 +33555,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "This is my friend Minh.",
         "I is six years old.",
-        "They are friends.",
-        "Miss Hoa is my teacher.",
-        "I am twelve years old."
+        "He is a student.",
+        "They are friends."
       ],
       "answer": "I is six years old.",
       "explanation": "I đi với am."
@@ -30642,10 +33576,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "This is my friend Lan.",
+        "I am twelve years old.",
         "This are my friend Nam.",
-        "Hello, my name is Lan.",
-        "Hello, my name is Nam.",
-        "This is my friend Lan."
+        "He is my teacher."
       ],
       "answer": "This are my friend Nam.",
       "explanation": "This đi với is."
@@ -30663,10 +33597,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is my friend An.",
-        "I am ten years old.",
-        "I am six years old.",
-        "He are a student."
+        "This is my friend Lan.",
+        "Hello, my name is Hoa.",
+        "He are a student.",
+        "This is my friend Nam."
       ],
       "answer": "He are a student.",
       "explanation": "He đi với is."
@@ -30684,10 +33618,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I am six years old.",
+        "Miss Hoa is my teacher.",
         "We is friends.",
-        "Minh is a student.",
-        "They are friends.",
-        "Miss Hoa is my teacher."
+        "Hello, my name is An."
       ],
       "answer": "We is friends.",
       "explanation": "We đi với are."
@@ -30705,10 +33639,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is my friend Minh.",
-        "She are my teacher.",
-        "Hello, my name is Nam.",
-        "Miss Hoa is my teacher."
+        "This is my friend An.",
+        "He is a student.",
+        "Hello, my name is An.",
+        "She are my teacher."
       ],
       "answer": "She are my teacher.",
       "explanation": "She đi với is."
@@ -30726,9 +33660,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is my friend An.",
-        "Hello, my name is Hoa.",
-        "This is my friend Hoa.",
+        "I am six years old.",
+        "We are friends.",
+        "I am nine years old.",
         "Hello, my name are Lan."
       ],
       "answer": "Hello, my name are Lan.",
@@ -30747,10 +33681,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is my friend Minh.",
-        "Hello, my name is Minh.",
-        "I am eleven years old.",
-        "I is seven years old."
+        "Hello, my name is Nam.",
+        "I is seven years old.",
+        "Miss Hoa is my teacher.",
+        "I am six years old."
       ],
       "answer": "I is seven years old.",
       "explanation": "I đi với am."
@@ -30768,10 +33702,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Hello, my name is Nam.",
-        "Hello, my name is Hoa.",
+        "I am ten years old.",
         "This are my friend Lan.",
-        "Hello, my name is Lan."
+        "She is a student.",
+        "This is my friend Minh."
       ],
       "answer": "This are my friend Lan.",
       "explanation": "This đi với is."
@@ -30789,10 +33723,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Miss Hoa is my teacher.",
-        "She are a student.",
-        "This is my friend Hoa.",
-        "Hello, my name is Hoa."
+        "I am nine years old.",
+        "I am eight years old.",
+        "He is a student.",
+        "She are a student."
       ],
       "answer": "She are a student.",
       "explanation": "She đi với is."
@@ -30810,10 +33744,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am eleven years old.",
         "They is friends.",
-        "This is my friend Lan.",
-        "This is my friend Hoa."
+        "I am six years old.",
+        "This is my friend Hoa.",
+        "This is my friend An."
       ],
       "answer": "They is friends.",
       "explanation": "They đi với are."
@@ -30831,10 +33765,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She is a student.",
         "He are my teacher.",
-        "Hello, my name is Lan.",
-        "I am twelve years old."
+        "They are friends.",
+        "This is my friend An.",
+        "I am eight years old."
       ],
       "answer": "He are my teacher.",
       "explanation": "He đi với is."
@@ -30852,10 +33786,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am seven years old.",
-        "This is my friend An.",
+        "I am nine years old.",
+        "They are friends.",
         "Hello, my name are Minh.",
-        "This is my friend Hoa."
+        "We are friends."
       ],
       "answer": "Hello, my name are Minh.",
       "explanation": "My name đi với is."
@@ -30873,9 +33807,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Hello, my name is Minh.",
-        "He is a student.",
+        "Hello, my name is An.",
         "I is eight years old.",
+        "Hello, my name is Nam.",
         "This is my friend Minh."
       ],
       "answer": "I is eight years old.",
@@ -30894,8 +33828,8 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am ten years old.",
-        "I am nine years old.",
+        "We are friends.",
+        "She is my teacher.",
         "Lan and Minh are friends.",
         "This are my friend Minh."
       ],
@@ -30915,10 +33849,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is my friend Minh.",
-        "Hello, my name is An.",
-        "This is my friend Lan.",
-        "Lan are a student."
+        "Hello, my name is Minh.",
+        "We are friends.",
+        "Lan are a student.",
+        "Hello, my name is Hoa."
       ],
       "answer": "Lan are a student.",
       "explanation": "Lan đi với is."
@@ -30936,10 +33870,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am twelve years old.",
-        "Hello, my name is Nam.",
-        "This is my friend Nam.",
-        "Lan and Minh is friends."
+        "I am eleven years old.",
+        "Lan and Minh is friends.",
+        "Hello, my name is An.",
+        "I am six years old."
       ],
       "answer": "Lan and Minh is friends.",
       "explanation": "Lan and Minh đi với are."
@@ -30957,10 +33891,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I am six years old.",
+        "Hello, my name is An.",
         "Miss Hoa are my teacher.",
-        "She is a student.",
-        "Lan and Minh are friends.",
-        "Hello, my name is Hoa."
+        "This is my friend Lan."
       ],
       "answer": "Miss Hoa are my teacher.",
       "explanation": "Miss Hoa đi với is."
@@ -30978,10 +33912,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "We are friends.",
         "Hello, my name are Hoa.",
-        "I am eleven years old.",
-        "I am nine years old.",
-        "Minh is a student."
+        "Hello, my name is Minh.",
+        "He is a student."
       ],
       "answer": "Hello, my name are Hoa.",
       "explanation": "My name đi với is."
@@ -30999,10 +33933,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is my friend Hoa.",
-        "Hello, my name is An.",
         "I is nine years old.",
-        "This is my friend Lan."
+        "I am eleven years old.",
+        "I am six years old.",
+        "She is my teacher."
       ],
       "answer": "I is nine years old.",
       "explanation": "I đi với am."
@@ -31020,10 +33954,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am twelve years old.",
-        "I am ten years old.",
-        "Miss Hoa is my teacher.",
-        "This are my friend Hoa."
+        "Lan is a student.",
+        "I am eleven years old.",
+        "This are my friend Hoa.",
+        "This is my friend Lan."
       ],
       "answer": "This are my friend Hoa.",
       "explanation": "This đi với is."
@@ -31042,9 +33976,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "I am seven years old.",
-        "Minh are a student.",
-        "She is my teacher.",
-        "I am eleven years old."
+        "I am twelve years old.",
+        "Hello, my name is An.",
+        "Minh are a student."
       ],
       "answer": "Minh are a student.",
       "explanation": "Minh đi với is."
@@ -31062,10 +33996,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She is a student.",
-        "She is my teacher.",
-        "Hello, my name is Lan.",
-        "Hello, my name are An."
+        "We are friends.",
+        "I am six years old.",
+        "Hello, my name are An.",
+        "This is my friend Nam."
       ],
       "answer": "Hello, my name are An.",
       "explanation": "My name đi với is."
@@ -31083,10 +34017,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "Miss Hoa is my teacher.",
         "I is ten years old.",
-        "I am twelve years old.",
-        "Hello, my name is Hoa.",
-        "She is my teacher."
+        "I am eleven years old.",
+        "She is a student."
       ],
       "answer": "I is ten years old.",
       "explanation": "I đi với am."
@@ -31104,10 +34038,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This are my friend An.",
-        "Lan and Minh are friends.",
-        "I am six years old.",
-        "I am nine years old."
+        "I am eight years old.",
+        "He is a student.",
+        "She is my teacher.",
+        "This are my friend An."
       ],
       "answer": "This are my friend An.",
       "explanation": "This đi với is."
@@ -31126,8 +34060,8 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "Hello, my name is Hoa.",
+        "She is my teacher.",
         "I is eleven years old.",
-        "This is my friend Hoa.",
         "Hello, my name is Minh."
       ],
       "answer": "I is eleven years old.",
@@ -31146,10 +34080,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Hello, my name is Lan.",
-        "Miss Hoa is my teacher.",
-        "This is my friend Hoa.",
-        "I is twelve years old."
+        "I is twelve years old.",
+        "Hello, my name is An.",
+        "Hello, my name is Hoa.",
+        "She is a student."
       ],
       "answer": "I is twelve years old.",
       "explanation": "I đi với am."
@@ -31169,10 +34103,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She has two cats.",
-        "I have four cats.",
-        "She has three pens.",
-        "I have two pen."
+        "I have three apples.",
+        "She has four cats.",
+        "I have two pen.",
+        "I have four apples."
       ],
       "answer": "I have two pen.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31190,10 +34124,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "There are three books.",
         "There is two pens.",
-        "There are three dogs.",
-        "She has three pens.",
-        "There are two books."
+        "She has four pens.",
+        "He has three books."
       ],
       "answer": "There is two pens.",
       "explanation": "There are đi với danh từ số nhiều."
@@ -31211,10 +34145,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She have two pens.",
-        "I have three books.",
-        "He has two pens.",
-        "I have three balls."
+        "He has three books.",
+        "There are three pens.",
+        "I have four books.",
+        "She have two pens."
       ],
       "answer": "She have two pens.",
       "explanation": "She đi với has."
@@ -31232,10 +34166,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have four pens.",
-        "He has two pens.",
-        "He has four books.",
-        "I have two book."
+        "She has four cats.",
+        "I have two dogs.",
+        "I have two book.",
+        "He has four books."
       ],
       "answer": "I have two book.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31254,9 +34188,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "There are two pen.",
-        "There are three pens.",
-        "I have two dogs.",
-        "I have three balls."
+        "I have four apples.",
+        "She has three books.",
+        "I have three books."
       ],
       "answer": "There are two pen.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31274,10 +34208,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "There are three cats.",
+        "I have two balls.",
         "He have two pens.",
-        "I have two dogs.",
-        "I have four dogs.",
-        "I have four apples."
+        "There are three pens."
       ],
       "answer": "He have two pens.",
       "explanation": "He đi với has."
@@ -31295,10 +34229,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She has four cats.",
+        "I have five books.",
         "I have two cat.",
-        "She has three cats.",
-        "She has three books."
+        "There are three dogs.",
+        "He has two pens."
       ],
       "answer": "I have two cat.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31316,10 +34250,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have five books.",
-        "I have three pens.",
+        "There are two apples.",
+        "There are two balls.",
         "There is two books.",
-        "He has four books."
+        "I have four apples."
       ],
       "answer": "There is two books.",
       "explanation": "There are đi với danh từ số nhiều."
@@ -31337,10 +34271,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She has two pens.",
+        "She has four pens.",
         "She have two books.",
-        "I have three pens.",
-        "There are two books."
+        "I have two cats.",
+        "She has two pens."
       ],
       "answer": "She have two books.",
       "explanation": "She đi với has."
@@ -31358,10 +34292,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have five books.",
-        "I have four books.",
-        "I have three balls.",
-        "I have two dog."
+        "I have two dog.",
+        "I have four cats.",
+        "There are three dogs.",
+        "She has three cats."
       ],
       "answer": "I have two dog.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31379,10 +34313,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He has two cats.",
-        "He has two pens.",
         "There are two book.",
-        "She has three pens."
+        "I have five books.",
+        "She has three pens.",
+        "There are three books."
       ],
       "answer": "There are two book.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31400,10 +34334,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I have five books.",
+        "There are two cats.",
         "He have two books.",
-        "She has three cats.",
-        "She has three books.",
-        "I have five pens."
+        "I have two cats."
       ],
       "answer": "He have two books.",
       "explanation": "He đi với has."
@@ -31421,10 +34355,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have four apples.",
-        "I have three cats.",
-        "He has four cats.",
-        "I have two apple."
+        "I have four cats.",
+        "I have two apple.",
+        "She has four books.",
+        "There are three cats."
       ],
       "answer": "I have two apple.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31443,9 +34377,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "There is two cats.",
-        "I have three dogs.",
-        "He has four books.",
-        "There are two books."
+        "I have four apples.",
+        "I have five books.",
+        "I have two apples."
       ],
       "answer": "There is two cats.",
       "explanation": "There are đi với danh từ số nhiều."
@@ -31463,10 +34397,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "There are two balls.",
-        "I have four cats.",
         "She have two cats.",
-        "I have four dogs."
+        "I have two books.",
+        "She has four cats.",
+        "I have five pens."
       ],
       "answer": "She have two cats.",
       "explanation": "She đi với has."
@@ -31485,9 +34419,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "I have two ball.",
-        "She has four books.",
-        "She has three pens.",
-        "There are three pens."
+        "I have two cats.",
+        "He has four pens.",
+        "He has three books."
       ],
       "answer": "I have two ball.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31505,10 +34439,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have two apples.",
-        "There are two cat.",
-        "I have two cats.",
-        "I have five books."
+        "I have four cats.",
+        "I have five books.",
+        "I have two balls.",
+        "There are two cat."
       ],
       "answer": "There are two cat.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31526,10 +34460,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have three balls.",
-        "She has two cats.",
+        "I have five pens.",
+        "There are three books.",
         "He have two cats.",
-        "There are three pens."
+        "I have four cats."
       ],
       "answer": "He have two cats.",
       "explanation": "He đi với has."
@@ -31547,10 +34481,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "There are two balls.",
-        "There are two books.",
+        "I have two pens.",
         "I have three pen.",
-        "I have four pens."
+        "She has three pens.",
+        "I have three apples."
       ],
       "answer": "I have three pen.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31568,10 +34502,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have four dogs.",
-        "I have three books.",
+        "He has four pens.",
         "There is two dogs.",
-        "She has three books."
+        "I have three dogs.",
+        "I have three cats."
       ],
       "answer": "There is two dogs.",
       "explanation": "There are đi với danh từ số nhiều."
@@ -31589,10 +34523,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have three apples.",
+        "I have four balls.",
+        "I have two dogs.",
         "She have three pens.",
-        "He has four books.",
-        "I have two pens."
+        "I have two cats."
       ],
       "answer": "She have three pens.",
       "explanation": "She đi với has."
@@ -31610,10 +34544,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He has four cats.",
+        "She has two pens.",
         "I have three book.",
-        "He has four pens.",
-        "He has four books.",
-        "I have two pens."
+        "I have four apples."
       ],
       "answer": "I have three book.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31631,10 +34565,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have three apples.",
-        "I have three books.",
         "There are two dog.",
-        "I have four cats."
+        "There are three cats.",
+        "I have four cats.",
+        "There are three books."
       ],
       "answer": "There are two dog.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31652,10 +34586,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "There are two balls.",
         "I have four apples.",
-        "She has four cats.",
-        "He have three pens."
+        "There are two balls.",
+        "He have three pens.",
+        "I have three dogs."
       ],
       "answer": "He have three pens.",
       "explanation": "He đi với has."
@@ -31673,10 +34607,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She has five pens.",
+        "There are three dogs.",
+        "I have three dogs.",
         "I have three cat.",
-        "He has two pens.",
-        "I have two dogs."
+        "I have three balls."
       ],
       "answer": "I have three cat.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31694,9 +34628,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She has three pens.",
-        "She has two books.",
-        "I have four books.",
+        "I have three books.",
+        "I have two dogs.",
+        "I have four dogs.",
         "There is two apples."
       ],
       "answer": "There is two apples.",
@@ -31715,10 +34649,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He has three books.",
         "She have three books.",
-        "There are three books.",
-        "There are three cats.",
-        "I have two apples."
+        "She has two pens.",
+        "I have three balls."
       ],
       "answer": "She have three books.",
       "explanation": "She đi với has."
@@ -31737,9 +34671,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "I have three dog.",
-        "I have four books.",
-        "I have three pens.",
-        "She has four cats."
+        "She has three cats.",
+        "She has two books.",
+        "There are three books."
       ],
       "answer": "I have three dog.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31757,10 +34691,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "There are three dogs.",
-        "He has four books.",
         "She has two books.",
-        "There are two apple."
+        "There are two apple.",
+        "I have three books.",
+        "There are three cats."
       ],
       "answer": "There are two apple.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31778,10 +34712,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have four pens.",
-        "I have four apples.",
-        "There are two dogs.",
-        "He have three books."
+        "There are three pens.",
+        "There are three books.",
+        "He have three books.",
+        "He has two books."
       ],
       "answer": "He have three books.",
       "explanation": "He đi với has."
@@ -31799,10 +34733,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "There are three pens.",
+        "There are three books.",
         "I have three apple.",
-        "He has two books.",
-        "There are three dogs.",
-        "There are two balls."
+        "I have two balls."
       ],
       "answer": "I have three apple.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31820,10 +34754,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She has five pens.",
-        "I have four apples.",
+        "I have two pens.",
         "There is two balls.",
-        "She has four books."
+        "There are three cats.",
+        "She has three books."
       ],
       "answer": "There is two balls.",
       "explanation": "There are đi với danh từ số nhiều."
@@ -31841,10 +34775,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have three apples.",
-        "She has four cats.",
-        "I have four apples.",
-        "She have three cats."
+        "He has three books.",
+        "She have three cats.",
+        "He has three pens.",
+        "She has two cats."
       ],
       "answer": "She have three cats.",
       "explanation": "She đi với has."
@@ -31862,10 +34796,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She has two cats.",
-        "I have three ball.",
-        "She has two books.",
-        "I have two pens."
+        "I have two books.",
+        "I have five books.",
+        "She has three books.",
+        "I have three ball."
       ],
       "answer": "I have three ball.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31883,10 +34817,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have four books.",
+        "I have two books.",
         "I have five books.",
-        "I have five pens.",
-        "There are two ball."
+        "There are two ball.",
+        "I have two dogs."
       ],
       "answer": "There are two ball.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31904,10 +34838,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "There are two apples.",
-        "There are three books.",
-        "I have three balls.",
-        "He have three cats."
+        "He have three cats.",
+        "There are two balls.",
+        "There are two cats.",
+        "She has three pens."
       ],
       "answer": "He have three cats.",
       "explanation": "He đi với has."
@@ -31925,10 +34859,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He has two cats.",
-        "He has three pens.",
+        "There are three pens.",
         "I have four pen.",
-        "I have three apples."
+        "I have three apples.",
+        "I have three pens."
       ],
       "answer": "I have four pen.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -31946,10 +34880,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He has four cats.",
+        "I have three dogs.",
+        "I have two dogs.",
         "There is three pens.",
-        "She has four cats.",
-        "I have four cats."
+        "She has four books."
       ],
       "answer": "There is three pens.",
       "explanation": "There are đi với danh từ số nhiều."
@@ -31968,9 +34902,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "There are three pens.",
-        "I have four dogs.",
-        "There are two pens.",
-        "She have four pens."
+        "She have four pens.",
+        "I have three cats.",
+        "I have four books."
       ],
       "answer": "She have four pens.",
       "explanation": "She đi với has."
@@ -31988,10 +34922,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He has four books.",
-        "I have three cats.",
-        "She has two cats.",
-        "I have four book."
+        "I have four book.",
+        "I have five pens.",
+        "She has five pens.",
+        "I have three books."
       ],
       "answer": "I have four book.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -32009,10 +34943,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have three pens.",
-        "There are three books.",
-        "He has four pens.",
-        "There are three pen."
+        "She has two pens.",
+        "She has three books.",
+        "There are three pen.",
+        "I have four dogs."
       ],
       "answer": "There are three pen.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -32030,10 +34964,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "There are two books.",
-        "I have four books.",
-        "She has four cats.",
-        "He have four pens."
+        "There are two dogs.",
+        "He have four pens.",
+        "I have three dogs.",
+        "She has three cats."
       ],
       "answer": "He have four pens.",
       "explanation": "He đi với has."
@@ -32051,10 +34985,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have four cat.",
-        "He has three books.",
-        "He has three pens.",
-        "He has four pens."
+        "There are two balls.",
+        "There are two dogs.",
+        "He has five pens.",
+        "I have four cat."
       ],
       "answer": "I have four cat.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -32072,10 +35006,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He has three cats.",
         "She has two books.",
-        "She has three books.",
         "There is three books.",
-        "There are two balls."
+        "I have two dogs."
       ],
       "answer": "There is three books.",
       "explanation": "There are đi với danh từ số nhiều."
@@ -32093,10 +35027,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She has three pens.",
-        "He has three cats.",
-        "She have four books.",
-        "There are two cats."
+        "I have five books.",
+        "She has two books.",
+        "She has three books.",
+        "She have four books."
       ],
       "answer": "She have four books.",
       "explanation": "She đi với has."
@@ -32114,10 +35048,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have four balls.",
         "I have four dog.",
-        "There are two cats.",
-        "I have four cats."
+        "She has five pens.",
+        "I have four pens.",
+        "He has two books."
       ],
       "answer": "I have four dog.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -32135,10 +35069,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have four books.",
-        "She has two books.",
-        "I have two books.",
-        "There are three book."
+        "There are three book.",
+        "He has two books.",
+        "There are two balls.",
+        "I have three pens."
       ],
       "answer": "There are three book.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -32156,10 +35090,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have two apples.",
-        "She has five pens.",
+        "She has three pens.",
+        "There are two pens.",
         "He have four books.",
-        "I have two dogs."
+        "I have four pens."
       ],
       "answer": "He have four books.",
       "explanation": "He đi với has."
@@ -32178,9 +35112,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "I have four apple.",
-        "She has three cats.",
-        "I have three books.",
-        "She has four books."
+        "There are three cats.",
+        "There are two balls.",
+        "He has four books."
       ],
       "answer": "I have four apple.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -32198,10 +35132,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have three dogs.",
+        "There are three pens.",
+        "She has two books.",
         "There is three cats.",
-        "He has three cats.",
-        "I have three cats."
+        "I have four balls."
       ],
       "answer": "There is three cats.",
       "explanation": "There are đi với danh từ số nhiều."
@@ -32219,10 +35153,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She has two pens.",
-        "I have two cats.",
         "She have four cats.",
-        "I have two apples."
+        "He has three books.",
+        "There are two apples.",
+        "I have three cats."
       ],
       "answer": "She have four cats.",
       "explanation": "She đi với has."
@@ -32240,10 +35174,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have four ball.",
+        "She has two cats.",
         "He has three books.",
-        "I have four books.",
-        "He has five pens."
+        "I have four ball.",
+        "He has four cats."
       ],
       "answer": "I have four ball.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -32261,10 +35195,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He has five pens.",
         "There are three cat.",
-        "I have three balls.",
-        "I have five books."
+        "There are two books.",
+        "He has two cats.",
+        "I have four books."
       ],
       "answer": "There are three cat.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -32282,10 +35216,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have two cats.",
+        "She has three pens.",
+        "I have three balls.",
         "He have four cats.",
-        "He has five pens.",
-        "He has two cats."
+        "I have five pens."
       ],
       "answer": "He have four cats.",
       "explanation": "He đi với has."
@@ -32303,9 +35237,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She has five pens.",
-        "There are two books.",
-        "I have four pens.",
+        "She has two pens.",
+        "I have two apples.",
+        "He has five pens.",
         "I have five pen."
       ],
       "answer": "I have five pen.",
@@ -32324,10 +35258,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "There are two books.",
-        "There are three books.",
+        "There are two pens.",
+        "He has three pens.",
         "There is three dogs.",
-        "He has four cats."
+        "She has three cats."
       ],
       "answer": "There is three dogs.",
       "explanation": "There are đi với danh từ số nhiều."
@@ -32345,10 +35279,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "There are two apples.",
         "She have five pens.",
-        "She has two books.",
-        "He has three books."
+        "She has three cats.",
+        "I have five books.",
+        "He has three pens."
       ],
       "answer": "She have five pens.",
       "explanation": "She đi với has."
@@ -32366,10 +35300,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He has five pens.",
-        "There are two cats.",
+        "He has three pens.",
+        "There are three dogs.",
         "I have five book.",
-        "He has four cats."
+        "He has two cats."
       ],
       "answer": "I have five book.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -32387,10 +35321,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I have four dogs.",
-        "She has two pens.",
         "There are three dog.",
-        "She has three books."
+        "I have two dogs.",
+        "I have five pens.",
+        "She has five pens."
       ],
       "answer": "There are three dog.",
       "explanation": "Sau số đếm từ 2 trở lên, danh từ phải thêm -s."
@@ -32408,10 +35342,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She has five pens.",
-        "He has two books.",
-        "I have three balls.",
-        "He have five pens."
+        "There are two apples.",
+        "I have four cats.",
+        "He have five pens.",
+        "I have two balls."
       ],
       "answer": "He have five pens.",
       "explanation": "He đi với has."
@@ -32432,9 +35366,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "This are my mother.",
-        "This is Minh's father.",
-        "This is Lan's brother.",
-        "This is Lan's father."
+        "This is my brother.",
+        "This is my father.",
+        "She has a brother."
       ],
       "answer": "This are my mother.",
       "explanation": "This đi với is."
@@ -32452,10 +35386,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is my mother.",
-        "This is Lan's sister.",
+        "He has two sisters.",
         "He are my father.",
-        "We are a family."
+        "We are a family.",
+        "She is my sister."
       ],
       "answer": "He are my father.",
       "explanation": "He đi với is."
@@ -32473,10 +35407,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She has a brother.",
-        "This is Lan's brother.",
-        "This is Lan's mother.",
-        "They is my parents."
+        "She is my mother.",
+        "She is my grandmother.",
+        "They is my parents.",
+        "This is Minh's mother."
       ],
       "answer": "They is my parents.",
       "explanation": "They đi với are."
@@ -32494,10 +35428,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is Minh's mother.",
+        "This is my grandmother.",
         "This is Lan mother.",
-        "This is Minh's sister.",
-        "This is my father."
+        "This is my father.",
+        "He is my grandfather."
       ],
       "answer": "This is Lan mother.",
       "explanation": "Sở hữu: tên người + 's (Lan's mother)."
@@ -32515,10 +35449,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She is my grandmother.",
-        "This is Minh's brother.",
-        "We are a family.",
-        "She have a brother."
+        "She is my sister.",
+        "She have a brother.",
+        "This is my mother.",
+        "They are my parents."
       ],
       "answer": "She have a brother.",
       "explanation": "She đi với has."
@@ -32536,10 +35470,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is Lan's brother.",
-        "This are my father.",
-        "This is my grandmother.",
-        "He is my brother."
+        "This is Minh's father.",
+        "She is my sister.",
+        "This is my baby.",
+        "This are my father."
       ],
       "answer": "This are my father.",
       "explanation": "This đi với is."
@@ -32557,10 +35491,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I have a sister.",
+        "She has a brother.",
         "He are my brother.",
-        "This is Minh's mother.",
-        "They are my parents.",
-        "We are a family."
+        "This is my grandfather."
       ],
       "answer": "He are my brother.",
       "explanation": "He đi với is."
@@ -32579,9 +35513,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "We is a family.",
-        "This is my sister.",
-        "This is Minh's sister.",
-        "This is Minh's brother."
+        "This is Minh's father.",
+        "She is my sister.",
+        "She has a brother."
       ],
       "answer": "We is a family.",
       "explanation": "We đi với are."
@@ -32599,10 +35533,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "This is Lan's brother.",
         "This is Lan father.",
-        "This is my mother.",
-        "This is my father.",
-        "This is Minh's mother."
+        "She is my mother.",
+        "He is my brother."
       ],
       "answer": "This is Lan father.",
       "explanation": "Sở hữu: tên người + 's (Lan's father)."
@@ -32620,10 +35554,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He have two sisters.",
+        "We are a family.",
         "He is my brother.",
-        "This is Lan's father.",
-        "This is Lan's sister."
+        "This is my sister.",
+        "He have two sisters."
       ],
       "answer": "He have two sisters.",
       "explanation": "He đi với has."
@@ -32641,10 +35575,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She is my grandmother.",
-        "This is my father.",
-        "He is my father.",
-        "This are my sister."
+        "This are my sister.",
+        "This is Lan's father.",
+        "This is Minh's mother.",
+        "They are my parents."
       ],
       "answer": "This are my sister.",
       "explanation": "This đi với is."
@@ -32662,10 +35596,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is my brother.",
+        "I have a sister.",
+        "This is my mother.",
         "He are my grandfather.",
-        "She is my grandmother.",
-        "This is my brother."
+        "He is my brother."
       ],
       "answer": "He are my grandfather.",
       "explanation": "He đi với is."
@@ -32683,10 +35617,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is Minh's mother.",
         "This is Lan sister.",
-        "This is Minh's brother.",
-        "This is Minh's father."
+        "He has two sisters.",
+        "This is Lan's mother.",
+        "She is my sister."
       ],
       "answer": "This is Lan sister.",
       "explanation": "Sở hữu: tên người + 's (Lan's sister)."
@@ -32704,10 +35638,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is Minh's sister.",
-        "We are a family.",
-        "This is Lan's mother.",
-        "I has a sister."
+        "I has a sister.",
+        "This is Lan's father.",
+        "This is my father.",
+        "This is Lan's sister."
       ],
       "answer": "I has a sister.",
       "explanation": "I đi với have, không đi với has."
@@ -32725,10 +35659,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "This is Minh's brother.",
+        "This is my baby.",
         "This are my brother.",
-        "She has a brother.",
-        "I have a sister.",
-        "We are a family."
+        "This is Lan's mother."
       ],
       "answer": "This are my brother.",
       "explanation": "This đi với is."
@@ -32746,10 +35680,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She is my sister.",
+        "This is my grandmother.",
         "He is my brother.",
         "She are my mother.",
-        "He is my father."
+        "This is Minh's brother."
       ],
       "answer": "She are my mother.",
       "explanation": "She đi với is."
@@ -32767,10 +35701,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is Lan brother.",
-        "This is my baby.",
-        "We are a family.",
-        "This is my grandmother."
+        "She has a brother.",
+        "This is Lan's mother.",
+        "This is my grandfather.",
+        "This is Lan brother."
       ],
       "answer": "This is Lan brother.",
       "explanation": "Sở hữu: tên người + 's (Lan's brother)."
@@ -32788,10 +35722,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "This is Minh's mother.",
         "This are my grandmother.",
-        "This is Minh's sister.",
-        "This is Lan's father.",
-        "I have a sister."
+        "This is Lan's brother.",
+        "This is my father."
       ],
       "answer": "This are my grandmother.",
       "explanation": "This đi với is."
@@ -32809,9 +35743,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is Minh's brother.",
-        "This is Lan's father.",
-        "This is Lan's sister.",
+        "This is my grandmother.",
+        "We are a family.",
+        "He is my father.",
         "She are my sister."
       ],
       "answer": "She are my sister.",
@@ -32831,9 +35765,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "This is Minh mother.",
-        "He has two sisters.",
-        "This is Lan's mother.",
-        "She has a brother."
+        "This is Minh's sister.",
+        "She is my sister.",
+        "This is my baby."
       ],
       "answer": "This is Minh mother.",
       "explanation": "Sở hữu: tên người + 's (Minh's mother)."
@@ -32851,10 +35785,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She is my sister.",
-        "This is Minh's mother.",
+        "She is my grandmother.",
         "This are my grandfather.",
-        "She has a brother."
+        "This is Minh's mother.",
+        "This is Lan's sister."
       ],
       "answer": "This are my grandfather.",
       "explanation": "This đi với is."
@@ -32872,10 +35806,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is Lan's brother.",
-        "She are my grandmother.",
-        "This is Lan's father.",
-        "This is Lan's sister."
+        "He is my grandfather.",
+        "He is my brother.",
+        "I have a sister.",
+        "She are my grandmother."
       ],
       "answer": "She are my grandmother.",
       "explanation": "She đi với is."
@@ -32893,10 +35827,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is Lan's sister.",
-        "She is my sister.",
+        "This is my grandmother.",
         "This is Minh father.",
-        "I have a sister."
+        "This is my baby.",
+        "He is my father."
       ],
       "answer": "This is Minh father.",
       "explanation": "Sở hữu: tên người + 's (Minh's father)."
@@ -32914,10 +35848,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is my sister.",
         "This are my baby.",
-        "She is my mother.",
-        "I have a sister."
+        "This is my grandfather.",
+        "She has a brother.",
+        "She is my grandmother."
       ],
       "answer": "This are my baby.",
       "explanation": "This đi với is."
@@ -32935,10 +35869,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is Minh sister.",
-        "This is Lan's mother.",
+        "This is Minh's brother.",
         "This is Lan's brother.",
-        "This is my father."
+        "This is Minh sister.",
+        "I have a sister."
       ],
       "answer": "This is Minh sister.",
       "explanation": "Sở hữu: tên người + 's (Minh's sister)."
@@ -32956,10 +35890,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "They are my parents.",
+        "We are a family.",
+        "He is my grandfather.",
         "This is Minh brother.",
-        "This is my grandfather.",
-        "I have a sister."
+        "This is my mother."
       ],
       "answer": "This is Minh brother.",
       "explanation": "Sở hữu: tên người + 's (Minh's brother)."
@@ -32979,10 +35913,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He watches TV.",
+        "He goes to school.",
         "He get up at six.",
-        "He helps mother.",
-        "I sleep early."
+        "He doesn't get up at six.",
+        "You brush your teeth."
       ],
       "answer": "He get up at six.",
       "explanation": "He đi với động từ thêm -s (gets up)."
@@ -33000,10 +35934,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "You watch TV.",
-        "He goes to school.",
-        "Lan doesn't get up at six.",
-        "I gets up at six."
+        "He helps mother.",
+        "I gets up at six.",
+        "He sleeps early.",
+        "I sleep early."
       ],
       "answer": "I gets up at six.",
       "explanation": "I đi với động từ nguyên thể (get up)."
@@ -33021,10 +35955,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I play football.",
         "He don't get up at six.",
-        "He doesn't go to school.",
-        "Lan doesn't brush her teeth."
+        "She doesn't get up at six.",
+        "I cook dinner.",
+        "He plays football."
       ],
       "answer": "He don't get up at six.",
       "explanation": "He đi với doesn't, không đi với don't."
@@ -33042,10 +35976,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He doesn't gets up at six.",
-        "She doesn't watch TV.",
-        "He brushes his teeth.",
-        "I watch TV."
+        "He goes to school.",
+        "You brush your teeth.",
+        "He eats breakfast.",
+        "He doesn't gets up at six."
       ],
       "answer": "He doesn't gets up at six.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (get up, không phải gets up)."
@@ -33063,10 +35997,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He helps mother.",
         "We doesn't get up at six.",
-        "You get up at six.",
-        "She doesn't go to school.",
-        "We don't go to school."
+        "He reads a book.",
+        "He gets up at six."
       ],
       "answer": "We doesn't get up at six.",
       "explanation": "We đi với don't, không đi với doesn't."
@@ -33084,10 +36018,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I play football.",
+        "They don't watch TV.",
         "He brush his teeth.",
-        "I go to school.",
-        "He doesn't go to school.",
-        "He plays football."
+        "You brush your teeth."
       ],
       "answer": "He brush his teeth.",
       "explanation": "He đi với động từ thêm -s (brushes)."
@@ -33105,10 +36039,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I sleep early.",
-        "He doesn't get up at six.",
-        "She brushes her teeth.",
-        "I brushes my teeth."
+        "I brushes my teeth.",
+        "We don't watch TV.",
+        "She doesn't eat breakfast.",
+        "They don't brush their teeth."
       ],
       "answer": "I brushes my teeth.",
       "explanation": "I đi với động từ nguyên thể (brush)."
@@ -33126,10 +36060,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "They don't eat breakfast.",
-        "I watch TV.",
-        "I brush my teeth.",
-        "He don't brush his teeth."
+        "You watch TV.",
+        "They don't get up at six.",
+        "He don't brush his teeth.",
+        "I go to school."
       ],
       "answer": "He don't brush his teeth.",
       "explanation": "He đi với doesn't, không đi với don't."
@@ -33147,10 +36081,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I go to school.",
-        "She gets up at six.",
-        "I sleep early.",
-        "He doesn't brushes his teeth."
+        "He doesn't brushes his teeth.",
+        "They don't eat breakfast.",
+        "He eats breakfast.",
+        "You get up at six."
       ],
       "answer": "He doesn't brushes his teeth.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (brush, không phải brushes)."
@@ -33168,10 +36102,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I play football.",
+        "You watch TV.",
         "We doesn't brush our teeth.",
-        "I sleep early.",
-        "She doesn't watch TV."
+        "I cook dinner.",
+        "He gets up at six."
       ],
       "answer": "We doesn't brush our teeth.",
       "explanation": "We đi với don't, không đi với doesn't."
@@ -33189,10 +36123,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "They don't get up at six.",
-        "He watch TV.",
-        "We don't brush our teeth.",
-        "She doesn't eat breakfast."
+        "He doesn't watch TV.",
+        "She gets up at six.",
+        "They don't brush their teeth.",
+        "He watch TV."
       ],
       "answer": "He watch TV.",
       "explanation": "He đi với động từ thêm -s (watches)."
@@ -33210,10 +36144,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He doesn't go to school.",
-        "I cook dinner.",
-        "I watches TV.",
-        "We don't get up at six."
+        "We don't watch TV.",
+        "I read a book.",
+        "He brushes his teeth.",
+        "I watches TV."
       ],
       "answer": "I watches TV.",
       "explanation": "I đi với động từ nguyên thể (watch)."
@@ -33231,10 +36165,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "They don't brush their teeth.",
-        "We don't brush our teeth.",
+        "He doesn't go to school.",
         "He don't watch TV.",
-        "He cooks dinner."
+        "I watch TV.",
+        "He eats breakfast."
       ],
       "answer": "He don't watch TV.",
       "explanation": "He đi với doesn't, không đi với don't."
@@ -33252,10 +36186,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't watch TV.",
-        "He doesn't eat breakfast.",
-        "She brushes her teeth.",
-        "He doesn't watches TV."
+        "He doesn't watches TV.",
+        "They don't watch TV.",
+        "They don't brush their teeth.",
+        "She doesn't get up at six."
       ],
       "answer": "He doesn't watches TV.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (watch, không phải watches)."
@@ -33273,10 +36207,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "They don't get up at six.",
-        "We doesn't watch TV.",
-        "They don't watch TV.",
-        "I play football."
+        "Lan doesn't brush her teeth.",
+        "He doesn't watch TV.",
+        "She doesn't eat breakfast.",
+        "We doesn't watch TV."
       ],
       "answer": "We doesn't watch TV.",
       "explanation": "We đi với don't, không đi với doesn't."
@@ -33294,10 +36228,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He gets up at six.",
-        "Lan doesn't get up at six.",
-        "I play football.",
-        "He go to school."
+        "We don't go to school.",
+        "He doesn't get up at six.",
+        "He go to school.",
+        "I help mother."
       ],
       "answer": "He go to school.",
       "explanation": "He đi với động từ thêm -s (goes)."
@@ -33315,10 +36249,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He brushes his teeth.",
-        "I goes to school.",
-        "I get up at six.",
-        "They don't eat breakfast."
+        "He helps mother.",
+        "He doesn't watch TV.",
+        "I eat breakfast.",
+        "I goes to school."
       ],
       "answer": "I goes to school.",
       "explanation": "I đi với động từ nguyên thể (go)."
@@ -33336,10 +36270,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I brush my teeth.",
+        "He doesn't brush his teeth.",
         "He don't go to school.",
-        "He doesn't eat breakfast.",
-        "She doesn't go to school.",
-        "He plays football."
+        "He gets up at six."
       ],
       "answer": "He don't go to school.",
       "explanation": "He đi với doesn't, không đi với don't."
@@ -33357,10 +36291,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We don't go to school.",
         "He doesn't goes to school.",
-        "He eats breakfast.",
-        "She doesn't watch TV."
+        "I get up at six.",
+        "She doesn't go to school.",
+        "They don't brush their teeth."
       ],
       "answer": "He doesn't goes to school.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (go, không phải goes)."
@@ -33378,10 +36312,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He doesn't get up at six.",
+        "She doesn't eat breakfast.",
         "We doesn't go to school.",
-        "She watches TV.",
-        "I eat breakfast.",
-        "I watch TV."
+        "She gets up at six."
       ],
       "answer": "We doesn't go to school.",
       "explanation": "We đi với don't, không đi với doesn't."
@@ -33399,10 +36333,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "We don't brush our teeth.",
+        "We don't watch TV.",
         "He eat breakfast.",
-        "She doesn't get up at six.",
-        "You brush your teeth.",
-        "She watches TV."
+        "They don't watch TV."
       ],
       "answer": "He eat breakfast.",
       "explanation": "He đi với động từ thêm -s (eats)."
@@ -33420,10 +36354,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't eat breakfast.",
+        "We don't watch TV.",
+        "He cooks dinner.",
         "I eats breakfast.",
-        "He doesn't eat breakfast.",
-        "She doesn't brush her teeth."
+        "She gets up at six."
       ],
       "answer": "I eats breakfast.",
       "explanation": "I đi với động từ nguyên thể (eat)."
@@ -33441,10 +36375,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He eats breakfast.",
-        "He don't eat breakfast.",
-        "I play football.",
-        "I get up at six."
+        "They don't go to school.",
+        "I eat breakfast.",
+        "Lan doesn't brush her teeth.",
+        "He don't eat breakfast."
       ],
       "answer": "He don't eat breakfast.",
       "explanation": "He đi với doesn't, không đi với don't."
@@ -33462,10 +36396,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He doesn't eats breakfast.",
-        "I eat breakfast.",
-        "He doesn't brush his teeth.",
-        "He doesn't go to school."
+        "He gets up at six.",
+        "She brushes her teeth.",
+        "She doesn't eat breakfast.",
+        "He doesn't eats breakfast."
       ],
       "answer": "He doesn't eats breakfast.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (eat, không phải eats)."
@@ -33483,9 +36417,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I brush my teeth.",
-        "They don't go to school.",
-        "He gets up at six.",
+        "You brush your teeth.",
+        "They don't brush their teeth.",
+        "We don't brush our teeth.",
         "We doesn't eat breakfast."
       ],
       "answer": "We doesn't eat breakfast.",
@@ -33504,10 +36438,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He doesn't brush his teeth.",
-        "He helps mother.",
-        "He play football.",
-        "You get up at six."
+        "He doesn't watch TV.",
+        "You get up at six.",
+        "We don't brush our teeth.",
+        "He play football."
       ],
       "answer": "He play football.",
       "explanation": "He đi với động từ thêm -s (plays)."
@@ -33525,9 +36459,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't brush her teeth.",
-        "We don't brush our teeth.",
-        "They don't get up at six.",
+        "She doesn't eat breakfast.",
+        "We don't get up at six.",
+        "He cooks dinner.",
         "I plays football."
       ],
       "answer": "I plays football.",
@@ -33546,10 +36480,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He plays football.",
-        "She doesn't brush her teeth.",
-        "I play football.",
-        "She don't get up at six."
+        "I go to school.",
+        "They don't go to school.",
+        "She don't get up at six.",
+        "We don't eat breakfast."
       ],
       "answer": "She don't get up at six.",
       "explanation": "She đi với doesn't, không đi với don't."
@@ -33567,10 +36501,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't eat breakfast.",
+        "I sleep early.",
+        "He doesn't brush his teeth.",
         "She doesn't gets up at six.",
-        "You watch TV.",
-        "Lan doesn't get up at six."
+        "We don't eat breakfast."
       ],
       "answer": "She doesn't gets up at six.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (get up, không phải gets up)."
@@ -33589,9 +36523,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "They doesn't get up at six.",
-        "He goes to school.",
-        "They don't brush their teeth.",
-        "We don't get up at six."
+        "They don't eat breakfast.",
+        "You brush your teeth.",
+        "I go to school."
       ],
       "answer": "They doesn't get up at six.",
       "explanation": "They đi với don't, không đi với doesn't."
@@ -33609,10 +36543,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I cook dinner.",
         "He read a book.",
-        "He plays football.",
-        "She doesn't watch TV."
+        "You get up at six.",
+        "She doesn't brush her teeth.",
+        "I cook dinner."
       ],
       "answer": "He read a book.",
       "explanation": "He đi với động từ thêm -s (reads)."
@@ -33630,10 +36564,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We don't brush our teeth.",
+        "She gets up at six.",
         "I reads a book.",
-        "I sleep early.",
-        "We don't eat breakfast."
+        "I cook dinner.",
+        "He sleeps early."
       ],
       "answer": "I reads a book.",
       "explanation": "I đi với động từ nguyên thể (read)."
@@ -33651,10 +36585,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan doesn't get up at six.",
+        "He helps mother.",
+        "I eat breakfast.",
         "She don't brush her teeth.",
-        "He plays football.",
-        "You brush your teeth."
+        "He cooks dinner."
       ],
       "answer": "She don't brush her teeth.",
       "explanation": "She đi với doesn't, không đi với don't."
@@ -33672,10 +36606,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I go to school.",
-        "He doesn't brush his teeth.",
         "She doesn't brushes her teeth.",
-        "We don't watch TV."
+        "He helps mother.",
+        "He doesn't go to school.",
+        "He gets up at six."
       ],
       "answer": "She doesn't brushes her teeth.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (brush, không phải brushes)."
@@ -33693,10 +36627,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He doesn't get up at six.",
+        "I sleep early.",
         "They doesn't brush their teeth.",
-        "They don't watch TV.",
-        "They don't get up at six.",
-        "I eat breakfast."
+        "I cook dinner."
       ],
       "answer": "They doesn't brush their teeth.",
       "explanation": "They đi với don't, không đi với doesn't."
@@ -33714,10 +36648,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan doesn't get up at six.",
-        "We don't brush our teeth.",
-        "He sleep early.",
-        "They don't eat breakfast."
+        "He goes to school.",
+        "She doesn't get up at six.",
+        "I watch TV.",
+        "He sleep early."
       ],
       "answer": "He sleep early.",
       "explanation": "He đi với động từ thêm -s (sleeps)."
@@ -33735,10 +36669,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "They don't brush their teeth.",
         "I sleeps early.",
-        "You brush your teeth.",
-        "He watches TV."
+        "He doesn't brush his teeth.",
+        "He doesn't watch TV.",
+        "She doesn't eat breakfast."
       ],
       "answer": "I sleeps early.",
       "explanation": "I đi với động từ nguyên thể (sleep)."
@@ -33756,10 +36690,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I help mother.",
+        "He reads a book.",
         "She don't watch TV.",
-        "She doesn't go to school.",
-        "I read a book.",
-        "He goes to school."
+        "He gets up at six."
       ],
       "answer": "She don't watch TV.",
       "explanation": "She đi với doesn't, không đi với don't."
@@ -33777,10 +36711,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She gets up at six.",
-        "I sleep early.",
+        "He brushes his teeth.",
         "She doesn't watches TV.",
-        "They don't get up at six."
+        "I read a book.",
+        "She doesn't eat breakfast."
       ],
       "answer": "She doesn't watches TV.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (watch, không phải watches)."
@@ -33798,9 +36732,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I play football.",
-        "He reads a book.",
-        "He doesn't watch TV.",
+        "I get up at six.",
+        "We don't eat breakfast.",
+        "They don't eat breakfast.",
         "They doesn't watch TV."
       ],
       "answer": "They doesn't watch TV.",
@@ -33819,10 +36753,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't eat breakfast.",
-        "She doesn't brush her teeth.",
+        "They don't watch TV.",
+        "I cook dinner.",
         "He help mother.",
-        "She gets up at six."
+        "We don't eat breakfast."
       ],
       "answer": "He help mother.",
       "explanation": "He đi với động từ thêm -s (helps)."
@@ -33840,10 +36774,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We don't brush our teeth.",
-        "She doesn't watch TV.",
-        "You brush your teeth.",
-        "I helps mother."
+        "I helps mother.",
+        "They don't go to school.",
+        "He doesn't brush his teeth.",
+        "He sleeps early."
       ],
       "answer": "I helps mother.",
       "explanation": "I đi với động từ nguyên thể (help)."
@@ -33861,10 +36795,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "They don't watch TV.",
-        "She doesn't brush her teeth.",
+        "They don't get up at six.",
         "She don't go to school.",
-        "He sleeps early."
+        "I help mother.",
+        "Lan doesn't get up at six."
       ],
       "answer": "She don't go to school.",
       "explanation": "She đi với doesn't, không đi với don't."
@@ -33882,10 +36816,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "They don't eat breakfast.",
+        "They don't go to school.",
         "She doesn't goes to school.",
-        "She brushes her teeth.",
-        "She doesn't get up at six.",
-        "I brush my teeth."
+        "He doesn't brush his teeth."
       ],
       "answer": "She doesn't goes to school.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (go, không phải goes)."
@@ -33903,10 +36837,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He doesn't brush his teeth.",
+        "She doesn't eat breakfast.",
         "They doesn't go to school.",
-        "They don't eat breakfast.",
-        "He cooks dinner."
+        "He eats breakfast.",
+        "She doesn't watch TV."
       ],
       "answer": "They doesn't go to school.",
       "explanation": "They đi với don't, không đi với doesn't."
@@ -33924,9 +36858,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We don't go to school.",
-        "He doesn't go to school.",
-        "He doesn't eat breakfast.",
+        "I help mother.",
+        "They don't get up at six.",
+        "You watch TV.",
         "He cook dinner."
       ],
       "answer": "He cook dinner.",
@@ -33945,10 +36879,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He plays football.",
+        "He brushes his teeth.",
         "I cooks dinner.",
-        "You get up at six.",
-        "We don't eat breakfast.",
-        "I eat breakfast."
+        "We don't get up at six."
       ],
       "answer": "I cooks dinner.",
       "explanation": "I đi với động từ nguyên thể (cook)."
@@ -33966,10 +36900,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He plays football.",
+        "I eat breakfast.",
         "She don't eat breakfast.",
-        "He brushes his teeth.",
-        "Lan doesn't brush her teeth."
+        "He doesn't eat breakfast.",
+        "I read a book."
       ],
       "answer": "She don't eat breakfast.",
       "explanation": "She đi với doesn't, không đi với don't."
@@ -33987,10 +36921,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't go to school.",
-        "We don't go to school.",
+        "She gets up at six.",
         "She doesn't eats breakfast.",
-        "We don't brush our teeth."
+        "Lan doesn't get up at six.",
+        "They don't eat breakfast."
       ],
       "answer": "She doesn't eats breakfast.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (eat, không phải eats)."
@@ -34008,10 +36942,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "They don't go to school.",
-        "I help mother.",
         "They doesn't eat breakfast.",
-        "He sleeps early."
+        "I brush my teeth.",
+        "He sleeps early.",
+        "I sleep early."
       ],
       "answer": "They doesn't eat breakfast.",
       "explanation": "They đi với don't, không đi với doesn't."
@@ -34029,10 +36963,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't get up at six.",
+        "She brushes her teeth.",
         "She get up at six.",
-        "We don't go to school.",
-        "He sleeps early."
+        "He eats breakfast.",
+        "I go to school."
       ],
       "answer": "She get up at six.",
       "explanation": "She đi với động từ thêm -s (gets up)."
@@ -34050,10 +36984,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She watches TV.",
-        "We don't get up at six.",
-        "He goes to school.",
-        "You gets up at six."
+        "You gets up at six.",
+        "I go to school.",
+        "He doesn't go to school.",
+        "Lan doesn't brush her teeth."
       ],
       "answer": "You gets up at six.",
       "explanation": "You đi với động từ nguyên thể (get up)."
@@ -34071,10 +37005,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I go to school.",
-        "They don't watch TV.",
-        "They don't brush their teeth.",
-        "Lan don't get up at six."
+        "We don't get up at six.",
+        "He eats breakfast.",
+        "Lan don't get up at six.",
+        "He plays football."
       ],
       "answer": "Lan don't get up at six.",
       "explanation": "Lan đi với doesn't, không đi với don't."
@@ -34092,10 +37026,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "They don't watch TV.",
-        "Lan doesn't gets up at six.",
-        "She doesn't go to school.",
-        "He goes to school."
+        "She doesn't get up at six.",
+        "I go to school.",
+        "Lan doesn't brush her teeth.",
+        "Lan doesn't gets up at six."
       ],
       "answer": "Lan doesn't gets up at six.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (get up, không phải gets up)."
@@ -34113,10 +37047,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We don't go to school.",
-        "She doesn't get up at six.",
-        "They don't watch TV.",
-        "She brush her teeth."
+        "He doesn't brush his teeth.",
+        "She brush her teeth.",
+        "Lan doesn't brush her teeth.",
+        "I help mother."
       ],
       "answer": "She brush her teeth.",
       "explanation": "She đi với động từ thêm -s (brushes)."
@@ -34134,9 +37068,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't go to school.",
-        "She brushes her teeth.",
-        "We don't eat breakfast.",
+        "We don't go to school.",
+        "She gets up at six.",
+        "He sleeps early.",
         "You brushes your teeth."
       ],
       "answer": "You brushes your teeth.",
@@ -34155,10 +37089,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He goes to school.",
-        "We don't go to school.",
-        "Lan don't brush her teeth.",
-        "We don't get up at six."
+        "He brushes his teeth.",
+        "I watch TV.",
+        "We don't eat breakfast.",
+        "Lan don't brush her teeth."
       ],
       "answer": "Lan don't brush her teeth.",
       "explanation": "Lan đi với doesn't, không đi với don't."
@@ -34176,9 +37110,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She brushes her teeth.",
-        "I watch TV.",
-        "He doesn't get up at six.",
+        "She doesn't get up at six.",
+        "I help mother.",
+        "I read a book.",
         "Lan doesn't brushes her teeth."
       ],
       "answer": "Lan doesn't brushes her teeth.",
@@ -34197,10 +37131,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He doesn't watch TV.",
+        "I cook dinner.",
+        "I play football.",
         "She watch TV.",
-        "We don't brush our teeth.",
-        "He helps mother."
+        "He eats breakfast."
       ],
       "answer": "She watch TV.",
       "explanation": "She đi với động từ thêm -s (watches)."
@@ -34218,9 +37152,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't eat breakfast.",
-        "We don't get up at six.",
-        "You get up at six.",
+        "He doesn't brush his teeth.",
+        "They don't brush their teeth.",
+        "He doesn't watch TV.",
         "You watches TV."
       ],
       "answer": "You watches TV.",
@@ -34241,10 +37175,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "It is red.",
+        "The bag is red.",
         "The pen are red.",
-        "It is blue.",
-        "The book is green.",
-        "It is pink."
+        "This is a ball."
       ],
       "answer": "The pen are red.",
       "explanation": "The pen (số ít) đi với is."
@@ -34262,10 +37196,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "The bags are blue.",
+        "This is a book.",
         "The pens is red.",
-        "The bags are green.",
-        "The cats are green.",
-        "It is pink."
+        "The chair is red."
       ],
       "answer": "The pens is red.",
       "explanation": "The pens (số nhiều) đi với are."
@@ -34283,10 +37217,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is an pen.",
-        "This is a cake.",
-        "The book is red.",
-        "This is a chair."
+        "The book is yellow.",
+        "This is a dog.",
+        "The pens are blue.",
+        "This is an pen."
       ],
       "answer": "This is an pen.",
       "explanation": "a đi với từ bắt đầu bằng phụ âm (a pen)."
@@ -34304,10 +37238,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "It is orange.",
-        "It is blue.",
-        "This is a dog.",
-        "It are red."
+        "The cats are green.",
+        "It are red.",
+        "The pens are green.",
+        "This is a ball."
       ],
       "answer": "It are red.",
       "explanation": "It đi với is."
@@ -34325,10 +37259,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The books are yellow.",
-        "The book is green.",
-        "The cats are red.",
-        "The pen are blue."
+        "This is a bag.",
+        "The bags are green.",
+        "The pen are blue.",
+        "The book is blue."
       ],
       "answer": "The pen are blue.",
       "explanation": "The pen (số ít) đi với is."
@@ -34346,10 +37280,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The pens is blue.",
         "The cats are yellow.",
-        "It is orange.",
-        "The dogs are blue."
+        "It is white.",
+        "The pens is blue.",
+        "The pens are green."
       ],
       "answer": "The pens is blue.",
       "explanation": "The pens (số nhiều) đi với are."
@@ -34367,9 +37301,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The pens are red.",
-        "The books are green.",
-        "The bag is yellow.",
+        "This is a bag.",
+        "The dog is blue.",
+        "It is pink.",
         "This is an book."
       ],
       "answer": "This is an book.",
@@ -34388,10 +37322,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The books are red.",
-        "The books are blue.",
-        "This is a bag.",
-        "It are blue."
+        "The cat is yellow.",
+        "The bags are blue.",
+        "It are blue.",
+        "The dog is red."
       ],
       "answer": "It are blue.",
       "explanation": "It đi với is."
@@ -34409,10 +37343,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The pen are green.",
-        "The pen is red.",
-        "The cat is blue.",
-        "The bag is blue."
+        "The bag is blue.",
+        "This is an orange.",
+        "The books are blue.",
+        "The pen are green."
       ],
       "answer": "The pen are green.",
       "explanation": "The pen (số ít) đi với is."
@@ -34431,9 +37365,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "The pens is green.",
-        "The dogs are yellow.",
-        "The book is blue.",
-        "The bag is red."
+        "The chair is red.",
+        "It is green.",
+        "The bags are yellow."
       ],
       "answer": "The pens is green.",
       "explanation": "The pens (số nhiều) đi với are."
@@ -34451,10 +37385,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The book is blue.",
-        "The bags are red.",
+        "The dog is green.",
         "This is an cat.",
-        "The book is yellow."
+        "The dog is blue.",
+        "The bag is green."
       ],
       "answer": "This is an cat.",
       "explanation": "a đi với từ bắt đầu bằng phụ âm (a cat)."
@@ -34472,10 +37406,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is a book.",
-        "It is yellow.",
-        "This is a cake.",
-        "It are green."
+        "The books are red.",
+        "It are green.",
+        "The pens are blue.",
+        "This is a dog."
       ],
       "answer": "It are green.",
       "explanation": "It đi với is."
@@ -34493,10 +37427,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The cats are red.",
+        "This is a pen.",
         "The pen are yellow.",
-        "The books are yellow.",
-        "This is a dog."
+        "The cat is green.",
+        "This is a cat."
       ],
       "answer": "The pen are yellow.",
       "explanation": "The pen (số ít) đi với is."
@@ -34514,10 +37448,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The pen is blue.",
+        "This is a dog.",
         "The book is blue.",
-        "The books are red.",
-        "The pens is yellow."
+        "The pens is yellow.",
+        "It is red."
       ],
       "answer": "The pens is yellow.",
       "explanation": "The pens (số nhiều) đi với are."
@@ -34535,10 +37469,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The dogs are red.",
-        "The bag is yellow.",
-        "This is an dog.",
-        "The bag is red."
+        "The pens are blue.",
+        "The book is blue.",
+        "The pen is green.",
+        "This is an dog."
       ],
       "answer": "This is an dog.",
       "explanation": "a đi với từ bắt đầu bằng phụ âm (a dog)."
@@ -34556,10 +37490,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "It are yellow.",
-        "The pen is blue.",
-        "The dog is red.",
-        "The cats are red."
+        "The pens are blue.",
+        "The bag is green.",
+        "The dog is yellow.",
+        "It are yellow."
       ],
       "answer": "It are yellow.",
       "explanation": "It đi với is."
@@ -34577,10 +37511,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The cats are yellow.",
-        "The books are green.",
         "The book are red.",
-        "The dog is blue."
+        "The bags are yellow.",
+        "This is a chair.",
+        "The pens are yellow."
       ],
       "answer": "The book are red.",
       "explanation": "The book (số ít) đi với is."
@@ -34598,9 +37532,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is a pen.",
-        "The dogs are red.",
-        "The cat is red.",
+        "The pens are green.",
+        "This is a chair.",
+        "It is green.",
         "The books is red."
       ],
       "answer": "The books is red.",
@@ -34619,10 +37553,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "It is blue.",
-        "The books are green.",
+        "The pens are green.",
         "This is an bag.",
-        "The chair is red."
+        "The books are blue.",
+        "The pen is red."
       ],
       "answer": "This is an bag.",
       "explanation": "a đi với từ bắt đầu bằng phụ âm (a bag)."
@@ -34640,10 +37574,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is a book.",
-        "The pen is red.",
-        "The dogs are blue.",
-        "It are black."
+        "The pens are red.",
+        "It are black.",
+        "The dog is green.",
+        "The bags are yellow."
       ],
       "answer": "It are black.",
       "explanation": "It đi với is."
@@ -34661,10 +37595,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The pens are blue.",
+        "The cat is red.",
+        "The bags are blue.",
         "The book are blue.",
-        "The cat is yellow.",
-        "It is white."
+        "The books are blue."
       ],
       "answer": "The book are blue.",
       "explanation": "The book (số ít) đi với is."
@@ -34682,10 +37616,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The cat is yellow.",
-        "The dogs are yellow.",
-        "The books is blue.",
-        "The bag is blue."
+        "The books are red.",
+        "The pen is yellow.",
+        "The books are yellow.",
+        "The books is blue."
       ],
       "answer": "The books is blue.",
       "explanation": "The books (số nhiều) đi với are."
@@ -34703,10 +37637,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "It is green.",
         "This is an chair.",
-        "The pens are blue.",
-        "The pens are yellow."
+        "The dog is green.",
+        "The cats are yellow.",
+        "The books are green."
       ],
       "answer": "This is an chair.",
       "explanation": "a đi với từ bắt đầu bằng phụ âm (a chair)."
@@ -34724,10 +37658,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The cats are green.",
-        "The book is blue.",
         "It are white.",
-        "This is a book."
+        "The cats are green.",
+        "The dog is red.",
+        "This is a cat."
       ],
       "answer": "It are white.",
       "explanation": "It đi với is."
@@ -34745,9 +37679,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The pen is red.",
-        "This is a cat.",
-        "The book is red.",
+        "This is an egg.",
+        "It is orange.",
+        "The cat is yellow.",
         "The book are green."
       ],
       "answer": "The book are green.",
@@ -34766,10 +37700,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is an apple.",
-        "The books are yellow.",
+        "The pen is green.",
         "The books is green.",
-        "This is a pen."
+        "The dogs are green.",
+        "The bag is yellow."
       ],
       "answer": "The books is green.",
       "explanation": "The books (số nhiều) đi với are."
@@ -34787,8 +37721,8 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The book is yellow.",
-        "The bag is red.",
+        "The pens are red.",
+        "It is pink.",
         "This is an cake.",
         "The dog is red."
       ],
@@ -34808,10 +37742,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The book is red.",
-        "The dog is blue.",
-        "This is an apple.",
-        "It are pink."
+        "It are pink.",
+        "The cat is red.",
+        "The bags are yellow.",
+        "The pen is blue."
       ],
       "answer": "It are pink.",
       "explanation": "It đi với is."
@@ -34829,10 +37763,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The bag is yellow.",
+        "The dog is red.",
         "The book are yellow.",
-        "The cats are green.",
-        "It is green."
+        "This is an apple.",
+        "It is blue."
       ],
       "answer": "The book are yellow.",
       "explanation": "The book (số ít) đi với is."
@@ -34850,10 +37784,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The cat is red.",
         "The books is yellow.",
-        "The dog is yellow.",
-        "This is a pen."
+        "The pens are yellow.",
+        "The chair is red.",
+        "The dogs are blue."
       ],
       "answer": "The books is yellow.",
       "explanation": "The books (số nhiều) đi với are."
@@ -34871,10 +37805,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The bags are green.",
-        "This is a cat.",
+        "The cat is green.",
+        "It is yellow.",
         "This is an ball.",
-        "The books are yellow."
+        "It is green."
       ],
       "answer": "This is an ball.",
       "explanation": "a đi với từ bắt đầu bằng phụ âm (a ball)."
@@ -34892,10 +37826,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The books are red.",
-        "The pen is red.",
         "It are orange.",
-        "The cats are green."
+        "The pens are green.",
+        "The dogs are green.",
+        "The pen is red."
       ],
       "answer": "It are orange.",
       "explanation": "It đi với is."
@@ -34913,10 +37847,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The bag is yellow.",
-        "It is green.",
-        "The bags are blue.",
-        "The cat are red."
+        "The books are blue.",
+        "The cat are red.",
+        "The pens are blue.",
+        "This is a book."
       ],
       "answer": "The cat are red.",
       "explanation": "The cat (số ít) đi với is."
@@ -34934,10 +37868,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is a book.",
+        "The cats are green.",
+        "The pens are blue.",
         "The cats is red.",
-        "The dog is red.",
-        "This is a cake."
+        "The pens are red."
       ],
       "answer": "The cats is red.",
       "explanation": "The cats (số nhiều) đi với are."
@@ -34955,10 +37889,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The pen is blue.",
-        "This is a book.",
+        "The books are red.",
+        "It is green.",
         "This is a apple.",
-        "The bags are blue."
+        "The cats are yellow."
       ],
       "answer": "This is a apple.",
       "explanation": "an đi với từ bắt đầu bằng nguyên âm (an apple)."
@@ -34976,10 +37910,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The book is red.",
-        "The bags are blue.",
-        "The bag is green.",
-        "The cat are blue."
+        "The cat are blue.",
+        "The dog is yellow.",
+        "The pen is blue.",
+        "The bag is blue."
       ],
       "answer": "The cat are blue.",
       "explanation": "The cat (số ít) đi với is."
@@ -34997,10 +37931,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The dogs are yellow.",
         "The cats is blue.",
-        "The pen is red.",
-        "The dog is yellow."
+        "The dog is blue.",
+        "The cat is blue.",
+        "The pen is red."
       ],
       "answer": "The cats is blue.",
       "explanation": "The cats (số nhiều) đi với are."
@@ -35019,9 +37953,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "This is a orange.",
-        "The chair is red.",
-        "The cat is red.",
-        "The dog is red."
+        "The cats are green.",
+        "This is a cat.",
+        "The bag is red."
       ],
       "answer": "This is a orange.",
       "explanation": "an đi với từ bắt đầu bằng nguyên âm (an orange)."
@@ -35040,9 +37974,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "The cat are green.",
-        "The books are yellow.",
-        "This is an egg.",
-        "The dog is blue."
+        "The book is blue.",
+        "It is green.",
+        "The pen is green."
       ],
       "answer": "The cat are green.",
       "explanation": "The cat (số ít) đi với is."
@@ -35060,10 +37994,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The dog is green.",
+        "The dog is yellow.",
         "The cats is green.",
-        "This is a pen.",
-        "It is orange."
+        "The pens are yellow.",
+        "The books are blue."
       ],
       "answer": "The cats is green.",
       "explanation": "The cats (số nhiều) đi với are."
@@ -35081,10 +38015,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The pens are green.",
-        "The book is yellow.",
         "This is a egg.",
-        "The books are yellow."
+        "The dogs are green.",
+        "It is green.",
+        "The pens are green."
       ],
       "answer": "This is a egg.",
       "explanation": "an đi với từ bắt đầu bằng nguyên âm (an egg)."
@@ -35102,9 +38036,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The dogs are red.",
-        "This is a ball.",
-        "The book is green.",
+        "It is green.",
+        "The pens are green.",
+        "This is a chair.",
         "The cat are yellow."
       ],
       "answer": "The cat are yellow.",
@@ -35123,10 +38057,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The books are red.",
+        "The cat is yellow.",
         "The cats is yellow.",
-        "The pens are green.",
-        "The cat is red."
+        "The dog is blue.",
+        "The chair is red."
       ],
       "answer": "The cats is yellow.",
       "explanation": "The cats (số nhiều) đi với are."
@@ -35144,10 +38078,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The pen is blue.",
-        "The pen is green.",
-        "The pens are yellow.",
-        "The dog are red."
+        "The pen is yellow.",
+        "The dog are red.",
+        "This is a cake.",
+        "The cats are red."
       ],
       "answer": "The dog are red.",
       "explanation": "The dog (số ít) đi với is."
@@ -35165,10 +38099,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is a ball.",
-        "The cat is green.",
-        "The dog is green.",
-        "The dogs is red."
+        "This is a cat.",
+        "The books are green.",
+        "The dogs is red.",
+        "The books are red."
       ],
       "answer": "The dogs is red.",
       "explanation": "The dogs (số nhiều) đi với are."
@@ -35186,10 +38120,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is a dog.",
-        "It is black.",
+        "This is a ball.",
+        "The books are yellow.",
         "The dog are blue.",
-        "It is blue."
+        "The book is green."
       ],
       "answer": "The dog are blue.",
       "explanation": "The dog (số ít) đi với is."
@@ -35207,10 +38141,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "It is white.",
-        "The books are yellow.",
+        "The books are green.",
+        "It is black.",
         "The dogs is blue.",
-        "It is blue."
+        "The books are yellow."
       ],
       "answer": "The dogs is blue.",
       "explanation": "The dogs (số nhiều) đi với are."
@@ -35228,10 +38162,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "It is red.",
+        "The pen is blue.",
         "The dog are green.",
         "This is a book.",
-        "The cat is red."
+        "The cat is green."
       ],
       "answer": "The dog are green.",
       "explanation": "The dog (số ít) đi với is."
@@ -35249,10 +38183,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "It is yellow.",
-        "The bag is blue.",
-        "The dogs is green.",
-        "This is a book."
+        "The cat is green.",
+        "It is pink.",
+        "This is an egg.",
+        "The dogs is green."
       ],
       "answer": "The dogs is green.",
       "explanation": "The dogs (số nhiều) đi với are."
@@ -35270,10 +38204,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "The cat is red.",
         "The dog are yellow.",
-        "The books are blue.",
-        "The chair is red.",
-        "The bags are yellow."
+        "It is white.",
+        "This is a pen."
       ],
       "answer": "The dog are yellow.",
       "explanation": "The dog (số ít) đi với is."
@@ -35291,10 +38225,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The pens are blue.",
-        "The cats are yellow.",
-        "The cat is blue.",
-        "The dogs is yellow."
+        "The pen is red.",
+        "The bag is green.",
+        "The dogs is yellow.",
+        "This is an egg."
       ],
       "answer": "The dogs is yellow.",
       "explanation": "The dogs (số nhiều) đi với are."
@@ -35312,10 +38246,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "This is a book.",
+        "The books are blue.",
         "The bag are red.",
-        "The pen is yellow.",
-        "The books are yellow.",
-        "The book is green."
+        "It is green."
       ],
       "answer": "The bag are red.",
       "explanation": "The bag (số ít) đi với is."
@@ -35333,10 +38267,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The bags is red.",
-        "This is a cake.",
-        "The cat is green.",
-        "The cats are green."
+        "The chair is red.",
+        "The books are green.",
+        "This is a cat.",
+        "The bags is red."
       ],
       "answer": "The bags is red.",
       "explanation": "The bags (số nhiều) đi với are."
@@ -35354,10 +38288,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "This is a dog.",
         "It is white.",
-        "The pen is red.",
-        "The bag are blue."
+        "The bag are blue.",
+        "The books are yellow.",
+        "It is orange."
       ],
       "answer": "The bag are blue.",
       "explanation": "The bag (số ít) đi với is."
@@ -35375,10 +38309,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "This is a bag.",
         "The bags is blue.",
-        "The pens are red.",
-        "This is an apple.",
-        "The bags are green."
+        "The cat is green.",
+        "The pens are green."
       ],
       "answer": "The bags is blue.",
       "explanation": "The bags (số nhiều) đi với are."
@@ -35396,10 +38330,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The bag are green.",
-        "The bag is blue.",
-        "The dogs are blue.",
-        "This is a bag."
+        "The books are blue.",
+        "The dog is blue.",
+        "This is a dog.",
+        "The bag are green."
       ],
       "answer": "The bag are green.",
       "explanation": "The bag (số ít) đi với is."
@@ -35417,10 +38351,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "It is yellow.",
-        "The bag is red.",
-        "The books are yellow.",
-        "The bags is green."
+        "The cats are yellow.",
+        "The bags is green.",
+        "It is red.",
+        "The dog is red."
       ],
       "answer": "The bags is green.",
       "explanation": "The bags (số nhiều) đi với are."
@@ -35438,10 +38372,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The cats are green.",
+        "The dog is blue.",
+        "The bags are red.",
         "The bag are yellow.",
-        "The bag is red.",
-        "The dogs are blue."
+        "This is an egg."
       ],
       "answer": "The bag are yellow.",
       "explanation": "The bag (số ít) đi với is."
@@ -35459,10 +38393,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The dog is green.",
-        "This is a chair.",
-        "The bags is yellow.",
-        "It is red."
+        "The bags are green.",
+        "The cat is yellow.",
+        "The pens are blue.",
+        "The bags is yellow."
       ],
       "answer": "The bags is yellow.",
       "explanation": "The bags (số nhiều) đi với are."
@@ -35480,10 +38414,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "The cats are red.",
-        "The bags are green.",
-        "This is a chair.",
-        "The chair are red."
+        "The chair are red.",
+        "This is an apple.",
+        "The pen is yellow.",
+        "The pens are green."
       ],
       "answer": "The chair are red.",
       "explanation": "The chair (số ít) đi với is."
@@ -35503,10 +38437,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He wants bananas.",
+        "He doesn't like apples.",
         "I likes apples.",
-        "Lan wants rice.",
-        "You like bananas."
+        "He wants bananas.",
+        "He wants fish."
       ],
       "answer": "I likes apples.",
       "explanation": "I đi với like, không thêm -s."
@@ -35524,10 +38458,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He doesn't like bananas.",
+        "She wants rice.",
         "He don't like apples.",
-        "Lan doesn't like milk.",
-        "I like bananas."
+        "She doesn't like rice.",
+        "He wants apples."
       ],
       "answer": "He don't like apples.",
       "explanation": "He đi với doesn't."
@@ -35545,10 +38479,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "You like rice.",
+        "He doesn't like apples.",
         "He want apples.",
-        "Lan doesn't like bananas.",
-        "She wants apples."
+        "Lan wants bananas.",
+        "Lan wants fish."
       ],
       "answer": "He want apples.",
       "explanation": "He đi với wants (thêm -s)."
@@ -35566,9 +38500,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Minh wants bananas.",
-        "They like bananas.",
-        "She doesn't like apples.",
+        "Lan wants fish.",
+        "We like apples.",
+        "He wants apples.",
         "I likes bananas."
       ],
       "answer": "I likes bananas.",
@@ -35587,10 +38521,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He don't like bananas.",
-        "I like apples.",
-        "He doesn't like rice.",
-        "They like bananas."
+        "She wants rice.",
+        "Lan wants rice.",
+        "I like milk.",
+        "He don't like bananas."
       ],
       "answer": "He don't like bananas.",
       "explanation": "He đi với doesn't."
@@ -35608,10 +38542,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He wants fish.",
+        "Lan wants fish.",
         "He want bananas.",
-        "She doesn't like apples.",
-        "They like fish."
+        "Lan wants bananas.",
+        "You like apples."
       ],
       "answer": "He want bananas.",
       "explanation": "He đi với wants (thêm -s)."
@@ -35629,10 +38563,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I like rice.",
-        "He wants milk.",
-        "They like apples.",
-        "I likes milk."
+        "You like milk.",
+        "Lan wants rice.",
+        "I likes milk.",
+        "We like milk."
       ],
       "answer": "I likes milk.",
       "explanation": "I đi với like, không thêm -s."
@@ -35650,10 +38584,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She wants bananas.",
-        "I like rice.",
-        "I like fish.",
-        "He don't like milk."
+        "You like apples.",
+        "He don't like milk.",
+        "You like bananas.",
+        "Minh wants bananas."
       ],
       "answer": "He don't like milk.",
       "explanation": "He đi với doesn't."
@@ -35671,10 +38605,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan wants bananas.",
-        "He want milk.",
-        "He wants fish.",
-        "He doesn't like milk."
+        "Minh wants milk.",
+        "I like milk.",
+        "Minh wants bananas.",
+        "He want milk."
       ],
       "answer": "He want milk.",
       "explanation": "He đi với wants (thêm -s)."
@@ -35692,10 +38626,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He wants rice.",
-        "She wants milk.",
-        "She wants fish.",
-        "I likes rice."
+        "I likes rice.",
+        "I like fish.",
+        "Lan doesn't like milk.",
+        "You like rice."
       ],
       "answer": "I likes rice.",
       "explanation": "I đi với like, không thêm -s."
@@ -35713,10 +38647,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We like apples.",
-        "Lan doesn't like apples.",
-        "He doesn't like apples.",
-        "He don't like rice."
+        "He wants bananas.",
+        "He don't like rice.",
+        "She doesn't like milk.",
+        "She wants apples."
       ],
       "answer": "He don't like rice.",
       "explanation": "He đi với doesn't."
@@ -35734,10 +38668,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She wants rice.",
-        "He want rice.",
-        "Minh wants milk.",
-        "He wants milk."
+        "He doesn't like apples.",
+        "They like fish.",
+        "Lan doesn't like bananas.",
+        "He want rice."
       ],
       "answer": "He want rice.",
       "explanation": "He đi với wants (thêm -s)."
@@ -35755,10 +38689,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We like rice.",
         "I likes fish.",
-        "Lan wants bananas.",
-        "He wants bananas."
+        "He doesn't like rice.",
+        "I like apples.",
+        "She wants bananas."
       ],
       "answer": "I likes fish.",
       "explanation": "I đi với like, không thêm -s."
@@ -35776,10 +38710,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He doesn't like apples.",
+        "Minh wants apples.",
         "She don't like apples.",
-        "Minh wants bananas.",
-        "He wants fish."
+        "We like apples.",
+        "Lan wants fish."
       ],
       "answer": "She don't like apples.",
       "explanation": "She đi với doesn't."
@@ -35798,9 +38732,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "He want fish.",
-        "He doesn't like milk.",
-        "Lan wants rice.",
-        "Lan wants apples."
+        "You like rice.",
+        "Minh doesn't like apples.",
+        "She doesn't like milk."
       ],
       "answer": "He want fish.",
       "explanation": "He đi với wants (thêm -s)."
@@ -35818,10 +38752,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "You likes apples.",
-        "I like bananas.",
+        "Lan doesn't like rice.",
         "We like apples.",
-        "They like rice."
+        "They like bananas.",
+        "You likes apples."
       ],
       "answer": "You likes apples.",
       "explanation": "You đi với like, không thêm -s."
@@ -35839,10 +38773,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We like rice.",
-        "He wants bananas.",
-        "You like rice.",
-        "She don't like bananas."
+        "You like apples.",
+        "She don't like bananas.",
+        "He wants rice.",
+        "I like rice."
       ],
       "answer": "She don't like bananas.",
       "explanation": "She đi với doesn't."
@@ -35861,9 +38795,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "She want apples.",
-        "We like rice.",
-        "She wants fish.",
-        "They like apples."
+        "Lan wants bananas.",
+        "Minh doesn't like rice.",
+        "She wants milk."
       ],
       "answer": "She want apples.",
       "explanation": "She đi với wants (thêm -s)."
@@ -35881,10 +38815,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She wants bananas.",
-        "Lan wants fish.",
-        "She doesn't like apples.",
-        "You likes bananas."
+        "She doesn't like bananas.",
+        "You likes bananas.",
+        "Minh wants fish.",
+        "We like apples."
       ],
       "answer": "You likes bananas.",
       "explanation": "You đi với like, không thêm -s."
@@ -35902,9 +38836,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan wants rice.",
-        "You like bananas.",
-        "She wants bananas.",
+        "Minh doesn't like bananas.",
+        "We like apples.",
+        "Minh doesn't like milk.",
         "She don't like milk."
       ],
       "answer": "She don't like milk.",
@@ -35923,9 +38857,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We like milk.",
-        "They like rice.",
-        "I like milk.",
+        "She wants apples.",
+        "I like apples.",
+        "You like milk.",
         "She want bananas."
       ],
       "answer": "She want bananas.",
@@ -35944,10 +38878,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We like rice.",
-        "He wants apples.",
-        "She wants apples.",
-        "You likes milk."
+        "Lan wants rice.",
+        "You likes milk.",
+        "They like apples.",
+        "They like milk."
       ],
       "answer": "You likes milk.",
       "explanation": "You đi với like, không thêm -s."
@@ -35965,10 +38899,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "You like milk.",
-        "He doesn't like milk.",
-        "You like rice.",
-        "She don't like rice."
+        "We like milk.",
+        "He wants milk.",
+        "She don't like rice.",
+        "Lan doesn't like milk."
       ],
       "answer": "She don't like rice.",
       "explanation": "She đi với doesn't."
@@ -35986,10 +38920,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She wants rice.",
+        "He wants fish.",
         "She want milk.",
-        "They like bananas.",
-        "I like rice."
+        "They like rice.",
+        "Lan doesn't like rice."
       ],
       "answer": "She want milk.",
       "explanation": "She đi với wants (thêm -s)."
@@ -36007,10 +38941,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "You like fish.",
-        "Minh doesn't like milk.",
-        "They like bananas.",
-        "You likes rice."
+        "She doesn't like milk.",
+        "She wants bananas.",
+        "You likes rice.",
+        "He doesn't like milk."
       ],
       "answer": "You likes rice.",
       "explanation": "You đi với like, không thêm -s."
@@ -36028,10 +38962,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I like fish.",
+        "You like milk.",
+        "Lan don't like apples.",
         "She wants apples.",
-        "I like apples.",
-        "Lan don't like apples."
+        "She wants rice."
       ],
       "answer": "Lan don't like apples.",
       "explanation": "Lan đi với doesn't."
@@ -36049,10 +38983,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He wants fish.",
+        "Lan doesn't like apples.",
         "She want rice.",
-        "She wants fish.",
-        "He wants milk."
+        "We like rice.",
+        "He doesn't like rice."
       ],
       "answer": "She want rice.",
       "explanation": "She đi với wants (thêm -s)."
@@ -36070,10 +39004,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "We like rice.",
+        "They like apples.",
         "You likes fish.",
-        "She wants apples.",
-        "She doesn't like bananas.",
-        "They like milk."
+        "Minh doesn't like milk."
       ],
       "answer": "You likes fish.",
       "explanation": "You đi với like, không thêm -s."
@@ -36091,10 +39025,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We like apples.",
-        "She wants apples.",
-        "You like apples.",
-        "Lan don't like bananas."
+        "She wants milk.",
+        "He wants apples.",
+        "Lan don't like bananas.",
+        "Minh wants apples."
       ],
       "answer": "Lan don't like bananas.",
       "explanation": "Lan đi với doesn't."
@@ -36113,9 +39047,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "She want fish.",
-        "I like fish.",
-        "He wants bananas.",
-        "Minh wants rice."
+        "You like fish.",
+        "He wants milk.",
+        "He wants apples."
       ],
       "answer": "She want fish.",
       "explanation": "She đi với wants (thêm -s)."
@@ -36133,10 +39067,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Minh doesn't like milk.",
-        "We like milk.",
-        "We likes apples.",
-        "They like milk."
+        "You like fish.",
+        "Minh wants bananas.",
+        "She wants rice.",
+        "We likes apples."
       ],
       "answer": "We likes apples.",
       "explanation": "We đi với like, không thêm -s."
@@ -36154,10 +39088,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I like fish.",
         "Lan don't like milk.",
-        "You like fish.",
-        "They like bananas.",
-        "Lan doesn't like apples."
+        "Minh doesn't like milk.",
+        "Minh doesn't like bananas."
       ],
       "answer": "Lan don't like milk.",
       "explanation": "Lan đi với doesn't."
@@ -36175,10 +39109,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I like milk.",
-        "I like rice.",
-        "They like bananas.",
-        "Lan want apples."
+        "Lan want apples.",
+        "Minh wants apples.",
+        "He wants bananas.",
+        "He wants apples."
       ],
       "answer": "Lan want apples.",
       "explanation": "Lan đi với wants (thêm -s)."
@@ -36196,10 +39130,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He doesn't like bananas.",
-        "We likes bananas.",
-        "Lan wants bananas.",
-        "They like apples."
+        "She wants rice.",
+        "Lan doesn't like rice.",
+        "She wants apples.",
+        "We likes bananas."
       ],
       "answer": "We likes bananas.",
       "explanation": "We đi với like, không thêm -s."
@@ -36217,10 +39151,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't like apples.",
-        "She doesn't like rice.",
+        "Minh doesn't like apples.",
+        "Minh wants apples.",
         "Lan don't like rice.",
-        "He wants milk."
+        "They like rice."
       ],
       "answer": "Lan don't like rice.",
       "explanation": "Lan đi với doesn't."
@@ -36238,10 +39172,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We like bananas.",
-        "She wants fish.",
-        "Lan want bananas.",
-        "You like bananas."
+        "We like fish.",
+        "He wants bananas.",
+        "Lan wants rice.",
+        "Lan want bananas."
       ],
       "answer": "Lan want bananas.",
       "explanation": "Lan đi với wants (thêm -s)."
@@ -36259,10 +39193,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan wants apples.",
-        "Lan wants milk.",
+        "He doesn't like bananas.",
+        "She doesn't like apples.",
         "We likes milk.",
-        "I like rice."
+        "Lan doesn't like milk."
       ],
       "answer": "We likes milk.",
       "explanation": "We đi với like, không thêm -s."
@@ -36280,10 +39214,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't like milk.",
-        "Lan wants fish.",
-        "Minh don't like apples.",
-        "She doesn't like rice."
+        "Lan doesn't like bananas.",
+        "Minh wants milk.",
+        "He doesn't like rice.",
+        "Minh don't like apples."
       ],
       "answer": "Minh don't like apples.",
       "explanation": "Minh đi với doesn't."
@@ -36301,10 +39235,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan wants rice.",
-        "Lan doesn't like rice.",
-        "He wants bananas.",
-        "Lan want milk."
+        "We like bananas.",
+        "We like fish.",
+        "Lan want milk.",
+        "Lan doesn't like apples."
       ],
       "answer": "Lan want milk.",
       "explanation": "Lan đi với wants (thêm -s)."
@@ -36322,10 +39256,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Minh doesn't like rice.",
-        "Minh doesn't like apples.",
-        "They like fish.",
-        "We likes rice."
+        "We likes rice.",
+        "She doesn't like rice.",
+        "We like fish.",
+        "Lan doesn't like bananas."
       ],
       "answer": "We likes rice.",
       "explanation": "We đi với like, không thêm -s."
@@ -36343,9 +39277,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan wants bananas.",
-        "She doesn't like rice.",
-        "She doesn't like milk.",
+        "Minh doesn't like rice.",
+        "He doesn't like rice.",
+        "Lan doesn't like apples.",
         "Minh don't like bananas."
       ],
       "answer": "Minh don't like bananas.",
@@ -36364,10 +39298,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She wants apples.",
-        "Lan wants milk.",
+        "Minh wants milk.",
+        "He doesn't like rice.",
         "Lan want rice.",
-        "They like rice."
+        "He wants apples."
       ],
       "answer": "Lan want rice.",
       "explanation": "Lan đi với wants (thêm -s)."
@@ -36385,10 +39319,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "You like milk.",
-        "They like bananas.",
-        "He wants bananas.",
-        "We likes fish."
+        "She doesn't like bananas.",
+        "We likes fish.",
+        "He wants milk.",
+        "I like apples."
       ],
       "answer": "We likes fish.",
       "explanation": "We đi với like, không thêm -s."
@@ -36406,10 +39340,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Minh doesn't like apples.",
+        "He doesn't like milk.",
+        "They like fish.",
         "Minh don't like milk.",
-        "Minh wants bananas.",
-        "Lan wants apples."
+        "We like fish."
       ],
       "answer": "Minh don't like milk.",
       "explanation": "Minh đi với doesn't."
@@ -36427,10 +39361,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "You like fish.",
-        "Lan want fish.",
-        "We like fish.",
-        "Minh doesn't like apples."
+        "We like apples.",
+        "She wants apples.",
+        "We like milk.",
+        "Lan want fish."
       ],
       "answer": "Lan want fish.",
       "explanation": "Lan đi với wants (thêm -s)."
@@ -36448,10 +39382,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She wants milk.",
-        "She wants fish.",
-        "You like fish.",
-        "They likes apples."
+        "I like fish.",
+        "I like bananas.",
+        "They likes apples.",
+        "She doesn't like milk."
       ],
       "answer": "They likes apples.",
       "explanation": "They đi với like, không thêm -s."
@@ -36469,10 +39403,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We like bananas.",
         "Minh don't like rice.",
-        "You like milk.",
-        "Lan doesn't like milk."
+        "Minh doesn't like bananas.",
+        "I like rice.",
+        "Minh wants bananas."
       ],
       "answer": "Minh don't like rice.",
       "explanation": "Minh đi với doesn't."
@@ -36490,10 +39424,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We like apples.",
-        "Minh wants milk.",
         "Minh want apples.",
-        "I like milk."
+        "Lan doesn't like apples.",
+        "Lan wants rice.",
+        "She doesn't like rice."
       ],
       "answer": "Minh want apples.",
       "explanation": "Minh đi với wants (thêm -s)."
@@ -36511,10 +39445,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan wants apples.",
-        "Lan wants fish.",
-        "Lan doesn't like rice.",
-        "They likes bananas."
+        "I like rice.",
+        "They likes bananas.",
+        "I like bananas.",
+        "They like rice."
       ],
       "answer": "They likes bananas.",
       "explanation": "They đi với like, không thêm -s."
@@ -36532,10 +39466,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "Lan wants apples.",
         "He doesn't likes apples.",
-        "She doesn't like apples.",
-        "He wants fish.",
-        "He wants apples."
+        "We like bananas.",
+        "Lan doesn't like rice."
       ],
       "answer": "He doesn't likes apples.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (like)."
@@ -36553,10 +39487,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Minh doesn't like rice.",
-        "You like bananas.",
         "Minh want bananas.",
-        "You like milk."
+        "Minh wants milk.",
+        "She wants bananas.",
+        "You like rice."
       ],
       "answer": "Minh want bananas.",
       "explanation": "Minh đi với wants (thêm -s)."
@@ -36574,10 +39508,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He wants milk.",
-        "Lan doesn't like apples.",
         "They likes milk.",
-        "Minh wants rice."
+        "She wants rice.",
+        "They like rice.",
+        "Minh doesn't like bananas."
       ],
       "answer": "They likes milk.",
       "explanation": "They đi với like, không thêm -s."
@@ -36595,10 +39529,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't like bananas.",
         "He doesn't likes bananas.",
-        "They like milk.",
-        "She wants bananas."
+        "Lan wants apples.",
+        "They like bananas.",
+        "Minh doesn't like bananas."
       ],
       "answer": "He doesn't likes bananas.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (like)."
@@ -36616,10 +39550,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan wants fish.",
+        "We like bananas.",
+        "I like milk.",
         "Minh want milk.",
-        "She wants milk.",
-        "He wants fish."
+        "I like bananas."
       ],
       "answer": "Minh want milk.",
       "explanation": "Minh đi với wants (thêm -s)."
@@ -36637,10 +39571,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't like bananas.",
-        "He wants bananas.",
-        "They likes rice.",
-        "I like milk."
+        "Lan wants rice.",
+        "We like apples.",
+        "She wants apples.",
+        "They likes rice."
       ],
       "answer": "They likes rice.",
       "explanation": "They đi với like, không thêm -s."
@@ -36659,9 +39593,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "He doesn't likes milk.",
-        "You like fish.",
-        "You like apples.",
-        "Lan wants milk."
+        "Lan doesn't like bananas.",
+        "Minh doesn't like bananas.",
+        "They like apples."
       ],
       "answer": "He doesn't likes milk.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (like)."
@@ -36679,10 +39613,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We like apples.",
-        "You like milk.",
-        "He doesn't like milk.",
-        "Minh want rice."
+        "Minh wants apples.",
+        "Minh want rice.",
+        "They like bananas.",
+        "Lan wants rice."
       ],
       "answer": "Minh want rice.",
       "explanation": "Minh đi với wants (thêm -s)."
@@ -36700,9 +39634,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He doesn't like milk.",
-        "You like fish.",
-        "We like fish.",
+        "He wants fish.",
+        "She wants fish.",
+        "You like bananas.",
         "They likes fish."
       ],
       "answer": "They likes fish.",
@@ -36721,10 +39655,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She wants fish.",
-        "He wants rice.",
-        "He doesn't like bananas.",
-        "He doesn't likes rice."
+        "You like fish.",
+        "He wants bananas.",
+        "He doesn't likes rice.",
+        "Minh doesn't like bananas."
       ],
       "answer": "He doesn't likes rice.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (like)."
@@ -36742,10 +39676,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I like rice.",
-        "Minh want fish.",
-        "I like apples.",
-        "You like fish."
+        "Minh doesn't like apples.",
+        "Minh doesn't like milk.",
+        "Lan doesn't like apples.",
+        "Minh want fish."
       ],
       "answer": "Minh want fish.",
       "explanation": "Minh đi với wants (thêm -s)."
@@ -36765,10 +39699,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "Is He tired?",
+        "She isn't sad.",
         "I is happy.",
-        "Lan isn't sad.",
-        "I am not tired.",
-        "I am busy."
+        "I am late."
       ],
       "answer": "I is happy.",
       "explanation": "I đi với am."
@@ -36786,10 +39720,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She isn't busy.",
-        "Is She happy?",
+        "He isn't hungry.",
         "I is not happy.",
-        "Is He busy?"
+        "He is thirsty.",
+        "Lan isn't happy."
       ],
       "answer": "I is not happy.",
       "explanation": "I đi với am not."
@@ -36807,10 +39741,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He isn't busy.",
-        "Is I happy?",
-        "Is Minh happy?",
-        "I am sick."
+        "I am not busy.",
+        "Is Lan busy?",
+        "I am ready.",
+        "Is I happy?"
       ],
       "answer": "Is I happy?",
       "explanation": "Câu hỏi với I dùng Am I."
@@ -36828,10 +39762,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Is Minh busy?",
-        "I am not happy.",
-        "I am not sad.",
-        "I is sad."
+        "I is sad.",
+        "She isn't hungry.",
+        "I am thirsty.",
+        "Lan isn't happy."
       ],
       "answer": "I is sad.",
       "explanation": "I đi với am."
@@ -36849,10 +39783,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "She isn't busy.",
         "I is not sad.",
-        "He is ready.",
-        "He isn't thirsty.",
-        "I am not happy."
+        "She isn't hungry.",
+        "He is sick."
       ],
       "answer": "I is not sad.",
       "explanation": "I đi với am not."
@@ -36870,10 +39804,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Is She busy?",
-        "I am kind.",
         "I is tired.",
-        "I am not happy."
+        "Is Lan busy?",
+        "Is He happy?",
+        "I am not sad."
       ],
       "answer": "I is tired.",
       "explanation": "I đi với am."
@@ -36891,10 +39825,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She isn't thirsty.",
-        "Is Lan tired?",
-        "I am not busy.",
-        "I is not tired."
+        "I is not tired.",
+        "He is busy.",
+        "I am busy.",
+        "I am early."
       ],
       "answer": "I is not tired.",
       "explanation": "I đi với am not."
@@ -36912,10 +39846,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is hungry.",
-        "He isn't hungry.",
-        "She isn't tired.",
-        "I is busy."
+        "He isn't busy.",
+        "I is busy.",
+        "Is He busy?",
+        "Is She tired?"
       ],
       "answer": "I is busy.",
       "explanation": "I đi với am."
@@ -36933,10 +39867,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Is He tired?",
-        "He is thirsty.",
         "I is not busy.",
-        "Is Lan sad?"
+        "I am kind.",
+        "I am sick.",
+        "Is Minh busy?"
       ],
       "answer": "I is not busy.",
       "explanation": "I đi với am not."
@@ -36954,10 +39888,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am tired.",
-        "He is busy.",
-        "She isn't busy.",
-        "I is hungry."
+        "I is hungry.",
+        "She isn't hungry.",
+        "Is Lan busy?",
+        "I am not thirsty."
       ],
       "answer": "I is hungry.",
       "explanation": "I đi với am."
@@ -36975,10 +39909,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He isn't thirsty.",
+        "Is He happy?",
+        "Lan isn't happy.",
         "I is not hungry.",
-        "He isn't happy.",
-        "He is thirsty."
+        "I am not busy."
       ],
       "answer": "I is not hungry.",
       "explanation": "I đi với am not."
@@ -36996,10 +39930,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am hungry.",
-        "He is ready.",
-        "He isn't happy.",
-        "Are He happy?"
+        "I am not thirsty.",
+        "Are He happy?",
+        "Is Minh sad?",
+        "Is She sad?"
       ],
       "answer": "Are He happy?",
       "explanation": "He đi với is."
@@ -37017,10 +39951,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is sick.",
-        "I am sad.",
+        "Lan isn't sad.",
         "I is thirsty.",
-        "He isn't busy."
+        "He isn't busy.",
+        "Is She happy?"
       ],
       "answer": "I is thirsty.",
       "explanation": "I đi với am."
@@ -37038,10 +39972,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He is ready.",
+        "I am hungry.",
         "I is not thirsty.",
-        "Is He tired?",
-        "She isn't sad.",
-        "Is She happy?"
+        "Is Lan happy?"
       ],
       "answer": "I is not thirsty.",
       "explanation": "I đi với am not."
@@ -37059,10 +39993,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Is Minh tired?",
-        "I am thirsty.",
+        "I am tired.",
+        "He is sad.",
         "Are He sad?",
-        "She isn't busy."
+        "He is happy."
       ],
       "answer": "Are He sad?",
       "explanation": "He đi với is."
@@ -37080,10 +40014,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She isn't happy.",
-        "He isn't tired.",
         "I is sick.",
-        "Is He happy?"
+        "I am not sad.",
+        "Is He sad?",
+        "I am thirsty."
       ],
       "answer": "I is sick.",
       "explanation": "I đi với am."
@@ -37101,10 +40035,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He isn't sad.",
-        "He aren't happy.",
-        "Is He tired?",
-        "I am thirsty."
+        "I am happy.",
+        "Is Lan busy?",
+        "I am sick.",
+        "He aren't happy."
       ],
       "answer": "He aren't happy.",
       "explanation": "He đi với isn't."
@@ -37122,10 +40056,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She isn't thirsty.",
-        "He is tired.",
-        "Are He tired?",
-        "He isn't busy."
+        "I am not sad.",
+        "He is hungry.",
+        "Is She busy?",
+        "Are He tired?"
       ],
       "answer": "Are He tired?",
       "explanation": "He đi với is."
@@ -37143,10 +40077,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He isn't thirsty.",
-        "I is ready.",
-        "He isn't sad.",
-        "I am happy."
+        "I am not hungry.",
+        "He is sick.",
+        "He isn't happy.",
+        "I is ready."
       ],
       "answer": "I is ready.",
       "explanation": "I đi với am."
@@ -37164,10 +40098,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am hungry.",
-        "He is hungry.",
-        "I am kind.",
-        "He aren't sad."
+        "She isn't happy.",
+        "He aren't sad.",
+        "He isn't tired.",
+        "Is Lan busy?"
       ],
       "answer": "He aren't sad.",
       "explanation": "He đi với isn't."
@@ -37185,10 +40119,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Are He busy?",
-        "I am late.",
-        "She isn't busy.",
-        "Is Lan sad?"
+        "I am kind.",
+        "He is happy.",
+        "He is sick.",
+        "Are He busy?"
       ],
       "answer": "Are He busy?",
       "explanation": "He đi với is."
@@ -37206,10 +40140,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is ready.",
         "I is late.",
-        "I am busy.",
-        "I am sick."
+        "He isn't thirsty.",
+        "Is He sad?",
+        "Is Minh sad?"
       ],
       "answer": "I is late.",
       "explanation": "I đi với am."
@@ -37227,10 +40161,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He aren't tired.",
-        "Lan isn't happy.",
-        "He is hungry.",
-        "He is tired."
+        "I am thirsty.",
+        "Is Minh busy?",
+        "I am not sad.",
+        "He aren't tired."
       ],
       "answer": "He aren't tired.",
       "explanation": "He đi với isn't."
@@ -37248,10 +40182,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am not busy.",
-        "He is sick.",
-        "Is Minh tired?",
-        "Are She happy?"
+        "Are She happy?",
+        "He isn't hungry.",
+        "Am I happy?",
+        "I am not hungry."
       ],
       "answer": "Are She happy?",
       "explanation": "She đi với is."
@@ -37269,10 +40203,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "Is Minh tired?",
+        "She isn't sad.",
         "I is early.",
-        "I am not tired.",
-        "Is Lan sad?",
-        "He isn't busy."
+        "Is Minh happy?"
       ],
       "answer": "I is early.",
       "explanation": "I đi với am."
@@ -37290,10 +40224,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He isn't thirsty.",
-        "She isn't tired.",
+        "She isn't happy.",
+        "She isn't sad.",
         "He aren't busy.",
-        "Is Minh happy?"
+        "Is Minh tired?"
       ],
       "answer": "He aren't busy.",
       "explanation": "He đi với isn't."
@@ -37311,10 +40245,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Are She sad?",
-        "He is happy.",
+        "He isn't sad.",
+        "He isn't hungry.",
         "Is She happy?",
-        "He isn't busy."
+        "Are She sad?"
       ],
       "answer": "Are She sad?",
       "explanation": "She đi với is."
@@ -37332,10 +40266,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am kind.",
         "I is free.",
-        "Is Lan happy?",
-        "I am tired."
+        "I am not tired.",
+        "I am not thirsty.",
+        "I am ready."
       ],
       "answer": "I is free.",
       "explanation": "I đi với am."
@@ -37353,10 +40287,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I am not tired.",
         "He aren't hungry.",
-        "I am not busy.",
-        "I am not hungry.",
-        "Is Lan tired?"
+        "Is She happy?",
+        "I am not thirsty."
       ],
       "answer": "He aren't hungry.",
       "explanation": "He đi với isn't."
@@ -37374,10 +40308,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He isn't busy.",
-        "Are She tired?",
-        "She isn't thirsty.",
-        "Is Minh sad?"
+        "I am kind.",
+        "I am busy.",
+        "Is Minh sad?",
+        "Are She tired?"
       ],
       "answer": "Are She tired?",
       "explanation": "She đi với is."
@@ -37395,10 +40329,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She isn't busy.",
-        "Is He sad?",
         "I is kind.",
-        "He isn't sad."
+        "She isn't sad.",
+        "He is busy.",
+        "Is Minh tired?"
       ],
       "answer": "I is kind.",
       "explanation": "I đi với am."
@@ -37416,10 +40350,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Is Lan happy?",
+        "I am hungry.",
+        "Am I happy?",
         "He aren't thirsty.",
-        "He isn't sad.",
-        "Is He tired?"
+        "Is Minh happy?"
       ],
       "answer": "He aren't thirsty.",
       "explanation": "He đi với isn't."
@@ -37437,10 +40371,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am not hungry.",
+        "I am tired.",
         "Are She busy?",
-        "He is hungry.",
-        "He is sick."
+        "Is Minh tired?",
+        "He isn't tired."
       ],
       "answer": "Are She busy?",
       "explanation": "She đi với is."
@@ -37458,10 +40392,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am kind.",
-        "He isn't busy.",
+        "Is He sad?",
         "He are happy.",
-        "Lan isn't happy."
+        "I am not busy.",
+        "He isn't busy."
       ],
       "answer": "He are happy.",
       "explanation": "He đi với is."
@@ -37479,10 +40413,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He isn't tired.",
         "She aren't happy.",
-        "Is She busy?",
-        "She isn't tired.",
-        "I am hungry."
+        "Is She sad?",
+        "I am late."
       ],
       "answer": "She aren't happy.",
       "explanation": "She đi với isn't."
@@ -37500,10 +40434,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is hungry.",
+        "I am not tired.",
+        "He is ready.",
         "Are Lan happy?",
-        "I am not hungry.",
-        "He is busy."
+        "I am not thirsty."
       ],
       "answer": "Are Lan happy?",
       "explanation": "Lan đi với is."
@@ -37521,10 +40455,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "Is Minh tired?",
         "She isn't tired.",
-        "I am not sad.",
-        "Am I happy?",
-        "He are sad."
+        "He are sad.",
+        "I am not hungry."
       ],
       "answer": "He are sad.",
       "explanation": "He đi với is."
@@ -37542,10 +40476,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She isn't tired.",
-        "She aren't sad.",
-        "He isn't hungry.",
-        "He is tired."
+        "I am kind.",
+        "Is Lan tired?",
+        "I am not happy.",
+        "She aren't sad."
       ],
       "answer": "She aren't sad.",
       "explanation": "She đi với isn't."
@@ -37563,10 +40497,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She isn't tired.",
-        "I am sad.",
         "Are Lan sad?",
-        "He isn't tired."
+        "He isn't sad.",
+        "Is Minh busy?",
+        "I am busy."
       ],
       "answer": "Are Lan sad?",
       "explanation": "Lan đi với is."
@@ -37584,10 +40518,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He isn't sad.",
+        "He are tired.",
+        "Is She tired?",
         "I am free.",
-        "Is He busy?",
-        "He are tired."
+        "She isn't thirsty."
       ],
       "answer": "He are tired.",
       "explanation": "He đi với is."
@@ -37605,10 +40539,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Is She tired?",
-        "She aren't tired.",
-        "Is She busy?",
-        "Is Minh tired?"
+        "He is busy.",
+        "I am kind.",
+        "He is happy.",
+        "She aren't tired."
       ],
       "answer": "She aren't tired.",
       "explanation": "She đi với isn't."
@@ -37626,10 +40560,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Are Lan tired?",
-        "I am tired.",
-        "Is She happy?",
-        "He is tired."
+        "She isn't happy.",
+        "I am not happy.",
+        "Is Minh happy?",
+        "Are Lan tired?"
       ],
       "answer": "Are Lan tired?",
       "explanation": "Lan đi với is."
@@ -37647,10 +40581,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She isn't sad.",
-        "He are busy.",
-        "I am tired.",
-        "Lan isn't sad."
+        "I am not thirsty.",
+        "I am free.",
+        "I am happy.",
+        "He are busy."
       ],
       "answer": "He are busy.",
       "explanation": "He đi với is."
@@ -37668,10 +40602,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Am I happy?",
-        "I am not thirsty.",
         "She aren't busy.",
-        "She isn't hungry."
+        "I am thirsty.",
+        "He is sick.",
+        "I am hungry."
       ],
       "answer": "She aren't busy.",
       "explanation": "She đi với isn't."
@@ -37689,10 +40623,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He isn't busy.",
+        "He is tired.",
+        "I am not tired.",
         "Are Lan busy?",
-        "I am thirsty.",
-        "I am hungry."
+        "He isn't tired."
       ],
       "answer": "Are Lan busy?",
       "explanation": "Lan đi với is."
@@ -37710,10 +40644,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He is happy.",
+        "I am not happy.",
         "He are hungry.",
-        "I am not hungry.",
-        "Am I happy?",
-        "Is He happy?"
+        "Is She busy?"
       ],
       "answer": "He are hungry.",
       "explanation": "He đi với is."
@@ -37731,10 +40665,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "Lan isn't happy.",
+        "I am not hungry.",
         "She aren't hungry.",
-        "I am sick.",
-        "I am late.",
-        "I am kind."
+        "I am sick."
       ],
       "answer": "She aren't hungry.",
       "explanation": "She đi với isn't."
@@ -37752,10 +40686,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She isn't hungry.",
+        "Is He busy?",
         "Are Minh happy?",
-        "He isn't sad.",
-        "He is thirsty."
+        "He is tired.",
+        "I am not thirsty."
       ],
       "answer": "Are Minh happy?",
       "explanation": "Minh đi với is."
@@ -37773,10 +40707,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am thirsty.",
-        "I am not happy.",
-        "He isn't sad.",
-        "He are thirsty."
+        "I am tired.",
+        "He are thirsty.",
+        "Lan isn't sad.",
+        "I am not tired."
       ],
       "answer": "He are thirsty.",
       "explanation": "He đi với is."
@@ -37794,10 +40728,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Is Lan busy?",
-        "I am sick.",
-        "She isn't busy.",
-        "She aren't thirsty."
+        "He isn't tired.",
+        "She aren't thirsty.",
+        "I am kind.",
+        "I am hungry."
       ],
       "answer": "She aren't thirsty.",
       "explanation": "She đi với isn't."
@@ -37815,10 +40749,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am ready.",
-        "Is She sad?",
-        "She isn't hungry.",
-        "Are Minh sad?"
+        "Are Minh sad?",
+        "He isn't happy.",
+        "He isn't thirsty.",
+        "Lan isn't happy."
       ],
       "answer": "Are Minh sad?",
       "explanation": "Minh đi với is."
@@ -37836,10 +40770,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He is sad.",
+        "He is ready.",
         "He are sick.",
-        "I am not busy.",
-        "Is He tired?",
-        "Is Minh happy?"
+        "Is He busy?"
       ],
       "answer": "He are sick.",
       "explanation": "He đi với is."
@@ -37857,10 +40791,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am not busy.",
-        "I am not happy.",
+        "Lan aren't happy.",
+        "Is He happy?",
         "Lan isn't sad.",
-        "Lan aren't happy."
+        "Is Minh tired?"
       ],
       "answer": "Lan aren't happy.",
       "explanation": "Lan đi với isn't."
@@ -37878,10 +40812,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is ready.",
+        "Is He sad?",
+        "Am I happy?",
         "Are Minh tired?",
-        "Lan isn't happy.",
-        "Is He sad?"
+        "Is Minh sad?"
       ],
       "answer": "Are Minh tired?",
       "explanation": "Minh đi với is."
@@ -37899,10 +40833,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am free.",
+        "I am ready.",
         "He are ready.",
-        "She isn't happy.",
-        "Is Minh happy?"
+        "He isn't thirsty.",
+        "Is Lan busy?"
       ],
       "answer": "He are ready.",
       "explanation": "He đi với is."
@@ -37920,10 +40854,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She isn't sad.",
-        "Is She busy?",
+        "He is thirsty.",
         "Lan aren't sad.",
-        "He is thirsty."
+        "I am happy.",
+        "I am not busy."
       ],
       "answer": "Lan aren't sad.",
       "explanation": "Lan đi với isn't."
@@ -37941,10 +40875,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Are Minh busy?",
-        "I am free.",
+        "I am not hungry.",
         "Is She sad?",
-        "She isn't busy."
+        "Is She busy?",
+        "Are Minh busy?"
       ],
       "answer": "Are Minh busy?",
       "explanation": "Minh đi với is."
@@ -37964,10 +40898,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He doesn't watch TV.",
+        "Does He play football?",
         "He go to school.",
-        "I help mother.",
-        "I play football.",
-        "They don't go to school."
+        "I eat breakfast."
       ],
       "answer": "He go to school.",
       "explanation": "He đi với động từ thêm -s (goes)."
@@ -37985,10 +40919,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I eat breakfast.",
+        "Does He help mother?",
         "I goes to school.",
-        "Does She watch TV?",
-        "Does She play football?"
+        "I play football.",
+        "We don't read a book."
       ],
       "answer": "I goes to school.",
       "explanation": "I đi với động từ nguyên thể (go)."
@@ -38007,9 +40941,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "He don't go to school.",
-        "Does He eat breakfast?",
-        "He doesn't help mother.",
-        "She doesn't play football."
+        "They don't read a book.",
+        "Does She play football?",
+        "I cook dinner."
       ],
       "answer": "He don't go to school.",
       "explanation": "He đi với doesn't."
@@ -38027,10 +40961,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He studies English.",
-        "I help mother.",
-        "He doesn't goes to school.",
-        "Does She watch TV?"
+        "He goes to school.",
+        "He likes apples.",
+        "We don't read a book.",
+        "He doesn't goes to school."
       ],
       "answer": "He doesn't goes to school.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (go)."
@@ -38048,10 +40982,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Does He watch TV?",
-        "We doesn't go to school.",
-        "He studies English.",
-        "I go to school."
+        "We don't read a book.",
+        "She doesn't play football.",
+        "I study English.",
+        "We doesn't go to school."
       ],
       "answer": "We doesn't go to school.",
       "explanation": "We đi với don't."
@@ -38069,10 +41003,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He eats breakfast.",
+        "I watch TV.",
         "Does He goes to school?",
-        "He doesn't watch TV.",
-        "He doesn't read a book.",
-        "He eats breakfast."
+        "They don't play football."
       ],
       "answer": "Does He goes to school?",
       "explanation": "Sau Does, động từ giữ nguyên thể (go)."
@@ -38090,10 +41024,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He watch TV.",
-        "Does He read a book?",
-        "She doesn't watch TV.",
-        "They don't play football."
+        "I watch TV.",
+        "Does He help mother?",
+        "She doesn't play football.",
+        "He watch TV."
       ],
       "answer": "He watch TV.",
       "explanation": "He đi với động từ thêm -s (watches)."
@@ -38111,10 +41045,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Does He play football?",
+        "He plays football.",
+        "He watches TV.",
         "I watches TV.",
-        "We don't help mother.",
-        "Does He help mother?"
+        "He studies English."
       ],
       "answer": "I watches TV.",
       "explanation": "I đi với động từ nguyên thể (watch)."
@@ -38132,10 +41066,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I like apples.",
-        "We don't help mother.",
-        "He don't watch TV.",
-        "I go to school."
+        "He likes apples.",
+        "Does He go to school?",
+        "He doesn't help mother.",
+        "He don't watch TV."
       ],
       "answer": "He don't watch TV.",
       "explanation": "He đi với doesn't."
@@ -38153,10 +41087,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I like apples.",
+        "He doesn't help mother.",
         "He doesn't watches TV.",
-        "He doesn't eat breakfast.",
-        "I love music.",
-        "I play football."
+        "We don't help mother."
       ],
       "answer": "He doesn't watches TV.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (watch)."
@@ -38174,10 +41108,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "They don't read a book.",
         "We doesn't watch TV.",
-        "He doesn't go to school.",
-        "He watches TV."
+        "He doesn't play football.",
+        "He eats breakfast.",
+        "He likes apples."
       ],
       "answer": "We doesn't watch TV.",
       "explanation": "We đi với don't."
@@ -38195,10 +41129,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Does He watches TV?",
-        "He doesn't watch TV.",
-        "Does He read a book?",
-        "He reads a book."
+        "They don't go to school.",
+        "He doesn't help mother.",
+        "He studies English.",
+        "Does He watches TV?"
       ],
       "answer": "Does He watches TV?",
       "explanation": "Sau Does, động từ giữ nguyên thể (watch)."
@@ -38216,10 +41150,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't play football.",
-        "We don't read a book.",
         "He play football.",
-        "Does He watch TV?"
+        "She doesn't watch TV.",
+        "He reads a book.",
+        "He eats breakfast."
       ],
       "answer": "He play football.",
       "explanation": "He đi với động từ thêm -s (plays)."
@@ -38237,10 +41171,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He watches TV.",
+        "I love music.",
+        "She doesn't watch TV.",
         "I plays football.",
-        "He goes to school.",
-        "They don't go to school."
+        "I go to school."
       ],
       "answer": "I plays football.",
       "explanation": "I đi với động từ nguyên thể (play)."
@@ -38258,10 +41192,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He don't play football.",
-        "We don't eat breakfast.",
-        "He eats breakfast.",
-        "I love music."
+        "I love music.",
+        "I cook dinner.",
+        "We don't play football.",
+        "He don't play football."
       ],
       "answer": "He don't play football.",
       "explanation": "He đi với doesn't."
@@ -38279,10 +41213,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He cooks dinner.",
-        "Does He watch TV?",
-        "We don't help mother.",
-        "He doesn't plays football."
+        "He doesn't plays football.",
+        "We don't play football.",
+        "He doesn't read a book.",
+        "Does He watch TV?"
       ],
       "answer": "He doesn't plays football.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (play)."
@@ -38300,10 +41234,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't play football.",
-        "She doesn't go to school.",
         "We doesn't play football.",
-        "I cook dinner."
+        "I read a book.",
+        "He watches TV.",
+        "He doesn't eat breakfast."
       ],
       "answer": "We doesn't play football.",
       "explanation": "We đi với don't."
@@ -38321,10 +41255,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I like apples.",
+        "Does She play football?",
+        "We don't read a book.",
         "Does He plays football?",
-        "They don't watch TV.",
-        "He studies English."
+        "They don't play football."
       ],
       "answer": "Does He plays football?",
       "explanation": "Sau Does, động từ giữ nguyên thể (play)."
@@ -38343,9 +41277,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "He read a book.",
-        "Does He read a book?",
         "He doesn't eat breakfast.",
-        "We don't eat breakfast."
+        "She doesn't watch TV.",
+        "Does He help mother?"
       ],
       "answer": "He read a book.",
       "explanation": "He đi với động từ thêm -s (reads)."
@@ -38363,9 +41297,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "She doesn't play football.",
+        "I study English.",
         "He likes apples.",
-        "Does She go to school?",
-        "We don't eat breakfast.",
         "I reads a book."
       ],
       "answer": "I reads a book.",
@@ -38384,10 +41318,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Does He read a book?",
-        "She doesn't watch TV.",
-        "I like apples.",
-        "He don't read a book."
+        "They don't play football.",
+        "He don't read a book.",
+        "He likes apples.",
+        "Does She play football?"
       ],
       "answer": "He don't read a book.",
       "explanation": "He đi với doesn't."
@@ -38405,10 +41339,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He watches TV.",
-        "He doesn't watch TV.",
-        "They don't watch TV.",
-        "He doesn't reads a book."
+        "He likes apples.",
+        "He doesn't reads a book.",
+        "Does He play football?",
+        "I help mother."
       ],
       "answer": "He doesn't reads a book.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (read)."
@@ -38426,10 +41360,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We doesn't read a book.",
+        "I cook dinner.",
         "She doesn't play football.",
-        "He goes to school.",
-        "He likes apples."
+        "We don't watch TV.",
+        "We doesn't read a book."
       ],
       "answer": "We doesn't read a book.",
       "explanation": "We đi với don't."
@@ -38447,10 +41381,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He watches TV.",
-        "He doesn't read a book.",
-        "I like apples.",
-        "Does He reads a book?"
+        "Does He reads a book?",
+        "Does He help mother?",
+        "I eat breakfast.",
+        "He cooks dinner."
       ],
       "answer": "Does He reads a book?",
       "explanation": "Sau Does, động từ giữ nguyên thể (read)."
@@ -38468,10 +41402,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "They don't play football.",
-        "She doesn't go to school.",
+        "We don't help mother.",
+        "They don't read a book.",
         "He eat breakfast.",
-        "Does He go to school?"
+        "Does She read a book?"
       ],
       "answer": "He eat breakfast.",
       "explanation": "He đi với động từ thêm -s (eats)."
@@ -38489,10 +41423,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Does She read a book?",
+        "I eats breakfast.",
+        "She doesn't play football.",
         "Does He watch TV?",
-        "He likes apples.",
-        "I eats breakfast."
+        "Does He go to school?"
       ],
       "answer": "I eats breakfast.",
       "explanation": "I đi với động từ nguyên thể (eat)."
@@ -38510,10 +41444,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I like apples.",
+        "I play football.",
+        "I eat breakfast.",
         "He don't eat breakfast.",
-        "She doesn't watch TV.",
-        "She doesn't read a book."
+        "Does He play football?"
       ],
       "answer": "He don't eat breakfast.",
       "explanation": "He đi với doesn't."
@@ -38531,10 +41465,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't go to school.",
-        "Does He watch TV?",
-        "He doesn't eats breakfast.",
-        "I like apples."
+        "She doesn't watch TV.",
+        "We don't eat breakfast.",
+        "He doesn't go to school.",
+        "He doesn't eats breakfast."
       ],
       "answer": "He doesn't eats breakfast.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (eat)."
@@ -38552,10 +41486,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She doesn't go to school.",
+        "He doesn't go to school.",
+        "We don't help mother.",
         "We doesn't eat breakfast.",
-        "We don't watch TV.",
-        "I go to school."
+        "I study English."
       ],
       "answer": "We doesn't eat breakfast.",
       "explanation": "We đi với don't."
@@ -38573,10 +41507,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Does He eats breakfast?",
-        "They don't watch TV.",
+        "He watches TV.",
         "We don't read a book.",
-        "Does He watch TV?"
+        "Does He eats breakfast?",
+        "He loves music."
       ],
       "answer": "Does He eats breakfast?",
       "explanation": "Sau Does, động từ giữ nguyên thể (eat)."
@@ -38594,10 +41528,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He help mother.",
-        "She doesn't watch TV.",
-        "He watches TV.",
-        "We don't read a book."
+        "He loves music.",
+        "I read a book.",
+        "He eats breakfast.",
+        "He help mother."
       ],
       "answer": "He help mother.",
       "explanation": "He đi với động từ thêm -s (helps)."
@@ -38615,10 +41549,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He likes apples.",
-        "I helps mother.",
-        "He plays football.",
-        "She doesn't watch TV."
+        "We don't go to school.",
+        "Does He eat breakfast?",
+        "I love music.",
+        "I helps mother."
       ],
       "answer": "I helps mother.",
       "explanation": "I đi với động từ nguyên thể (help)."
@@ -38637,9 +41571,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "We don't read a book.",
-        "Does He read a book?",
-        "He don't help mother.",
-        "She doesn't read a book."
+        "They don't go to school.",
+        "I love music.",
+        "He don't help mother."
       ],
       "answer": "He don't help mother.",
       "explanation": "He đi với doesn't."
@@ -38657,10 +41591,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I watch TV.",
-        "We don't go to school.",
-        "He cooks dinner.",
-        "He doesn't helps mother."
+        "Does She watch TV?",
+        "He goes to school.",
+        "He doesn't helps mother.",
+        "They don't go to school."
       ],
       "answer": "He doesn't helps mother.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (help)."
@@ -38679,9 +41613,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "We doesn't help mother.",
-        "We don't play football.",
-        "They don't play football.",
-        "I help mother."
+        "Does He go to school?",
+        "I cook dinner.",
+        "Does She watch TV?"
       ],
       "answer": "We doesn't help mother.",
       "explanation": "We đi với don't."
@@ -38700,9 +41634,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "Does He helps mother?",
-        "Does He play football?",
-        "He doesn't read a book.",
-        "He likes apples."
+        "We don't watch TV.",
+        "She doesn't read a book.",
+        "Does He go to school?"
       ],
       "answer": "Does He helps mother?",
       "explanation": "Sau Does, động từ giữ nguyên thể (help)."
@@ -38720,10 +41654,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Does He watch TV?",
+        "Does She play football?",
         "He cook dinner.",
-        "We don't help mother.",
-        "He eats breakfast."
+        "Does He read a book?",
+        "He helps mother."
       ],
       "answer": "He cook dinner.",
       "explanation": "He đi với động từ thêm -s (cooks)."
@@ -38741,10 +41675,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He cooks dinner.",
-        "We don't read a book.",
+        "He plays football.",
+        "She doesn't go to school.",
         "I cooks dinner.",
-        "Does He watch TV?"
+        "I watch TV."
       ],
       "answer": "I cooks dinner.",
       "explanation": "I đi với động từ nguyên thể (cook)."
@@ -38762,10 +41696,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He helps mother.",
-        "Does He eat breakfast?",
-        "He doesn't eat breakfast.",
-        "She don't go to school."
+        "We don't play football.",
+        "He doesn't watch TV.",
+        "She don't go to school.",
+        "He helps mother."
       ],
       "answer": "She don't go to school.",
       "explanation": "She đi với doesn't."
@@ -38783,10 +41717,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Does He watch TV?",
-        "They don't watch TV.",
-        "Does She play football?",
-        "She doesn't goes to school."
+        "Does He help mother?",
+        "He watches TV.",
+        "She doesn't goes to school.",
+        "They don't play football."
       ],
       "answer": "She doesn't goes to school.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (go)."
@@ -38805,9 +41739,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "They doesn't go to school.",
-        "He doesn't watch TV.",
-        "She doesn't play football.",
-        "Does She watch TV?"
+        "She doesn't go to school.",
+        "Does He play football?",
+        "Does He go to school?"
       ],
       "answer": "They doesn't go to school.",
       "explanation": "They đi với don't."
@@ -38825,9 +41759,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He doesn't play football.",
-        "I help mother.",
-        "He loves music.",
+        "I eat breakfast.",
+        "She doesn't play football.",
+        "I love music.",
         "Does She goes to school?"
       ],
       "answer": "Does She goes to school?",
@@ -38846,10 +41780,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He watches TV.",
-        "He like apples.",
-        "I cook dinner.",
-        "I like apples."
+        "I study English.",
+        "He doesn't watch TV.",
+        "Does She read a book?",
+        "He like apples."
       ],
       "answer": "He like apples.",
       "explanation": "He đi với động từ thêm -s (likes)."
@@ -38868,9 +41802,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "He goes to school.",
-        "I help mother.",
-        "I likes apples.",
-        "We don't help mother."
+        "He watches TV.",
+        "She doesn't watch TV.",
+        "I likes apples."
       ],
       "answer": "I likes apples.",
       "explanation": "I đi với động từ nguyên thể (like)."
@@ -38888,10 +41822,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "They don't play football.",
+        "I like apples.",
         "She don't watch TV.",
-        "We don't go to school.",
-        "They don't read a book."
+        "Does He play football?",
+        "He doesn't go to school."
       ],
       "answer": "She don't watch TV.",
       "explanation": "She đi với doesn't."
@@ -38909,10 +41843,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He cooks dinner.",
-        "He doesn't go to school.",
-        "Does He eat breakfast?",
-        "She doesn't watches TV."
+        "I cook dinner.",
+        "I study English.",
+        "She doesn't watches TV.",
+        "We don't read a book."
       ],
       "answer": "She doesn't watches TV.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (watch)."
@@ -38930,10 +41864,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I watch TV.",
-        "He loves music.",
-        "He reads a book.",
-        "They doesn't watch TV."
+        "We don't eat breakfast.",
+        "They don't play football.",
+        "They doesn't watch TV.",
+        "He doesn't play football."
       ],
       "answer": "They doesn't watch TV.",
       "explanation": "They đi với don't."
@@ -38951,10 +41885,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I read a book.",
         "Does She watches TV?",
-        "We don't play football.",
-        "We don't go to school."
+        "I cook dinner.",
+        "She doesn't read a book.",
+        "He doesn't watch TV."
       ],
       "answer": "Does She watches TV?",
       "explanation": "Sau Does, động từ giữ nguyên thể (watch)."
@@ -38972,10 +41906,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "We don't play football.",
-        "I go to school.",
-        "He doesn't watch TV.",
-        "He love music."
+        "I study English.",
+        "He love music.",
+        "We don't go to school.",
+        "We don't watch TV."
       ],
       "answer": "He love music.",
       "explanation": "He đi với động từ thêm -s (loves)."
@@ -38993,10 +41927,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "Does He go to school?",
         "I loves music.",
-        "He helps mother.",
-        "He doesn't read a book.",
-        "Does She watch TV?"
+        "He plays football.",
+        "She doesn't go to school."
       ],
       "answer": "I loves music.",
       "explanation": "I đi với động từ nguyên thể (love)."
@@ -39014,10 +41948,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I study English.",
         "She don't play football.",
-        "We don't play football.",
-        "She doesn't read a book.",
-        "They don't read a book."
+        "We don't help mother.",
+        "Does She watch TV?"
       ],
       "answer": "She don't play football.",
       "explanation": "She đi với doesn't."
@@ -39035,10 +41969,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He doesn't go to school.",
+        "He likes apples.",
+        "I read a book.",
         "She doesn't plays football.",
-        "We don't help mother.",
-        "He plays football."
+        "Does He watch TV?"
       ],
       "answer": "She doesn't plays football.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (play)."
@@ -39056,10 +41990,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "They don't watch TV.",
-        "He watches TV.",
-        "Does He watch TV?",
-        "They doesn't play football."
+        "They doesn't play football.",
+        "He goes to school.",
+        "I help mother.",
+        "Does He go to school?"
       ],
       "answer": "They doesn't play football.",
       "explanation": "They đi với don't."
@@ -39077,10 +42011,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Does He watch TV?",
-        "I watch TV.",
-        "He reads a book.",
-        "Does She plays football?"
+        "Does She plays football?",
+        "He watches TV.",
+        "Does He read a book?",
+        "We don't eat breakfast."
       ],
       "answer": "Does She plays football?",
       "explanation": "Sau Does, động từ giữ nguyên thể (play)."
@@ -39098,10 +42032,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I eat breakfast.",
-        "I study English.",
+        "Does He read a book?",
         "He study English.",
-        "He eats breakfast."
+        "He helps mother.",
+        "He doesn't help mother."
       ],
       "answer": "He study English.",
       "explanation": "He đi với động từ thêm -s (studies)."
@@ -39119,10 +42053,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He watches TV.",
         "I studies English.",
-        "He loves music.",
-        "He goes to school."
+        "He doesn't go to school.",
+        "He goes to school.",
+        "Does He eat breakfast?"
       ],
       "answer": "I studies English.",
       "explanation": "I đi với động từ nguyên thể (study)."
@@ -39140,9 +42074,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He cooks dinner.",
-        "I eat breakfast.",
-        "We don't watch TV.",
+        "Does He watch TV?",
+        "Does He play football?",
+        "We don't eat breakfast.",
         "She don't read a book."
       ],
       "answer": "She don't read a book.",
@@ -39161,10 +42095,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He loves music.",
+        "Does She go to school?",
         "She doesn't reads a book.",
-        "Does She watch TV?",
-        "He watches TV."
+        "Does He eat breakfast?",
+        "He doesn't help mother."
       ],
       "answer": "She doesn't reads a book.",
       "explanation": "Sau doesn't, động từ giữ nguyên thể (read)."
@@ -39182,10 +42116,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Does She play football?",
-        "I help mother.",
+        "Does He read a book?",
+        "I watch TV.",
         "They doesn't read a book.",
-        "I read a book."
+        "He cooks dinner."
       ],
       "answer": "They doesn't read a book.",
       "explanation": "They đi với don't."
@@ -39203,10 +42137,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I help mother.",
-        "He watches TV.",
-        "He likes apples.",
-        "Does She reads a book?"
+        "Does She reads a book?",
+        "I watch TV.",
+        "She doesn't watch TV.",
+        "I read a book."
       ],
       "answer": "Does She reads a book?",
       "explanation": "Sau Does, động từ giữ nguyên thể (read)."
@@ -39227,9 +42161,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "I is playing football.",
+        "She isn't singing a song.",
         "I am not reading a book.",
-        "Lan isn't reading a book.",
-        "I am swimming in the pool."
+        "I am drawing a picture."
       ],
       "answer": "I is playing football.",
       "explanation": "I đi với am."
@@ -39247,10 +42181,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I am swimming in the pool.",
         "I am play football.",
-        "Lan isn't playing football.",
-        "He is reading a book.",
-        "Lan isn't reading a book."
+        "I am watching TV.",
+        "He isn't reading a book."
       ],
       "answer": "I am play football.",
       "explanation": "Hiện tại tiếp diễn: be + V-ing (playing, không phải play)."
@@ -39268,10 +42202,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am reading a book.",
-        "He is playing football.",
+        "I am not reading a book.",
         "I playing football.",
-        "He is reading a book."
+        "He isn't playing football.",
+        "I am reading a book."
       ],
       "answer": "I playing football.",
       "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
@@ -39289,10 +42223,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan isn't playing football.",
-        "He isn't eating breakfast.",
-        "I is not playing football.",
-        "She isn't singing a song."
+        "He is watching TV.",
+        "He is eating breakfast.",
+        "I am watching TV.",
+        "I is not playing football."
       ],
       "answer": "I is not playing football.",
       "explanation": "I đi với am not."
@@ -39310,10 +42244,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am not singing a song.",
         "I is reading a book.",
-        "I am swimming in the pool.",
-        "I am cooking dinner."
+        "I am drawing a picture.",
+        "He isn't eating breakfast.",
+        "I am singing a song."
       ],
       "answer": "I is reading a book.",
       "explanation": "I đi với am."
@@ -39331,10 +42265,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is swimming in the pool.",
-        "I am drawing a picture.",
+        "She isn't eating breakfast.",
+        "I am read a book.",
         "He isn't eating breakfast.",
-        "I am read a book."
+        "He is reading a book."
       ],
       "answer": "I am read a book.",
       "explanation": "Hiện tại tiếp diễn: be + V-ing (reading, không phải read)."
@@ -39352,10 +42286,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He isn't eating breakfast.",
+        "Lan isn't eating breakfast.",
         "I reading a book.",
-        "He is singing a song.",
-        "He isn't singing a song."
+        "He isn't reading a book.",
+        "I am singing a song."
       ],
       "answer": "I reading a book.",
       "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
@@ -39374,9 +42308,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "She isn't eating breakfast.",
-        "I am cooking dinner.",
+        "Lan isn't reading a book.",
         "I is not reading a book.",
-        "I am reading a book."
+        "He is eating breakfast."
       ],
       "answer": "I is not reading a book.",
       "explanation": "I đi với am not."
@@ -39394,10 +42328,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am not reading a book.",
-        "I is eating breakfast.",
-        "She isn't reading a book.",
-        "I am cooking dinner."
+        "He is singing a song.",
+        "I am not singing a song.",
+        "I am playing football.",
+        "I is eating breakfast."
       ],
       "answer": "I is eating breakfast.",
       "explanation": "I đi với am."
@@ -39415,10 +42349,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am eat breakfast.",
-        "I am drawing a picture.",
-        "He isn't reading a book.",
-        "He isn't singing a song."
+        "He is watching TV.",
+        "She isn't reading a book.",
+        "He is swimming in the pool.",
+        "I am eat breakfast."
       ],
       "answer": "I am eat breakfast.",
       "explanation": "Hiện tại tiếp diễn: be + V-ing (eating, không phải eat)."
@@ -39436,10 +42370,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is eating breakfast.",
-        "Lan isn't eating breakfast.",
         "I eating breakfast.",
-        "Lan isn't playing football."
+        "He is swimming in the pool.",
+        "I am not singing a song.",
+        "Lan isn't eating breakfast."
       ],
       "answer": "I eating breakfast.",
       "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
@@ -39457,10 +42391,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I am playing football.",
         "I is not eating breakfast.",
-        "He is swimming in the pool.",
-        "I am drawing a picture.",
-        "I am not reading a book."
+        "She isn't eating breakfast.",
+        "I am singing a song."
       ],
       "answer": "I is not eating breakfast.",
       "explanation": "I đi với am not."
@@ -39478,10 +42412,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He isn't reading a book.",
+        "She isn't singing a song.",
+        "Lan isn't playing football.",
         "I is singing a song.",
-        "He is swimming in the pool.",
-        "I am reading a book."
+        "He is watching TV."
       ],
       "answer": "I is singing a song.",
       "explanation": "I đi với am."
@@ -39499,10 +42433,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He isn't reading a book.",
+        "I am cooking dinner.",
         "She isn't reading a book.",
         "I am sing a song.",
-        "I am not playing football."
+        "He is eating breakfast."
       ],
       "answer": "I am sing a song.",
       "explanation": "Hiện tại tiếp diễn: be + V-ing (singing, không phải sing)."
@@ -39520,10 +42454,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am swimming in the pool.",
-        "I am reading a book.",
-        "He is reading a book.",
-        "I singing a song."
+        "He isn't reading a book.",
+        "Lan isn't reading a book.",
+        "I singing a song.",
+        "He is swimming in the pool."
       ],
       "answer": "I singing a song.",
       "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
@@ -39541,10 +42475,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He isn't reading a book.",
-        "She isn't singing a song.",
         "I is not singing a song.",
-        "I am reading a book."
+        "He is eating breakfast.",
+        "He is singing a song.",
+        "He is watching TV."
       ],
       "answer": "I is not singing a song.",
       "explanation": "I đi với am not."
@@ -39562,10 +42496,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I is swimming in the pool.",
-        "I am not playing football.",
-        "He isn't playing football.",
-        "I am eating breakfast."
+        "She isn't reading a book.",
+        "He isn't reading a book.",
+        "I am drawing a picture.",
+        "I is swimming in the pool."
       ],
       "answer": "I is swimming in the pool.",
       "explanation": "I đi với am."
@@ -39583,9 +42517,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She isn't playing football.",
-        "I am reading a book.",
-        "Lan isn't reading a book.",
+        "He is drawing a picture.",
+        "She isn't eating breakfast.",
+        "I am watching TV.",
         "I am swim in the pool."
       ],
       "answer": "I am swim in the pool.",
@@ -39604,10 +42538,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He is singing a song.",
+        "I am not playing football.",
         "I swimming in the pool.",
-        "She isn't singing a song.",
-        "He is drawing a picture.",
-        "He is eating breakfast."
+        "He is swimming in the pool."
       ],
       "answer": "I swimming in the pool.",
       "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
@@ -39626,9 +42560,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "He aren't playing football.",
-        "I am not playing football.",
-        "I am not singing a song.",
-        "I am eating breakfast."
+        "I am drawing a picture.",
+        "He is singing a song.",
+        "He isn't reading a book."
       ],
       "answer": "He aren't playing football.",
       "explanation": "He đi với isn't."
@@ -39646,10 +42580,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She isn't singing a song.",
-        "He is singing a song.",
+        "I am swimming in the pool.",
+        "I am not singing a song.",
         "I is drawing a picture.",
-        "She isn't playing football."
+        "Lan isn't reading a book."
       ],
       "answer": "I is drawing a picture.",
       "explanation": "I đi với am."
@@ -39667,10 +42601,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He is eating breakfast.",
         "I am draw a picture.",
         "I am reading a book.",
-        "She isn't reading a book.",
-        "He is eating breakfast."
+        "I am swimming in the pool."
       ],
       "answer": "I am draw a picture.",
       "explanation": "Hiện tại tiếp diễn: be + V-ing (drawing, không phải draw)."
@@ -39688,10 +42622,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is eating breakfast.",
-        "He is reading a book.",
+        "I am not singing a song.",
         "I drawing a picture.",
-        "I am singing a song."
+        "He isn't reading a book.",
+        "She isn't playing football."
       ],
       "answer": "I drawing a picture.",
       "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
@@ -39709,10 +42643,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She isn't playing football.",
-        "He is playing football.",
-        "He aren't reading a book.",
-        "Lan isn't playing football."
+        "He isn't playing football.",
+        "He is reading a book.",
+        "He is swimming in the pool.",
+        "He aren't reading a book."
       ],
       "answer": "He aren't reading a book.",
       "explanation": "He đi với isn't."
@@ -39730,10 +42664,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He isn't playing football.",
+        "He isn't reading a book.",
         "I is watching TV.",
-        "I am cooking dinner.",
-        "She isn't eating breakfast."
+        "She isn't reading a book.",
+        "I am singing a song."
       ],
       "answer": "I is watching TV.",
       "explanation": "I đi với am."
@@ -39751,10 +42685,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He isn't playing football.",
+        "He is playing football.",
         "I am watch TV.",
-        "He is swimming in the pool.",
-        "I am not singing a song."
+        "I am cooking dinner.",
+        "She isn't eating breakfast."
       ],
       "answer": "I am watch TV.",
       "explanation": "Hiện tại tiếp diễn: be + V-ing (watching, không phải watch)."
@@ -39773,9 +42707,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "I watching TV.",
-        "He isn't singing a song.",
-        "He is eating breakfast.",
-        "He is singing a song."
+        "I am cooking dinner.",
+        "He is swimming in the pool.",
+        "He is watching TV."
       ],
       "answer": "I watching TV.",
       "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
@@ -39794,9 +42728,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "He aren't eating breakfast.",
-        "I am reading a book.",
         "I am swimming in the pool.",
-        "She isn't eating breakfast."
+        "I am watching TV.",
+        "I am eating breakfast."
       ],
       "answer": "He aren't eating breakfast.",
       "explanation": "He đi với isn't."
@@ -39814,10 +42748,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is reading a book.",
+        "I am not eating breakfast.",
+        "I am singing a song.",
         "I is cooking dinner.",
-        "I am not singing a song.",
-        "He is singing a song."
+        "I am playing football."
       ],
       "answer": "I is cooking dinner.",
       "explanation": "I đi với am."
@@ -39835,10 +42769,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is playing football.",
+        "I am not singing a song.",
+        "I am swimming in the pool.",
         "I am cook dinner.",
-        "He isn't reading a book.",
-        "I am not reading a book."
+        "He is drawing a picture."
       ],
       "answer": "I am cook dinner.",
       "explanation": "Hiện tại tiếp diễn: be + V-ing (cooking, không phải cook)."
@@ -39856,10 +42790,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "She isn't singing a song.",
+        "I am not playing football.",
         "He is eating breakfast.",
-        "I cooking dinner.",
-        "I am playing football.",
-        "I am not eating breakfast."
+        "I cooking dinner."
       ],
       "answer": "I cooking dinner.",
       "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
@@ -39877,10 +42811,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I am singing a song.",
+        "She isn't eating breakfast.",
         "He aren't singing a song.",
-        "He isn't eating breakfast.",
-        "He is reading a book.",
-        "He is swimming in the pool."
+        "Lan isn't playing football."
       ],
       "answer": "He aren't singing a song.",
       "explanation": "He đi với isn't."
@@ -39898,10 +42832,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am watching TV.",
+        "He are playing football.",
         "He isn't singing a song.",
-        "I am not reading a book.",
-        "He are playing football."
+        "He is drawing a picture.",
+        "Lan isn't eating breakfast."
       ],
       "answer": "He are playing football.",
       "explanation": "He đi với is."
@@ -39919,10 +42853,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am cooking dinner.",
         "He is play football.",
-        "He is drawing a picture.",
-        "I am drawing a picture."
+        "I am drawing a picture.",
+        "I am singing a song.",
+        "She isn't singing a song."
       ],
       "answer": "He is play football.",
       "explanation": "Hiện tại tiếp diễn: be + V-ing (playing, không phải play)."
@@ -39940,10 +42874,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am drawing a picture.",
-        "I am not playing football.",
+        "She isn't singing a song.",
+        "He isn't reading a book.",
         "He playing football.",
-        "I am not eating breakfast."
+        "He is eating breakfast."
       ],
       "answer": "He playing football.",
       "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
@@ -39961,10 +42895,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am not reading a book.",
+        "He isn't reading a book.",
+        "She isn't eating breakfast.",
         "She aren't playing football.",
-        "I am not singing a song.",
-        "He is watching TV."
+        "Lan isn't eating breakfast."
       ],
       "answer": "She aren't playing football.",
       "explanation": "She đi với isn't."
@@ -39982,10 +42916,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan isn't eating breakfast.",
         "I am reading a book.",
+        "He are reading a book.",
         "She isn't reading a book.",
-        "He are reading a book."
+        "He isn't singing a song."
       ],
       "answer": "He are reading a book.",
       "explanation": "He đi với is."
@@ -40003,10 +42937,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am not singing a song.",
+        "I am not reading a book.",
         "He is read a book.",
-        "He is swimming in the pool.",
-        "I am swimming in the pool."
+        "I am watching TV.",
+        "I am not playing football."
       ],
       "answer": "He is read a book.",
       "explanation": "Hiện tại tiếp diễn: be + V-ing (reading, không phải read)."
@@ -40024,10 +42958,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan isn't reading a book.",
-        "I am reading a book.",
+        "He is eating breakfast.",
+        "He is watching TV.",
         "He reading a book.",
-        "He isn't reading a book."
+        "He isn't playing football."
       ],
       "answer": "He reading a book.",
       "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
@@ -40045,10 +42979,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He is watching TV.",
+        "He is reading a book.",
         "She aren't reading a book.",
-        "I am swimming in the pool.",
-        "I am eating breakfast.",
-        "He is reading a book."
+        "I am not reading a book."
       ],
       "answer": "She aren't reading a book.",
       "explanation": "She đi với isn't."
@@ -40066,10 +43000,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am singing a song.",
-        "I am not reading a book.",
         "He are eating breakfast.",
-        "She isn't eating breakfast."
+        "He is drawing a picture.",
+        "He is playing football.",
+        "I am not reading a book."
       ],
       "answer": "He are eating breakfast.",
       "explanation": "He đi với is."
@@ -40087,8 +43021,8 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am cooking dinner.",
-        "He is watching TV.",
+        "She isn't reading a book.",
+        "He is reading a book.",
         "I am playing football.",
         "He is eat breakfast."
       ],
@@ -40108,10 +43042,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She isn't reading a book.",
-        "She isn't singing a song.",
+        "He eating breakfast.",
         "He is singing a song.",
-        "He eating breakfast."
+        "I am watching TV.",
+        "I am drawing a picture."
       ],
       "answer": "He eating breakfast.",
       "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
@@ -40130,9 +43064,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "She aren't eating breakfast.",
-        "He is singing a song.",
-        "He isn't playing football.",
-        "He is swimming in the pool."
+        "He is drawing a picture.",
+        "I am singing a song.",
+        "He isn't playing football."
       ],
       "answer": "She aren't eating breakfast.",
       "explanation": "She đi với isn't."
@@ -40150,10 +43084,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is watching TV.",
-        "I am not eating breakfast.",
+        "She isn't playing football.",
         "He are singing a song.",
-        "He is reading a book."
+        "He is eating breakfast.",
+        "I am not eating breakfast."
       ],
       "answer": "He are singing a song.",
       "explanation": "He đi với is."
@@ -40172,8 +43106,8 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "I am singing a song.",
-        "Lan isn't eating breakfast.",
-        "Lan isn't reading a book.",
+        "I am not eating breakfast.",
+        "I am not reading a book.",
         "He is sing a song."
       ],
       "answer": "He is sing a song.",
@@ -40192,10 +43126,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am not singing a song.",
-        "He singing a song.",
-        "He is reading a book.",
-        "He is swimming in the pool."
+        "Lan isn't eating breakfast.",
+        "Lan isn't reading a book.",
+        "He is eating breakfast.",
+        "He singing a song."
       ],
       "answer": "He singing a song.",
       "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
@@ -40213,10 +43147,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He isn't playing football.",
-        "He is playing football.",
-        "She aren't singing a song.",
-        "I am not eating breakfast."
+        "He isn't singing a song.",
+        "I am cooking dinner.",
+        "I am not playing football.",
+        "She aren't singing a song."
       ],
       "answer": "She aren't singing a song.",
       "explanation": "She đi với isn't."
@@ -40234,10 +43168,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "She isn't playing football.",
+        "I am cooking dinner.",
         "He are swimming in the pool.",
-        "Lan isn't eating breakfast.",
-        "She isn't reading a book.",
-        "Lan isn't reading a book."
+        "I am singing a song."
       ],
       "answer": "He are swimming in the pool.",
       "explanation": "He đi với is."
@@ -40255,10 +43189,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am not reading a book.",
-        "I am singing a song.",
-        "He is swim in the pool.",
-        "She isn't singing a song."
+        "I am not singing a song.",
+        "Lan isn't reading a book.",
+        "I am not eating breakfast.",
+        "He is swim in the pool."
       ],
       "answer": "He is swim in the pool.",
       "explanation": "Hiện tại tiếp diễn: be + V-ing (swimming, không phải swim)."
@@ -40276,10 +43210,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am watching TV.",
-        "I am singing a song.",
-        "Lan isn't playing football.",
-        "He swimming in the pool."
+        "I am drawing a picture.",
+        "I am playing football.",
+        "He swimming in the pool.",
+        "He is eating breakfast."
       ],
       "answer": "He swimming in the pool.",
       "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
@@ -40297,10 +43231,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He is singing a song.",
         "I am playing football.",
-        "He isn't eating breakfast.",
         "Lan aren't playing football.",
-        "I am reading a book."
+        "I am swimming in the pool."
       ],
       "answer": "Lan aren't playing football.",
       "explanation": "Lan đi với isn't."
@@ -40319,9 +43253,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "He are drawing a picture.",
-        "He isn't playing football.",
-        "I am cooking dinner.",
-        "I am drawing a picture."
+        "He is reading a book.",
+        "She isn't singing a song.",
+        "I am cooking dinner."
       ],
       "answer": "He are drawing a picture.",
       "explanation": "He đi với is."
@@ -40339,10 +43273,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I am eating breakfast.",
+        "He is swimming in the pool.",
         "He is draw a picture.",
-        "I am not singing a song.",
-        "Lan isn't reading a book.",
-        "He is reading a book."
+        "He is playing football."
       ],
       "answer": "He is draw a picture.",
       "explanation": "Hiện tại tiếp diễn: be + V-ing (drawing, không phải draw)."
@@ -40360,10 +43294,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am not singing a song.",
+        "He is eating breakfast.",
+        "I am cooking dinner.",
         "He drawing a picture.",
-        "He isn't playing football.",
-        "He is singing a song."
+        "Lan isn't reading a book."
       ],
       "answer": "He drawing a picture.",
       "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
@@ -40381,10 +43315,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is drawing a picture.",
-        "He isn't singing a song.",
-        "I am cooking dinner.",
-        "Lan aren't reading a book."
+        "I am not playing football.",
+        "I am not singing a song.",
+        "Lan aren't reading a book.",
+        "I am singing a song."
       ],
       "answer": "Lan aren't reading a book.",
       "explanation": "Lan đi với isn't."
@@ -40402,10 +43336,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is playing football.",
-        "He is drawing a picture.",
+        "He are watching TV.",
         "I am drawing a picture.",
-        "He are watching TV."
+        "He is playing football.",
+        "He is eating breakfast."
       ],
       "answer": "He are watching TV.",
       "explanation": "He đi với is."
@@ -40423,10 +43357,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I am eating breakfast.",
+        "I am not singing a song.",
         "He is watch TV.",
-        "She isn't eating breakfast.",
-        "He isn't playing football.",
-        "He is eating breakfast."
+        "He isn't reading a book."
       ],
       "answer": "He is watch TV.",
       "explanation": "Hiện tại tiếp diễn: be + V-ing (watching, không phải watch)."
@@ -40444,10 +43378,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am cooking dinner.",
+        "Lan isn't reading a book.",
         "He watching TV.",
-        "He isn't eating breakfast.",
-        "He is playing football."
+        "I am not singing a song.",
+        "He is drawing a picture."
       ],
       "answer": "He watching TV.",
       "explanation": "Câu hiện tại tiếp diễn phải có be (is/are/am)."
@@ -40465,10 +43399,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am singing a song.",
-        "She isn't eating breakfast.",
-        "She isn't singing a song.",
-        "Lan aren't eating breakfast."
+        "She isn't playing football.",
+        "She isn't reading a book.",
+        "Lan aren't eating breakfast.",
+        "I am reading a book."
       ],
       "answer": "Lan aren't eating breakfast.",
       "explanation": "Lan đi với isn't."
@@ -40488,10 +43422,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He called a friend last night.",
-        "She didn't cook dinner.",
-        "He didn't clean the room.",
-        "I play football yesterday."
+        "I didn't cook dinner.",
+        "I cooked dinner yesterday.",
+        "I play football yesterday.",
+        "He washed hands last week."
       ],
       "answer": "I play football yesterday.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (played)."
@@ -40509,10 +43443,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He walked to school yesterday.",
+        "I helped mother last night.",
         "I didn't played football.",
-        "He cooked dinner yesterday.",
-        "He visited grandma yesterday.",
-        "He walked to school yesterday."
+        "I didn't help mother."
       ],
       "answer": "I didn't played football.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (play)."
@@ -40530,10 +43464,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He walked to school yesterday.",
-        "I didn't play football.",
+        "I called a friend last night.",
         "Did I played football?",
-        "I studied English last week."
+        "Did She play football?",
+        "I washed hands last week."
       ],
       "answer": "Did I played football?",
       "explanation": "Sau Did, động từ giữ nguyên thể (play)."
@@ -40551,10 +43485,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He watched TV last night.",
-        "Did Lan play football?",
+        "He walked to school yesterday.",
+        "I called a friend last night.",
         "I watch TV last night.",
-        "He didn't cook dinner."
+        "Did He play football?"
       ],
       "answer": "I watch TV last night.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (watched)."
@@ -40572,10 +43506,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I didn't watched TV.",
-        "She didn't clean the room.",
         "Did I help mother?",
-        "I called a friend last night."
+        "Lan didn't play football.",
+        "I didn't watched TV.",
+        "Did I play football?"
       ],
       "answer": "I didn't watched TV.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (watch)."
@@ -40593,10 +43527,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did She watch TV?",
+        "I didn't clean the room.",
+        "I didn't wash hands.",
         "Did I watched TV?",
-        "Did I clean the room?",
-        "Did He wash hands?"
+        "Did He watch TV?"
       ],
       "answer": "Did I watched TV?",
       "explanation": "Sau Did, động từ giữ nguyên thể (watch)."
@@ -40614,10 +43548,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He washed hands last week.",
-        "I helped mother last night.",
         "I clean the room last week.",
-        "Did He play football?"
+        "He cooked dinner yesterday.",
+        "She didn't watch TV.",
+        "Did She cook dinner?"
       ],
       "answer": "I clean the room last week.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (cleaned)."
@@ -40635,10 +43569,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He visited grandma yesterday.",
-        "Did He cook dinner?",
         "I didn't cleaned the room.",
-        "Lan didn't watch TV."
+        "She didn't help mother.",
+        "Did He wash hands?",
+        "I walked to school yesterday."
       ],
       "answer": "I didn't cleaned the room.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (clean)."
@@ -40656,10 +43590,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She didn't cook dinner.",
         "Did I cleaned the room?",
-        "He called a friend last night.",
-        "He washed hands last week."
+        "She didn't wash hands.",
+        "He studied English last week.",
+        "He didn't wash hands."
       ],
       "answer": "Did I cleaned the room?",
       "explanation": "Sau Did, động từ giữ nguyên thể (clean)."
@@ -40677,10 +43611,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did He wash hands?",
-        "Did She play football?",
-        "He didn't play football.",
-        "I cook dinner yesterday."
+        "Lan didn't play football.",
+        "Did She wash hands?",
+        "I cook dinner yesterday.",
+        "I didn't cook dinner."
       ],
       "answer": "I cook dinner yesterday.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (cooked)."
@@ -40698,10 +43632,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I studied English last week.",
-        "I didn't cooked dinner.",
-        "She didn't wash hands.",
-        "Did He play football?"
+        "Did She clean the room?",
+        "Did He help mother?",
+        "I walked to school yesterday.",
+        "I didn't cooked dinner."
       ],
       "answer": "I didn't cooked dinner.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (cook)."
@@ -40719,10 +43653,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I didn't wash hands.",
-        "Did I clean the room?",
-        "Did I cooked dinner?",
-        "I cooked dinner yesterday."
+        "She didn't play football.",
+        "He didn't play football.",
+        "Did He help mother?",
+        "Did I cooked dinner?"
       ],
       "answer": "Did I cooked dinner?",
       "explanation": "Sau Did, động từ giữ nguyên thể (cook)."
@@ -40740,10 +43674,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I help mother last night.",
-        "Did She watch TV?",
         "He played football yesterday.",
-        "She didn't wash hands."
+        "I help mother last night.",
+        "Did She help mother?",
+        "Did Lan play football?"
       ],
       "answer": "I help mother last night.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (helped)."
@@ -40761,10 +43695,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I didn't wash hands.",
-        "Lan didn't watch TV.",
         "I didn't helped mother.",
-        "I cooked dinner yesterday."
+        "Did She watch TV?",
+        "Did She wash hands?",
+        "She didn't cook dinner."
       ],
       "answer": "I didn't helped mother.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (help)."
@@ -40783,9 +43717,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "Did I helped mother?",
-        "He cleaned the room last week.",
-        "Lan didn't watch TV.",
-        "Did I play football?"
+        "He didn't clean the room.",
+        "He walked to school yesterday.",
+        "I didn't clean the room."
       ],
       "answer": "Did I helped mother?",
       "explanation": "Sau Did, động từ giữ nguyên thể (help)."
@@ -40803,10 +43737,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I helped mother last night.",
-        "Did She wash hands?",
-        "He walked to school yesterday.",
-        "I wash hands last week."
+        "I called a friend last night.",
+        "He didn't wash hands.",
+        "I wash hands last week.",
+        "Did He clean the room?"
       ],
       "answer": "I wash hands last week.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (washed)."
@@ -40825,9 +43759,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "I didn't washed hands.",
-        "He played football yesterday.",
-        "Did I watch TV?",
-        "Did She play football?"
+        "Did She cook dinner?",
+        "I didn't watch TV.",
+        "Lan didn't watch TV."
       ],
       "answer": "I didn't washed hands.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (wash)."
@@ -40845,10 +43779,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did I help mother?",
-        "I didn't clean the room.",
         "Did I washed hands?",
-        "Did He play football?"
+        "I didn't wash hands.",
+        "Did He help mother?",
+        "He didn't play football."
       ],
       "answer": "Did I washed hands?",
       "explanation": "Sau Did, động từ giữ nguyên thể (wash)."
@@ -40866,10 +43800,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did He clean the room?",
-        "Did She watch TV?",
         "I visit grandma yesterday.",
-        "He walked to school yesterday."
+        "He helped mother last night.",
+        "I studied English last week.",
+        "I didn't watch TV."
       ],
       "answer": "I visit grandma yesterday.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (visited)."
@@ -40888,9 +43822,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "He didn't played football.",
-        "Did She clean the room?",
-        "She didn't play football.",
-        "I didn't play football."
+        "I didn't play football.",
+        "He cleaned the room last week.",
+        "Did He help mother?"
       ],
       "answer": "He didn't played football.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (play)."
@@ -40908,10 +43842,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I cleaned the room last week.",
         "Did He played football?",
-        "I washed hands last week.",
-        "Did I wash hands?",
-        "He visited grandma yesterday."
+        "I didn't clean the room.",
+        "I washed hands last week."
       ],
       "answer": "Did He played football?",
       "explanation": "Sau Did, động từ giữ nguyên thể (play)."
@@ -40929,10 +43863,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I cooked dinner yesterday.",
         "I call a friend last night.",
-        "I didn't wash hands.",
-        "Did She clean the room?",
-        "I played football yesterday."
+        "He cleaned the room last week.",
+        "I walked to school yesterday."
       ],
       "answer": "I call a friend last night.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (called)."
@@ -40951,9 +43885,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "He didn't watched TV.",
-        "Did He clean the room?",
-        "He helped mother last night.",
-        "I didn't play football."
+        "I visited grandma yesterday.",
+        "I didn't wash hands.",
+        "I called a friend last night."
       ],
       "answer": "He didn't watched TV.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (watch)."
@@ -40971,10 +43905,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He didn't help mother.",
-        "Did Lan watch TV?",
+        "He didn't watch TV.",
+        "He played football yesterday.",
         "Did He watched TV?",
-        "Did He help mother?"
+        "He didn't clean the room."
       ],
       "answer": "Did He watched TV?",
       "explanation": "Sau Did, động từ giữ nguyên thể (watch)."
@@ -40992,10 +43926,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "She didn't cook dinner.",
+        "She didn't wash hands.",
         "I study English last week.",
-        "He cooked dinner yesterday.",
-        "Did I cook dinner?",
-        "He didn't cook dinner."
+        "I played football yesterday."
       ],
       "answer": "I study English last week.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (studied)."
@@ -41013,10 +43947,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She didn't cook dinner.",
-        "Did I clean the room?",
+        "I helped mother last night.",
+        "I didn't watch TV.",
         "He didn't cleaned the room.",
-        "Did She clean the room?"
+        "She didn't watch TV."
       ],
       "answer": "He didn't cleaned the room.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (clean)."
@@ -41034,10 +43968,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "Lan didn't watch TV.",
+        "He walked to school yesterday.",
         "Did She cook dinner?",
-        "I didn't help mother.",
-        "Did He cleaned the room?",
-        "Did I watch TV?"
+        "Did He cleaned the room?"
       ],
       "answer": "Did He cleaned the room?",
       "explanation": "Sau Did, động từ giữ nguyên thể (clean)."
@@ -41055,10 +43989,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did She help mother?",
         "I walk to school yesterday.",
+        "I watched TV last night.",
         "Did He cook dinner?",
-        "Lan didn't play football."
+        "Did I watch TV?"
       ],
       "answer": "I walk to school yesterday.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (walked)."
@@ -41076,10 +44010,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I didn't play football.",
-        "She didn't play football.",
-        "I cleaned the room last week.",
-        "He didn't cooked dinner."
+        "She didn't cook dinner.",
+        "He didn't cooked dinner.",
+        "She didn't clean the room.",
+        "He cleaned the room last week."
       ],
       "answer": "He didn't cooked dinner.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (cook)."
@@ -41097,10 +44031,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He didn't wash hands.",
+        "Did Lan watch TV?",
         "Did He cooked dinner?",
-        "I didn't cook dinner.",
-        "He cooked dinner yesterday."
+        "I didn't help mother.",
+        "I didn't play football."
       ],
       "answer": "Did He cooked dinner?",
       "explanation": "Sau Did, động từ giữ nguyên thể (cook)."
@@ -41118,10 +44052,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He play football yesterday.",
-        "She didn't wash hands.",
-        "Did He play football?",
-        "Did He help mother?"
+        "I cooked dinner yesterday.",
+        "I walked to school yesterday.",
+        "He didn't watch TV.",
+        "He play football yesterday."
       ],
       "answer": "He play football yesterday.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (played)."
@@ -41139,10 +44073,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I helped mother last night.",
-        "I cooked dinner yesterday.",
+        "Did He wash hands?",
+        "I called a friend last night.",
         "He didn't helped mother.",
-        "Did I help mother?"
+        "She didn't play football."
       ],
       "answer": "He didn't helped mother.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (help)."
@@ -41160,10 +44094,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She didn't clean the room.",
-        "Did He helped mother?",
-        "I didn't watch TV.",
-        "I studied English last week."
+        "Did She watch TV?",
+        "Did She wash hands?",
+        "I called a friend last night.",
+        "Did He helped mother?"
       ],
       "answer": "Did He helped mother?",
       "explanation": "Sau Did, động từ giữ nguyên thể (help)."
@@ -41181,10 +44115,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I didn't watch TV.",
+        "I visited grandma yesterday.",
         "He watch TV last night.",
-        "Did I play football?",
-        "He visited grandma yesterday.",
-        "Did She clean the room?"
+        "Did I cook dinner?"
       ],
       "answer": "He watch TV last night.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (watched)."
@@ -41202,10 +44136,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did He cook dinner?",
-        "He washed hands last week.",
+        "I cleaned the room last week.",
         "He didn't washed hands.",
-        "Did Lan play football?"
+        "He watched TV last night.",
+        "He didn't help mother."
       ],
       "answer": "He didn't washed hands.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (wash)."
@@ -41223,10 +44157,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He walked to school yesterday.",
-        "I called a friend last night.",
-        "He studied English last week.",
-        "Did He washed hands?"
+        "Did He help mother?",
+        "I didn't cook dinner.",
+        "Did He washed hands?",
+        "He played football yesterday."
       ],
       "answer": "Did He washed hands?",
       "explanation": "Sau Did, động từ giữ nguyên thể (wash)."
@@ -41244,10 +44178,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She didn't play football.",
         "He clean the room last week.",
-        "I watched TV last night.",
-        "Did He watch TV?"
+        "She didn't clean the room.",
+        "I played football yesterday.",
+        "He cooked dinner yesterday."
       ],
       "answer": "He clean the room last week.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (cleaned)."
@@ -41265,10 +44199,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did He cook dinner?",
-        "He cleaned the room last week.",
+        "Did He play football?",
         "She didn't played football.",
-        "I visited grandma yesterday."
+        "She didn't help mother.",
+        "He visited grandma yesterday."
       ],
       "answer": "She didn't played football.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (play)."
@@ -41286,10 +44220,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I helped mother last night.",
         "Did She played football?",
-        "She didn't watch TV.",
-        "Did She clean the room?"
+        "He didn't cook dinner.",
+        "I didn't play football.",
+        "He played football yesterday."
       ],
       "answer": "Did She played football?",
       "explanation": "Sau Did, động từ giữ nguyên thể (play)."
@@ -41307,10 +44241,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "She didn't watch TV.",
+        "He didn't help mother.",
         "He cook dinner yesterday.",
-        "I called a friend last night.",
-        "Did He play football?",
-        "I didn't help mother."
+        "Did He cook dinner?"
       ],
       "answer": "He cook dinner yesterday.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (cooked)."
@@ -41328,10 +44262,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He called a friend last night.",
-        "Did She help mother?",
-        "He cleaned the room last week.",
-        "She didn't watched TV."
+        "She didn't watched TV.",
+        "Did I play football?",
+        "I called a friend last night.",
+        "He visited grandma yesterday."
       ],
       "answer": "She didn't watched TV.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (watch)."
@@ -41349,10 +44283,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He didn't watch TV.",
+        "Did Lan play football?",
         "Did She watched TV?",
-        "He watched TV last night.",
-        "He called a friend last night.",
-        "He cleaned the room last week."
+        "Did He clean the room?"
       ],
       "answer": "Did She watched TV?",
       "explanation": "Sau Did, động từ giữ nguyên thể (watch)."
@@ -41370,10 +44304,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "Did He clean the room?",
         "He help mother last night.",
-        "I didn't cook dinner.",
-        "I cleaned the room last week.",
-        "She didn't help mother."
+        "She didn't wash hands.",
+        "Did She play football?"
       ],
       "answer": "He help mother last night.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (helped)."
@@ -41391,10 +44325,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I visited grandma yesterday.",
-        "I helped mother last night.",
-        "Did He help mother?",
-        "She didn't cleaned the room."
+        "Lan didn't play football.",
+        "She didn't cleaned the room.",
+        "She didn't wash hands.",
+        "I washed hands last week."
       ],
       "answer": "She didn't cleaned the room.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (clean)."
@@ -41412,10 +44346,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He visited grandma yesterday.",
-        "He didn't cook dinner.",
-        "He washed hands last week.",
-        "Did She cleaned the room?"
+        "Did She play football?",
+        "Did He help mother?",
+        "Did She cleaned the room?",
+        "Did I clean the room?"
       ],
       "answer": "Did She cleaned the room?",
       "explanation": "Sau Did, động từ giữ nguyên thể (clean)."
@@ -41434,9 +44368,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "He wash hands last week.",
-        "He helped mother last night.",
-        "Did I help mother?",
-        "I cooked dinner yesterday."
+        "He didn't wash hands.",
+        "I cleaned the room last week.",
+        "Did She help mother?"
       ],
       "answer": "He wash hands last week.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (washed)."
@@ -41454,10 +44388,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He watched TV last night.",
         "She didn't cooked dinner.",
-        "Did I cook dinner?",
-        "Did He help mother?"
+        "Lan didn't play football.",
+        "Did He cook dinner?",
+        "Did He wash hands?"
       ],
       "answer": "She didn't cooked dinner.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (cook)."
@@ -41475,10 +44409,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did I play football?",
-        "Lan didn't play football.",
+        "Did She help mother?",
         "Did She cooked dinner?",
-        "I didn't help mother."
+        "I called a friend last night.",
+        "Did I clean the room?"
       ],
       "answer": "Did She cooked dinner?",
       "explanation": "Sau Did, động từ giữ nguyên thể (cook)."
@@ -41496,10 +44430,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He called a friend last night.",
-        "Did He wash hands?",
-        "Did She watch TV?",
-        "He visit grandma yesterday."
+        "He studied English last week.",
+        "He visit grandma yesterday.",
+        "Did She wash hands?",
+        "He didn't watch TV."
       ],
       "answer": "He visit grandma yesterday.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (visited)."
@@ -41517,10 +44451,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "Lan didn't play football.",
+        "Did He cook dinner?",
         "She didn't helped mother.",
-        "She didn't play football.",
-        "I didn't play football.",
-        "I helped mother last night."
+        "Did I wash hands?"
       ],
       "answer": "She didn't helped mother.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (help)."
@@ -41538,10 +44472,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did He play football?",
-        "He cleaned the room last week.",
-        "He cooked dinner yesterday.",
-        "Did She helped mother?"
+        "Did She helped mother?",
+        "He played football yesterday.",
+        "She didn't cook dinner.",
+        "She didn't clean the room."
       ],
       "answer": "Did She helped mother?",
       "explanation": "Sau Did, động từ giữ nguyên thể (help)."
@@ -41559,10 +44493,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He didn't help mother.",
-        "Did She play football?",
-        "He call a friend last night.",
-        "Did He help mother?"
+        "Did I wash hands?",
+        "He studied English last week.",
+        "He played football yesterday.",
+        "He call a friend last night."
       ],
       "answer": "He call a friend last night.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (called)."
@@ -41580,9 +44514,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He played football yesterday.",
-        "Lan didn't watch TV.",
-        "I didn't help mother.",
+        "I didn't watch TV.",
+        "Did He clean the room?",
+        "Did He watch TV?",
         "She didn't washed hands."
       ],
       "answer": "She didn't washed hands.",
@@ -41601,10 +44535,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He called a friend last night.",
+        "Did She cook dinner?",
         "Did She washed hands?",
-        "Did I cook dinner?",
-        "I didn't play football.",
-        "She didn't help mother."
+        "I didn't play football."
       ],
       "answer": "Did She washed hands?",
       "explanation": "Sau Did, động từ giữ nguyên thể (wash)."
@@ -41622,10 +44556,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did I cook dinner?",
-        "She didn't cook dinner.",
+        "Did I watch TV?",
         "He study English last week.",
-        "I played football yesterday."
+        "Did Lan watch TV?",
+        "Did He help mother?"
       ],
       "answer": "He study English last week.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (studied)."
@@ -41643,9 +44577,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I cleaned the room last week.",
-        "She didn't cook dinner.",
         "Did I help mother?",
+        "He cooked dinner yesterday.",
+        "I studied English last week.",
         "Lan didn't played football."
       ],
       "answer": "Lan didn't played football.",
@@ -41664,9 +44598,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did I help mother?",
         "He didn't cook dinner.",
-        "Did She help mother?",
+        "I studied English last week.",
+        "He cooked dinner yesterday.",
         "Did Lan played football?"
       ],
       "answer": "Did Lan played football?",
@@ -41685,10 +44619,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I played football yesterday.",
+        "He didn't clean the room.",
+        "Did I clean the room?",
         "He walk to school yesterday.",
-        "Did He wash hands?",
-        "I watched TV last night."
+        "Did He clean the room?"
       ],
       "answer": "He walk to school yesterday.",
       "explanation": "Quá khứ đơn: động từ thêm -ed (walked)."
@@ -41706,10 +44640,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He cleaned the room last week.",
-        "I called a friend last night.",
-        "I helped mother last night.",
-        "Lan didn't watched TV."
+        "Lan didn't watched TV.",
+        "He watched TV last night.",
+        "Did He help mother?",
+        "I watched TV last night."
       ],
       "answer": "Lan didn't watched TV.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (watch)."
@@ -41728,9 +44662,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "Did Lan watched TV?",
-        "He walked to school yesterday.",
-        "He cooked dinner yesterday.",
-        "I didn't play football."
+        "He cleaned the room last week.",
+        "Did He cook dinner?",
+        "He cooked dinner yesterday."
       ],
       "answer": "Did Lan watched TV?",
       "explanation": "Sau Did, động từ giữ nguyên thể (watch)."
@@ -41750,10 +44684,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She didn't go to school.",
-        "I found a ball yesterday.",
-        "He ate rice yesterday.",
-        "I goed to school yesterday."
+        "I goed to school yesterday.",
+        "I didn't buy a book.",
+        "I ran fast yesterday.",
+        "He made a cake yesterday."
       ],
       "answer": "I goed to school yesterday.",
       "explanation": "Quá khứ của go là went, không phải goed."
@@ -41771,10 +44705,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I didn't went to school.",
-        "I went to school yesterday.",
-        "He made a cake yesterday.",
-        "I took a pen yesterday."
+        "I didn't give me a pen.",
+        "He didn't give me a pen.",
+        "I drank milk yesterday.",
+        "I didn't went to school."
       ],
       "answer": "I didn't went to school.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (go)."
@@ -41792,10 +44726,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She didn't go to school.",
-        "I saw a bird yesterday.",
-        "I took a pen yesterday.",
-        "Did I went to school?"
+        "Did He eat rice?",
+        "Did I went to school?",
+        "I bought a book yesterday.",
+        "Did He see a bird?"
       ],
       "answer": "Did I went to school?",
       "explanation": "Sau Did, động từ giữ nguyên thể (go)."
@@ -41813,10 +44747,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I buyed a book yesterday.",
-        "I didn't eat rice.",
-        "Did He take a pen?",
-        "Did I eat rice?"
+        "I drank milk yesterday.",
+        "He didn't take a pen.",
+        "Did I eat rice?",
+        "I buyed a book yesterday."
       ],
       "answer": "I buyed a book yesterday.",
       "explanation": "Quá khứ của buy là bought, không phải buyed."
@@ -41834,10 +44768,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He didn't eat rice.",
-        "Did I give me a pen?",
-        "I didn't bought a book.",
-        "He ate rice yesterday."
+        "Did He see a bird?",
+        "He didn't take a pen.",
+        "He went to school yesterday.",
+        "I didn't bought a book."
       ],
       "answer": "I didn't bought a book.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (buy)."
@@ -41855,10 +44789,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did I bought a book?",
-        "He didn't make a cake.",
-        "I went to school yesterday.",
-        "I drank milk yesterday."
+        "I ate rice yesterday.",
+        "He didn't eat rice.",
+        "He bought a book yesterday.",
+        "Did I bought a book?"
       ],
       "answer": "Did I bought a book?",
       "explanation": "Sau Did, động từ giữ nguyên thể (buy)."
@@ -41876,10 +44810,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I took a pen yesterday.",
-        "Did He see a bird?",
-        "He took a pen yesterday.",
-        "I eated rice yesterday."
+        "I didn't go to school.",
+        "I eated rice yesterday.",
+        "I sang a song yesterday.",
+        "I didn't see a bird."
       ],
       "answer": "I eated rice yesterday.",
       "explanation": "Quá khứ của eat là ate, không phải eated."
@@ -41897,10 +44831,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I drank milk yesterday.",
-        "Did I drink milk?",
         "I didn't ate rice.",
-        "I ran fast yesterday."
+        "I made a cake yesterday.",
+        "I drank milk yesterday.",
+        "She didn't see a bird."
       ],
       "answer": "I didn't ate rice.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (eat)."
@@ -41918,9 +44852,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did I make a cake?",
-        "I found a ball yesterday.",
-        "He didn't give me a pen.",
+        "Did He drink milk?",
+        "Did He give me a pen?",
+        "He didn't take a pen.",
         "Did I ate rice?"
       ],
       "answer": "Did I ate rice?",
@@ -41939,10 +44873,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did I eat rice?",
         "I seed a bird yesterday.",
-        "I didn't give me a pen.",
-        "I didn't make a cake."
+        "I ran fast yesterday.",
+        "Did He drink milk?",
+        "He didn't see a bird."
       ],
       "answer": "I seed a bird yesterday.",
       "explanation": "Quá khứ của see là saw, không phải seed."
@@ -41960,10 +44894,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He took a pen yesterday.",
+        "I went to school yesterday.",
         "I didn't saw a bird.",
-        "Did He buy a book?",
-        "I didn't give me a pen.",
-        "He ate rice yesterday."
+        "Did He eat rice?"
       ],
       "answer": "I didn't saw a bird.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (see)."
@@ -41981,10 +44915,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did He see a bird?",
-        "I didn't buy a book.",
+        "I swam in the pool yesterday.",
+        "Did I take a pen?",
         "Did I saw a bird?",
-        "Did He give me a pen?"
+        "I gave me a pen yesterday."
       ],
       "answer": "Did I saw a bird?",
       "explanation": "Sau Did, động từ giữ nguyên thể (see)."
@@ -42002,10 +44936,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He made a cake yesterday.",
-        "I drank milk yesterday.",
-        "I maked a cake yesterday.",
-        "She didn't eat rice."
+        "Did He give me a pen?",
+        "She didn't see a bird.",
+        "Did She eat rice?",
+        "I maked a cake yesterday."
       ],
       "answer": "I maked a cake yesterday.",
       "explanation": "Quá khứ của make là made, không phải maked."
@@ -42023,10 +44957,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He didn't eat rice.",
         "I didn't made a cake.",
         "I didn't go to school.",
-        "I swam in the pool yesterday.",
-        "I sang a song yesterday."
+        "Did He take a pen?"
       ],
       "answer": "I didn't made a cake.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (make)."
@@ -42045,9 +44979,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "Did I made a cake?",
-        "Did He eat rice?",
         "Did He drink milk?",
-        "I sang a song yesterday."
+        "He took a pen yesterday.",
+        "She didn't see a bird."
       ],
       "answer": "Did I made a cake?",
       "explanation": "Sau Did, động từ giữ nguyên thể (make)."
@@ -42065,10 +44999,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I taked a pen yesterday.",
-        "Did I take a pen?",
-        "She didn't see a bird.",
-        "Did She eat rice?"
+        "Did I go to school?",
+        "I made a cake yesterday.",
+        "Did I eat rice?",
+        "I taked a pen yesterday."
       ],
       "answer": "I taked a pen yesterday.",
       "explanation": "Quá khứ của take là took, không phải taked."
@@ -42086,9 +45020,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did She buy a book?",
+        "She didn't see a bird.",
         "I didn't took a pen.",
-        "He saw a bird yesterday.",
+        "Did I eat rice?",
         "He didn't give me a pen."
       ],
       "answer": "I didn't took a pen.",
@@ -42107,10 +45041,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He took a pen yesterday.",
         "Did I took a pen?",
-        "I saw a bird yesterday.",
-        "Did I give me a pen?",
-        "She didn't buy a book."
+        "I didn't eat rice.",
+        "Did I drink milk?"
       ],
       "answer": "Did I took a pen?",
       "explanation": "Sau Did, động từ giữ nguyên thể (take)."
@@ -42128,10 +45062,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did He make a cake?",
-        "I drinked milk yesterday.",
-        "I didn't see a bird.",
-        "Did He go to school?"
+        "He didn't buy a book.",
+        "He took a pen yesterday.",
+        "He saw a bird yesterday.",
+        "I drinked milk yesterday."
       ],
       "answer": "I drinked milk yesterday.",
       "explanation": "Quá khứ của drink là drank, không phải drinked."
@@ -42150,9 +45084,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "I didn't drank milk.",
-        "I bought a book yesterday.",
-        "He made a cake yesterday.",
-        "I didn't eat rice."
+        "Did She go to school?",
+        "He didn't buy a book.",
+        "I didn't go to school."
       ],
       "answer": "I didn't drank milk.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (drink)."
@@ -42170,10 +45104,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He didn't see a bird.",
+        "I didn't make a cake.",
         "Did I drank milk?",
-        "Did He go to school?",
-        "Did I go to school?",
-        "Did She eat rice?"
+        "Did She buy a book?"
       ],
       "answer": "Did I drank milk?",
       "explanation": "Sau Did, động từ giữ nguyên thể (drink)."
@@ -42191,10 +45125,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I read a book yesterday.",
+        "He didn't take a pen.",
+        "He didn't make a cake.",
         "I gived me a pen yesterday.",
-        "He ate rice yesterday.",
-        "She didn't buy a book."
+        "I didn't see a bird."
       ],
       "answer": "I gived me a pen yesterday.",
       "explanation": "Quá khứ của give là gave, không phải gived."
@@ -42212,10 +45146,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He bought a book yesterday.",
+        "He ate rice yesterday.",
         "I didn't gave me a pen.",
-        "He went to school yesterday.",
-        "He made a cake yesterday."
+        "I didn't see a bird.",
+        "I gave me a pen yesterday."
       ],
       "answer": "I didn't gave me a pen.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (give)."
@@ -42233,10 +45167,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I ate rice yesterday.",
-        "He took a pen yesterday.",
         "Did I gave me a pen?",
-        "I didn't make a cake."
+        "Did I go to school?",
+        "He didn't drink milk.",
+        "He didn't see a bird."
       ],
       "answer": "Did I gave me a pen?",
       "explanation": "Sau Did, động từ giữ nguyên thể (give)."
@@ -42254,10 +45188,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did She eat rice?",
-        "He took a pen yesterday.",
+        "I saw a bird yesterday.",
+        "Did I go to school?",
         "I finded a ball yesterday.",
-        "She didn't eat rice."
+        "I didn't give me a pen."
       ],
       "answer": "I finded a ball yesterday.",
       "explanation": "Quá khứ của find là found, không phải finded."
@@ -42275,10 +45209,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did He eat rice?",
-        "I swam in the pool yesterday.",
+        "I bought a book yesterday.",
         "He didn't went to school.",
-        "Did He take a pen?"
+        "She didn't eat rice.",
+        "I didn't go to school."
       ],
       "answer": "He didn't went to school.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (go)."
@@ -42296,10 +45230,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did She eat rice?",
-        "I gave me a pen yesterday.",
-        "I read a book yesterday.",
-        "Did He went to school?"
+        "He didn't eat rice.",
+        "He didn't take a pen.",
+        "Did He went to school?",
+        "Did I buy a book?"
       ],
       "answer": "Did He went to school?",
       "explanation": "Sau Did, động từ giữ nguyên thể (go)."
@@ -42317,10 +45251,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He didn't drink milk.",
-        "He bought a book yesterday.",
-        "He didn't make a cake.",
-        "I singed a song yesterday."
+        "I singed a song yesterday.",
+        "He didn't go to school.",
+        "He took a pen yesterday.",
+        "I read a book yesterday."
       ],
       "answer": "I singed a song yesterday.",
       "explanation": "Quá khứ của sing là sang, không phải singed."
@@ -42338,10 +45272,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I didn't give me a pen.",
         "He didn't bought a book.",
-        "He didn't go to school.",
-        "She didn't go to school."
+        "Did He take a pen?",
+        "Did I eat rice?",
+        "I went to school yesterday."
       ],
       "answer": "He didn't bought a book.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (buy)."
@@ -42359,10 +45293,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did She eat rice?",
+        "He didn't drink milk.",
+        "I didn't take a pen.",
         "Did He bought a book?",
-        "I didn't drink milk.",
-        "Did I take a pen?"
+        "He didn't buy a book."
       ],
       "answer": "Did He bought a book?",
       "explanation": "Sau Did, động từ giữ nguyên thể (buy)."
@@ -42380,10 +45314,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He didn't go to school.",
+        "He made a cake yesterday.",
         "I swimmed in the pool yesterday.",
         "He didn't eat rice.",
-        "I wrote a letter yesterday."
+        "I didn't take a pen."
       ],
       "answer": "I swimmed in the pool yesterday.",
       "explanation": "Quá khứ của swim là swam, không phải swimmed."
@@ -42401,10 +45335,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He went to school yesterday.",
-        "I didn't give me a pen.",
-        "I saw a bird yesterday.",
-        "He didn't ate rice."
+        "He ate rice yesterday.",
+        "I gave me a pen yesterday.",
+        "He didn't ate rice.",
+        "Did I buy a book?"
       ],
       "answer": "He didn't ate rice.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (eat)."
@@ -42422,10 +45356,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I bought a book yesterday.",
-        "He didn't give me a pen.",
-        "Did I take a pen?",
-        "Did He ate rice?"
+        "Did I drink milk?",
+        "I didn't take a pen.",
+        "Did He ate rice?",
+        "Did I eat rice?"
       ],
       "answer": "Did He ate rice?",
       "explanation": "Sau Did, động từ giữ nguyên thể (eat)."
@@ -42443,10 +45377,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "She didn't go to school.",
         "I runned fast yesterday.",
-        "Did He buy a book?",
-        "I didn't go to school.",
-        "He made a cake yesterday."
+        "He didn't give me a pen.",
+        "He didn't make a cake."
       ],
       "answer": "I runned fast yesterday.",
       "explanation": "Quá khứ của run là ran, không phải runned."
@@ -42464,10 +45398,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did He give me a pen?",
-        "He didn't give me a pen.",
-        "I went to school yesterday.",
-        "He didn't saw a bird."
+        "He didn't saw a bird.",
+        "Did He take a pen?",
+        "Did I buy a book?",
+        "He didn't go to school."
       ],
       "answer": "He didn't saw a bird.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (see)."
@@ -42485,10 +45419,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "He went to school yesterday.",
+        "Did She eat rice?",
         "Did He saw a bird?",
-        "Did She buy a book?",
-        "He bought a book yesterday.",
-        "Did He drink milk?"
+        "She didn't go to school."
       ],
       "answer": "Did He saw a bird?",
       "explanation": "Sau Did, động từ giữ nguyên thể (see)."
@@ -42506,10 +45440,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I didn't drink milk.",
-        "She didn't eat rice.",
         "I writed a letter yesterday.",
-        "I gave me a pen yesterday."
+        "Did I go to school?",
+        "She didn't see a bird.",
+        "She didn't eat rice."
       ],
       "answer": "I writed a letter yesterday.",
       "explanation": "Quá khứ của write là wrote, không phải writed."
@@ -42527,10 +45461,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did I give me a pen?",
-        "He ate rice yesterday.",
-        "He didn't made a cake.",
-        "Did He give me a pen?"
+        "Did She eat rice?",
+        "He didn't go to school.",
+        "Did He take a pen?",
+        "He didn't made a cake."
       ],
       "answer": "He didn't made a cake.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (make)."
@@ -42548,10 +45482,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did He made a cake?",
-        "He bought a book yesterday.",
-        "I didn't go to school.",
-        "Did I eat rice?"
+        "I didn't see a bird.",
+        "I went to school yesterday.",
+        "Did I give me a pen?",
+        "Did He made a cake?"
       ],
       "answer": "Did He made a cake?",
       "explanation": "Sau Did, động từ giữ nguyên thể (make)."
@@ -42569,10 +45503,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I sang a song yesterday.",
+        "I didn't go to school.",
         "I readed a book yesterday.",
-        "I saw a bird yesterday.",
-        "Did I take a pen?",
-        "I found a ball yesterday."
+        "He didn't take a pen."
       ],
       "answer": "I readed a book yesterday.",
       "explanation": "Quá khứ của read là read, không phải readed."
@@ -42590,9 +45524,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I didn't go to school.",
-        "I wrote a letter yesterday.",
-        "He didn't make a cake.",
+        "I took a pen yesterday.",
+        "I didn't give me a pen.",
+        "I didn't see a bird.",
         "He didn't took a pen."
       ],
       "answer": "He didn't took a pen.",
@@ -42611,10 +45545,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I made a cake yesterday.",
-        "Did I take a pen?",
-        "I didn't drink milk.",
-        "Did He took a pen?"
+        "He made a cake yesterday.",
+        "I bought a book yesterday.",
+        "Did He took a pen?",
+        "She didn't buy a book."
       ],
       "answer": "Did He took a pen?",
       "explanation": "Sau Did, động từ giữ nguyên thể (take)."
@@ -42632,10 +45566,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He didn't buy a book.",
-        "He took a pen yesterday.",
+        "He didn't take a pen.",
+        "She didn't buy a book.",
         "He goed to school yesterday.",
-        "I read a book yesterday."
+        "I wrote a letter yesterday."
       ],
       "answer": "He goed to school yesterday.",
       "explanation": "Quá khứ của go là went, không phải goed."
@@ -42653,10 +45587,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I drank milk yesterday.",
-        "She didn't buy a book.",
+        "He didn't make a cake.",
+        "He bought a book yesterday.",
         "He didn't drank milk.",
-        "I went to school yesterday."
+        "I didn't buy a book."
       ],
       "answer": "He didn't drank milk.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (drink)."
@@ -42674,10 +45608,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did He drank milk?",
-        "Did He see a bird?",
-        "He ate rice yesterday.",
-        "Did I give me a pen?"
+        "I found a ball yesterday.",
+        "Did I go to school?",
+        "I ran fast yesterday.",
+        "Did He drank milk?"
       ],
       "answer": "Did He drank milk?",
       "explanation": "Sau Did, động từ giữ nguyên thể (drink)."
@@ -42695,9 +45629,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did She eat rice?",
+        "I took a pen yesterday.",
         "Did I go to school?",
-        "Did He eat rice?",
+        "Did He see a bird?",
         "He buyed a book yesterday."
       ],
       "answer": "He buyed a book yesterday.",
@@ -42717,9 +45651,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "He didn't gave me a pen.",
-        "He didn't make a cake.",
-        "He saw a bird yesterday.",
-        "I sang a song yesterday."
+        "I ate rice yesterday.",
+        "Did He buy a book?",
+        "I didn't drink milk."
       ],
       "answer": "He didn't gave me a pen.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (give)."
@@ -42737,10 +45671,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I ran fast yesterday.",
+        "I drank milk yesterday.",
+        "I found a ball yesterday.",
         "Did He gave me a pen?",
-        "I didn't take a pen.",
-        "He didn't take a pen."
+        "I swam in the pool yesterday."
       ],
       "answer": "Did He gave me a pen?",
       "explanation": "Sau Did, động từ giữ nguyên thể (give)."
@@ -42758,10 +45692,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He saw a bird yesterday.",
-        "He eated rice yesterday.",
-        "He didn't buy a book.",
-        "I ran fast yesterday."
+        "She didn't go to school.",
+        "Did I make a cake?",
+        "I read a book yesterday.",
+        "He eated rice yesterday."
       ],
       "answer": "He eated rice yesterday.",
       "explanation": "Quá khứ của eat là ate, không phải eated."
@@ -42780,9 +45714,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "She didn't went to school.",
-        "I ate rice yesterday.",
-        "I went to school yesterday.",
-        "I gave me a pen yesterday."
+        "Did He drink milk?",
+        "Did She go to school?",
+        "Did He see a bird?"
       ],
       "answer": "She didn't went to school.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (go)."
@@ -42800,10 +45734,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I made a cake yesterday.",
+        "She didn't buy a book.",
         "Did She went to school?",
-        "I drank milk yesterday.",
-        "Did He drink milk?",
-        "He went to school yesterday."
+        "I found a ball yesterday."
       ],
       "answer": "Did She went to school?",
       "explanation": "Sau Did, động từ giữ nguyên thể (go)."
@@ -42821,10 +45755,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did I give me a pen?",
-        "She didn't go to school.",
-        "I didn't give me a pen.",
-        "He seed a bird yesterday."
+        "He seed a bird yesterday.",
+        "Did He drink milk?",
+        "I went to school yesterday.",
+        "He went to school yesterday."
       ],
       "answer": "He seed a bird yesterday.",
       "explanation": "Quá khứ của see là saw, không phải seed."
@@ -42842,10 +45776,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did He give me a pen?",
-        "I gave me a pen yesterday.",
-        "She didn't bought a book.",
-        "I didn't eat rice."
+        "He didn't see a bird.",
+        "He bought a book yesterday.",
+        "I swam in the pool yesterday.",
+        "She didn't bought a book."
       ],
       "answer": "She didn't bought a book.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (buy)."
@@ -42863,10 +45797,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I found a ball yesterday.",
         "Did She bought a book?",
-        "She didn't go to school.",
-        "Did She see a bird?",
-        "Did He make a cake?"
+        "He didn't give me a pen.",
+        "I didn't drink milk."
       ],
       "answer": "Did She bought a book?",
       "explanation": "Sau Did, động từ giữ nguyên thể (buy)."
@@ -42884,10 +45818,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He ate rice yesterday.",
+        "He didn't eat rice.",
         "He maked a cake yesterday.",
-        "He didn't take a pen.",
-        "Did She go to school?"
+        "Did She see a bird?",
+        "I didn't eat rice."
       ],
       "answer": "He maked a cake yesterday.",
       "explanation": "Quá khứ của make là made, không phải maked."
@@ -42905,10 +45839,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I found a ball yesterday.",
+        "Did I see a bird?",
         "She didn't ate rice.",
-        "I sang a song yesterday.",
-        "I swam in the pool yesterday.",
-        "He saw a bird yesterday."
+        "He didn't make a cake."
       ],
       "answer": "She didn't ate rice.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (eat)."
@@ -42926,10 +45860,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I took a pen yesterday.",
-        "He saw a bird yesterday.",
-        "Did She ate rice?",
-        "I saw a bird yesterday."
+        "Did He buy a book?",
+        "He went to school yesterday.",
+        "I read a book yesterday.",
+        "Did She ate rice?"
       ],
       "answer": "Did She ate rice?",
       "explanation": "Sau Did, động từ giữ nguyên thể (eat)."
@@ -42947,10 +45881,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He taked a pen yesterday.",
         "He didn't make a cake.",
-        "Did He go to school?",
-        "Did I make a cake?"
+        "He taked a pen yesterday.",
+        "Did He take a pen?",
+        "He went to school yesterday."
       ],
       "answer": "He taked a pen yesterday.",
       "explanation": "Quá khứ của take là took, không phải taked."
@@ -42968,10 +45902,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He didn't make a cake.",
+        "Did I buy a book?",
+        "I didn't take a pen.",
         "She didn't saw a bird.",
-        "Did She eat rice?",
-        "Did She see a bird?"
+        "Did He give me a pen?"
       ],
       "answer": "She didn't saw a bird.",
       "explanation": "Sau didn't, động từ giữ nguyên thể (see)."
@@ -42989,10 +45923,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Did He eat rice?",
-        "I found a ball yesterday.",
         "Did She saw a bird?",
-        "I went to school yesterday."
+        "Did He go to school?",
+        "He didn't eat rice.",
+        "I sang a song yesterday."
       ],
       "answer": "Did She saw a bird?",
       "explanation": "Sau Did, động từ giữ nguyên thể (see)."
@@ -43012,9 +45946,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He will play football.",
-        "He won't play football.",
-        "He is going to play football.",
+        "I am going to travel next week.",
+        "She won't play football.",
+        "I will call you tonight.",
         "I will goes to school."
       ],
       "answer": "I will goes to school.",
@@ -43033,10 +45967,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She will play football.",
+        "She won't play football.",
         "He will going to school.",
-        "Lan will visit grandma.",
-        "I will go to school."
+        "She will play football.",
+        "He won't help mother."
       ],
       "answer": "He will going to school.",
       "explanation": "Sau will, động từ giữ nguyên thể (go, không phải going)."
@@ -43055,9 +45989,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "I is going to go to school.",
-        "She won't visit grandma.",
-        "I will cook dinner.",
-        "I will travel next week."
+        "He is going to go to school.",
+        "He is going to help mother.",
+        "He is going to play football."
       ],
       "answer": "I is going to go to school.",
       "explanation": "I đi với am."
@@ -43076,9 +46010,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "I am going to goes to school.",
-        "Lan will help mother.",
-        "She will play football.",
-        "I will go to school."
+        "I am going to call you tonight.",
+        "He will play football.",
+        "She won't play football."
       ],
       "answer": "I am going to goes to school.",
       "explanation": "Sau be going to, động từ giữ nguyên thể (go)."
@@ -43096,10 +46030,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am going to play football.",
+        "She won't go to school.",
+        "Lan won't help mother.",
         "He won't goes to school.",
-        "I will play football.",
-        "I will go to school."
+        "Lan won't visit grandma."
       ],
       "answer": "He won't goes to school.",
       "explanation": "Sau won't, động từ giữ nguyên thể (go)."
@@ -43117,9 +46051,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am going to visit grandma.",
-        "He will go to school.",
-        "I will read a book tomorrow.",
+        "She will play football.",
+        "He is going to help mother.",
+        "He won't visit grandma.",
         "I will plays football."
       ],
       "answer": "I will plays football.",
@@ -43139,9 +46073,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "He will playing football.",
-        "I am going to read a book tomorrow.",
-        "She won't go to school.",
-        "She will help mother."
+        "She is going to play football.",
+        "Lan won't go to school.",
+        "I will play football."
       ],
       "answer": "He will playing football.",
       "explanation": "Sau will, động từ giữ nguyên thể (play, không phải playing)."
@@ -43159,10 +46093,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He won't visit grandma.",
+        "I am going to visit grandma.",
         "I is going to play football.",
-        "Lan will help mother.",
-        "Lan will go to school."
+        "She won't help mother.",
+        "I will read a book tomorrow."
       ],
       "answer": "I is going to play football.",
       "explanation": "I đi với am."
@@ -43180,10 +46114,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am going to plays football.",
-        "She will go to school.",
         "Lan won't help mother.",
-        "He is going to visit grandma."
+        "He will play football.",
+        "I am going to plays football.",
+        "Lan will go to school."
       ],
       "answer": "I am going to plays football.",
       "explanation": "Sau be going to, động từ giữ nguyên thể (play)."
@@ -43201,10 +46135,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She will go to school.",
-        "He won't help mother.",
+        "She will visit grandma.",
         "He won't plays football.",
-        "He is going to help mother."
+        "Lan won't help mother.",
+        "I will cook dinner."
       ],
       "answer": "He won't plays football.",
       "explanation": "Sau won't, động từ giữ nguyên thể (play)."
@@ -43222,10 +46156,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan will play football.",
-        "Lan won't play football.",
-        "I am going to play football.",
-        "I will helps mother."
+        "He is going to help mother.",
+        "She will visit grandma.",
+        "I will helps mother.",
+        "Lan won't help mother."
       ],
       "answer": "I will helps mother.",
       "explanation": "Sau will, động từ giữ nguyên thể (help)."
@@ -43243,10 +46177,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "She will go to school.",
+        "I am going to help mother.",
         "He will helping mother.",
-        "She won't go to school.",
-        "He will go to school.",
-        "I will call you tonight."
+        "He won't go to school."
       ],
       "answer": "He will helping mother.",
       "explanation": "Sau will, động từ giữ nguyên thể (help, không phải helping)."
@@ -43264,10 +46198,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He won't go to school.",
         "I is going to help mother.",
-        "Lan won't go to school.",
-        "She will go to school."
+        "I will help mother.",
+        "I will play football.",
+        "He is going to visit grandma."
       ],
       "answer": "I is going to help mother.",
       "explanation": "I đi với am."
@@ -43285,10 +46219,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She is going to visit grandma.",
-        "She is going to help mother.",
+        "Lan will visit grandma.",
+        "I am going to read a book tomorrow.",
         "I am going to helps mother.",
-        "I will help mother."
+        "She won't visit grandma."
       ],
       "answer": "I am going to helps mother.",
       "explanation": "Sau be going to, động từ giữ nguyên thể (help)."
@@ -43306,10 +46240,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She won't go to school.",
-        "I am going to visit grandma.",
+        "She is going to go to school.",
+        "I am going to read a book tomorrow.",
         "He won't helps mother.",
-        "She won't play football."
+        "She is going to visit grandma."
       ],
       "answer": "He won't helps mother.",
       "explanation": "Sau won't, động từ giữ nguyên thể (help)."
@@ -43327,10 +46261,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I will travel next week.",
         "I will visits grandma.",
-        "Lan won't help mother.",
-        "He is going to play football.",
-        "Lan won't go to school."
+        "She is going to go to school.",
+        "He won't help mother."
       ],
       "answer": "I will visits grandma.",
       "explanation": "Sau will, động từ giữ nguyên thể (visit)."
@@ -43349,9 +46283,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "He will visiting grandma.",
-        "She will help mother.",
-        "I will play football.",
-        "He won't visit grandma."
+        "I am going to cook dinner.",
+        "I am going to read a book tomorrow.",
+        "She won't visit grandma."
       ],
       "answer": "He will visiting grandma.",
       "explanation": "Sau will, động từ giữ nguyên thể (visit, không phải visiting)."
@@ -43369,10 +46303,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She is going to help mother.",
+        "I am going to travel next week.",
         "I is going to visit grandma.",
-        "He is going to visit grandma.",
-        "Lan won't go to school."
+        "I will go to school.",
+        "I will help mother."
       ],
       "answer": "I is going to visit grandma.",
       "explanation": "I đi với am."
@@ -43390,10 +46324,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I will visit grandma.",
-        "I will cook dinner.",
-        "I am going to visits grandma.",
-        "I will call you tonight."
+        "I will go to school.",
+        "I am going to go to school.",
+        "I am going to call you tonight.",
+        "I am going to visits grandma."
       ],
       "answer": "I am going to visits grandma.",
       "explanation": "Sau be going to, động từ giữ nguyên thể (visit)."
@@ -43412,9 +46346,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "He won't visits grandma.",
-        "I am going to cook dinner.",
-        "He will visit grandma.",
-        "I am going to travel next week."
+        "Lan will help mother.",
+        "Lan won't go to school.",
+        "I am going to help mother."
       ],
       "answer": "He won't visits grandma.",
       "explanation": "Sau won't, động từ giữ nguyên thể (visit)."
@@ -43432,10 +46366,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I will go to school.",
-        "I will cooks dinner.",
-        "She is going to play football.",
-        "She won't play football."
+        "He is going to visit grandma.",
+        "I will read a book tomorrow.",
+        "She is going to help mother.",
+        "I will cooks dinner."
       ],
       "answer": "I will cooks dinner.",
       "explanation": "Sau will, động từ giữ nguyên thể (cook)."
@@ -43454,9 +46388,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "She will going to school.",
-        "She will visit grandma.",
-        "He is going to visit grandma.",
-        "I will cook dinner."
+        "I will cook dinner.",
+        "She will play football.",
+        "Lan will go to school."
       ],
       "answer": "She will going to school.",
       "explanation": "Sau will, động từ giữ nguyên thể (go, không phải going)."
@@ -43474,10 +46408,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She is going to go to school.",
-        "I will call you tonight.",
-        "I am going to read a book tomorrow.",
-        "I is going to cook dinner."
+        "He won't go to school.",
+        "I is going to cook dinner.",
+        "She will help mother.",
+        "I am going to play football."
       ],
       "answer": "I is going to cook dinner.",
       "explanation": "I đi với am."
@@ -43495,10 +46429,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am going to play football.",
+        "She is going to play football.",
+        "I am going to cook dinner.",
         "He is going to goes to school.",
-        "He won't play football.",
-        "I will call you tonight."
+        "He won't help mother."
       ],
       "answer": "He is going to goes to school.",
       "explanation": "Sau be going to, động từ giữ nguyên thể (go)."
@@ -43516,10 +46450,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am going to cook dinner.",
-        "I am going to travel next week.",
+        "Lan will visit grandma.",
         "She won't goes to school.",
-        "I will play football."
+        "He is going to visit grandma.",
+        "I am going to read a book tomorrow."
       ],
       "answer": "She won't goes to school.",
       "explanation": "Sau won't, động từ giữ nguyên thể (go)."
@@ -43537,10 +46471,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan won't go to school.",
+        "I am going to play football.",
         "I will travels next week.",
-        "He is going to visit grandma.",
-        "He won't go to school."
+        "I will call you tonight.",
+        "Lan won't play football."
       ],
       "answer": "I will travels next week.",
       "explanation": "Sau will, động từ giữ nguyên thể (travel)."
@@ -43558,10 +46492,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is going to play football.",
-        "She is going to play football.",
         "She will playing football.",
-        "He will play football."
+        "I will call you tonight.",
+        "Lan will help mother.",
+        "Lan will visit grandma."
       ],
       "answer": "She will playing football.",
       "explanation": "Sau will, động từ giữ nguyên thể (play, không phải playing)."
@@ -43579,10 +46513,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I will read a book tomorrow.",
-        "I is going to travel next week.",
-        "Lan will play football.",
-        "She won't help mother."
+        "She will go to school.",
+        "He is going to play football.",
+        "I will play football.",
+        "I is going to travel next week."
       ],
       "answer": "I is going to travel next week.",
       "explanation": "I đi với am."
@@ -43600,10 +46534,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She will play football.",
-        "I will call you tonight.",
+        "She won't play football.",
         "He is going to plays football.",
-        "I will help mother."
+        "I am going to read a book tomorrow.",
+        "She is going to visit grandma."
       ],
       "answer": "He is going to plays football.",
       "explanation": "Sau be going to, động từ giữ nguyên thể (play)."
@@ -43621,10 +46555,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He won't help mother.",
+        "He will help mother.",
+        "He will play football.",
         "She won't plays football.",
-        "I am going to read a book tomorrow.",
-        "Lan will visit grandma."
+        "I am going to travel next week."
       ],
       "answer": "She won't plays football.",
       "explanation": "Sau won't, động từ giữ nguyên thể (play)."
@@ -43642,10 +46576,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He will go to school.",
-        "He is going to visit grandma.",
         "I will calls you tonight.",
-        "Lan will help mother."
+        "He won't go to school.",
+        "I am going to go to school.",
+        "She is going to help mother."
       ],
       "answer": "I will calls you tonight.",
       "explanation": "Sau will, động từ giữ nguyên thể (call)."
@@ -43663,10 +46597,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She will play football.",
-        "She is going to go to school.",
-        "Lan won't visit grandma.",
-        "She will helping mother."
+        "I am going to help mother.",
+        "She is going to help mother.",
+        "She will helping mother.",
+        "I am going to go to school."
       ],
       "answer": "She will helping mother.",
       "explanation": "Sau will, động từ giữ nguyên thể (help, không phải helping)."
@@ -43684,10 +46618,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He is going to play football.",
-        "I will help mother.",
-        "I am going to go to school.",
-        "I is going to call you tonight."
+        "He is going to help mother.",
+        "I is going to call you tonight.",
+        "Lan won't visit grandma.",
+        "She won't go to school."
       ],
       "answer": "I is going to call you tonight.",
       "explanation": "I đi với am."
@@ -43705,10 +46639,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am going to visit grandma.",
-        "He is going to helps mother.",
-        "She will go to school.",
-        "Lan will go to school."
+        "He won't play football.",
+        "He will play football.",
+        "He won't visit grandma.",
+        "He is going to helps mother."
       ],
       "answer": "He is going to helps mother.",
       "explanation": "Sau be going to, động từ giữ nguyên thể (help)."
@@ -43726,10 +46660,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She won't helps mother.",
-        "She is going to go to school.",
-        "Lan won't help mother.",
-        "He will play football."
+        "Lan will visit grandma.",
+        "I will play football.",
+        "He won't go to school.",
+        "She won't helps mother."
       ],
       "answer": "She won't helps mother.",
       "explanation": "Sau won't, động từ giữ nguyên thể (help)."
@@ -43747,10 +46681,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am going to cook dinner.",
-        "He won't visit grandma.",
-        "Lan will go to school.",
-        "I will reads a book tomorrow."
+        "I will reads a book tomorrow.",
+        "He won't play football.",
+        "She won't help mother.",
+        "I will play football."
       ],
       "answer": "I will reads a book tomorrow.",
       "explanation": "Sau will, động từ giữ nguyên thể (read)."
@@ -43768,10 +46702,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I will read a book tomorrow.",
-        "Lan will help mother.",
-        "She will visiting grandma.",
-        "I am going to travel next week."
+        "He won't help mother.",
+        "She will help mother.",
+        "I will travel next week.",
+        "She will visiting grandma."
       ],
       "answer": "She will visiting grandma.",
       "explanation": "Sau will, động từ giữ nguyên thể (visit, không phải visiting)."
@@ -43789,10 +46723,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She is going to visit grandma.",
         "I is going to read a book tomorrow.",
-        "He will play football.",
-        "I am going to play football."
+        "Lan won't visit grandma.",
+        "He is going to help mother.",
+        "I am going to cook dinner."
       ],
       "answer": "I is going to read a book tomorrow.",
       "explanation": "I đi với am."
@@ -43810,9 +46744,9 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan won't help mother.",
-        "He won't help mother.",
-        "She will go to school.",
+        "He won't play football.",
+        "He is going to help mother.",
+        "I am going to help mother.",
         "He is going to visits grandma."
       ],
       "answer": "He is going to visits grandma.",
@@ -43831,10 +46765,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan will help mother.",
-        "I will play football.",
+        "I will go to school.",
+        "She is going to help mother.",
         "She won't visits grandma.",
-        "I will cook dinner."
+        "He will visit grandma."
       ],
       "answer": "She won't visits grandma.",
       "explanation": "Sau won't, động từ giữ nguyên thể (visit)."
@@ -43852,10 +46786,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He will goes to school.",
-        "I will help mother.",
-        "She is going to play football.",
-        "I will travel next week."
+        "Lan won't help mother.",
+        "He is going to play football.",
+        "I will call you tonight.",
+        "He will goes to school."
       ],
       "answer": "He will goes to school.",
       "explanation": "Sau will, động từ giữ nguyên thể (go)."
@@ -43873,10 +46807,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He won't go to school.",
-        "Lan will going to school.",
-        "I am going to read a book tomorrow.",
-        "She is going to go to school."
+        "I am going to play football.",
+        "Lan won't help mother.",
+        "She won't help mother.",
+        "Lan will going to school."
       ],
       "answer": "Lan will going to school.",
       "explanation": "Sau will, động từ giữ nguyên thể (go, không phải going)."
@@ -43894,10 +46828,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He are going to go to school.",
-        "I am going to call you tonight.",
-        "Lan will play football.",
-        "I will call you tonight."
+        "He will visit grandma.",
+        "He will go to school.",
+        "He will play football.",
+        "He are going to go to school."
       ],
       "answer": "He are going to go to school.",
       "explanation": "He đi với is."
@@ -43915,10 +46849,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He will play football.",
-        "She is going to help mother.",
+        "Lan won't go to school.",
+        "Lan won't visit grandma.",
         "She is going to goes to school.",
-        "Lan won't go to school."
+        "He is going to help mother."
       ],
       "answer": "She is going to goes to school.",
       "explanation": "Sau be going to, động từ giữ nguyên thể (go)."
@@ -43936,10 +46870,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan will go to school.",
+        "She will visit grandma.",
+        "Lan will play football.",
         "Lan won't goes to school.",
-        "I will read a book tomorrow.",
-        "She will play football."
+        "I will cook dinner."
       ],
       "answer": "Lan won't goes to school.",
       "explanation": "Sau won't, động từ giữ nguyên thể (go)."
@@ -43957,10 +46891,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I will visit grandma.",
-        "She won't play football.",
         "He will plays football.",
-        "I am going to go to school."
+        "I will travel next week.",
+        "I will go to school.",
+        "She won't go to school."
       ],
       "answer": "He will plays football.",
       "explanation": "Sau will, động từ giữ nguyên thể (play)."
@@ -43978,10 +46912,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I will read a book tomorrow.",
-        "He won't play football.",
-        "I am going to help mother.",
-        "Lan will playing football."
+        "She won't visit grandma.",
+        "Lan will playing football.",
+        "He won't go to school.",
+        "He is going to play football."
       ],
       "answer": "Lan will playing football.",
       "explanation": "Sau will, động từ giữ nguyên thể (play, không phải playing)."
@@ -43999,10 +46933,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan will go to school.",
-        "He will visit grandma.",
         "She is going to go to school.",
-        "He are going to play football."
+        "He are going to play football.",
+        "Lan won't help mother.",
+        "Lan will visit grandma."
       ],
       "answer": "He are going to play football.",
       "explanation": "He đi với is."
@@ -44020,10 +46954,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I will cook dinner.",
-        "I will help mother.",
+        "He won't go to school.",
         "She is going to plays football.",
-        "He is going to go to school."
+        "She is going to help mother.",
+        "I am going to go to school."
       ],
       "answer": "She is going to plays football.",
       "explanation": "Sau be going to, động từ giữ nguyên thể (play)."
@@ -44041,10 +46975,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
+        "I will visit grandma.",
         "Lan won't plays football.",
-        "He is going to go to school.",
-        "I am going to go to school.",
-        "I am going to help mother."
+        "He won't play football.",
+        "She won't visit grandma."
       ],
       "answer": "Lan won't plays football.",
       "explanation": "Sau won't, động từ giữ nguyên thể (play)."
@@ -44062,10 +46996,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan will help mother.",
-        "Lan won't go to school.",
-        "He will play football.",
-        "He will helps mother."
+        "He will helps mother.",
+        "She will visit grandma.",
+        "I will visit grandma.",
+        "Lan won't visit grandma."
       ],
       "answer": "He will helps mother.",
       "explanation": "Sau will, động từ giữ nguyên thể (help)."
@@ -44083,10 +47017,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "He won't visit grandma.",
-        "He will play football.",
-        "I am going to visit grandma.",
-        "Lan will helping mother."
+        "Lan will go to school.",
+        "Lan will helping mother.",
+        "She will help mother.",
+        "I am going to go to school."
       ],
       "answer": "Lan will helping mother.",
       "explanation": "Sau will, động từ giữ nguyên thể (help, không phải helping)."
@@ -44104,10 +47038,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "I am going to play football.",
-        "She is going to go to school.",
-        "I will play football.",
-        "He are going to help mother."
+        "I am going to help mother.",
+        "She will help mother.",
+        "He are going to help mother.",
+        "He won't visit grandma."
       ],
       "answer": "He are going to help mother.",
       "explanation": "He đi với is."
@@ -44125,10 +47059,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan will visit grandma.",
-        "She won't help mother.",
-        "I will help mother.",
-        "She is going to helps mother."
+        "She is going to helps mother.",
+        "She will play football.",
+        "Lan will help mother.",
+        "I am going to visit grandma."
       ],
       "answer": "She is going to helps mother.",
       "explanation": "Sau be going to, động từ giữ nguyên thể (help)."
@@ -44146,10 +47080,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan will play football.",
+        "He won't go to school.",
+        "She will go to school.",
         "Lan won't helps mother.",
-        "I will call you tonight.",
-        "Lan will visit grandma."
+        "He won't help mother."
       ],
       "answer": "Lan won't helps mother.",
       "explanation": "Sau won't, động từ giữ nguyên thể (help)."
@@ -44167,10 +47101,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "Lan will play football.",
         "He will visits grandma.",
-        "I will play football.",
-        "I am going to travel next week."
+        "I will call you tonight.",
+        "Lan will visit grandma.",
+        "I will cook dinner."
       ],
       "answer": "He will visits grandma.",
       "explanation": "Sau will, động từ giữ nguyên thể (visit)."
@@ -44189,9 +47123,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "Lan will visiting grandma.",
-        "He will go to school.",
-        "I am going to read a book tomorrow.",
-        "He won't go to school."
+        "He will help mother.",
+        "She won't go to school.",
+        "She won't visit grandma."
       ],
       "answer": "Lan will visiting grandma.",
       "explanation": "Sau will, động từ giữ nguyên thể (visit, không phải visiting)."
@@ -44209,10 +47143,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She is going to go to school.",
-        "He is going to help mother.",
-        "I will cook dinner.",
-        "He are going to visit grandma."
+        "He are going to visit grandma.",
+        "I will travel next week.",
+        "She won't play football.",
+        "I will call you tonight."
       ],
       "answer": "He are going to visit grandma.",
       "explanation": "He đi với is."
@@ -44230,10 +47164,10 @@ export const errorBanks = {
       "type": "pickWrong",
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
-        "She won't go to school.",
-        "Lan won't help mother.",
-        "I will go to school.",
-        "She is going to visits grandma."
+        "He will go to school.",
+        "She will play football.",
+        "She is going to visits grandma.",
+        "I am going to travel next week."
       ],
       "answer": "She is going to visits grandma.",
       "explanation": "Sau be going to, động từ giữ nguyên thể (visit)."
@@ -44252,9 +47186,9 @@ export const errorBanks = {
       "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
       "options": [
         "Lan won't visits grandma.",
-        "He is going to play football.",
-        "She will help mother.",
-        "Lan will visit grandma."
+        "I will call you tonight.",
+        "I am going to visit grandma.",
+        "I will cook dinner."
       ],
       "answer": "Lan won't visits grandma.",
       "explanation": "Sau won't, động từ giữ nguyên thể (visit)."
@@ -44267,6 +47201,1268 @@ export const errorBanks = {
         "Lan won't visit grandma."
       ],
       "explanation": "Sau won't, động từ giữ nguyên thể (visit)."
+    }
+  ],
+  "comparative": [
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This hat is redder than that hat.",
+        "This film is more boring than that film.",
+        "She is busier than her sister.",
+        "Tom is more tall than Jack."
+      ],
+      "answer": "Tom is more tall than Jack.",
+      "explanation": "Tính từ ngắn tall thêm -er (taller), không dùng more."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Tom is more tall than Jack.",
+      "answers": [
+        "Tom is taller than Jack."
+      ],
+      "explanation": "Tính từ ngắn tall thêm -er (taller), không dùng more."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Today is worse than yesterday.",
+        "A turtle is slower than a rabbit.",
+        "This lesson is easier than that lesson.",
+        "An elephant is biger than a dog."
+      ],
+      "answer": "An elephant is biger than a dog.",
+      "explanation": "Big gấp đôi phụ âm cuối: bigger (không phải biger)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "An elephant is biger than a dog.",
+      "answers": [
+        "An elephant is bigger than a dog."
+      ],
+      "explanation": "Big gấp đôi phụ âm cuối: bigger (không phải biger)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "His bag is heavier than my bag.",
+        "Today is sunnyer than yesterday.",
+        "A horse is faster than a cow.",
+        "This lesson is easier than that lesson."
+      ],
+      "answer": "Today is sunnyer than yesterday.",
+      "explanation": "Sunny đổi y thành i: sunnier (không phải sunnyer)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Today is sunnyer than yesterday.",
+      "answers": [
+        "Today is sunnier than yesterday."
+      ],
+      "explanation": "Sunny đổi y thành i: sunnier (không phải sunnyer)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "An elephant is bigger than a dog.",
+        "A cat is thinner than a dog.",
+        "This book is interestinger than that book.",
+        "Tom is taller than Jack."
+      ],
+      "answer": "This book is interestinger than that book.",
+      "explanation": "Interesting là tính từ dài → more interesting (không phải interestinger)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This book is interestinger than that book.",
+      "answers": [
+        "This book is more interesting than that book."
+      ],
+      "explanation": "Interesting là tính từ dài → more interesting (không phải interestinger)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This cake is more delicious than that cake.",
+        "This film is more boring than that film.",
+        "This book is gooder than that book.",
+        "This flower is prettier than that flower."
+      ],
+      "answer": "This book is gooder than that book.",
+      "explanation": "Good là từ bất quy tắc → better."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This book is gooder than that book.",
+      "answers": [
+        "This book is better than that book."
+      ],
+      "explanation": "Good là từ bất quy tắc → better."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "An elephant is bigger than a dog.",
+        "A pig is fatter than a dog.",
+        "This book is more interesting than that book.",
+        "Tom is more taller than Jack."
+      ],
+      "answer": "Tom is more taller than Jack.",
+      "explanation": "Chỉ dùng 1 cách: taller, không dùng \"more taller\"."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Tom is more taller than Jack.",
+      "answers": [
+        "Tom is taller than Jack."
+      ],
+      "explanation": "Chỉ dùng 1 cách: taller, không dùng \"more taller\"."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Today is hotter than yesterday.",
+        "The blue bag is cheaper than the red bag.",
+        "Tom is taller Jack.",
+        "This book is better than that book."
+      ],
+      "answer": "Tom is taller Jack.",
+      "explanation": "Câu so sánh hơn phải có than: Tom is taller than Jack."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Tom is taller Jack.",
+      "answers": [
+        "Tom is taller than Jack."
+      ],
+      "explanation": "Câu so sánh hơn phải có than: Tom is taller than Jack."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This book is more interesting than that book.",
+        "His bag is heavier than my bag.",
+        "Tom is tallest than Jack.",
+        "This flower is more beautiful than that flower."
+      ],
+      "answer": "Tom is tallest than Jack.",
+      "explanation": "Câu có than dùng so sánh hơn (taller), không dùng dạng nhất (tallest)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Tom is tallest than Jack.",
+      "answers": [
+        "Tom is taller than Jack."
+      ],
+      "explanation": "Câu có than dùng so sánh hơn (taller), không dùng dạng nhất (tallest)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The blue bag is cheaper than the red bag.",
+        "A pig is fatter than a dog.",
+        "An elephant is more big than a dog.",
+        "A car is more expensive than a bike."
+      ],
+      "answer": "An elephant is more big than a dog.",
+      "explanation": "Tính từ ngắn big thêm -er (bigger), không dùng more."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "An elephant is more big than a dog.",
+      "answers": [
+        "An elephant is bigger than a dog."
+      ],
+      "explanation": "Tính từ ngắn big thêm -er (bigger), không dùng more."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A giraffe is taller than a horse.",
+        "The red bag is more expensive than the blue bag.",
+        "This flower is more beautiful than that flower.",
+        "Today is hoter than yesterday."
+      ],
+      "answer": "Today is hoter than yesterday.",
+      "explanation": "Hot gấp đôi phụ âm cuối: hotter (không phải hoter)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Today is hoter than yesterday.",
+      "answers": [
+        "Today is hotter than yesterday."
+      ],
+      "explanation": "Hot gấp đôi phụ âm cuối: hotter (không phải hoter)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This film is more boring than that film.",
+        "A tiger is more dangerous than a cat.",
+        "This flower is prettyer than that flower.",
+        "Tom is taller than Jack."
+      ],
+      "answer": "This flower is prettyer than that flower.",
+      "explanation": "Pretty đổi y thành i: prettier (không phải prettyer)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This flower is prettyer than that flower.",
+      "answers": [
+        "This flower is prettier than that flower."
+      ],
+      "explanation": "Pretty đổi y thành i: prettier (không phải prettyer)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A tiger is more dangerous than a cat.",
+        "A car is more expensive than a bike.",
+        "A giraffe is taller than a horse.",
+        "The red bag is expensiveer than the blue bag."
+      ],
+      "answer": "The red bag is expensiveer than the blue bag.",
+      "explanation": "Expensive là tính từ dài → more expensive (không phải expensiveer)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The red bag is expensiveer than the blue bag.",
+      "answers": [
+        "The red bag is more expensive than the blue bag."
+      ],
+      "explanation": "Expensive là tính từ dài → more expensive (không phải expensiveer)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "An elephant is bigger than a dog.",
+        "Lan is happier than Hoa.",
+        "This hat is redder than that hat.",
+        "This book is more good than that book."
+      ],
+      "answer": "This book is more good than that book.",
+      "explanation": "Good là từ bất quy tắc → better, không dùng more good."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This book is more good than that book.",
+      "answers": [
+        "This book is better than that book."
+      ],
+      "explanation": "Good là từ bất quy tắc → better, không dùng more good."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "An elephant is more bigger than a dog.",
+        "A tiger is more dangerous than a cat.",
+        "This chair is more comfortable than that chair.",
+        "Tom is taller than Jack."
+      ],
+      "answer": "An elephant is more bigger than a dog.",
+      "explanation": "Chỉ dùng 1 cách: bigger, không dùng \"more bigger\"."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "An elephant is more bigger than a dog.",
+      "answers": [
+        "An elephant is bigger than a dog."
+      ],
+      "explanation": "Chỉ dùng 1 cách: bigger, không dùng \"more bigger\"."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A pig is fatter than a dog.",
+        "This chair is more comfortable than that chair.",
+        "This book is more interesting than that book.",
+        "An elephant is bigger a dog."
+      ],
+      "answer": "An elephant is bigger a dog.",
+      "explanation": "Câu so sánh hơn phải có than: An elephant is bigger than a dog."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "An elephant is bigger a dog.",
+      "answers": [
+        "An elephant is bigger than a dog."
+      ],
+      "explanation": "Câu so sánh hơn phải có than: An elephant is bigger than a dog."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She is busier than her sister.",
+        "A cat is thinner than a dog.",
+        "An elephant is biggest than a dog.",
+        "A car is more expensive than a bike."
+      ],
+      "answer": "An elephant is biggest than a dog.",
+      "explanation": "Câu có than dùng so sánh hơn (bigger), không dùng dạng nhất (biggest)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "An elephant is biggest than a dog.",
+      "answers": [
+        "An elephant is bigger than a dog."
+      ],
+      "explanation": "Câu có than dùng so sánh hơn (bigger), không dùng dạng nhất (biggest)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A tiger is more dangerous than a cat.",
+        "This chair is more comfortable than that chair.",
+        "A lion is stronger than a dog.",
+        "A horse is more fast than a cow."
+      ],
+      "answer": "A horse is more fast than a cow.",
+      "explanation": "Tính từ ngắn fast thêm -er (faster), không dùng more."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A horse is more fast than a cow.",
+      "answers": [
+        "A horse is faster than a cow."
+      ],
+      "explanation": "Tính từ ngắn fast thêm -er (faster), không dùng more."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This lesson is easier than that lesson.",
+        "A pig is fater than a dog.",
+        "A cat is thinner than a dog.",
+        "A lion is stronger than a dog."
+      ],
+      "answer": "A pig is fater than a dog.",
+      "explanation": "Fat gấp đôi phụ âm cuối: fatter (không phải fater)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A pig is fater than a dog.",
+      "answers": [
+        "A pig is fatter than a dog."
+      ],
+      "explanation": "Fat gấp đôi phụ âm cuối: fatter (không phải fater)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan is happier than Hoa.",
+        "A turtle is slower than a rabbit.",
+        "This lesson is easyer than that lesson.",
+        "Tom is taller than Jack."
+      ],
+      "answer": "This lesson is easyer than that lesson.",
+      "explanation": "Easy đổi y thành i: easier (không phải easyer)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This lesson is easyer than that lesson.",
+      "answers": [
+        "This lesson is easier than that lesson."
+      ],
+      "explanation": "Easy đổi y thành i: easier (không phải easyer)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The red bag is more expensive than the blue bag.",
+        "This hat is redder than that hat.",
+        "This flower is beautifuler than that flower.",
+        "A car is more expensive than a bike."
+      ],
+      "answer": "This flower is beautifuler than that flower.",
+      "explanation": "Beautiful là tính từ dài → more beautiful (không phải beautifuler)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This flower is beautifuler than that flower.",
+      "answers": [
+        "This flower is more beautiful than that flower."
+      ],
+      "explanation": "Beautiful là tính từ dài → more beautiful (không phải beautifuler)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A turtle is slower than a rabbit.",
+        "This film is more boring than that film.",
+        "A dog is smaller than an elephant.",
+        "Today is badder than yesterday."
+      ],
+      "answer": "Today is badder than yesterday.",
+      "explanation": "Bad là từ bất quy tắc → worse."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Today is badder than yesterday.",
+      "answers": [
+        "Today is worse than yesterday."
+      ],
+      "explanation": "Bad là từ bất quy tắc → worse."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Lan is happier than Hoa.",
+        "Today is sunnier than yesterday.",
+        "A horse is more faster than a cow.",
+        "A turtle is slower than a rabbit."
+      ],
+      "answer": "A horse is more faster than a cow.",
+      "explanation": "Chỉ dùng 1 cách: faster, không dùng \"more faster\"."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A horse is more faster than a cow.",
+      "answers": [
+        "A horse is faster than a cow."
+      ],
+      "explanation": "Chỉ dùng 1 cách: faster, không dùng \"more faster\"."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This question is more difficult than that question.",
+        "A horse is faster a cow.",
+        "This flower is prettier than that flower.",
+        "This book is better than that book."
+      ],
+      "answer": "A horse is faster a cow.",
+      "explanation": "Câu so sánh hơn phải có than: A horse is faster than a cow."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A horse is faster a cow.",
+      "answers": [
+        "A horse is faster than a cow."
+      ],
+      "explanation": "Câu so sánh hơn phải có than: A horse is faster than a cow."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This chair is more comfortable than that chair.",
+        "This flower is prettier than that flower.",
+        "A horse is fastest than a cow.",
+        "She is busier than her sister."
+      ],
+      "answer": "A horse is fastest than a cow.",
+      "explanation": "Câu có than dùng so sánh hơn (faster), không dùng dạng nhất (fastest)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A horse is fastest than a cow.",
+      "answers": [
+        "A horse is faster than a cow."
+      ],
+      "explanation": "Câu có than dùng so sánh hơn (faster), không dùng dạng nhất (fastest)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The blue bag is cheaper than the red bag.",
+        "This question is more difficult than that question.",
+        "She is busier than her sister.",
+        "A giraffe is more tall than a horse."
+      ],
+      "answer": "A giraffe is more tall than a horse.",
+      "explanation": "Tính từ ngắn tall thêm -er (taller), không dùng more."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A giraffe is more tall than a horse.",
+      "answers": [
+        "A giraffe is taller than a horse."
+      ],
+      "explanation": "Tính từ ngắn tall thêm -er (taller), không dùng more."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This question is more difficult than that question.",
+        "A pig is fatter than a dog.",
+        "A cat is thiner than a dog.",
+        "Today is worse than yesterday."
+      ],
+      "answer": "A cat is thiner than a dog.",
+      "explanation": "Thin gấp đôi phụ âm cuối: thinner (không phải thiner)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A cat is thiner than a dog.",
+      "answers": [
+        "A cat is thinner than a dog."
+      ],
+      "explanation": "Thin gấp đôi phụ âm cuối: thinner (không phải thiner)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A dog is smaller than an elephant.",
+        "This dog is friendlyer than that dog.",
+        "The red bag is more expensive than the blue bag.",
+        "The blue bag is cheaper than the red bag."
+      ],
+      "answer": "This dog is friendlyer than that dog.",
+      "explanation": "Friendly đổi y thành i: friendlier (không phải friendlyer)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This dog is friendlyer than that dog.",
+      "answers": [
+        "This dog is friendlier than that dog."
+      ],
+      "explanation": "Friendly đổi y thành i: friendlier (không phải friendlyer)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A car is expensiveer than a bike.",
+        "An elephant is bigger than a dog.",
+        "Lan is happier than Hoa.",
+        "This chair is more comfortable than that chair."
+      ],
+      "answer": "A car is expensiveer than a bike.",
+      "explanation": "Expensive là tính từ dài → more expensive (không phải expensiveer)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A car is expensiveer than a bike.",
+      "answers": [
+        "A car is more expensive than a bike."
+      ],
+      "explanation": "Expensive là tính từ dài → more expensive (không phải expensiveer)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A car is more expensive than a bike.",
+        "A dog is smaller than an elephant.",
+        "Tom is taller than Jack.",
+        "Today is more bad than yesterday."
+      ],
+      "answer": "Today is more bad than yesterday.",
+      "explanation": "Bad là từ bất quy tắc → worse, không dùng more bad."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Today is more bad than yesterday.",
+      "answers": [
+        "Today is worse than yesterday."
+      ],
+      "explanation": "Bad là từ bất quy tắc → worse, không dùng more bad."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A turtle is slower than a rabbit.",
+        "This flower is prettier than that flower.",
+        "A giraffe is more taller than a horse.",
+        "This flower is more beautiful than that flower."
+      ],
+      "answer": "A giraffe is more taller than a horse.",
+      "explanation": "Chỉ dùng 1 cách: taller, không dùng \"more taller\"."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A giraffe is more taller than a horse.",
+      "answers": [
+        "A giraffe is taller than a horse."
+      ],
+      "explanation": "Chỉ dùng 1 cách: taller, không dùng \"more taller\"."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "An elephant is bigger than a dog.",
+        "A giraffe is taller a horse.",
+        "A turtle is slower than a rabbit.",
+        "This flower is more beautiful than that flower."
+      ],
+      "answer": "A giraffe is taller a horse.",
+      "explanation": "Câu so sánh hơn phải có than: A giraffe is taller than a horse."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A giraffe is taller a horse.",
+      "answers": [
+        "A giraffe is taller than a horse."
+      ],
+      "explanation": "Câu so sánh hơn phải có than: A giraffe is taller than a horse."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This lesson is easier than that lesson.",
+        "A giraffe is tallest than a horse.",
+        "The blue bag is cheaper than the red bag.",
+        "His bag is heavier than my bag."
+      ],
+      "answer": "A giraffe is tallest than a horse.",
+      "explanation": "Câu có than dùng so sánh hơn (taller), không dùng dạng nhất (tallest)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A giraffe is tallest than a horse.",
+      "answers": [
+        "A giraffe is taller than a horse."
+      ],
+      "explanation": "Câu có than dùng so sánh hơn (taller), không dùng dạng nhất (tallest)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A dog is smaller than an elephant.",
+        "A turtle is more slow than a rabbit.",
+        "An elephant is bigger than a dog.",
+        "A cat is thinner than a dog."
+      ],
+      "answer": "A turtle is more slow than a rabbit.",
+      "explanation": "Tính từ ngắn slow thêm -er (slower), không dùng more."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A turtle is more slow than a rabbit.",
+      "answers": [
+        "A turtle is slower than a rabbit."
+      ],
+      "explanation": "Tính từ ngắn slow thêm -er (slower), không dùng more."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The red bag is more expensive than the blue bag.",
+        "A lion is stronger than a dog.",
+        "This book is more interesting than that book.",
+        "This hat is reder than that hat."
+      ],
+      "answer": "This hat is reder than that hat.",
+      "explanation": "Red gấp đôi phụ âm cuối: redder (không phải reder)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This hat is reder than that hat.",
+      "answers": [
+        "This hat is redder than that hat."
+      ],
+      "explanation": "Red gấp đôi phụ âm cuối: redder (không phải reder)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This cake is more delicious than that cake.",
+        "She is busyer than her sister.",
+        "The blue bag is cheaper than the red bag.",
+        "The red bag is more expensive than the blue bag."
+      ],
+      "answer": "She is busyer than her sister.",
+      "explanation": "Busy đổi y thành i: busier (không phải busyer)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "She is busyer than her sister.",
+      "answers": [
+        "She is busier than her sister."
+      ],
+      "explanation": "Busy đổi y thành i: busier (không phải busyer)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A car is more expensive than a bike.",
+        "Today is sunnier than yesterday.",
+        "This book is more interesting than that book.",
+        "This film is boringer than that film."
+      ],
+      "answer": "This film is boringer than that film.",
+      "explanation": "Boring là tính từ dài → more boring (không phải boringer)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This film is boringer than that film.",
+      "answers": [
+        "This film is more boring than that film."
+      ],
+      "explanation": "Boring là tính từ dài → more boring (không phải boringer)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This cake is more delicious than that cake.",
+        "A turtle is more slower than a rabbit.",
+        "Lan is happier than Hoa.",
+        "She is busier than her sister."
+      ],
+      "answer": "A turtle is more slower than a rabbit.",
+      "explanation": "Chỉ dùng 1 cách: slower, không dùng \"more slower\"."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A turtle is more slower than a rabbit.",
+      "answers": [
+        "A turtle is slower than a rabbit."
+      ],
+      "explanation": "Chỉ dùng 1 cách: slower, không dùng \"more slower\"."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A turtle is slower a rabbit.",
+        "This flower is more beautiful than that flower.",
+        "This book is more interesting than that book.",
+        "Today is hotter than yesterday."
+      ],
+      "answer": "A turtle is slower a rabbit.",
+      "explanation": "Câu so sánh hơn phải có than: A turtle is slower than a rabbit."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A turtle is slower a rabbit.",
+      "answers": [
+        "A turtle is slower than a rabbit."
+      ],
+      "explanation": "Câu so sánh hơn phải có than: A turtle is slower than a rabbit."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The red bag is more expensive than the blue bag.",
+        "A turtle is slowest than a rabbit.",
+        "This flower is prettier than that flower.",
+        "A lion is stronger than a dog."
+      ],
+      "answer": "A turtle is slowest than a rabbit.",
+      "explanation": "Câu có than dùng so sánh hơn (slower), không dùng dạng nhất (slowest)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A turtle is slowest than a rabbit.",
+      "answers": [
+        "A turtle is slower than a rabbit."
+      ],
+      "explanation": "Câu có than dùng so sánh hơn (slower), không dùng dạng nhất (slowest)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A lion is more strong than a dog.",
+        "This flower is prettier than that flower.",
+        "The red bag is more expensive than the blue bag.",
+        "A tiger is more dangerous than a cat."
+      ],
+      "answer": "A lion is more strong than a dog.",
+      "explanation": "Tính từ ngắn strong thêm -er (stronger), không dùng more."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A lion is more strong than a dog.",
+      "answers": [
+        "A lion is stronger than a dog."
+      ],
+      "explanation": "Tính từ ngắn strong thêm -er (stronger), không dùng more."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This lesson is easier than that lesson.",
+        "Lan is happyer than Hoa.",
+        "A horse is faster than a cow.",
+        "A tiger is more dangerous than a cat."
+      ],
+      "answer": "Lan is happyer than Hoa.",
+      "explanation": "Happy đổi y thành i: happier (không phải happyer)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Lan is happyer than Hoa.",
+      "answers": [
+        "Lan is happier than Hoa."
+      ],
+      "explanation": "Happy đổi y thành i: happier (không phải happyer)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Today is worse than yesterday.",
+        "This flower is prettier than that flower.",
+        "This cake is deliciouser than that cake.",
+        "This book is more interesting than that book."
+      ],
+      "answer": "This cake is deliciouser than that cake.",
+      "explanation": "Delicious là tính từ dài → more delicious (không phải deliciouser)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This cake is deliciouser than that cake.",
+      "answers": [
+        "This cake is more delicious than that cake."
+      ],
+      "explanation": "Delicious là tính từ dài → more delicious (không phải deliciouser)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The blue bag is cheaper than the red bag.",
+        "A pig is fatter than a dog.",
+        "A lion is more stronger than a dog.",
+        "Today is sunnier than yesterday."
+      ],
+      "answer": "A lion is more stronger than a dog.",
+      "explanation": "Chỉ dùng 1 cách: stronger, không dùng \"more stronger\"."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A lion is more stronger than a dog.",
+      "answers": [
+        "A lion is stronger than a dog."
+      ],
+      "explanation": "Chỉ dùng 1 cách: stronger, không dùng \"more stronger\"."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A giraffe is taller than a horse.",
+        "A lion is stronger a dog.",
+        "A turtle is slower than a rabbit.",
+        "A horse is faster than a cow."
+      ],
+      "answer": "A lion is stronger a dog.",
+      "explanation": "Câu so sánh hơn phải có than: A lion is stronger than a dog."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A lion is stronger a dog.",
+      "answers": [
+        "A lion is stronger than a dog."
+      ],
+      "explanation": "Câu so sánh hơn phải có than: A lion is stronger than a dog."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A lion is strongest than a dog.",
+        "A tiger is more dangerous than a cat.",
+        "This lesson is easier than that lesson.",
+        "Lan is happier than Hoa."
+      ],
+      "answer": "A lion is strongest than a dog.",
+      "explanation": "Câu có than dùng so sánh hơn (stronger), không dùng dạng nhất (strongest)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A lion is strongest than a dog.",
+      "answers": [
+        "A lion is stronger than a dog."
+      ],
+      "explanation": "Câu có than dùng so sánh hơn (stronger), không dùng dạng nhất (strongest)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Today is worse than yesterday.",
+        "A dog is more small than an elephant.",
+        "The blue bag is cheaper than the red bag.",
+        "An elephant is bigger than a dog."
+      ],
+      "answer": "A dog is more small than an elephant.",
+      "explanation": "Tính từ ngắn small thêm -er (smaller), không dùng more."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A dog is more small than an elephant.",
+      "answers": [
+        "A dog is smaller than an elephant."
+      ],
+      "explanation": "Tính từ ngắn small thêm -er (smaller), không dùng more."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "She is busier than her sister.",
+        "This question is more difficult than that question.",
+        "This flower is prettier than that flower.",
+        "His bag is heavyer than my bag."
+      ],
+      "answer": "His bag is heavyer than my bag.",
+      "explanation": "Heavy đổi y thành i: heavier (không phải heavyer)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "His bag is heavyer than my bag.",
+      "answers": [
+        "His bag is heavier than my bag."
+      ],
+      "explanation": "Heavy đổi y thành i: heavier (không phải heavyer)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This chair is more comfortable than that chair.",
+        "A tiger is dangerouser than a cat.",
+        "This lesson is easier than that lesson.",
+        "A giraffe is taller than a horse."
+      ],
+      "answer": "A tiger is dangerouser than a cat.",
+      "explanation": "Dangerous là tính từ dài → more dangerous (không phải dangerouser)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A tiger is dangerouser than a cat.",
+      "answers": [
+        "A tiger is more dangerous than a cat."
+      ],
+      "explanation": "Dangerous là tính từ dài → more dangerous (không phải dangerouser)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Tom is taller than Jack.",
+        "She is busier than her sister.",
+        "A dog is more smaller than an elephant.",
+        "Today is hotter than yesterday."
+      ],
+      "answer": "A dog is more smaller than an elephant.",
+      "explanation": "Chỉ dùng 1 cách: smaller, không dùng \"more smaller\"."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A dog is more smaller than an elephant.",
+      "answers": [
+        "A dog is smaller than an elephant."
+      ],
+      "explanation": "Chỉ dùng 1 cách: smaller, không dùng \"more smaller\"."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A dog is smaller an elephant.",
+        "This dog is friendlier than that dog.",
+        "The red bag is more expensive than the blue bag.",
+        "A car is more expensive than a bike."
+      ],
+      "answer": "A dog is smaller an elephant.",
+      "explanation": "Câu so sánh hơn phải có than: A dog is smaller than an elephant."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A dog is smaller an elephant.",
+      "answers": [
+        "A dog is smaller than an elephant."
+      ],
+      "explanation": "Câu so sánh hơn phải có than: A dog is smaller than an elephant."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "A dog is smallest than an elephant.",
+        "Today is worse than yesterday.",
+        "A pig is fatter than a dog.",
+        "This flower is prettier than that flower."
+      ],
+      "answer": "A dog is smallest than an elephant.",
+      "explanation": "Câu có than dùng so sánh hơn (smaller), không dùng dạng nhất (smallest)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "A dog is smallest than an elephant.",
+      "answers": [
+        "A dog is smaller than an elephant."
+      ],
+      "explanation": "Câu có than dùng so sánh hơn (smaller), không dùng dạng nhất (smallest)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This film is more boring than that film.",
+        "The blue bag is more cheap than the red bag.",
+        "A horse is faster than a cow.",
+        "A lion is stronger than a dog."
+      ],
+      "answer": "The blue bag is more cheap than the red bag.",
+      "explanation": "Tính từ ngắn cheap thêm -er (cheaper), không dùng more."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The blue bag is more cheap than the red bag.",
+      "answers": [
+        "The blue bag is cheaper than the red bag."
+      ],
+      "explanation": "Tính từ ngắn cheap thêm -er (cheaper), không dùng more."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This question is difficulter than that question.",
+        "An elephant is bigger than a dog.",
+        "Lan is happier than Hoa.",
+        "This chair is more comfortable than that chair."
+      ],
+      "answer": "This question is difficulter than that question.",
+      "explanation": "Difficult là tính từ dài → more difficult (không phải difficulter)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This question is difficulter than that question.",
+      "answers": [
+        "This question is more difficult than that question."
+      ],
+      "explanation": "Difficult là tính từ dài → more difficult (không phải difficulter)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This book is better than that book.",
+        "The blue bag is more cheaper than the red bag.",
+        "A giraffe is taller than a horse.",
+        "This cake is more delicious than that cake."
+      ],
+      "answer": "The blue bag is more cheaper than the red bag.",
+      "explanation": "Chỉ dùng 1 cách: cheaper, không dùng \"more cheaper\"."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The blue bag is more cheaper than the red bag.",
+      "answers": [
+        "The blue bag is cheaper than the red bag."
+      ],
+      "explanation": "Chỉ dùng 1 cách: cheaper, không dùng \"more cheaper\"."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "An elephant is bigger than a dog.",
+        "This chair is more comfortable than that chair.",
+        "This cake is more delicious than that cake.",
+        "This book is more interesting that book."
+      ],
+      "answer": "This book is more interesting that book.",
+      "explanation": "Câu so sánh hơn phải có than: This book is more interesting than that book."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This book is more interesting that book.",
+      "answers": [
+        "This book is more interesting than that book."
+      ],
+      "explanation": "Câu so sánh hơn phải có than: This book is more interesting than that book."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "The blue bag is cheapest than the red bag.",
+        "A lion is stronger than a dog.",
+        "The red bag is more expensive than the blue bag.",
+        "This dog is friendlier than that dog."
+      ],
+      "answer": "The blue bag is cheapest than the red bag.",
+      "explanation": "Câu có than dùng so sánh hơn (cheaper), không dùng dạng nhất (cheapest)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "The blue bag is cheapest than the red bag.",
+      "answers": [
+        "The blue bag is cheaper than the red bag."
+      ],
+      "explanation": "Câu có than dùng so sánh hơn (cheaper), không dùng dạng nhất (cheapest)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This book is more interesting than that book.",
+        "Today is more hot than yesterday.",
+        "The blue bag is cheaper than the red bag.",
+        "This dog is friendlier than that dog."
+      ],
+      "answer": "Today is more hot than yesterday.",
+      "explanation": "Tính từ ngắn hot thêm -er (hotter), không dùng more."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Today is more hot than yesterday.",
+      "answers": [
+        "Today is hotter than yesterday."
+      ],
+      "explanation": "Tính từ ngắn hot thêm -er (hotter), không dùng more."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "This chair is comfortableer than that chair.",
+        "This hat is redder than that hat.",
+        "This dog is friendlier than that dog.",
+        "A horse is faster than a cow."
+      ],
+      "answer": "This chair is comfortableer than that chair.",
+      "explanation": "Comfortable là tính từ dài → more comfortable (không phải comfortableer)."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This chair is comfortableer than that chair.",
+      "answers": [
+        "This chair is more comfortable than that chair."
+      ],
+      "explanation": "Comfortable là tính từ dài → more comfortable (không phải comfortableer)."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Today is more hotter than yesterday.",
+        "This book is more interesting than that book.",
+        "Today is sunnier than yesterday.",
+        "His bag is heavier than my bag."
+      ],
+      "answer": "Today is more hotter than yesterday.",
+      "explanation": "Chỉ dùng 1 cách: hotter, không dùng \"more hotter\"."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "Today is more hotter than yesterday.",
+      "answers": [
+        "Today is hotter than yesterday."
+      ],
+      "explanation": "Chỉ dùng 1 cách: hotter, không dùng \"more hotter\"."
+    },
+    {
+      "type": "pickWrong",
+      "prompt": "Câu nào viết SAI? Bấm vào câu sai.",
+      "options": [
+        "Today is sunnier than yesterday.",
+        "This book is better that book.",
+        "A tiger is more dangerous than a cat.",
+        "Today is hotter than yesterday."
+      ],
+      "answer": "This book is better that book.",
+      "explanation": "Câu so sánh hơn phải có than: This book is better than that book."
+    },
+    {
+      "type": "fixSentence",
+      "prompt": "Câu này viết SAI. Gõ lại câu đúng:",
+      "wrong": "This book is better that book.",
+      "answers": [
+        "This book is better than that book."
+      ],
+      "explanation": "Câu so sánh hơn phải có than: This book is better than that book."
     }
   ]
 }

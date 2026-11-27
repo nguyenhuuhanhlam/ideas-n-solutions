@@ -223,4 +223,55 @@ export const conjugationGuides = {
       { example: 'Lan and Minh are going to travel.', why: '2 người → are going to.' },
     ],
   },
+  'comparative': {
+    tableTitle: 'Bảng quy tắc so sánh hơn',
+    specialsTitle: 'Ví dụ đặc biệt — dễ nhầm nhất',
+    table: {
+      idKey: 'kind',
+      columns: [
+        { key: 'kind', header: 'Loại tính từ' },
+        { key: 'rule', header: 'Cách tạo so sánh hơn' },
+        { key: 'example', header: 'Ví dụ' },
+      ],
+      rows: [
+        { kind: 'Ngắn (1 âm tiết)', rule: 'thêm -er', example: 'tall → taller, fast → faster' },
+        { kind: 'Tận cùng là -e', rule: 'chỉ thêm -r', example: 'nice → nicer, large → larger' },
+        { kind: '1 nguyên âm + 1 phụ âm cuối', rule: 'gấp đôi phụ âm + -er', example: 'big → bigger, hot → hotter' },
+        { kind: 'Phụ âm + y', rule: 'đổi y thành i + -er', example: 'happy → happier, easy → easier' },
+        { kind: 'Dài (2 âm tiết trở lên)', rule: 'more + tính từ', example: 'beautiful → more beautiful' },
+        { kind: 'Bất quy tắc', rule: 'đổi hẳn từ', example: 'good → better, bad → worse, far → farther' },
+      ],
+    },
+    flow: [
+      { label: 'Nhìn tính từ cần so sánh', sub: 'Ví dụ: big, happy, beautiful, good' },
+      {
+        decision: 'Có phải từ bất quy tắc? (good, bad, far)',
+        branches: [
+          { tag: 'Đúng, bất quy tắc', result: 'better / worse / farther', note: 'Đổi hẳn từ — học thuộc' },
+          { tag: 'Không', result: 'Đi tiếp bước sau', note: 'Xem tính từ dài hay ngắn' },
+        ],
+      },
+      {
+        decision: 'Tính từ dài hay ngắn?',
+        branches: [
+          { tag: 'Dài (2 âm tiết trở lên)', result: 'more + tính từ', note: 'more beautiful, more expensive' },
+          { tag: 'Ngắn (1 âm tiết, hoặc tận cùng -y)', result: 'thêm -er', note: 'Xem đuôi từ ở bước cuối' },
+        ],
+      },
+      { label: 'Tính từ ngắn: xem đuôi từ', sub: 'tận cùng -e → chỉ + r · phụ âm + y → đổi y thành i + er · 1 nguyên âm + 1 phụ âm cuối → gấp đôi phụ âm + er · còn lại → + er' },
+      { label: 'Ghép câu: A + be + so sánh hơn + than + B', sub: 'Tom is taller than Jack.' },
+    ],
+    tips: [
+      'Câu so sánh hơn thường có "than" (hơn): bigger than, faster than — đừng quên than.',
+      'Chỉ chọn 1 cách: hoặc thêm -er, hoặc dùng more. "More bigger" là sai.',
+      'Big, hot, thin, fat, sad, wet, red: gấp đôi phụ âm cuối trước khi thêm -er.',
+      'Muốn nói "hơn nhiều" thì thêm much ở trước: much bigger, much faster.',
+    ],
+    specials: [
+      { example: 'She is happier today.', why: 'Happy tận cùng là phụ âm + y → đổi y thành i: happier (không phải happyer).' },
+      { example: 'This book is better than that book.', why: 'Good không thành "gooder" — so sánh hơn của good là better.' },
+      { example: 'The red bag is more expensive than the blue bag.', why: 'Expensive là tính từ dài → dùng more, không thêm -er (không phải expensiver).' },
+      { example: 'An elephant is much bigger than a dog.', why: '"Hơn nhiều" = much + so sánh hơn: much bigger.' },
+    ],
+  },
 }
