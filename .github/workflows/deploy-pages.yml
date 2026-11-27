@@ -31,6 +31,7 @@ jobs:
             surveyjs-demo/package-lock.json
             synaps-draft/web/package-lock.json
             photo-app/package-lock.json
+            command-map/package-lock.json
       # Mỗi app nằm trong thư mục riêng; build với base là subpath Pages của app đó
       - run: npm ci
         working-directory: timeline-projects
@@ -60,9 +61,14 @@ jobs:
         working-directory: photo-app
       - run: npm run build -- --base=/ideas-n-solutions/photo-app/
         working-directory: photo-app
+      - run: npm ci
+        working-directory: command-map
+      # base của command-map ghi cố định trong vite.config.js nên build trần
+      - run: npm run build
+        working-directory: command-map
       # Ghép các app + trang chủ ở root thành một site duy nhất
       - run: |
-          mkdir -p _site/timeline-projects _site/team-assistant-sim _site/platformer-game _site/english-learning _site/surveyjs-demo _site/synaps-draft _site/photo-app _site/hairline-ui _site/mientay-demo _site/autocad-lisp
+          mkdir -p _site/timeline-projects _site/team-assistant-sim _site/platformer-game _site/english-learning _site/surveyjs-demo _site/synaps-draft _site/photo-app _site/command-map _site/hairline-ui _site/mientay-demo _site/autocad-lisp
           cp -r timeline-projects/dist/* _site/timeline-projects/
           cp -r team-assistant-sim/dist/* _site/team-assistant-sim/
           cp -r platformer-game/dist/* _site/platformer-game/
@@ -70,6 +76,7 @@ jobs:
           cp -r surveyjs-demo/dist/* _site/surveyjs-demo/
           cp -r synaps-draft/web/dist/* _site/synaps-draft/
           cp -r photo-app/dist/* _site/photo-app/
+          cp -r command-map/dist/* _site/command-map/
           cp -r hairline-ui/* _site/hairline-ui/
           cp -r mientay-demo/* _site/mientay-demo/
           cp -r autocad-lisp/* _site/autocad-lisp/

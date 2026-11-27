@@ -15,6 +15,7 @@ thư mục mới và một thẻ vào trang chủ ở `index.html`.
 | Form Hub — điền form trực tiếp + API cho ứng dụng khác (link điền, JSON form, nhúng iframe) | `surveyjs-demo/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/surveyjs-demo/ |
 | Synaps Draft — vẽ kiến trúc: drafting 2D chính xác (tường/cửa/cửa sổ, snap, mm) + xem 3D đồng bộ; xuất DXF qua API FastAPI local | `synaps-draft/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/synaps-draft/ |
 | Ảnh nhóm — chụp ảnh trên mobile up thẳng lên Cloudinary, cả nhóm xem chung mọi máy; trình xem vuốt/pinch zoom | `photo-app/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/photo-app/ |
+| Command Map — kho lệnh command dạng mindmap (sidebar root + canvas tự do, bấm lệnh là copy); UI demo dữ liệu mẫu, bản chính dùng Firebase | `command-map/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/command-map/ |
 | MIENTAY Website Demo — bản demo tái thiết kế mientay.com.vn theo bố cục tạp chí kienviet.net: đủ 34 dự án thật, lọc theo dịch vụ | `mientay-demo/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/mientay-demo/ |
 | Hairline UI — bộ kit giao diện dùng lại: phong cách hairline grid (chỉ line 1px, không card/shadow/bo góc), CSS + JS vanilla dùng chung | `hairline-ui/` | https://nguyenhuuhanhlam.github.io/ideas-n-solutions/hairline-ui/demo.html |
 
