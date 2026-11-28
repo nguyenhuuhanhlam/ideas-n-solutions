@@ -188,7 +188,7 @@
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
   (defun *error* (msg)
     (vla-EndUndoMark doc)
-    (princ (strcat "\nDa huy. Loi: " msg))
+    (princ (strcat "\nCancelled. Error: " msg))
     (princ)
   )
   (vla-StartUndoMark doc)
@@ -201,7 +201,7 @@
 
   (setq ss (ssget "X" '((0 . "HATCH"))))
   (if (not ss)
-    (princ "\nKhong co HATCH nao trong ban ve.")
+    (princ "\nNo HATCH objects in this drawing.")
     (progn
       (setq n (sslength ss)
             i 0
@@ -231,30 +231,30 @@
         )
         (setq i (1+ i))
       )
-      (princ (strcat "\nDa chuyen " (itoa ok) "/" (itoa n)
-                     " HATCH sang SOLID, "
+      (princ (strcat "\nConverted " (itoa ok) "/" (itoa n)
+                     " HATCH to SOLID, "
                      (if (= transp 0)
-                       "khong trong suot (duc hoan toan)"
-                       (strcat "trong suot " (itoa transp) "%"))
-                     ", giu nguyen mau."))
+                       "fully opaque"
+                       (strcat "transparency " (itoa transp) "%"))
+                     ", colors unchanged."))
       (if (> skip 0)
-        (princ (strcat "\nBo qua " (itoa skip)
-                       " HATCH tren layer khoa."))
+        (princ (strcat "\nSkipped " (itoa skip)
+                       " HATCH on locked layers."))
       )
       (if (> patfail 0)
         (princ (strcat "\n" (itoa patfail)
-                       " HATCH khong doi duoc pattern."))
+                       " HATCH could not change pattern."))
       )
       (if (> trfail 0)
         (princ (strcat "\n" (itoa trfail)
-                       " HATCH doi duoc pattern nhung khong dat duoc do trong suot."))
+                       " HATCH changed pattern but could not set transparency."))
       )
       (if (> otherfail 0)
         (princ (strcat "\n" (itoa otherfail)
-                       " HATCH gap loi khac."))
+                       " HATCH failed with other errors."))
       )
       (if *hs-firsterr*
-        (princ (strcat "\nLoi dau tien gap: " *hs-firsterr*))
+        (princ (strcat "\nFirst error encountered: " *hs-firsterr*))
       )
     )
   )
@@ -274,5 +274,5 @@
   (princ)
 )
 
-(princ "\nDa nap HATCHSOLID — go HATCHSOLID (SOLID, trong suot 60%) hoac HATCHSOLIDDUC (SOLID, duc hoan toan).")
+(princ "\nHATCHSOLID loaded - run HATCHSOLID (SOLID, 60% transparent) or HATCHSOLIDDUC (SOLID, fully opaque).")
 (princ)

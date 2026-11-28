@@ -42,6 +42,30 @@
 ;;; - Khung nhìn (view) được giữ nguyên như trước khi chạy lệnh.
 ;;; - Rectang trên layer khóa vẫn in bình thường (in không sửa entity).
 ;;;
+;;; NÂNG CẤP 2026-11-28 — nối PLOTSCAN vào PLOTPDF (đã thảo luận
+;;; và kiểm chứng riêng bằng lệnh PLOTSCAN trước khi nối):
+;;; - Thêm CHẾ ĐỘ CHỌN "Scan" bên cạnh chế độ cũ "Pick"
+;;;   (mặc định vẫn là Pick, hành vi cũ không đổi): pick P1
+;;;   rồi P2, lệnh quét Crossing 1 vùng duy nhất — rectang nào
+;;;   bị chạm vào là tính, không quan tâm layer; chỉ nhận
+;;;   polyline khép kín 4 đỉnh là hình chữ nhật thẳng trục;
+;;;   chuẩn hoá khung bao, khử trùng khít, giữ rectang ngoài
+;;;   cùng bằng thuật toán diện tích giảm dần, bóc thử chặn
+;;;   rectang bao tổng (quy về giấy ở tỉ lệ 1/100, cạnh hợp lý
+;;;   140..1250mm); sắp xếp chữ Z theo chiều kéo P1 -> P2;
+;;;   bỏ qua rectang đã in ở lần chạy trước như chế độ cũ;
+;;;   đánh dấu ảo + báo cáo, hỏi xác nhận mới in. Thuật toán
+;;;   này giữ nguyên từ PLOTSCAN (tiền tố pps-), PLOTSCAN user
+;;;   đã test trên bản vẽ thật 28-11: "khá ổn, nhận dạng tốt".
+;;; - Thêm OPTION TỈ LỆ Ở KHÂU IN, hỏi sau khi chọn thư mục:
+;;;   Fit (như cũ, ép vừa A4) hoặc Scale (tỉ lệ cố định 1/N, N
+;;;   mặc định 100): khổ giấy ISO tự chọn theo từng khung —
+;;;   khổ nhỏ nhất từ A4 tới A0 mà khung ở tỉ lệ đó vừa (đã
+;;;   trừ lề 5mm mỗi phía); khung lớn hơn A0 ở tỉ lệ đó thì
+;;;   lùi về Fit vào A0 và ghi chú rõ ở dòng báo cáo file đó.
+;;;   Chuỗi tỉ lệ truyền vào -PLOT dạng "1=N". Chế độ Scale là
+;;;   mới, cần test thật trên 1 khung trước khi in cả loạt.
+;;;
 ;;; Bài học rút ra (kiểm chứng thực tế + tra cứu tài liệu Autodesk,
 ;;; 2026-11-25):
 ;;; - KHÔNG in theo cửa sổ bằng ActiveX SetWindowToPlot/PlotToFile
@@ -106,7 +130,7 @@
        (if shell
          (progn
            (setq folder (vlax-invoke-method shell 'BrowseForFolder
-                          0 "Chon thu muc luu PDF" 0))
+                          0 "Select folder to save PDFs" 0))
            (vlax-release-object shell)
            (if folder
              (progn
@@ -126,7 +150,7 @@
   ;; thư mục chứa file đó, không tạo file thật.
   (if (not path)
     (progn
-      (setq f (getfiled "Chon thu muc luu PDF: vao thu muc roi OK (ten file chi la tam)"
+      (setq f (getfiled "Select output folder: open the folder and click OK (the file name is only a placeholder)"
                         "plotpdf.pdf" "pdf" 1))
       (if f (setq path (vl-filename-directory f)))
     )
@@ -237,7 +261,347 @@
   (grvecs vecs)
 )
 
-(defun pp-plot-one (x1 y1 x2 y2 fpath)
+
+;; ============================================================
+;; NHÓM HÀM QUÉT VÙNG (pps-) — sao từ PLOTSCAN đã kiểm chứng,
+;; đổi tiền tố ps- thành pps- để nạp chung với plotscan.lsp
+;; không đụng tên. Hằng số: *pps-scale* chỉ dùng cho kiểm tra
+;; bao tổng và báo cáo (tỉ lệ bản vẽ thường 1/100), KHÔNG liên
+;; quan tới tỉ lệ in chọn ở khâu in.
+;; ============================================================
+
+(setq *pps-scale* 100.0)       ; ti le ban ve cho kiem tra bao tong
+(setq *pps-paper-min* 140.0)   ; canh giay nho nhat hop ly (mm giay)
+(setq *pps-paper-max* 1250.0)  ; canh giay lon nhat hop ly (mm giay)
+(setq *pps-tol* 0.5)           ; dung sai hinh hoc (don vi ban ve)
+
+(defun pps-area (r)
+  ;; r = (ename x1 y1 x2 y2 handle) — cùng khuôn rects của PLOTPDF
+  (* (- (nth 3 r) (nth 1 r)) (- (nth 4 r) (nth 2 r)))
+)
+
+(defun pps-cx (r) (/ (+ (nth 1 r) (nth 3 r)) 2.0))
+(defun pps-cy (r) (/ (+ (nth 2 r) (nth 4 r)) 2.0))
+
+(defun pps-contained-p (inner outer / eps)
+  (setq eps *pps-tol*)
+  (and (>= (nth 1 inner) (- (nth 1 outer) eps))
+       (<= (nth 3 inner) (+ (nth 3 outer) eps))
+       (>= (nth 2 inner) (- (nth 2 outer) eps))
+       (<= (nth 4 inner) (+ (nth 4 outer) eps)))
+)
+
+(defun pps-same-bbox-p (a b)
+  (and (<= (abs (- (nth 1 a) (nth 1 b))) *pps-tol*)
+       (<= (abs (- (nth 2 a) (nth 2 b))) *pps-tol*)
+       (<= (abs (- (nth 3 a) (nth 3 b))) *pps-tol*)
+       (<= (abs (- (nth 4 a) (nth 4 b))) *pps-tol*))
+)
+
+(defun pps-vertices (en data / elev pt pts e vd)
+  ;; Đỉnh WCS của polyline, thuần entget như pp-bbox (không
+  ;; ActiveX). Bỏ đỉnh cuối nếu trùng đỉnh đầu.
+  (setq pts nil)
+  (if (= (cdr (assoc 0 data)) "LWPOLYLINE")
+    (progn
+      (setq elev (cond ((cdr (assoc 38 data))) (0.0)))
+      (foreach pt data
+        (if (= (car pt) 10)
+          (setq pt (trans (list (cadr pt) (caddr pt) elev) en 0)
+                pts (append pts (list (list (car pt) (cadr pt)))))))
+    )
+    (progn
+      (setq e (entnext en))
+      (while (and e (= (cdr (assoc 0 (setq vd (entget e)))) "VERTEX"))
+        (setq pt (cdr (assoc 10 vd))
+              pts (append pts (list (list (car pt) (cadr pt))))
+              e (entnext e)))
+    )
+  )
+  (if (and (> (length pts) 1)
+           (<= (abs (- (car (car pts)) (car (last pts)))) *pps-tol*)
+           (<= (abs (- (cadr (car pts)) (cadr (last pts)))) *pps-tol*))
+    (setq pts (reverse (cdr (reverse pts))))
+  )
+  pts
+)
+
+(defun pps-rect-bbox (pts / x1 y1 x2 y2 ok codes cd pt)
+  ;; 4 đỉnh có phải hình chữ nhật thẳng trục không: mỗi đỉnh là
+  ;; 1 góc của khung bao và 4 đỉnh phủ đủ 4 góc khác nhau.
+  ;; Đạt thì trả khung bao (x1 y1 x2 y2), không thì nil.
+  (setq x1 (apply 'min (mapcar 'car pts))
+        x2 (apply 'max (mapcar 'car pts))
+        y1 (apply 'min (mapcar 'cadr pts))
+        y2 (apply 'max (mapcar 'cadr pts))
+        ok (and (> (- x2 x1) *pps-tol*) (> (- y2 y1) *pps-tol*))
+        codes nil)
+  (if ok
+    (progn
+      (foreach pt pts
+        (if (not (and (or (<= (abs (- (car pt) x1)) *pps-tol*)
+                          (<= (abs (- (car pt) x2)) *pps-tol*))
+                      (or (<= (abs (- (cadr pt) y1)) *pps-tol*)
+                          (<= (abs (- (cadr pt) y2)) *pps-tol*))))
+          (setq ok nil)
+          (setq cd (+ (if (<= (abs (- (car pt) x2)) *pps-tol*) 1 0)
+                      (if (<= (abs (- (cadr pt) y2)) *pps-tol*) 2 0))
+                codes (if (member cd codes) codes (cons cd codes)))
+        )
+      )
+      (if (/= (length codes) 4) (setq ok nil))
+    )
+  )
+  (if ok (list x1 y1 x2 y2) nil)
+)
+
+(defun pps-cmp-area (a b)
+  ;; Diện tích giảm dần, hoà thì handle — tie-break duy nhất để
+  ;; vl-sort không loại mất phần tử "bằng nhau".
+  (cond ((/= (pps-area a) (pps-area b)) (> (pps-area a) (pps-area b)))
+        (T (> (nth 5 a) (nth 5 b))))
+)
+
+(defun pps-outermost (cands / kept c blocked k)
+  ;; Tham lam diện tích giảm dần: giữ rectang không nằm trong
+  ;; bất kỳ rectang nào đã giữ.
+  (setq kept nil)
+  (foreach c (vl-sort cands 'pps-cmp-area)
+    (setq blocked nil)
+    (foreach k kept
+      (if (pps-contained-p c k) (setq blocked T))
+    )
+    (if (not blocked) (setq kept (append kept (list c))))
+  )
+  kept
+)
+
+(defun pps-plausible-p (r / pw ph)
+  ;; Kích thước quy về giấy ở *pps-scale* có hợp lý không.
+  (setq pw (/ (- (nth 3 r) (nth 1 r)) *pps-scale*)
+        ph (/ (- (nth 4 r) (nth 2 r)) *pps-scale*))
+  (and (>= pw *pps-paper-min*) (<= pw *pps-paper-max*)
+       (>= ph *pps-paper-min*) (<= ph *pps-paper-max*))
+)
+
+(defun pps-children (parent cands / out c)
+  (setq out nil)
+  (foreach c cands
+    (if (and (/= (nth 5 c) (nth 5 parent)) (pps-contained-p c parent))
+      (setq out (append out (list c)))
+    )
+  )
+  out
+)
+
+;; Chiều sắp xếp suy từ chiều kéo P1 -> P2, đặt trước vl-sort.
+(setq *pps-topfirst* T)
+(setq *pps-leftfirst* T)
+
+(defun pps-cmp-row (a b)
+  (cond ((/= (pps-cy a) (pps-cy b))
+         (if *pps-topfirst* (> (pps-cy a) (pps-cy b)) (< (pps-cy a) (pps-cy b))))
+        ((/= (pps-cx a) (pps-cx b))
+         (if *pps-leftfirst* (< (pps-cx a) (pps-cx b)) (> (pps-cx a) (pps-cx b))))
+        (T (> (nth 5 a) (nth 5 b))))
+)
+
+(defun pps-cmp-inrow (a b)
+  (cond ((/= (pps-cx a) (pps-cx b))
+         (if *pps-leftfirst* (< (pps-cx a) (pps-cx b)) (> (pps-cx a) (pps-cx b))))
+        ((/= (pps-cy a) (pps-cy b))
+         (if *pps-topfirst* (> (pps-cy a) (pps-cy b)) (< (pps-cy a) (pps-cy b))))
+        (T (> (nth 5 a) (nth 5 b))))
+)
+
+(defun pps-sort-z (frames / avg rowtol sorted rows row anchor out r)
+  ;; Chữ Z: nhóm hàng theo tâm Y (dung sai = nửa chiều cao
+  ;; khung trung bình), trong hàng xếp theo tâm X.
+  (setq avg 0.0)
+  (foreach r frames (setq avg (+ avg (- (nth 4 r) (nth 2 r)))))
+  (setq rowtol (* 0.5 (/ avg (length frames)))
+        sorted (vl-sort frames 'pps-cmp-row)
+        rows nil row nil anchor nil)
+  (foreach r sorted
+    (if (or (not row) (> (abs (- (pps-cy r) anchor)) rowtol))
+      (progn
+        (if row (setq rows (append rows (list row))))
+        (setq row (list r) anchor (pps-cy r))
+      )
+      (setq row (append row (list r)))
+    )
+  )
+  (if row (setq rows (append rows (list row))))
+  (setq out nil)
+  (foreach row rows
+    (setq out (append out (vl-sort row 'pps-cmp-inrow)))
+  )
+  out
+)
+
+(defun pps-paper-for (w h denom / fl fs papers p result)
+  ;; Khổ giấy ISO nhỏ nhất (A4 -> A0) mà khung w x h in ở tỉ lệ
+  ;; 1/denom vừa được, đã trừ lề 5mm mỗi phía. Không khổ nào
+  ;; vừa thì trả nil. Tên khổ theo đúng chuỗi DWG To PDF.pc3
+  ;; như khổ A4 đang dùng trong pp-plot-one.
+  (setq fl (/ (max w h) denom)
+        fs (/ (min w h) denom)
+        papers '(("ISO A4 (297.00 x 210.00 MM)" 297.0 210.0)
+                 ("ISO A3 (420.00 x 297.00 MM)" 420.0 297.0)
+                 ("ISO A2 (594.00 x 420.00 MM)" 594.0 420.0)
+                 ("ISO A1 (841.00 x 594.00 MM)" 841.0 594.0)
+                 ("ISO A0 (1189.00 x 841.00 MM)" 1189.0 841.0))
+        result nil)
+  (foreach p papers
+    (if (and (not result)
+             (<= (+ fl 10.0) (nth 1 p))
+             (<= (+ fs 10.0) (nth 2 p)))
+      (setq result (car p))
+    )
+  )
+  result
+)
+
+(defun pps-scale-str (denom)
+  ;; Chuỗi tỉ lệ cho -PLOT: "1=100" cho tỉ lệ 1/100.
+  (if (= denom (float (fix denom)))
+    (strcat "1=" (itoa (fix denom)))
+    (strcat "1=" (rtos denom 2 2)))
+)
+
+(defun pps-scan (/ p1u p2u p1 p2 ss total i en data typ pts bb rec
+                  nnotpoly nnotclosed nnot4 nnotrect cands dedup dup
+                  kept containers round changed newkept k childs sub
+                  plaus ordered out skipped conf s blocked d r)
+  ;; Quét 1 vùng P1 -> P2, trả danh sách rects đã sắp xếp đúng
+  ;; khuôn của PLOTPDF (ename x1 y1 x2 y2 handle), đã lọc bỏ
+  ;; rectang in rồi ở lần chạy trước, đã đánh dấu ảo và đã hỏi
+  ;; xác nhận in. Hủy/không có khung thì trả nil.
+  (setq p1u (getpoint "\nPick first corner P1 of the scan region: "))
+  (if p1u (setq p2u (getcorner p1u "\nPick opposite corner P2: ")))
+  (if (or (not p1u) (not p2u))
+    (progn (princ "\nRegion selection cancelled.") nil)
+    (progn
+      (setq p1 (trans p1u 1 0)
+            p2 (trans p2u 1 0)
+            *pps-leftfirst* (<= (car p1) (car p2))
+            *pps-topfirst* (>= (cadr p1) (cadr p2)))
+      ;; Quét Crossing + phân loại + chuẩn hoá
+      (setq ss (ssget "_C" p1u p2u)
+            total 0 nnotpoly 0 nnotclosed 0 nnot4 0 nnotrect 0
+            cands nil)
+      (if ss
+        (progn
+          (setq total (sslength ss) i 0)
+          (while (< i total)
+            (setq en (ssname ss i) i (1+ i))
+            (vl-catch-all-apply
+              '(lambda ()
+                 (setq data (entget en)
+                       typ (cdr (assoc 0 data)))
+                 (cond
+                   ((not (member typ '("LWPOLYLINE" "POLYLINE")))
+                    (setq nnotpoly (1+ nnotpoly)))
+                   ((/= 1 (logand 1 (cdr (assoc 70 data))))
+                    (setq nnotclosed (1+ nnotclosed)))
+                   (T
+                    (setq pts (pps-vertices en data))
+                    (cond
+                      ((/= (length pts) 4)
+                       (setq nnot4 (1+ nnot4)))
+                      ((not (setq bb (pps-rect-bbox pts)))
+                       (setq nnotrect (1+ nnotrect)))
+                      (T
+                       (setq rec (list en (nth 0 bb) (nth 1 bb)
+                                       (nth 2 bb) (nth 3 bb)
+                                       (cdr (assoc 5 data)))
+                             cands (append cands (list rec))))
+                    ))
+                 ))
+              nil)
+          )
+        )
+      )
+      ;; Khử trùng khít
+      (setq dedup nil dup 0)
+      (foreach rec cands
+        (setq blocked nil)
+        (foreach d dedup
+          (if (pps-same-bbox-p rec d) (setq blocked T))
+        )
+        (if blocked
+          (setq dup (1+ dup))
+          (setq dedup (append dedup (list rec)))
+        )
+      )
+      ;; Rectang ngoài cùng + bóc rectang bao tổng (tối đa 3 vòng)
+      (setq kept (pps-outermost dedup) containers 0 round 0 changed T)
+      (while (and changed (< round 3))
+        (setq round (1+ round) changed nil newkept nil)
+        (foreach k kept
+          (setq childs (pps-children k dedup)
+                sub (pps-outermost childs)
+                plaus nil)
+          (foreach s sub
+            (if (pps-plausible-p s) (setq plaus (append plaus (list s))))
+          )
+          (if (>= (length plaus) 2)
+            (progn
+              (setq containers (1+ containers) changed T
+                    newkept (append newkept plaus))
+              (princ (strcat "\nWarning: 1 super-container rectangle removed (it contained "
+                             (itoa (length plaus)) " plausible frame(s))."))
+            )
+            (setq newkept (append newkept (list k)))
+          )
+        )
+        (setq kept newkept)
+      )
+      ;; Sắp xếp chữ Z, lọc rectang đã in ở lần chạy trước
+      (setq ordered (if kept (pps-sort-z kept) nil)
+            out nil skipped 0)
+      (foreach r ordered
+        (if (member (pp-key (car r)) *pp-printed*)
+          (setq skipped (1+ skipped))
+          (setq out (append out (list r)))
+        )
+      )
+      (setq ordered out)
+      ;; Đánh dấu ảo theo đúng thứ tự sẽ in
+      (setq i 0)
+      (foreach r ordered
+        (setq i (1+ i))
+        (vl-catch-all-apply 'pp-mark
+          (list (nth 1 r) (nth 2 r) (nth 3 r) (nth 4 r) i))
+      )
+      ;; Báo cáo tóm tắt
+      (princ (strcat "\nScan: touched " (itoa total) " object(s) | valid rectangles "
+                     (itoa (length cands)) " | duplicates " (itoa dup)
+                     " | not a closed rectangle/polyline: "
+                     (itoa (+ nnotpoly nnotclosed nnot4 nnotrect))
+                     " | super-containers removed " (itoa containers)
+                     " | already printed, skipped " (itoa skipped)))
+      (princ (strcat "\n>>> Found " (itoa (length ordered)) " frame(s) to print."))
+      (if (not ordered)
+        nil
+        (progn
+          (initget "Yes No")
+          (setq conf (getkword (strcat "\nPrint " (itoa (length ordered))
+                                       " frame(s) found? [Yes/No] <Yes>: ")))
+          (if (= conf "No")
+            (progn
+              (princ "\nPrinting cancelled. The virtual marks stay on screen for review (REGEN to clear).")
+              nil
+            )
+            ordered
+          )
+        )
+      )
+    )
+  )
+)
+
+(defun pp-plot-one (x1 y1 x2 y2 fpath paper scaleans)
   ;; In 1 rectang ra PDF bằng -PLOT chi tiết. Chuỗi đáp án theo
   ;; đúng thứ tự prompt của AutoCAD 2022 (model space):
   ;;   Detailed? Yes -> layout: hiện tại -> thiết bị -> khổ giấy ->
@@ -255,12 +619,12 @@
     '(lambda ()
        (command "_.-PLOT" "_Yes" ""
                 "DWG To PDF - NO PREVIEW.pc3"
-                "ISO A4 (297.00 x 210.00 MM)"
+                paper
                 "_Millimeters"
                 (if (> (- x2 x1) (- y2 y1)) "_Landscape" "_Portrait")
                 "_No"
                 "_Window" (list x1 y1) (list x2 y2)
-                "_Fit" "_Center"
+                scaleans "_Center"
                 "_Yes" "monochrome.ctb" "_Yes"
                 ""
                 fpath "_No" "_Yes")
@@ -271,7 +635,7 @@
 
 (defun c:PLOTPDF (/ *error* ent i en data mn mx bb sep rects notclosed
                    folder dwgbase pad bg fd r res ok fail vctr vsize fpath
-                   go)
+                   go mode smode denom paper scaleans note w h)
   (defun *error* (msg)
     (if bg (pp-setvar "BACKGROUNDPLOT" bg))
     (if fd (pp-setvar "FILEDIA" fd))
@@ -279,7 +643,7 @@
       (vl-catch-all-apply
         '(lambda () (command "_.ZOOM" "_C" vctr vsize)) nil)
     )
-    (princ (strcat "\nDa huy. Loi: " msg))
+    (princ (strcat "\nCancelled. Error: " msg))
     (princ)
   )
   (setq go T)
@@ -289,7 +653,7 @@
   ;; vì lúc đó tọa độ cửa sổ in sẽ sai. ---
   (if (and (= (getvar "TILEMODE") 0) (> (getvar "CVPORT") 1))
     (progn
-      (princ "\nDang o trong viewport — hay thoat ra paper space roi chay lai.")
+      (princ "\nYou are inside a viewport - exit to paper space and run again.")
       (setq go nil)
     )
   )
@@ -299,19 +663,25 @@
       ;; --- Chọn rectang: click từng cái một để giữ đúng thứ tự chọn.
       ;; (ssget không giữ thứ tự click — nó trả theo thứ tự database.) ---
       (setq rects nil notclosed 0)
-      (while (setq ent (entsel "\nClick rectang theo thu tu in (Enter de ket thuc chon): "))
+      (initget "Pick Scan")
+      (setq mode (getkword "\nSelect frames by [Pick/Scan] <Pick>: "))
+      (if (not mode) (setq mode "Pick"))
+      (if (= mode "Scan")
+        (setq rects (pps-scan))
+        (progn
+      (while (setq ent (entsel "\nClick rectangles in print order (Enter to finish): "))
         (setq en (car ent)
               data (entget en))
         (cond
           ((not (member (cdr (assoc 0 data)) '("LWPOLYLINE" "POLYLINE")))
-           (princ "\nDoi tuong vua chon khong phai polyline — bo qua, chon tiep."))
+           (princ "\nSelected object is not a polyline - skipped, keep picking."))
           ((/= 1 (logand 1 (cdr (assoc 70 data))))
            (setq notclosed (1+ notclosed))
-           (princ "\nPolyline khong khop kin — bo qua, chon tiep."))
+           (princ "\nPolyline is not closed - skipped, keep picking."))
           ((member en (mapcar 'car rects))
-           (princ "\nRectang nay da chon roi — bo qua, chon tiep."))
+           (princ "\nThis rectangle was already selected - skipped, keep picking."))
           ((member (pp-key en) *pp-printed*)
-           (princ "\nRectang nay da in roi o lan chay truoc — bo qua, chon tiep."))
+           (princ "\nThis rectangle was already printed in a previous run - skipped, keep picking."))
           (T
            (setq bb (pp-bbox en)
                  mn (car bb)
@@ -322,22 +692,35 @@
            ;; Đánh dấu ảo: khung đỏ + số thứ tự, để thấy đã chọn
            (vl-catch-all-apply 'pp-mark
              (list (car mn) (cadr mn) (car mx) (cadr mx) (length rects)))
-           (princ (strcat "\nDa chon " (itoa (length rects)) " rectang."))
+           (princ (strcat "\nSelected " (itoa (length rects)) " rectangle(s)."))
           )
         )
       )
+        ) ; het progn cua che do TungCai
+      ) ; het if che do chon
       (if (not rects)
-        (princ "\nChua chon rectang nao.")
+        (if (= mode "Pick") (princ "\nNo rectangle selected."))
         (progn
           ;; --- Chọn thư mục lưu (mỗi lần chạy chọn lại) ---
           (setq folder (vl-catch-all-apply 'pp-pick-folder nil))
           (if (or (vl-catch-all-error-p folder) (not folder))
-            (princ "\nDa huy chon thu muc.")
+            (princ "\nFolder selection cancelled.")
             (progn
               ;; Lưu khung nhìn hiện tại để trả lại sau khi in,
               ;; tránh màn hình bị nhảy khi hoàn tất lệnh
               (setq vctr (getvar "VIEWCTR")
                     vsize (getvar "VIEWSIZE"))
+              ;; --- Option tỉ lệ in: Fit (như cũ) hoặc Tile (tỉ lệ
+              ;; cố định 1/N, khổ giấy tự chọn theo từng khung) ---
+              (initget "Fit Scale")
+              (setq smode (getkword "\nPlot scale [Fit/Scale] <Fit>: "))
+              (if (not smode) (setq smode "Fit"))
+              (if (= smode "Scale")
+                (progn
+                  (setq denom (getreal "\nScale denominator for 1/N <100>: "))
+                  (if (or (not denom) (<= denom 0)) (setq denom 100.0))
+                )
+              )
               ;; --- In từng rectang theo thứ tự đã chọn ---
               (setq dwgbase (vl-filename-base (getvar "DWGNAME"))
                     pad (strlen (itoa (length rects)))
@@ -356,10 +739,26 @@
                                                 '("\\" "/"))
                                       "" sep)
                                     dwgbase "_" (pp-pad i pad) ".pdf"))
+                (setq w (- (nth 3 r) (nth 1 r))
+                      h (- (nth 4 r) (nth 2 r))
+                      paper "ISO A4 (297.00 x 210.00 MM)"
+                      scaleans "_Fit"
+                      note "")
+                (if (= smode "Scale")
+                  (progn
+                    (setq scaleans (pps-scale-str denom)
+                          paper (pps-paper-for w h denom))
+                    (if (not paper)
+                      (setq paper "ISO A0 (1189.00 x 841.00 MM)"
+                            scaleans "_Fit"
+                            note " (frame larger than A0 at this scale - fitted to A0)")
+                    )
+                  )
+                )
                 (setq res (vl-catch-all-apply
                             'pp-plot-one
                             (list (nth 1 r) (nth 2 r)
-                                  (nth 3 r) (nth 4 r) fpath)))
+                                  (nth 3 r) (nth 4 r) fpath paper scaleans)))
                 (cond
                   ((vl-catch-all-error-p res)
                    (setq fail (1+ fail)))
@@ -371,22 +770,22 @@
                                   ".pdf - " (itoa (vl-file-size fpath))
                                   " bytes"
                                   (if (<= (vl-file-size fpath) 1353)
-                                    " (trang trang?)" ""))))
+                                    " (blank page?)" "") note)))
                   (T (setq fail (1+ fail)))
                 )
               )
               (pp-setvar "BACKGROUNDPLOT" bg)
               (pp-setvar "FILEDIA" fd)
               ;; --- Báo cáo ---
-              (princ (strcat "\nDa in " (itoa ok) "/" (itoa (length rects))
-                             " file vao thu muc: " folder))
+              (princ (strcat "\nPrinted " (itoa ok) "/" (itoa (length rects))
+                             " file(s) to folder: " folder))
               (if (> notclosed 0)
-                (princ (strcat "\nBo qua " (itoa notclosed)
-                               " polyline khong khop kin."))
+                (princ (strcat "\nSkipped " (itoa notclosed)
+                               " non-closed polyline(s)."))
               )
               (if (> fail 0)
                 (princ (strcat "\n" (itoa fail)
-                               " file in loi — xem dong lenh phia tren de biet ly do."))
+                               " file(s) failed - see the command line above for details."))
               )
               ;; Trả lại khung nhìn như trước khi in
               (if vctr
@@ -405,9 +804,9 @@
 (defun c:PLOTPDFRESET ()
   ;; Xóa danh sách rectang đã in, để chọn in lại từ đầu.
   (setq *pp-printed* nil)
-  (princ "\nDa xoa danh sach rectang da in — co the chon in lai tu dau.")
+  (princ "\nPrinted list cleared - you can select and print everything again.")
   (princ)
 )
 
-(princ "\nDa nap PLOTPDF — go PLOTPDF, click chon rectang theo thu tu roi chon thu muc; lenh in bang -PLOT chi tiet theo cau hinh da dat truoc. Go PLOTPDFRESET neu muon xoa danh sach rectang da in.")
+(princ "\nPLOTPDF loaded - run PLOTPDF, choose Pick (click each rectangle) or Scan (pick P1->P2 to find frames in bulk), choose a folder, choose Fit or Scale (fixed ratio), then print. Run PLOTPDFRESET to clear the printed list.")
 (princ)

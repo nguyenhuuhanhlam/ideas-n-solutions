@@ -117,7 +117,7 @@
        (if shell
          (progn
            (setq folder (vlax-invoke-method shell 'BrowseForFolder
-                          0 "Chon thu muc luu PDF" 0))
+                          0 "Select folder to save PDFs" 0))
            (vlax-release-object shell)
            (if folder
              (progn
@@ -137,7 +137,7 @@
   ;; thư mục chứa file đó, không tạo file thật.
   (if (not path)
     (progn
-      (setq f (getfiled "Chon thu muc luu PDF: vao thu muc roi OK (ten file chi la tam)"
+      (setq f (getfiled "Select output folder: open the folder and click OK (the file name is only a placeholder)"
                         "plotpdf.pdf" "pdf" 1))
       (if f (setq path (vl-filename-directory f)))
     )
@@ -294,7 +294,7 @@
       (vl-catch-all-apply
         '(lambda () (command "_.ZOOM" "_C" vctr vsize)) nil)
     )
-    (princ (strcat "\nDa huy. Loi: " msg))
+    (princ (strcat "\nCancelled. Error: " msg))
     (princ)
   )
   (setq go T)
@@ -304,7 +304,7 @@
   ;; vì lúc đó tọa độ cửa sổ in sẽ sai. ---
   (if (and (= (getvar "TILEMODE") 0) (> (getvar "CVPORT") 1))
     (progn
-      (princ "\nDang o trong viewport — hay thoat ra paper space roi chay lai.")
+      (princ "\nYou are inside a viewport - exit to paper space and run again.")
       (setq go nil)
     )
   )
@@ -314,19 +314,19 @@
       ;; --- Chọn rectang: click từng cái một để giữ đúng thứ tự chọn.
       ;; (ssget không giữ thứ tự click — nó trả theo thứ tự database.) ---
       (setq rects nil notclosed 0)
-      (while (setq ent (entsel "\nClick rectang theo thu tu in (Enter de ket thuc chon): "))
+      (while (setq ent (entsel "\nClick rectangles in print order (Enter to finish): "))
         (setq en (car ent)
               data (entget en))
         (cond
           ((not (member (cdr (assoc 0 data)) '("LWPOLYLINE" "POLYLINE")))
-           (princ "\nDoi tuong vua chon khong phai polyline — bo qua, chon tiep."))
+           (princ "\nSelected object is not a polyline - skipped, keep picking."))
           ((/= 1 (logand 1 (cdr (assoc 70 data))))
            (setq notclosed (1+ notclosed))
-           (princ "\nPolyline khong khop kin — bo qua, chon tiep."))
+           (princ "\nPolyline is not closed - skipped, keep picking."))
           ((member en (mapcar 'car rects))
-           (princ "\nRectang nay da chon roi — bo qua, chon tiep."))
+           (princ "\nThis rectangle was already selected - skipped, keep picking."))
           ((member (ppm-key en) *ppm-printed*)
-           (princ "\nRectang nay da in roi o lan chay truoc — bo qua, chon tiep."))
+           (princ "\nThis rectangle was already printed in a previous run - skipped, keep picking."))
           (T
            (setq bb (ppm-bbox en)
                  mn (car bb)
@@ -337,17 +337,17 @@
            ;; Đánh dấu ảo: khung đỏ + số thứ tự, để thấy đã chọn
            (vl-catch-all-apply 'ppm-mark
              (list (car mn) (cadr mn) (car mx) (cadr mx) (length rects)))
-           (princ (strcat "\nDa chon " (itoa (length rects)) " rectang."))
+           (princ (strcat "\nSelected " (itoa (length rects)) " rectangle(s)."))
           )
         )
       )
       (if (not rects)
-        (princ "\nChua chon rectang nao.")
+        (princ "\nNo rectangle selected.")
         (progn
           ;; --- Chọn thư mục lưu (mỗi lần chạy chọn lại) ---
           (setq folder (vl-catch-all-apply 'ppm-pick-folder nil))
           (if (or (vl-catch-all-error-p folder) (not folder))
-            (princ "\nDa huy chon thu muc.")
+            (princ "\nFolder selection cancelled.")
             (progn
               ;; Lưu khung nhìn hiện tại để trả lại sau khi in,
               ;; tránh màn hình bị nhảy khi hoàn tất lệnh
@@ -386,22 +386,22 @@
                                   ".pdf - " (itoa (vl-file-size fpath))
                                   " bytes"
                                   (if (<= (vl-file-size fpath) 1353)
-                                    " (trang trang?)" ""))))
+                                    " (blank page?)" ""))))
                   (T (setq fail (1+ fail)))
                 )
               )
               (ppm-setvar "BACKGROUNDPLOT" bg)
               (ppm-setvar "FILEDIA" fd)
               ;; --- Báo cáo ---
-              (princ (strcat "\nDa in " (itoa ok) "/" (itoa (length rects))
-                             " file vao thu muc: " folder))
+              (princ (strcat "\nPrinted " (itoa ok) "/" (itoa (length rects))
+                             " file(s) to folder: " folder))
               (if (> notclosed 0)
-                (princ (strcat "\nBo qua " (itoa notclosed)
-                               " polyline khong khop kin."))
+                (princ (strcat "\nSkipped " (itoa notclosed)
+                               " non-closed polyline(s)."))
               )
               (if (> fail 0)
                 (princ (strcat "\n" (itoa fail)
-                               " file in loi — xem dong lenh phia tren de biet ly do."))
+                               " file(s) failed - see the command line above for details."))
               )
               ;; Trả lại khung nhìn như trước khi in
               (if vctr
@@ -420,9 +420,9 @@
 (defun c:PLOTPDFMRESET ()
   ;; Xóa danh sách rectang đã in, để chọn in lại từ đầu.
   (setq *ppm-printed* nil)
-  (princ "\nDa xoa danh sach rectang da in — co the chon in lai tu dau.")
+  (princ "\nPrinted list cleared - you can select and print everything again.")
   (princ)
 )
 
-(princ "\nDa nap PLOTPDFM — go PLOTPDFM, click chon rectang theo thu tu roi chon thu muc; lenh in bang -PLOT chi tiet theo cau hinh da dat truoc. Go PLOTPDFMRESET neu muon xoa danh sach rectang da in.")
+(princ "\nPLOTPDFM loaded - run PLOTPDFM, click rectangles in print order, then choose a folder; printing uses detailed -PLOT with the current setup. Run PLOTPDFMRESET to clear the printed list.")
 (princ)
