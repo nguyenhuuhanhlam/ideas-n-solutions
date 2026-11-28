@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { loadLibrary, saveLibrary, relayoutRootVisible, resetLibrary, loadSettings, saveSettings } from './data/store'
+import { templateTrees, collapseTopLevel } from './data/seed'
 import { diffLibraries, diffIsEmpty } from './lib/syncdiff'
 import { DELETE_ROOT_CODE } from './lib/security'
 import { MARK_OPTIONS, markHex } from './lib/marks'
@@ -554,6 +555,24 @@ export default function App() {
     switchRoot(rootId)
   }
 
+  // Nạp thêm 1 root từ bộ mẫu vào kho hiện tại (không đụng dữ liệu cũ)
+  const addFromTemplate = (tree) => {
+    if (libRef.current.roots.some((r) => r.id === tree.root.id)) {
+      showToast(`Đã có root "${tree.root.title}" trong kho`)
+      return
+    }
+    const now = Date.now()
+    const newNodes = collapseTopLevel(tree.nodes).map((x) => ({ ...x, updatedAt: now }))
+    let next = {
+      roots: [...libRef.current.roots, tree.root],
+      nodes: [...libRef.current.nodes, ...newNodes],
+    }
+    next = relayoutRootVisible(next, tree.root.id)
+    commit(next)
+    switchRoot(tree.root.id)
+    showToast(`Đã thêm root mẫu "${tree.root.title}"`)
+  }
+
   // Xoá root phải nhập đúng mã bảo mật tạm thời (xem lib/security.js)
   const deleteRoot = (root) => {
     setDelCode('')
@@ -867,6 +886,18 @@ export default function App() {
             />
             <button className="btn btn-icon" onClick={addRoot}><Icon name="plus" />Root</button>
           </div>
+          {templateTrees().some((t) => !libUi.roots.some((r) => r.id === t.root.id)) && (
+            <div className="template-row">
+              <span className="template-label">Bộ mẫu:</span>
+              {templateTrees()
+                .filter((t) => !libUi.roots.some((r) => r.id === t.root.id))
+                .map((t) => (
+                  <button key={t.root.id} className="btn btn-icon" onClick={() => addFromTemplate(t)}>
+                    <Icon name="plus" />{t.root.title}
+                  </button>
+                ))}
+            </div>
+          )}
 
           <div className="side-head"><span>Cài đặt</span></div>
           <label className="checkrow">

@@ -87,6 +87,70 @@ function dockerTree() {
   }
 }
 
+function powershellTree() {
+  seq = 0
+  const R = 'powershell'
+  const root = n(R, null, 'PowerShell', '', 'Windows PowerShell 5.1 / PowerShell 7 — nhiều lệnh cần mở bằng quyền Administrator')
+  const help = n(R, root.id, 'Trợ giúp & khám phá')
+  const files = n(R, root.id, 'File & thư mục')
+  const proc = n(R, root.id, 'Tiến trình & dịch vụ')
+  const sys = n(R, root.id, 'Hệ thống & nhật ký')
+  const net = n(R, root.id, 'Mạng')
+  const env = n(R, root.id, 'Môi trường & script')
+  const marks = { 'Khởi động lại dịch vụ in': 'green', 'Cập nhật mọi ứng dụng': 'blue' }
+  const nodes = [
+    root, help, files, proc, sys, net, env,
+    n(R, help.id, 'Trợ giúp của một lệnh', 'Get-Help <tên-lệnh> -Examples', 'Xem ví dụ thực tế của cmdlet'),
+    n(R, help.id, 'Tìm lệnh theo từ khoá', 'Get-Command *<từ-khoá>*'),
+    n(R, help.id, 'Xem thuộc tính của đối tượng', 'Get-Process | Get-Member', 'Liệt kê property/method của đối tượng trả về'),
+    n(R, help.id, 'Phiên bản PowerShell', '$PSVersionTable.PSVersion'),
+    n(R, help.id, 'Lịch sử lệnh đã gõ', 'Get-History'),
+    n(R, files.id, 'Liệt kê file', 'Get-ChildItem', 'Alias: dir, ls'),
+    n(R, files.id, 'Tìm file theo đuôi', 'Get-ChildItem <đường-dẫn> -Recurse -Filter *.<đuôi>', 'Tìm trong cả thư mục con'),
+    n(R, files.id, 'Chuyển thư mục', 'Set-Location <đường-dẫn>', 'Alias: cd'),
+    n(R, files.id, 'Tạo thư mục mới', 'New-Item -ItemType Directory -Path <đường-dẫn>'),
+    n(R, files.id, 'Copy file / thư mục', 'Copy-Item <nguồn> <đích> -Recurse'),
+    n(R, files.id, 'Xoá file / thư mục', 'Remove-Item <đường-dẫn> -Recurse', 'Cẩn thận: xoá hẳn, không qua thùng rác'),
+    n(R, files.id, 'Xem cuối file log', 'Get-Content <file> -Tail 50 -Wait', '-Wait để theo dõi tiếp khi file ghi thêm'),
+    n(R, files.id, 'Tìm chữ trong file', 'Select-String -Path <file> -Pattern "<chuỗi>"'),
+    n(R, files.id, 'Nén thư mục thành ZIP', 'Compress-Archive -Path <thư-mục>\\* -DestinationPath <file>.zip'),
+    n(R, proc.id, 'Top 10 tiến trình ngốn CPU', 'Get-Process | Sort-Object CPU -Descending | Select-Object -First 10'),
+    n(R, proc.id, 'Top 10 tiến trình ngốn RAM', 'Get-Process | Sort-Object WorkingSet -Descending | Select-Object -First 10'),
+    n(R, proc.id, 'Dừng tiến trình theo tên', 'Stop-Process -Name <tên> -Force', 'Cẩn thận: mất dữ liệu chưa lưu của tiến trình đó'),
+    n(R, proc.id, 'Dịch vụ đang chạy', 'Get-Service | Where-Object Status -eq Running'),
+    n(R, proc.id, 'Khởi động lại dịch vụ in', 'Restart-Service Spooler', 'Hay dùng khi kẹt lệnh in'),
+    n(R, proc.id, 'Đặt dịch vụ tự khởi động', 'Set-Service -Name <tên-dịch-vụ> -StartupType Automatic'),
+    n(R, sys.id, 'Thông tin máy tổng quát', 'Get-ComputerInfo'),
+    n(R, sys.id, 'Dung lượng trống các ổ đĩa', 'Get-Volume | Where-Object DriveLetter'),
+    n(R, sys.id, 'Máy đã chạy bao lâu', '(Get-Date) - (Get-CimInstance Win32_OperatingSystem).LastBootUpTime'),
+    n(R, sys.id, '20 sự kiện hệ thống mới nhất', 'Get-WinEvent -LogName System -MaxEvents 20'),
+    n(R, sys.id, 'Cập nhật mọi ứng dụng', 'winget upgrade --all --accept-package-agreements --accept-source-agreements'),
+    n(R, net.id, 'Cấu hình IP / gateway / DNS', 'Get-NetIPConfiguration'),
+    n(R, net.id, 'Kiểm tra 1 cổng TCP của máy khác', 'Test-NetConnection <máy> -Port <cổng>', 'Alias: tnc — thay cho ping + telnet'),
+    n(R, net.id, 'Ping', 'Test-Connection <máy> -Count 4'),
+    n(R, net.id, 'Các cổng đang nghe', 'Get-NetTCPConnection -State Listen'),
+    n(R, net.id, 'Tiến trình đang giữ 1 cổng', 'Get-NetTCPConnection -LocalPort <cổng> | Select-Object OwningProcess'),
+    n(R, net.id, 'Phân giải DNS', 'Resolve-DnsName <tên-miền>'),
+    n(R, net.id, 'Xoá cache DNS', 'Clear-DnsClientCache'),
+    n(R, net.id, 'Tải file từ web', 'Invoke-WebRequest <url> -OutFile <tên-file>'),
+    n(R, env.id, 'Cho phép chạy file script .ps1', 'Set-ExecutionPolicy -Scope CurrentUser RemoteSigned', 'Mặc định Windows chặn chạy script'),
+    n(R, env.id, 'Xem biến PATH', "$env:PATH -split ';'"),
+    n(R, env.id, 'Xuất kết quả ra CSV', 'Get-Process | Export-Csv <file>.csv -NoTypeInformation'),
+    n(R, env.id, 'Chạy lệnh trên máy khác', 'Invoke-Command -ComputerName <máy> -ScriptBlock { Get-Service }', 'Cần bật WinRM ở máy đích'),
+  ].map((x) => (marks[x.title] ? { ...x, mark: marks[x.title] } : x))
+  return {
+    root: { id: R, title: 'PowerShell', description: 'Lệnh PowerShell hay dùng trên Windows' },
+    nodes,
+  }
+}
+
+// Các root mẫu để nạp THÊM vào kho đã có (nút "Bộ mẫu" ở sidebar desktop).
+// Không nằm trong seedLibrary: kho mới tạo vẫn bắt đầu bằng npm/Git/Docker,
+// người dùng tự nạp thêm khi cần — nạp không đụng tới dữ liệu hiện có.
+export function templateTrees() {
+  return [powershellTree()]
+}
+
 // Mặc định khi mở app: chỉ hiện node gốc + các node cận gốc,
 // các nhánh ở trạng thái đóng (collapsed) — bấm nút +N mới bung ra.
 export function collapseTopLevel(nodes) {
