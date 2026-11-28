@@ -1,10 +1,11 @@
 // Firebase cho Command Map (bản chính): dùng chung project dev-lab-vm với
-// TuTi. Đăng nhập Google (Auth) + Firestore theo TỪNG TÀI KHOẢN:
-//   users/{uid}/cmdmap_roots/{rootId}
-//   users/{uid}/cmdmap_nodes/{nodeId}
+// Ahri và TuTi. Đăng nhập Google (Auth) + Firestore theo TỪNG TÀI KHOẢN,
+// nằm trong namespace apps/command-map như quy ước chung của project:
+//   apps/command-map/users/{uid}/roots/{rootId}
+//   apps/command-map/users/{uid}/nodes/{nodeId}
 // File này được import động (import()) nên Firebase chỉ tải khi đăng nhập,
 // không làm nặng bundle lúc mở app. Firestore Rules cần có:
-//   match /users/{userId}/{document=**} {
+//   match /apps/command-map/users/{userId}/{document=**} {
 //     allow read, write: if request.auth != null && request.auth.uid == userId;
 //   }
 import { initializeApp, getApps } from 'firebase/app'
@@ -47,8 +48,8 @@ export async function signOutUser() {
   await signOut(a)
 }
 
-const rootsCol = (d, uid) => collection(d, 'users', uid, 'cmdmap_roots')
-const nodesCol = (d, uid) => collection(d, 'users', uid, 'cmdmap_nodes')
+const rootsCol = (d, uid) => collection(d, 'apps', 'command-map', 'users', uid, 'roots')
+const nodesCol = (d, uid) => collection(d, 'apps', 'command-map', 'users', uid, 'nodes')
 
 // Lắng nghe dữ liệu của 1 tài khoản theo thời gian thực. onData chỉ được gọi
 // khi CẢ 2 collection đã có snapshot đầu tiên. Trả hàm huỷ lắng nghe.
@@ -97,7 +98,7 @@ export function syncErrorText(e) {
   if (code === 'auth/unauthorized-domain') return 'Tên miền này chưa được cho phép đăng nhập — cần thêm nguyenhuuhanhlam.github.io vào Authorized domains trong Firebase Console (Authentication → Settings).'
   if (code === 'auth/network-request-failed') return 'Không có mạng — dữ liệu vẫn lưu trên máy này, kiểm tra mạng rồi thử lại.'
   if (code === 'auth/user-disabled') return 'Tài khoản này đã bị vô hiệu hóa trong Firebase.'
-  if (code === 'permission-denied' || code === 'firestore/permission-denied') return 'Chưa có quyền ghi dữ liệu — cần dán đoạn Rules cho /users/{uid} vào Firestore Rules trong Firebase Console.'
+  if (code === 'permission-denied' || code === 'firestore/permission-denied') return 'Chưa có quyền ghi dữ liệu — cần dán đoạn Rules cho apps/command-map/users/{uid} vào Firestore Rules trong Firebase Console.'
   if (code === 'unavailable' || code === 'failed-precondition') return 'Không kết nối được Firebase lúc này — dữ liệu vẫn lưu trên máy này, sẽ đồng bộ lại sau.'
   return 'Đồng bộ chưa được — dữ liệu vẫn lưu trên máy này. Thử lại sau.'
 }
