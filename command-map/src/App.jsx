@@ -59,8 +59,6 @@ export default function App() {
   const cloudReadyRef = useRef(false)
   const pushChainRef = useRef(Promise.resolve())
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 820px)').matches)
-  const [showAddRoot, setShowAddRoot] = useState(false)
-  const [sheetOpen, setSheetOpen] = useState(false)
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 820px)')
     const on = (e) => setIsMobile(e.matches)
@@ -792,19 +790,7 @@ export default function App() {
               onClick={() => switchRoot(root.id)}
             >{root.title}</button>
           ))}
-          <button className="m-chip" onClick={() => setShowAddRoot((v) => !v)}>+ Root</button>
         </div>
-        {showAddRoot && (
-          <div className="m-addroot">
-            <input
-              placeholder="Tên root mới…"
-              value={newRootTitle}
-              onChange={(e) => setNewRootTitle(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && addRoot()}
-            />
-            <button className="btn" onClick={addRoot}>Thêm</button>
-          </div>
-        )}
         <div className="m-list">
           {mRows.map(({ node, depth }) => {
             const kids = childrenOf(activeNodes, node.id)
@@ -827,7 +813,7 @@ export default function App() {
                   )}
                   <button
                     className="m-title"
-                    onClick={() => { selectedRef.current = node.id; setSelectedId(node.id); setSheetOpen(true) }}
+                    onClick={() => { if (kids.length) toggleCollapse(node) }}
                   >
                     {node.title}
                     {node.collapsed && kids.length > 0 && (
@@ -844,52 +830,10 @@ export default function App() {
               </div>
             )
           })}
-          <div className="m-foot">
-            <button className="btn" onClick={exportJson}>Xuất JSON</button>
-            <label className="btn file-btn">
-              Nhập JSON
-              <input type="file" accept="application/json" hidden onChange={(e) => { importJson(e.target.files[0]); e.target.value = '' }} />
-            </label>
-            <button className="btn" onClick={() => { const lib = resetLibrary(); commit(lib); if (lib.roots[0]) switchRoot(lib.roots[0].id) }}>
-              Khôi phục dữ liệu mẫu
-            </button>
-          </div>
         </div>
 
-        {selected && sheetOpen && (
-          <div className="sheet-backdrop" onClick={() => setSheetOpen(false)}>
-            <div className="sheet insp-form" onClick={(e) => e.stopPropagation()}>
-              <label>Tiêu đề</label>
-              <input value={selected.title} onChange={(e) => updateNode(selected, { title: e.target.value })} />
-              <label>Lệnh (bấm vào dòng lệnh trong danh sách là copy)</label>
-              <textarea className="mono" rows={3} value={selected.command} onChange={(e) => updateNode(selected, { command: e.target.value })} placeholder="vd: npm list -g --depth=0" />
-              <label>Ghi chú</label>
-              <textarea rows={3} value={selected.note} onChange={(e) => updateNode(selected, { note: e.target.value })} />
-              <label>Đánh dấu màu (lưu ý lệnh hay dùng)</label>
-              {markRowJsx(selected)}
-              <div className="insp-actions">
-                <button className="btn btn-icon" onClick={() => addChild(selected)}><Icon name="plus" />Node con</button>
-                {selected.command && <button className="btn btn-icon" onClick={() => copyCommand(selected)}><Icon name="copy" />Copy lệnh</button>}
-                {!selected.parentId
-                  ? (
-                    <button
-                      className="btn danger"
-                      onClick={() => {
-                        const r = libUi.roots.find((x) => x.id === selected.rootId)
-                        setSheetOpen(false)
-                        if (r) deleteRoot(r)
-                      }}
-                    >Xoá root này</button>
-                  )
-                  : <button className="btn danger" onClick={() => { deleteNode(selected); setSheetOpen(false) }}>Xoá node</button>}
-                <button className="btn" onClick={() => setSheetOpen(false)}>Đóng</button>
-              </div>
-            </div>
-          </div>
-        )}
         {fillPopJsx}
         {toast && <div className="toast">{toast}</div>}
-        {deleteModalJsx}
       </div>
     )
   }
