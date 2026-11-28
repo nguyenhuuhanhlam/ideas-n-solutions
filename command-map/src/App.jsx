@@ -135,9 +135,8 @@ export default function App() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     // Palette Hairline: sáng/tối theo hệ thống, khớp token CSS của kit
     const dark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const P = dark
-      ? { bg: '#292219', fg: '#ece5d3', muted: '#a39a89', line: '#3d362b', hover: '#332b1f', accent: '#e9a23b', red: '#f87171', dot: '#3a3226', edge: '#574c3a' }
-      : { bg: '#fdfaf3', fg: '#0a0a0a', muted: '#78716c', line: '#e3d7bf', hover: '#f0e7d2', accent: '#b45309', red: '#dc2626', dot: '#e9dec6', edge: '#d9cbae' }
+    // Canvas luôn là "bảng đen" gần đen tông ấm, bất kể khung sáng/tối (user chốt 2026-11-28)
+    const P = { bg: '#161310', fg: '#f2ead8', muted: '#8a7f6d', line: '#3d362b', hover: '#241e16', accent: '#e9a23b', red: '#f87171', dot: '#262019', edge: '#5a5041' }
     ctx.fillStyle = P.bg
     ctx.fillRect(0, 0, W, H)
     const cam = cameraRef.current
@@ -216,7 +215,7 @@ export default function App() {
       }
       // chấm tròn solid đánh dấu màu (lệnh hay dùng)
       if (node.mark) {
-        const hex = markHex(node.mark, dark)
+        const hex = markHex(node.mark, true)
         if (hex) {
           ctx.fillStyle = hex
           ctx.beginPath(); ctx.arc(node.x + w - 12, node.y + 12, 5, 0, Math.PI * 2); ctx.fill()
