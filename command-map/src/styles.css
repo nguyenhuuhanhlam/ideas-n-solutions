@@ -211,3 +211,32 @@ button:disabled { opacity: .45; cursor: default; }
   .sidebar { width: 220px; }
   .demo-tag { display: none; }
 }
+
+/* ===== Giao diện mobile (app tự chuyển khi màn hình ≤820px) =====
+   Cây chuyển sang danh sách thụt lề, bỏ hẳn canvas. */
+.app-mobile { display: flex; flex-direction: column; height: 100%; }
+.app-mobile .status { display: none; }
+.app-mobile .search-wrap { padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.m-chips { display: flex; gap: 8px; padding: 10px 12px; overflow-x: auto; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+.m-chip { border: 1px solid var(--line); background: var(--bg); color: var(--fg); padding: 6px 12px; font: inherit; white-space: nowrap; cursor: pointer; }
+.m-chip.active { border-color: var(--fg); font-weight: 700; }
+.m-addroot { display: flex; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.m-addroot input { flex: 1; }
+.m-list { flex: 1; overflow-y: auto; }
+.m-row { border-bottom: 1px solid var(--line); padding-top: 8px; padding-bottom: 8px; padding-right: 10px; }
+.m-row.flash { background: var(--hover); }
+.m-row.flash .m-title { color: var(--red); }
+.m-row-head { display: flex; align-items: center; gap: 6px; }
+.m-toggle { width: 26px; height: 26px; border: none; background: none; color: var(--muted); font-size: 17px; cursor: pointer; flex-shrink: 0; padding: 0; }
+.m-toggle.empty { cursor: default; }
+.m-mark { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.m-title { flex: 1; border: none; background: none; color: var(--fg); font: inherit; font-weight: 600; text-align: left; padding: 4px 0; cursor: pointer; }
+.m-badge { color: var(--muted); font-weight: 400; margin-left: 8px; font-size: 12px; }
+.m-cmd { display: flex; gap: 8px; align-items: center; width: calc(100% - 32px); margin: 4px 0 2px 32px; border: none; background: var(--hover); color: var(--fg); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; padding: 7px 9px; text-align: left; cursor: pointer; }
+.m-cmd-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-cmd-copy { color: var(--muted); }
+.m-foot { display: flex; gap: 8px; padding: 12px; flex-wrap: wrap; }
+.sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.38); z-index: 65; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--bg); border-top: 1px solid var(--line); padding: 14px; max-height: 84vh; overflow-y: auto; }
+.app-mobile .fill-pop { position: fixed; left: 12px; right: 12px; bottom: 12px; top: auto; z-index: 70; }
+.app-mobile .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: 18px; top: auto; z-index: 80; }

@@ -6,6 +6,7 @@ import { MARK_OPTIONS, markHex } from './lib/marks'
 import {
   nodeSize, childrenOf, visibleNodes, subtreeIds, hiddenCount,
   treeBounds, placeholders, fillPlaceholders, foldText, LEVEL_GAP_X, NODE_GAP_Y,
+  flattenVisible,
 } from './lib/geometry'
 
 const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36)
@@ -57,6 +58,15 @@ export default function App() {
   const cloudBaseRef = useRef(null) // trạng thái mây gần nhất đã biết
   const cloudReadyRef = useRef(false)
   const pushChainRef = useRef(Promise.resolve())
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 820px)').matches)
+  const [showAddRoot, setShowAddRoot] = useState(false)
+  const [sheetOpen, setSheetOpen] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 820px)')
+    const on = (e) => setIsMobile(e.matches)
+    mq.addEventListener('change', on)
+    return () => mq.removeEventListener('change', on)
+  }, [])
   const [rootDelReq, setRootDelReq] = useState(null)
   const [delCode, setDelCode] = useState('')
   const [delCodeErr, setDelCodeErr] = useState('')
@@ -409,22 +419,26 @@ export default function App() {
     } catch { showToast('Trình duyệt chặn clipboard — chọn node rồi bấm Copy ở panel phải') }
   }, [showToast])
 
+  const toggleCollapse = (node) => {
+    const nodes = libRef.current.nodes.map((x) =>
+      x.id === node.id ? { ...x, collapsed: !x.collapsed } : x)
+    let next = { ...libRef.current, nodes }
+    if (settingsRef.current.autoLayoutOnToggle) {
+      next = relayoutRootVisible(next, node.rootId)
+      commit(next)
+      if (!isMobile) requestAnimationFrame(() => fitView())
+    } else {
+      commit(next)
+    }
+  }
+
   const onPointerDown = (e) => {
     if (e.button !== 0) return
     canvasRef.current.setPointerCapture(e.pointerId)
     const p = toWorld(e)
     const hit = hitNode(p.x, p.y)
     if (hit?.zone === 'badge') {
-      const nodes = libRef.current.nodes.map((x) =>
-        x.id === hit.node.id ? { ...x, collapsed: !x.collapsed } : x)
-      let next = { ...libRef.current, nodes }
-      if (settingsRef.current.autoLayoutOnToggle) {
-        next = relayoutRootVisible(next, activeRootRef.current)
-        commit(next)
-        requestAnimationFrame(() => fitView())
-      } else {
-        commit(next)
-      }
+      toggleCollapse(hit.node)
       return
     }
     if (hit) {
@@ -622,6 +636,11 @@ export default function App() {
     setHighlightId(r.node.id)
     switchRoot(r.node.rootId, r.node.id)
     setQuery('')
+    if (isMobile) {
+      setTimeout(() => {
+        document.querySelector(`[data-mnode="${r.node.id}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      }, 380)
+    }
   }
 
   const zoomBy = (f) => {
@@ -635,11 +654,8 @@ export default function App() {
     draw()
   }
 
-  const activeRoot = libUi.roots.find((r) => r.id === activeRootId)
-  const countOf = (rootId) => libUi.nodes.filter((x) => x.rootId === rootId && x.command).length
 
-  return (
-    <div className="app">
+  const topbarJsx = (
       <header className="topbar">
         <div className="brand"><i />Command Map</div>
         <span className="status">
@@ -653,9 +669,9 @@ export default function App() {
           ? <button className="btn" onClick={onSignOut}>Đăng xuất</button>
           : <button className="btn" onClick={onSignIn}>Đăng nhập Google</button>}
       </header>
+  )
 
-      <div className="main">
-        <aside className="sidebar">
+  const searchJsx = (
           <div className="search-wrap">
             <input
               className="search"
@@ -675,8 +691,216 @@ export default function App() {
               </div>
             )}
           </div>
+  )
 
-          <div className="side-head">
+  const fillPopJsx = fillReq && (
+
+              <div className="fill-pop">
+                <div className="fill-title">Điền giá trị trước khi copy</div>
+                <div className="fill-cmd">{fillReq.node.command}</div>
+                {placeholders(fillReq.node.command).map((ph) => (
+                  <label key={ph.raw} className="fill-row">
+                    <span>{ph.name}</span>
+                    <input
+                      autoFocus
+                      value={fillReq.values[ph.name] || ''}
+                      onChange={(e) => setFillReq({ ...fillReq, values: { ...fillReq.values, [ph.name]: e.target.value } })}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') document.getElementById('fill-copy-btn')?.click()
+                        if (e.key === 'Escape') setFillReq(null)
+                      }}
+                    />
+                  </label>
+                ))}
+                <div className="fill-actions">
+                  <button className="btn" onClick={() => setFillReq(null)}>Huỷ</button>
+                  <button
+                    id="fill-copy-btn"
+                    className="btn primary"
+                    onClick={async () => {
+                      const cmd = fillPlaceholders(fillReq.node.command, fillReq.values)
+                      try { await navigator.clipboard.writeText(cmd); showToast(`Đã copy: ${cmd}`) } catch { showToast('Không copy được') }
+                      setFillReq(null)
+                    }}
+                  >Copy</button>
+                </div>
+              </div>
+  )
+
+  const deleteModalJsx = rootDelReq && (
+
+        <div className="modal-backdrop" onClick={() => setRootDelReq(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-title">Xoá root "{rootDelReq.title}"?</div>
+            <p className="modal-text">
+              Toàn bộ cây lệnh của root này sẽ bị xoá{user ? ' trên mọi máy đã đồng bộ' : ''}.
+              Nhập mã bảo mật để xác nhận:
+            </p>
+            <input
+              type="password"
+              autoFocus
+              value={delCode}
+              placeholder="Mã bảo mật"
+              onChange={(e) => { setDelCode(e.target.value); setDelCodeErr('') }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') confirmDeleteRoot()
+                if (e.key === 'Escape') setRootDelReq(null)
+              }}
+            />
+            {delCodeErr && <div className="modal-err">{delCodeErr}</div>}
+            <div className="fill-actions">
+              <button className="btn" onClick={() => setRootDelReq(null)}>Huỷ</button>
+              <button className="btn danger" onClick={confirmDeleteRoot}>Xoá root</button>
+            </div>
+          </div>
+        </div>
+  )
+
+  const markRowJsx = (node) => (
+    <div className="mark-row">
+      <button
+        className={`btn mark-none ${!node.mark ? 'on' : ''}`}
+        onClick={() => updateNode(node, { mark: null })}
+      >Không</button>
+      {MARK_OPTIONS.map((m) => (
+        <button
+          key={m.key}
+          className={`mark-dot ${node.mark === m.key ? 'on' : ''}`}
+          title={m.label}
+          style={{ background: `var(${m.varName})` }}
+          onClick={() => updateNode(node, { mark: node.mark === m.key ? null : m.key })}
+        />
+      ))}
+    </div>
+  )
+
+  const activeRoot = libUi.roots.find((r) => r.id === activeRootId)
+  const countOf = (rootId) => libUi.nodes.filter((x) => x.rootId === rootId && x.command).length
+
+  // ===== Giao diện mobile (≤820px): cây dạng danh sách thụt lề, không canvas =====
+  if (isMobile) {
+    const mRows = flattenVisible(activeNodes)
+    return (
+      <div className="app app-mobile">
+        {topbarJsx}
+        {searchJsx}
+        <div className="m-chips">
+          {libUi.roots.map((root) => (
+            <button
+              key={root.id}
+              className={`m-chip ${root.id === activeRootId ? 'active' : ''}`}
+              onClick={() => switchRoot(root.id)}
+            >{root.title}</button>
+          ))}
+          <button className="m-chip" onClick={() => setShowAddRoot((v) => !v)}>+ Root</button>
+        </div>
+        {showAddRoot && (
+          <div className="m-addroot">
+            <input
+              placeholder="Tên root mới…"
+              value={newRootTitle}
+              onChange={(e) => setNewRootTitle(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && addRoot()}
+            />
+            <button className="btn" onClick={addRoot}>Thêm</button>
+          </div>
+        )}
+        <div className="m-list">
+          {mRows.map(({ node, depth }) => {
+            const kids = childrenOf(activeNodes, node.id)
+            return (
+              <div
+                key={node.id}
+                data-mnode={node.id}
+                className={`m-row ${node.id === highlightId ? 'flash' : ''}`}
+                style={{ paddingLeft: 10 + depth * 18 }}
+              >
+                <div className="m-row-head">
+                  {kids.length
+                    ? <button className="m-toggle" onClick={() => toggleCollapse(node)}>{node.collapsed ? '›' : '⌄'}</button>
+                    : <span className="m-toggle empty" />}
+                  {node.mark && (
+                    <span
+                      className="m-mark"
+                      style={{ background: `var(${MARK_OPTIONS.find((m) => m.key === node.mark)?.varName || '--muted'})` }}
+                    />
+                  )}
+                  <button
+                    className="m-title"
+                    onClick={() => { selectedRef.current = node.id; setSelectedId(node.id); setSheetOpen(true) }}
+                  >
+                    {node.title}
+                    {node.collapsed && kids.length > 0 && (
+                      <span className="m-badge">+{hiddenCount(activeNodes, node.id)}</span>
+                    )}
+                  </button>
+                </div>
+                {node.command && (
+                  <button className="m-cmd" onClick={() => copyCommand(node)}>
+                    <span className="m-cmd-text">{node.command}</span>
+                    <span className="m-cmd-copy">⧉</span>
+                  </button>
+                )}
+              </div>
+            )
+          })}
+          <div className="m-foot">
+            <button className="btn" onClick={exportJson}>Xuất JSON</button>
+            <label className="btn file-btn">
+              Nhập JSON
+              <input type="file" accept="application/json" hidden onChange={(e) => { importJson(e.target.files[0]); e.target.value = '' }} />
+            </label>
+            <button className="btn" onClick={() => { const lib = resetLibrary(); commit(lib); if (lib.roots[0]) switchRoot(lib.roots[0].id) }}>
+              Khôi phục dữ liệu mẫu
+            </button>
+          </div>
+        </div>
+
+        {selected && sheetOpen && (
+          <div className="sheet-backdrop" onClick={() => setSheetOpen(false)}>
+            <div className="sheet insp-form" onClick={(e) => e.stopPropagation()}>
+              <label>Tiêu đề</label>
+              <input value={selected.title} onChange={(e) => updateNode(selected, { title: e.target.value })} />
+              <label>Lệnh (bấm vào dòng lệnh trong danh sách là copy)</label>
+              <textarea className="mono" rows={3} value={selected.command} onChange={(e) => updateNode(selected, { command: e.target.value })} placeholder="vd: npm list -g --depth=0" />
+              <label>Ghi chú</label>
+              <textarea rows={3} value={selected.note} onChange={(e) => updateNode(selected, { note: e.target.value })} />
+              <label>Đánh dấu màu (lưu ý lệnh hay dùng)</label>
+              {markRowJsx(selected)}
+              <div className="insp-actions">
+                <button className="btn btn-icon" onClick={() => addChild(selected)}><Icon name="plus" />Node con</button>
+                {selected.command && <button className="btn btn-icon" onClick={() => copyCommand(selected)}><Icon name="copy" />Copy lệnh</button>}
+                {!selected.parentId
+                  ? (
+                    <button
+                      className="btn danger"
+                      onClick={() => {
+                        const r = libUi.roots.find((x) => x.id === selected.rootId)
+                        setSheetOpen(false)
+                        if (r) deleteRoot(r)
+                      }}
+                    >Xoá root này</button>
+                  )
+                  : <button className="btn danger" onClick={() => { deleteNode(selected); setSheetOpen(false) }}>Xoá node</button>}
+                <button className="btn" onClick={() => setSheetOpen(false)}>Đóng</button>
+              </div>
+            </div>
+          </div>
+        )}
+        {fillPopJsx}
+        {toast && <div className="toast">{toast}</div>}
+        {deleteModalJsx}
+      </div>
+    )
+  }
+
+  return (
+    <div className="app">
+{topbarJsx}
+
+      <div className="main">
+        <aside className="sidebar">
+{searchJsx}          <div className="side-head">
             <span>Root lệnh ({libUi.roots.length})</span>
           </div>
           <div className="root-list">
@@ -756,39 +980,7 @@ export default function App() {
             </div>
             {toast && <div className="toast">{toast}</div>}
 
-            {fillReq && (
-              <div className="fill-pop">
-                <div className="fill-title">Điền giá trị trước khi copy</div>
-                <div className="fill-cmd">{fillReq.node.command}</div>
-                {placeholders(fillReq.node.command).map((ph) => (
-                  <label key={ph.raw} className="fill-row">
-                    <span>{ph.name}</span>
-                    <input
-                      autoFocus
-                      value={fillReq.values[ph.name] || ''}
-                      onChange={(e) => setFillReq({ ...fillReq, values: { ...fillReq.values, [ph.name]: e.target.value } })}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') document.getElementById('fill-copy-btn')?.click()
-                        if (e.key === 'Escape') setFillReq(null)
-                      }}
-                    />
-                  </label>
-                ))}
-                <div className="fill-actions">
-                  <button className="btn" onClick={() => setFillReq(null)}>Huỷ</button>
-                  <button
-                    id="fill-copy-btn"
-                    className="btn primary"
-                    onClick={async () => {
-                      const cmd = fillPlaceholders(fillReq.node.command, fillReq.values)
-                      try { await navigator.clipboard.writeText(cmd); showToast(`Đã copy: ${cmd}`) } catch { showToast('Không copy được') }
-                      setFillReq(null)
-                    }}
-                  >Copy</button>
-                </div>
-              </div>
-            )}
-          </div>
+{fillPopJsx}          </div>
         </section>
 
         <aside className="inspector">
@@ -803,21 +995,7 @@ export default function App() {
               <label>Ghi chú</label>
               <textarea rows={4} value={selected.note} onChange={(e) => updateNode(selected, { note: e.target.value })} />
               <label>Đánh dấu màu (lưu ý lệnh hay dùng)</label>
-              <div className="mark-row">
-                <button
-                  className={`btn mark-none ${!selected.mark ? 'on' : ''}`}
-                  onClick={() => updateNode(selected, { mark: null })}
-                >Không</button>
-                {MARK_OPTIONS.map((m) => (
-                  <button
-                    key={m.key}
-                    className={`mark-dot ${selected.mark === m.key ? 'on' : ''}`}
-                    title={m.label}
-                    style={{ background: `var(${m.varName})` }}
-                    onClick={() => updateNode(selected, { mark: selected.mark === m.key ? null : m.key })}
-                  />
-                ))}
-              </div>
+              {markRowJsx(selected)}
               <div className="insp-actions">
                 <button className="btn btn-icon" onClick={() => addChild(selected)}><Icon name="plus" />Node con</button>
                 {selected.command && <button className="btn btn-icon" onClick={() => copyCommand(selected)}><Icon name="copy" />Copy lệnh</button>}
@@ -828,33 +1006,6 @@ export default function App() {
         </aside>
       </div>
 
-      {rootDelReq && (
-        <div className="modal-backdrop" onClick={() => setRootDelReq(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-title">Xoá root "{rootDelReq.title}"?</div>
-            <p className="modal-text">
-              Toàn bộ cây lệnh của root này sẽ bị xoá{user ? ' trên mọi máy đã đồng bộ' : ''}.
-              Nhập mã bảo mật để xác nhận:
-            </p>
-            <input
-              type="password"
-              autoFocus
-              value={delCode}
-              placeholder="Mã bảo mật"
-              onChange={(e) => { setDelCode(e.target.value); setDelCodeErr('') }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') confirmDeleteRoot()
-                if (e.key === 'Escape') setRootDelReq(null)
-              }}
-            />
-            {delCodeErr && <div className="modal-err">{delCodeErr}</div>}
-            <div className="fill-actions">
-              <button className="btn" onClick={() => setRootDelReq(null)}>Huỷ</button>
-              <button className="btn danger" onClick={confirmDeleteRoot}>Xoá root</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+{deleteModalJsx}    </div>
   )
 }

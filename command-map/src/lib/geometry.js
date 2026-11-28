@@ -20,6 +20,22 @@ export function rootNodeOf(nodes) {
   return nodes.find((x) => !x.parentId) || null
 }
 
+// Làm phẳng cây thành danh sách dòng theo cấp (cho giao diện mobile dạng
+// danh sách thụt lề): chỉ gồm node đang hiện, kèm độ sâu của từng node.
+export function flattenVisible(nodes) {
+  const root = rootNodeOf(nodes)
+  if (!root) return []
+  const out = []
+  const walk = (node, depth) => {
+    out.push({ node, depth })
+    if (!node.collapsed) {
+      for (const k of childrenOf(nodes, node.id)) walk(k, depth + 1)
+    }
+  }
+  walk(root, 0)
+  return out
+}
+
 export function subtreeIds(nodes, id) {
   const out = []
   const walk = (cur) => {
