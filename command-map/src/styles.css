@@ -2,17 +2,17 @@
    Token lấy nguyên từ kit: line 1px, không card/shadow/radius, padding trong ô,
    chữ 13px/1.4, heading mục uppercase 11px muted, dark theo prefers-color-scheme. */
 :root {
-  --bg: #ffffff; --fg: #0a0a0a; --muted: #737373; --line: #e5e5e5;
-  --hover: #fafafa; --accent: #2563eb;
+  --bg: #f7f1e5; --fg: #0a0a0a; --muted: #78716c; --line: #e3d7bf;
+  --hover: #f0e7d2; --accent: #b45309;
   --green: #16a34a; --blue: #2563eb; --red: #dc2626; --purple: #9333ea; --orange: #ea580c; --amber: #d97706;
-  --fade-from: rgba(255,255,255,0);
+  --fade-from: rgba(247,241,229,0);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0b0b0c; --fg: #ededed; --muted: #8a8a8f; --line: #26262a;
-    --hover: #131315; --accent: #60a5fa;
+    --bg: #201a13; --fg: #ece5d3; --muted: #a39a89; --line: #3d362b;
+    --hover: #2a241b; --accent: #e9a23b;
     --green: #4ade80; --blue: #60a5fa; --red: #f87171; --purple: #c084fc; --orange: #fb923c; --amber: #fbbf24;
-    --fade-from: rgba(11,11,12,0);
+    --fade-from: rgba(32,26,19,0);
   }
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }

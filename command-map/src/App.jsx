@@ -136,8 +136,8 @@ export default function App() {
     // Palette Hairline: sáng/tối theo hệ thống, khớp token CSS của kit
     const dark = window.matchMedia('(prefers-color-scheme: dark)').matches
     const P = dark
-      ? { bg: '#0b0b0c', fg: '#ededed', muted: '#8a8a8f', line: '#26262a', hover: '#131315', accent: '#60a5fa', red: '#f87171', dot: '#1d1d20', edge: '#3f3f45' }
-      : { bg: '#ffffff', fg: '#0a0a0a', muted: '#737373', line: '#e5e5e5', hover: '#fafafa', accent: '#2563eb', red: '#dc2626', dot: '#eeeeee', edge: '#cfcfcf' }
+      ? { bg: '#292219', fg: '#ece5d3', muted: '#a39a89', line: '#3d362b', hover: '#332b1f', accent: '#e9a23b', red: '#f87171', dot: '#3a3226', edge: '#574c3a' }
+      : { bg: '#fdfaf3', fg: '#0a0a0a', muted: '#78716c', line: '#e3d7bf', hover: '#f0e7d2', accent: '#b45309', red: '#dc2626', dot: '#e9dec6', edge: '#d9cbae' }
     ctx.fillStyle = P.bg
     ctx.fillRect(0, 0, W, H)
     const cam = cameraRef.current
